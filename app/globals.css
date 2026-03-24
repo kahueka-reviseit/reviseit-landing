@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap');
+
+:root {
+  --terracotta: #B85042;
+  --terracotta-light: #D4887E;
+  --sage: #5B8A72;
+  --sage-light: #A7BEAE;
+  --gold: #D4A574;
+  --navy: #1A1A2E;
+  --off-white: #F8F6F0;
+  --light-gray: #F0EDE6;
+  --dark-text: #2D2D2D;
+  --mid-text: #4A4A4A;
+  --med-gray: #8A8A8A;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--off-white);
+  color: var(--dark-text);
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--dark-text);
+}
+
+p {
+  color: var(--mid-text);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.sage-bar {
+  height: 6px;
+  background: var(--sage);
+  width: 100%;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.eyebrow {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.eyebrow-terracotta {
+  color: var(--terracotta);
+}
+
+.eyebrow-sage {
+  color: var(--sage);
+}
