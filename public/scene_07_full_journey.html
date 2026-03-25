@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scene 07 — The Full Journey</title>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   SCENE 07 — End-to-end journey
+   Act 1  (0s)     Catalogue fades in
+   Act 2  (2.5s)   Three cards tick one by one
+   Act 3  (7s)     Cards detach, catalogue fades, cards stack
+   Act 4  (11s)    Cards expand → question blocks form
+   Act 5  (16s)    WhatsApp beats (diagram, synthesis, graph, purity)
+   Act 6  (resolved) Final paper complete
+   ═══════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  background: #D8D4CC;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 24px 16px 40px;
+}
+
+.scene-label {
+  font-family: Georgia, serif;
+  font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: #8A7A6A; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; max-width: 720px;
+}
+.scene-label::before { content:''; display:inline-block; width:28px; height:1px; background:#B8A898; }
+
+/* ══════════════════════════════════════
+   STAGE — single container that holds
+   all acts; acts show/hide via JS
+   ══════════════════════════════════════ */
+.stage {
+  width: 100%;
+  max-width: 720px;
+  position: relative;
+  min-height: 520px;
+}
+
+/* ══════════════════════════════════════
+   ACT 1 + 2: CATALOGUE SPREAD
+   ══════════════════════════════════════ */
+.act-catalogue {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.act-catalogue.visible { opacity: 1; }
+.act-catalogue.fading  { opacity: 0; transition: opacity 0.9s ease; }
+
+.desk {
+  background: #C8C2B8;
+  border-radius: 6px;
+  padding: 28px 14px 32px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+.spread {
+  display: flex;
+  width: 100%;
+  height: 480px;
+  position: relative;
+}
+.page {
+  width: 50%; height: 100%;
+  background: #F8F6F0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.page.left  { border-radius:2px 0 0 2px; border:0.5px solid #A8A098; border-right:none; box-shadow:-5px 0 10px rgba(0,0,0,0.22); }
+.page.right { border-radius:0 2px 2px 0; border:0.5px solid #A8A098; border-left:none;  box-shadow:5px 0 10px rgba(0,0,0,0.22); }
+.page.left  .page-inner { padding:0 7px 0 10px; flex:1; overflow:hidden; display:flex; flex-direction:column; }
+.page.right .page-inner { padding:0 10px 0 7px; flex:1; overflow:hidden; display:flex; flex-direction:column; }
+
+.fold {
+  width: 12px; flex-shrink: 0; align-self: stretch;
+  background: linear-gradient(to right,
+    rgba(0,0,0,0.28) 0%,rgba(0,0,0,0.12) 35%,
+    rgba(255,255,255,0.15) 50%,rgba(0,0,0,0.10) 65%,rgba(0,0,0,0.26) 100%);
+  z-index: 2;
+}
+
+.pg-header { background:#1A1A2E; padding:5px 8px 4px; display:flex; justify-content:space-between; align-items:center; flex-shrink:0; height:44px; }
+.ph-brand  { font-family:Georgia,serif; font-size:8px; color:#D4A574; letter-spacing:1.5px; text-transform:uppercase; }
+.ph-title  { font-family:Georgia,serif; font-size:10px; color:#fff; font-weight:700; margin-top:1px; }
+.ph-sub    { font-family:Georgia,serif; font-size:8px; color:#A7BEAE; text-align:right; }
+.ph-pg     { font-family:Georgia,serif; font-size:9px; color:#D4A574; font-weight:700; text-align:right; margin-top:1px; }
+
+.sec-break { display:flex; align-items:center; gap:5px; padding:5px 0 2px; flex-shrink:0; }
+.sec-label { font-family:'Trebuchet MS',sans-serif; font-size:6.5px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; white-space:nowrap; }
+.sec-label.mech{color:#5B8A72}.sec-label.wave{color:#1A1A2E}.sec-label.chem{color:#B85042}.sec-label.gold{color:#8A6020}
+.sec-rule  { flex:1; height:0.5px; }
+.sec-rule.mech{background:#5B8A72;opacity:0.5}.sec-rule.wave{background:#1A1A2E;opacity:0.4}.sec-rule.chem{background:#B85042;opacity:0.5}.sec-rule.gold{background:#D4A574;opacity:0.7}
+.sec-name  { font-family:Georgia,serif; font-size:9px; font-weight:700; padding:0 0 3px; }
+.sec-name.mech{color:#2D2D2D}.sec-name.wave{color:#1A1A2E}.sec-name.chem{color:#B85042}.sec-name.gold{color:#8A6020}
+
+/* Catalogue card */
+.cat-card { margin:0 0 4px; border:0.5px solid #D4D0C8; background:#fff; flex-shrink:0; position:relative; transition:box-shadow 0.3s, border 0.3s; }
+.cat-card.ticked { border:1.5px solid #1A1A2E !important; box-shadow:0 0 0 3px rgba(212,165,116,0.35),0 2px 8px rgba(0,0,0,0.12); }
+
+/* Tick badge — starts invisible */
+.tick-badge {
+  position: absolute; top: 5px; right: 5px;
+  width: 15px; height: 15px;
+  background: #D4A574; border-radius: 50%;
+  border: 1.5px solid #F8F6F0;
+  font-size: 8px; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transform: scale(0.4);
+  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.tick-badge.visible { opacity:1; transform:scale(1); }
+
+.card-accent { height:2.5px; width:100%; }
+.card-accent.mech{background:#5B8A72}.card-accent.wave{background:#1A1A2E}.card-accent.chem{background:#B85042}.card-accent.gold{background:#D4A574}
+.card-top  { display:flex; justify-content:space-between; align-items:center; padding:4px 7px 2px; }
+.spec-pill { font-family:'Trebuchet MS',sans-serif; font-size:6.5px; font-weight:700; padding:1.5px 5px; border-radius:7px; border:0.5px solid; white-space:nowrap; }
+.spec-pill.mech{background:#EEF2EF;color:#27500A;border-color:#5B8A72}
+.spec-pill.wave{background:#EEF2F8;color:#0C447C;border-color:#1A1A2E}
+.spec-pill.gold{background:#FDF5E8;color:#633806;border-color:#D4A574}
+.mark-badge { font-family:'Trebuchet MS',sans-serif; font-size:6.5px; font-weight:700; padding:1.5px 5px; border-radius:7px; background:#1A1A2E; color:#D4A574; white-space:nowrap; }
+.card-name  { font-family:Georgia,serif; font-size:8.5px; font-weight:700; color:#2D2D2D; padding:1px 7px 2px; line-height:1.25; }
+.card-desc  { font-size:7px; color:#4A4A4A; padding:0 7px 3px; line-height:1.4; }
+.card-scen  { border-top:0.5px solid #EDE9E2; padding:3px 7px 4px; background:#FAFAF7; }
+.scen-heading { font-family:'Trebuchet MS',sans-serif; font-size:6px; font-weight:700; color:#8A8A8A; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:1px; }
+.scen-text  { font-size:7px; color:#6E6E6E; font-style:italic; line-height:1.3; }
+.pg-footer  { background:#EDE9E2; padding:3px 7px; display:flex; justify-content:space-between; align-items:center; flex-shrink:0; margin-top:auto; }
+.pf-text    { font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#8A8A8A; }
+.cards-area { flex:1; overflow:hidden; display:flex; flex-direction:column; }
+
+/* ══════════════════════════════════════
+   ACT 3: SELECTED CARDS STACK
+   ══════════════════════════════════════ */
+.act-stack {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.7s ease;
+}
+.act-stack.visible { opacity:1; pointer-events:auto; }
+.act-stack.fading  { opacity:0; transition:opacity 0.7s ease; }
+
+.stack-surface {
+  background: #F8F6F0;
+  border: 0.5px solid #B8B4AC;
+  border-radius: 3px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.14);
+  padding: 20px 18px;
+}
+.stack-label {
+  font-family: 'Trebuchet MS', sans-serif;
+  font-size: 7px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color: #8A7A6A; margin-bottom: 12px;
+}
+.stacked-card {
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  background: #fff;
+  border: 0.5px solid #D4D0C8;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1);
+}
+.stacked-card.visible { opacity:1; transform:translateY(0); }
+.stacked-card:last-child { margin-bottom:0; }
+.sc-accent { height:3px; }
+.sc-accent.mech{background:#5B8A72} .sc-accent.wave{background:#1A1A2E} .sc-accent.gold{background:#D4A574}
+.sc-inner { padding:8px 10px; display:flex; align-items:center; gap:8px; }
+.sc-q-num { font-family:Georgia,serif; font-size:9px; font-weight:700; color:#1A1A2E; white-space:nowrap; }
+.sc-title  { font-family:Georgia,serif; font-size:9px; font-weight:700; color:#1A1A2E; flex:1; }
+.sc-chip   { font-family:'Trebuchet MS',sans-serif; font-size:6.5px; font-weight:700; padding:2px 7px; border-radius:7px; }
+.sc-chip.mech{background:#EEF2EF;color:#27500A;border:0.5px solid #5B8A72;}
+.sc-chip.wave{background:#EEF2F8;color:#0C447C;border:0.5px solid #1A1A2E;}
+.sc-chip.gold{background:#FDF5E8;color:#633806;border:0.5px solid #D4A574;}
+
+/* ══════════════════════════════════════
+   ACT 4 + 5 + 6: QUESTION PAPER
+   (reuses scene-06 paper styles)
+   ══════════════════════════════════════ */
+.act-paper {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.9s ease;
+}
+.act-paper.visible { opacity:1; pointer-events:auto; }
+
+.a4-paper {
+  background: #FEFDF9;
+  border: 0.5px solid #B8B4AC;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08),0 8px 24px rgba(0,0,0,0.14);
+  position: relative;
+  overflow: visible;
+}
+.paper-header { background:#1A1A2E; padding:10px 22px; display:flex; justify-content:space-between; align-items:center; }
+.ph-left .ph-brand2 { font-family:Georgia,serif; font-size:8px; color:#D4A574; letter-spacing:2px; text-transform:uppercase; }
+.ph-left .ph-title2 { font-family:Georgia,serif; font-size:13px; color:#fff; font-weight:700; margin-top:2px; }
+.ph-right { text-align:right; }
+.ph-school { font-family:Georgia,serif; font-size:8.5px; color:#A7BEAE; }
+.ph-meta   { font-family:'Trebuchet MS',sans-serif; font-size:8px; color:#8AB0A0; margin-top:2px; }
+.ph-meta strong { color:#D4A574; }
+.accent-rule { height:2.5px; background:linear-gradient(to right,#D4A574,#5B8A72 35%,#1A1A2E 100%); }
+.paper-body { padding:16px 22px 0; }
+
+.q-block { padding-bottom:18px; margin-bottom:18px; position:relative; }
+.q-block:last-child { margin-bottom:0; padding-bottom:10px; }
+.q-num-row { display:flex; align-items:baseline; gap:8px; margin-bottom:7px; }
+.q-num-p   { font-family:Georgia,serif; font-size:10.5px; font-weight:700; color:#1A1A2E; white-space:nowrap; }
+.q-title-p { font-family:Georgia,serif; font-size:10.5px; font-weight:700; color:#1A1A2E; flex:1; }
+.scenario  { font-family:Georgia,serif; font-size:8.5px; color:#2D2D2D; line-height:1.6; margin-bottom:8px; }
+.scenario strong { font-weight:700; }
+.sub-q     { display:flex; gap:7px; margin-bottom:4px; align-items:flex-start; }
+.sub-num   { font-family:'Trebuchet MS',sans-serif; font-size:8px; font-weight:700; color:#1A1A2E; min-width:26px; padding-top:1px; }
+.sub-text  { font-family:Georgia,serif; font-size:8.5px; color:#2D2D2D; line-height:1.5; flex:1; }
+.sub-mark  { font-family:'Trebuchet MS',sans-serif; font-size:7.5px; font-weight:700; color:#1A1A2E; white-space:nowrap; padding-top:1px; }
+.diag-wrap { border:0.5px solid #D8D4CC; background:#F6F4F0; border-radius:2px; padding:6px; display:flex; justify-content:center; align-items:center; margin-bottom:8px; }
+.two-col   { display:flex; gap:10px; margin-bottom:8px; }
+.two-col .diag-wrap { flex:1; margin-bottom:0; }
+.two-col .diag-wrap.graph-col { flex:0 0 168px; }
+.eq-box    { background:#F4F4F4; border:0.5px solid #C8C8C8; border-left:3px solid #2D2D2D; border-radius:2px; padding:8px 12px; margin-bottom:8px; text-align:center; }
+.eq-label  { font-family:'Trebuchet MS',sans-serif; font-size:6.5px; font-weight:700; color:#5A5A5A; letter-spacing:1px; text-transform:uppercase; margin-bottom:3px; }
+.eq-main   { font-family:Georgia,serif; font-size:10.5px; font-weight:700; color:#1A1A2E; }
+.data-tbl  { width:100%; border-collapse:collapse; font-size:8px; margin-bottom:8px; }
+.data-tbl th { background:#3A3A3A; color:#fff; padding:4px 8px; text-align:left; font-weight:700; font-family:'Trebuchet MS',sans-serif; font-size:7.5px; }
+.data-tbl td { padding:3px 8px; border-bottom:0.5px solid #EDE9E2; font-family:Georgia,serif; font-size:8px; color:#2D2D2D; }
+.data-tbl tr:last-child td { border-bottom:none; }
+.data-tbl tr:nth-child(even) td { background:#FAF8F4; }
+.chain     { display:flex; align-items:center; justify-content:center; gap:0; margin-bottom:8px; flex-wrap:wrap; }
+.c-step    { background:#fff; border:0.5px solid #C8C8C8; border-radius:3px; padding:3px 8px; font-family:'Trebuchet MS',sans-serif; font-size:6.5px; font-weight:700; color:#1A1A2E; text-align:center; white-space:nowrap; }
+.c-step span { display:block; font-size:6px; color:#6A6A6A; font-weight:400; margin-top:1px; }
+.c-arrow   { font-size:12px; color:#2D2D2D; font-weight:700; padding:0 3px; }
+.q-total-line { font-family:Georgia,serif; font-size:9px; color:#1A1A2E; text-align:right; margin-top:8px; transition:opacity 0.4s ease; }
+.paper-footer { background:#EDE9E2; padding:5px 22px; display:flex; justify-content:space-between; align-items:center; }
+.pf-txt    { font-family:'Trebuchet MS',sans-serif; font-size:6.5px; color:#8A8A8A; }
+
+/* Diagram placeholder */
+.diag-ph {
+  border:0.5px solid #D8D4CC; background:#F0EEE8; border-radius:2px;
+  height:90px; margin-bottom:8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  transition: opacity 0.5s ease;
+}
+.diag-ph-icon { font-size:18px; opacity:0.2; }
+.diag-ph-txt  { font-family:'Trebuchet MS',sans-serif; font-size:7px; color:#A8A098; letter-spacing:0.8px; text-transform:uppercase; }
+.diag-real { opacity:0; max-height:0; overflow:hidden; transition:opacity 0.8s ease,max-height 0.8s ease; }
+.diag-real.revealed { opacity:1; max-height:400px; }
+.sub-q.hidden { opacity:0; max-height:0; overflow:hidden; margin-bottom:0; transition:opacity 0.7s ease,max-height 0.6s ease,margin-bottom 0.4s ease; }
+.sub-q.hidden.revealed { opacity:1; max-height:60px; margin-bottom:4px; }
+
+/* WhatsApp bubble */
+.bubble-layer { position:absolute; top:0; left:0; right:0; bottom:0; pointer-events:none; z-index:100; overflow:hidden; }
+.wa-bubble {
+  position:absolute; right:18px; max-width:220px;
+  background:#E8F5E9; border-radius:12px 12px 3px 12px;
+  padding:8px 11px 7px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.15);
+  font-family:'Trebuchet MS',sans-serif; font-size:8px; color:#1A1A2E; line-height:1.45;
+  opacity:0; transform:translateX(40px) scale(0.94);
+  transition:opacity 0.35s ease,transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+.wa-bubble.show { opacity:1; transform:translateX(0) scale(1); }
+.wa-bubble.hide { opacity:0; transform:translateX(20px) scale(0.96); transition:opacity 0.3s ease,transform 0.3s ease; }
+.wa-bubble::after { content:''; position:absolute; bottom:0; right:-6px; width:0; height:0; border-style:solid; border-width:0 0 10px 8px; border-color:transparent transparent #E8F5E9 transparent; }
+.wa-name  { font-size:7px; font-weight:700; color:#5B8A72; margin-bottom:3px; letter-spacing:0.3px; }
+.wa-quote { font-family:Georgia,serif; font-size:22px; color:#D4A574; line-height:0.5; display:block; margin-bottom:3px; opacity:0.6; }
+.wa-tick  { font-size:7px; color:#5B8A72; float:right; margin-left:6px; margin-top:2px; }
+
+@keyframes highlightPulse { 0%{background:rgba(212,165,116,0.2)} 60%{background:rgba(212,165,116,0.1)} 100%{background:transparent} }
+.pulse { animation:highlightPulse 1.4s ease forwards; border-radius:2px; }
+
+/* Beat dots progress bar */
+.beat-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin: 20px auto 0;
+  width: 100%;
+  max-width: 520px;
+  position: relative;
+}
+/* Connecting line behind dots */
+.beat-bar::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 32px; right: 32px;
+  height: 1px;
+  background: #C8C4BC;
+  z-index: 0;
+}
+.beat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+.beat-dot {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #E0DCD4;
+  border: 2px solid #C8C4BC;
+  transition: background 0.4s ease, border-color 0.4s ease, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.beat-dot.lit {
+  background: #D4A574;
+  border-color: #B8884A;
+  transform: scale(1.2);
+}
+.beat-dot.done {
+  background: #5B8A72;
+  border-color: #3A6A52;
+  transform: scale(1);
+}
+.beat-label {
+  font-family: 'Trebuchet MS', sans-serif;
+  font-size: 6.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #A8A098;
+  text-align: center;
+  line-height: 1.3;
+  transition: color 0.4s ease;
+  white-space: nowrap;
+}
+.beat-label.lit  { color: #8A6020; }
+.beat-label.done { color: #3A6A52; }
+
+/* Replay */
+.replay-btn {
+  display:block; margin:14px auto 0;
+  font-family:'Trebuchet MS',sans-serif; font-size:8px; font-weight:700;
+  color:#1A1A2E; background:transparent;
+  border:1px solid #C8C4BC; border-radius:4px;
+  padding:5px 16px; cursor:pointer; letter-spacing:0.5px;
+  opacity:0; transition:opacity 0.5s ease;
+}
+.replay-btn:hover { background:#EDE9E2; }
+.replay-btn.visible { opacity:1; }
+</style>
+</head>
+<body>
+
+<div class="scene-label">Scene 07 — The full journey</div>
+
+<!-- ═══════ STAGE ═══════ -->
+<div class="stage" id="stage">
+
+  <!-- ─── ACT 1+2: CATALOGUE ─── -->
+  <div class="act-catalogue" id="actCatalogue">
+    <div class="desk">
+      <div class="spread">
+
+        <!-- LEFT PAGE -->
+        <div class="page left">
+          <div class="page-inner">
+            <div class="pg-header">
+              <div><div class="ph-brand">Revise It</div><div class="ph-title">Question Catalogue</div></div>
+              <div><div class="ph-sub">Gr 11 Physical Sciences</div><div class="ph-pg">Page 3</div></div>
+            </div>
+            <div class="cards-area">
+              <div class="sec-break"><span class="sec-label mech">Paper 1 · Physics</span><div class="sec-rule mech"></div></div>
+              <div class="sec-name mech">Mechanics</div>
+
+              <!-- CARD: MECH-01 (not selected) -->
+              <div class="cat-card" id="cc-mech01">
+                <div class="card-accent mech"></div>
+                <div class="card-top"><span class="spec-pill mech">P1-MECH-01</span><span class="mark-badge">12–15 marks</span></div>
+                <div class="card-name">Equilibrium &amp; Suspended Objects</div>
+                <div class="card-desc">Object held stationary by ropes. Learners resolve forces, calculate unknown force.</div>
+                <div class="card-scen"><div class="scen-heading">Example scenarios</div><div class="scen-text">"Traffic light on two cables"</div></div>
+              </div>
+
+              <!-- CARD: MECH-07 (selected ✓) -->
+              <div class="cat-card" id="cc-mech07">
+                <div class="tick-badge" id="tick1">✓</div>
+                <div class="card-accent mech"></div>
+                <div class="card-top"><span class="spec-pill mech">P1-MECH-07</span><span class="mark-badge">17–35 marks</span></div>
+                <div class="card-name">Connected Bodies — Inclined Plane</div>
+                <div class="card-desc">Block on slope + hanging mass via pulley. Two-phase: rope cut mid-problem.</div>
+                <div class="card-scen"><div class="scen-heading">Example scenarios</div><div class="scen-text">"Block on incline + hanging mass"</div></div>
+              </div>
+
+              <div class="sec-break" style="padding-top:5px"><span class="sec-label wave">Paper 1 · Physics</span><div class="sec-rule wave"></div></div>
+              <div class="sec-name wave">Waves &amp; EM Induction</div>
+
+              <!-- CARD: EM-01 (selected ✓) -->
+              <div class="cat-card" id="cc-em01">
+                <div class="tick-badge" id="tick2">✓</div>
+                <div class="card-accent wave"></div>
+                <div class="card-top"><span class="spec-pill wave">P1-EM-01</span><span class="mark-badge">12–16 marks</span></div>
+                <div class="card-name">Electromagnetic Induction</div>
+                <div class="card-desc">Coil and magnet scenario. Apply Faraday's and Lenz's Law, calculate induced EMF.</div>
+                <div class="card-scen"><div class="scen-heading">Example scenarios</div><div class="scen-text">"Magnet into solenoid" · "Generator"</div></div>
+              </div>
+
+              <!-- CARD: WAVE-01 (not selected) -->
+              <div class="cat-card" id="cc-wave01">
+                <div class="card-accent wave"></div>
+                <div class="card-top"><span class="spec-pill wave">P1-WAVE-01</span><span class="mark-badge">10–14 marks</span></div>
+                <div class="card-name">Waves &amp; Sound</div>
+                <div class="card-desc">Wave diagram provided. Use v = fλ, apply sound intensity concepts.</div>
+                <div class="card-scen"><div class="scen-heading">Example scenarios</div><div class="scen-text">"Wave on string" · "Doppler"</div></div>
+              </div>
+            </div>
+            <div class="pg-footer">
+              <span class="pf-text">Revise It · reviseit.io</span>
+              <span class="pf-text">3</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="fold"></div>
+
+        <!-- RIGHT PAGE -->
+        <div class="page right">
+          <div class="page-inner">
+            <div class="pg-header">
+              <div><div class="ph-brand">Revise It</div><div class="ph-title">Question Catalogue</div></div>
+              <div><div class="ph-sub">Gr 11 Physical Sciences</div><div class="ph-pg">Page 4</div></div>
+            </div>
+            <div class="cards-area">
+              <div class="sec-break"><span class="sec-label chem">Paper 2 · Chemistry</span><div class="sec-rule chem"></div></div>
+              <div class="sec-name chem">Energy &amp; Reactions</div>
+
+              <!-- CARD: CHEM-01 (not selected) -->
+              <div class="cat-card">
+                <div class="card-accent chem"></div>
+                <div class="card-top"><span class="spec-pill" style="background:#FAF0EE;color:#712B13;border:0.5px solid #B85042">P2-CHEM-01</span><span class="mark-badge">15–20 marks</span></div>
+                <div class="card-name">Thermochemistry</div>
+                <div class="card-desc">Interpret energy profiles, calculate q = mcΔT, apply Hess's Law.</div>
+                <div class="card-scen"><div class="scen-heading">Example scenarios</div><div class="scen-text">"Methane combustion in calorimeter"</div></div>
+              </div>
+
+              <div class="sec-break" style="padding-top:5px"><span class="sec-label gold">Paper 2 · Chemistry</span><div class="sec-rule gold"></div></div>
+              <div class="sec-name gold">Stoichiometry &amp; Structure</div>
+
+              <!-- CARD: CHEM-03 (selected ✓) -->
+              <div class="cat-card" id="cc-chem03">
+                <div class="tick-badge" id="tick3">✓</div>
+                <div class="card-accent gold"></div>
+                <div class="card-top"><span class="spec-pill gold">P2-CHEM-03</span><span class="mark-badge">15–22 marks</span></div>
+                <div class="card-name">Stoichiometry Chain</div>
+                <div class="card-desc">Multi-step stoichiometry: moles from mass, molar ratios, yield and purity.</div>
+                <div class="card-scen"><div class="scen-heading">Example scenarios</div><div class="scen-text">"Mass of product" · "% yield"</div></div>
+              </div>
+
+              <!-- CARD: CHEM-05 (not selected) -->
+              <div class="cat-card">
+                <div class="card-accent gold"></div>
+                <div class="card-top"><span class="spec-pill gold">P2-CHEM-05</span><span class="mark-badge">14–20 marks</span></div>
+                <div class="card-name">Molecular Structure Analysis</div>
+                <div class="card-desc">Lewis structures, VSEPR, bond polarity and molecular polarity.</div>
+                <div class="card-scen"><div class="scen-heading">Example scenarios</div><div class="scen-text">"Lewis structure of SF₄"</div></div>
+              </div>
+
+              <!-- CARD: CHEM-06 (not selected) -->
+              <div class="cat-card">
+                <div class="card-accent gold"></div>
+                <div class="card-top"><span class="spec-pill gold">P2-CHEM-06</span><span class="mark-badge">12–18 marks</span></div>
+                <div class="card-name">Intermolecular Forces</div>
+                <div class="card-desc">Compare IMF types, explain boiling points, solubility predictions.</div>
+                <div class="card-scen"><div class="scen-heading">Example scenarios</div><div class="scen-text">"Rank CH₄, NH₃, H₂O by BP"</div></div>
+              </div>
+            </div>
+            <div class="pg-footer">
+              <span class="pf-text">Revise It · reviseit.io</span>
+              <span class="pf-text">4</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /spread -->
+    </div><!-- /desk -->
+  </div><!-- /act-catalogue -->
+
+
+  <!-- ─── ACT 3: STACKED CARDS ─── -->
+  <div class="act-stack" id="actStack">
+    <div class="stack-surface">
+      <div class="stack-label">3 questions selected · June 2026 Paper</div>
+
+      <div class="stacked-card" id="sc1">
+        <div class="sc-accent mech"></div>
+        <div class="sc-inner">
+          <span class="sc-q-num">Question 1</span>
+          <span class="sc-title">Newton's Laws — Connected Bodies</span>
+          <span class="sc-chip mech">P1-MECH-07</span>
+        </div>
+      </div>
+
+      <div class="stacked-card" id="sc2">
+        <div class="sc-accent wave"></div>
+        <div class="sc-inner">
+          <span class="sc-q-num">Question 2</span>
+          <span class="sc-title">Electromagnetic Induction</span>
+          <span class="sc-chip wave">P1-EM-01</span>
+        </div>
+      </div>
+
+      <div class="stacked-card" id="sc3">
+        <div class="sc-accent gold"></div>
+        <div class="sc-inner">
+          <span class="sc-q-num">Question 3</span>
+          <span class="sc-title">Stoichiometry — Quantitative Aspects</span>
+          <span class="sc-chip gold">P2-CHEM-03</span>
+        </div>
+      </div>
+    </div>
+  </div><!-- /act-stack -->
+
+
+  <!-- ─── ACT 4+5+6: QUESTION PAPER ─── -->
+  <div class="act-paper" id="actPaper">
+    <div class="a4-paper">
+
+      <!-- Bubble layer -->
+      <div class="bubble-layer">
+        <div class="wa-bubble" id="b1" style="top:148px;">
+          <div class="wa-name">Ms. Dlamini</div>
+          <span class="wa-quote">"</span>
+          Block A on the slope, Block B hanging vertically — proper pulley setup.
+          <span class="wa-tick">✓✓</span>
+        </div>
+        <div class="wa-bubble" id="b2" style="top:148px;">
+          <div class="wa-name">Ms. Dlamini</div>
+          <span class="wa-quote">"</span>
+          Add a synthesis question at the end — the learner claims the angle decreases tension. Deep thinking.
+          <span class="wa-tick">✓✓</span>
+        </div>
+        <div class="wa-bubble" id="b3" style="top:560px;">
+          <div class="wa-name">Ms. Dlamini</div>
+          <span class="wa-quote">"</span>
+          I want a flux-time graph as the stimulus — show the coil being removed over time.
+          <span class="wa-tick">✓✓</span>
+        </div>
+        <div class="wa-bubble" id="b4" style="top:1020px;">
+          <div class="wa-name">Ms. Dlamini</div>
+          <span class="wa-quote">"</span>
+          Add a purity twist at the end — back-calculate the pure CaCO₃ from the actual yield.
+          <span class="wa-tick">✓✓</span>
+        </div>
+      </div>
+
+      <!-- Paper header -->
+      <div class="paper-header">
+        <div class="ph-left">
+          <div class="ph-brand2">Revise It</div>
+          <div class="ph-title2">Grade 11 Physical Sciences</div>
+        </div>
+        <div class="ph-right">
+          <div class="ph-school">Greenfield High School · Ms. T. Dlamini</div>
+          <div class="ph-meta">June 2026 &nbsp;·&nbsp; <strong>Total: 150 marks</strong> &nbsp;·&nbsp; <strong>3 hours</strong></div>
+        </div>
+      </div>
+      <div class="accent-rule"></div>
+
+      <div class="paper-body">
+
+        <!-- QUESTION 1 -->
+        <div class="q-block">
+          <div class="q-num-row">
+            <span class="q-num-p">QUESTION 1</span>
+            <span class="q-title-p">NEWTON'S LAWS — CONNECTED BODIES</span>
+          </div>
+          <div class="scenario">Two blocks, <strong>A (8 kg)</strong> and <strong>B (5 kg)</strong>, are connected by a light, inextensible string over a frictionless pulley at the top of an inclined plane. Block A rests on the surface at <strong>30°</strong> to the horizontal. The coefficient of kinetic friction is <strong>μ<sub>k</sub> = 0.25</strong>. Block B hangs freely.</div>
+
+          <div class="diag-ph" id="q1-ph"><div class="diag-ph-icon">⬜</div><div class="diag-ph-txt">Diagram not yet defined</div></div>
+          <div class="diag-real" id="q1-diag">
+            <div class="diag-wrap">
+              <svg viewBox="0 0 480 200" width="420" height="175" xmlns="http://www.w3.org/2000/svg" style="font-family:Arial,sans-serif;">
+                <polygon points="30,175 300,175 300,40" fill="#EDEAE4" stroke="none"/>
+                <line x1="30" y1="175" x2="300" y2="40" stroke="#4A4040" stroke-width="2"/>
+                <line x1="300" y1="40" x2="300" y2="175" stroke="#4A4040" stroke-width="1.5"/>
+                <line x1="28" y1="175" x2="320" y2="175" stroke="#4A4040" stroke-width="1.8"/>
+                <line x1="30" y1="177" x2="24" y2="185" stroke="#7A7070" stroke-width="0.8"/><line x1="50" y1="177" x2="44" y2="185" stroke="#7A7070" stroke-width="0.8"/><line x1="70" y1="177" x2="64" y2="185" stroke="#7A7070" stroke-width="0.8"/><line x1="90" y1="177" x2="84" y2="185" stroke="#7A7070" stroke-width="0.8"/><line x1="110" y1="177" x2="104" y2="185" stroke="#7A7070" stroke-width="0.8"/><line x1="130" y1="177" x2="124" y2="185" stroke="#7A7070" stroke-width="0.8"/><line x1="150" y1="177" x2="144" y2="185" stroke="#7A7070" stroke-width="0.8"/><line x1="170" y1="177" x2="164" y2="185" stroke="#7A7070" stroke-width="0.8"/><line x1="190" y1="177" x2="184" y2="185" stroke="#7A7070" stroke-width="0.8"/><line x1="210" y1="177" x2="204" y2="185" stroke="#7A7070" stroke-width="0.8"/><line x1="230" y1="177" x2="224" y2="185" stroke="#7A7070" stroke-width="0.8"/><line x1="250" y1="177" x2="244" y2="185" stroke="#7A7070" stroke-width="0.8"/><line x1="270" y1="177" x2="264" y2="185" stroke="#7A7070" stroke-width="0.8"/><line x1="290" y1="177" x2="284" y2="185" stroke="#7A7070" stroke-width="0.8"/><line x1="310" y1="177" x2="304" y2="185" stroke="#7A7070" stroke-width="0.8"/>
+                <polyline points="300,165 289,165 289,175" fill="none" stroke="#4A4040" stroke-width="1"/>
+                <path d="M 73,152 A 50,50 0 0,1 80,175" fill="none" stroke="#1A1A2E" stroke-width="1.1"/>
+                <text x="59" y="172" font-size="8.5" fill="#1A1A2E" font-weight="700">30°</text>
+                <line x1="300" y1="40" x2="314" y2="40" stroke="#6A5A4A" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="300" cy="40" r="10" fill="#F5F2EC" stroke="#3A3030" stroke-width="1.5"/>
+                <circle cx="300" cy="40" r="4.5" fill="#D4A574" stroke="#A87840" stroke-width="0.9"/>
+                <circle cx="300" cy="40" r="1.8" fill="#3A3030"/>
+                <line x1="175" y1="92" x2="292" y2="44" stroke="#1A1A2E" stroke-width="1.4"/>
+                <line x1="310" y1="50" x2="310" y2="62" stroke="#1A1A2E" stroke-width="1.4"/>
+                <g transform="translate(155,99) rotate(-30)"><rect x="-22" y="-9" width="44" height="18" fill="#5B8A72" stroke="#2D5A42" stroke-width="1.3" rx="2"/><text x="0" y="5" font-size="9" fill="#fff" font-weight="700" text-anchor="middle">A</text></g>
+                <text x="165" y="128" font-size="8.5" fill="#1A1A2E" font-weight="700" transform="rotate(-30,165,128)">8 kg</text>
+                <g transform="translate(141,110) rotate(-30)"><line x1="0" y1="0" x2="-24" y2="0" stroke="#B85042" stroke-width="1.6"/><polygon points="-24,0 -18,-3 -18,3" fill="#B85042"/></g>
+                <text x="98" y="138" font-size="7.5" fill="#B85042" font-weight="700" font-style="italic" transform="rotate(-30,98,138)">f (μk=0.25)</text>
+                <g transform="translate(168,96) rotate(-30)"><line x1="0" y1="0" x2="22" y2="0" stroke="#D4A574" stroke-width="1.6"/><polygon points="22,0 16,-3 16,3" fill="#D4A574"/></g>
+                <rect x="290" y="62" width="40" height="26" fill="#1A1A2E" stroke="#0A0A1E" stroke-width="1.3" rx="2"/>
+                <text x="310" y="79" font-size="9" fill="#fff" font-weight="700" text-anchor="middle">B</text>
+                <text x="336" y="78" font-size="8.5" fill="#1A1A2E" font-weight="700">5 kg</text>
+                <line x1="310" y1="88" x2="310" y2="108" stroke="#1A1A2E" stroke-width="1.4"/><polygon points="310,113 306,105 314,105" fill="#1A1A2E"/>
+                <text x="315" y="106" font-size="8" fill="#1A1A2E" font-weight="700">Fg</text>
+                <line x1="310" y1="62" x2="310" y2="45" stroke="#1A1A2E" stroke-width="1.4"/><polygon points="310,40 306,48 314,48" fill="#1A1A2E"/>
+                <text x="315" y="56" font-size="8" fill="#1A1A2E" font-weight="700">T</text>
+              </svg>
+            </div>
+          </div>
+
+          <div class="sub-q"><span class="sub-num">1.1</span><span class="sub-text">Draw a labelled free-body diagram showing <em>all</em> forces acting on block A.</span><span class="sub-mark">(4)</span></div>
+          <div class="sub-q"><span class="sub-num">1.2</span><span class="sub-text">Apply Newton's Second Law to each block and derive an expression for the acceleration of the system.</span><span class="sub-mark">(5)</span></div>
+          <div class="sub-q"><span class="sub-num">1.3</span><span class="sub-text">Calculate the tension in the string while the blocks are in motion.</span><span class="sub-mark">(4)</span></div>
+          <div class="sub-q"><span class="sub-num">1.4</span><span class="sub-text">The string is suddenly cut. Describe the subsequent motion of block A and support your answer with a calculation.</span><span class="sub-mark">(5)</span></div>
+          <div class="sub-q hidden" id="p-q1s5"><span class="sub-num">1.5</span><span class="sub-text">A learner claims that increasing the angle of the incline would decrease the tension in the string. Is this claim correct? Explain your reasoning.</span><span class="sub-mark">(3)</span></div>
+          <div class="q-total-line" id="p-q1total">[18]</div>
+        </div>
+
+        <!-- QUESTION 2 -->
+        <div class="q-block">
+          <div class="q-num-row">
+            <span class="q-num-p">QUESTION 2</span>
+            <span class="q-title-p">ELECTROMAGNETIC INDUCTION</span>
+          </div>
+          <div class="scenario">A circular coil of <strong>50 turns</strong> and cross-sectional area <strong>0.04 m²</strong> is placed in a uniform magnetic field then removed in <strong>0.4 s</strong>. The graph below shows how the magnetic flux changes over time. The coil resistance is <strong>2 Ω</strong>.</div>
+
+          <div class="diag-ph" id="q2-ph"><div class="diag-ph-icon">⬜</div><div class="diag-ph-txt">Diagram stimulus not yet defined</div></div>
+          <div class="diag-real" id="q2-diag">
+            <div class="two-col">
+              <div class="diag-wrap">
+                <svg viewBox="0 0 240 130" width="200" height="108" xmlns="http://www.w3.org/2000/svg" style="font-family:Arial,sans-serif;">
+                  <rect x="10" y="50" width="44" height="30" fill="#B85042" stroke="#8A2A1A" stroke-width="1.1" rx="2"/><text x="32" y="69" font-size="11" fill="#fff" font-weight="700" text-anchor="middle">N</text>
+                  <rect x="54" y="50" width="44" height="30" fill="#1A1A2E" stroke="#0A0A1E" stroke-width="1.1" rx="2"/><text x="76" y="69" font-size="11" fill="#fff" font-weight="700" text-anchor="middle">S</text>
+                  <line x1="103" y1="65" x2="120" y2="65" stroke="#D4A574" stroke-width="1.8"/><polygon points="120,65 114,62 114,68" fill="#D4A574"/>
+                  <text x="106" y="59" font-size="7" fill="#D4A574" font-weight="700">v</text>
+                  <rect x="126" y="40" width="96" height="50" fill="none" stroke="#1A1A2E" stroke-width="1.4" rx="4"/>
+                  <line x1="134" y1="40" x2="134" y2="90" stroke="#4A4A6A" stroke-width="0.8"/><line x1="142" y1="40" x2="142" y2="90" stroke="#4A4A6A" stroke-width="0.8"/><line x1="150" y1="40" x2="150" y2="90" stroke="#4A4A6A" stroke-width="0.8"/><line x1="158" y1="40" x2="158" y2="90" stroke="#4A4A6A" stroke-width="0.8"/><line x1="166" y1="40" x2="166" y2="90" stroke="#4A4A6A" stroke-width="0.8"/><line x1="174" y1="40" x2="174" y2="90" stroke="#4A4A6A" stroke-width="0.8"/><line x1="182" y1="40" x2="182" y2="90" stroke="#4A4A6A" stroke-width="0.8"/><line x1="190" y1="40" x2="190" y2="90" stroke="#4A4A6A" stroke-width="0.8"/><line x1="198" y1="40" x2="198" y2="90" stroke="#4A4A6A" stroke-width="0.8"/><line x1="206" y1="40" x2="206" y2="90" stroke="#4A4A6A" stroke-width="0.8"/>
+                  <ellipse cx="126" cy="65" rx="5.5" ry="24" fill="#F0EDE6" stroke="#1A1A2E" stroke-width="1.4"/>
+                  <ellipse cx="222" cy="65" rx="4.5" ry="22" fill="#E8E4DE" stroke="#1A1A2E" stroke-width="1.1"/>
+                  <line x1="126" y1="90" x2="126" y2="108" stroke="#1A1A2E" stroke-width="1.1"/><line x1="222" y1="90" x2="222" y2="108" stroke="#1A1A2E" stroke-width="1.1"/>
+                  <line x1="126" y1="108" x2="168" y2="108" stroke="#1A1A2E" stroke-width="1.1"/><line x1="180" y1="108" x2="222" y2="108" stroke="#1A1A2E" stroke-width="1.1"/>
+                  <circle cx="174" cy="108" r="11" fill="#F8F6F0" stroke="#1A1A2E" stroke-width="1.1"/>
+                  <text x="174" y="112" font-size="8.5" fill="#1A1A2E" font-weight="700" text-anchor="middle">G</text>
+                  <text x="116" y="102" font-size="7.5" fill="#1A1A2E" font-weight="700">X</text><text x="226" y="102" font-size="7.5" fill="#1A1A2E" font-weight="700">Y</text>
+                  <text x="134" y="35" font-size="7" fill="#1A1A2E" font-style="italic">N = 50 turns</text>
+                </svg>
+              </div>
+              <div class="diag-wrap graph-col">
+                <svg viewBox="0 0 170 122" width="160" height="115" xmlns="http://www.w3.org/2000/svg" style="font-family:Arial,sans-serif;">
+                  <rect x="30" y="8" width="126" height="84" fill="#FAFAF7" stroke="#D8D4CC" stroke-width="0.7"/>
+                  <line x1="30" y1="36" x2="156" y2="36" stroke="#EEEAE4" stroke-width="0.5"/><line x1="30" y1="64" x2="156" y2="64" stroke="#EEEAE4" stroke-width="0.5"/>
+                  <line x1="30" y1="8" x2="30" y2="92" stroke="#1A1A2E" stroke-width="1.3"/><line x1="30" y1="92" x2="158" y2="92" stroke="#1A1A2E" stroke-width="1.3"/>
+                  <line x1="30" y1="8" x2="62" y2="8" stroke="#1A1A2E" stroke-width="1.8"/>
+                  <line x1="62" y1="8" x2="124" y2="92" stroke="#1A1A2E" stroke-width="1.8"/>
+                  <line x1="124" y1="92" x2="156" y2="92" stroke="#1A1A2E" stroke-width="1.8"/>
+                  <text x="6" y="12" font-size="6.5" fill="#1A1A2E">0.8</text><text x="16" y="92" font-size="6.5" fill="#1A1A2E">0</text>
+                  <text x="2" y="54" font-size="7" fill="#1A1A2E" transform="rotate(-90,2,54)">Φ (Wb)</text>
+                  <line x1="62" y1="92" x2="62" y2="96" stroke="#1A1A2E" stroke-width="1"/><line x1="124" y1="92" x2="124" y2="96" stroke="#1A1A2E" stroke-width="1"/>
+                  <text x="56" y="104" font-size="6.5" fill="#1A1A2E">0.2</text><text x="118" y="104" font-size="6.5" fill="#1A1A2E">0.6</text>
+                  <text x="83" y="116" font-size="7" fill="#1A1A2E" text-anchor="middle">Time (s)</text>
+                  <text x="88" y="6" font-size="6.5" fill="#8A8A8A" text-anchor="middle" font-style="italic">Magnetic Flux vs Time</text>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="sub-q"><span class="sub-num">2.1</span><span class="sub-text">State Faraday's Law of Electromagnetic Induction in words.</span><span class="sub-mark">(2)</span></div>
+          <div class="sub-q"><span class="sub-num">2.2</span><span class="sub-text">Use the graph to calculate the average induced EMF as the coil is removed from the field.</span><span class="sub-mark">(4)</span></div>
+          <div class="sub-q"><span class="sub-num">2.3</span><span class="sub-text">Calculate the induced current through the galvanometer during removal.</span><span class="sub-mark">(3)</span></div>
+          <div class="sub-q"><span class="sub-num">2.4</span><span class="sub-text">The coil is replaced with one of identical dimensions but with <strong>100 turns</strong>. State and explain whether the induced EMF will be larger, smaller, or the same.</span><span class="sub-mark">(3)</span></div>
+          <div class="sub-q"><span class="sub-num">2.5</span><span class="sub-text">The original coil is held stationary inside the field. What will be observed on the galvanometer? Explain.</span><span class="sub-mark">(2)</span></div>
+          <div class="q-total-line">[14]</div>
+        </div>
+
+        <!-- QUESTION 3 -->
+        <div class="q-block">
+          <div class="q-num-row">
+            <span class="q-num-p">QUESTION 3</span>
+            <span class="q-title-p">STOICHIOMETRY — QUANTITATIVE ASPECTS</span>
+          </div>
+          <div class="scenario">Calcium carbonate reacts with dilute hydrochloric acid. An impure sample of CaCO₃ with a mass of <strong>15.0 g</strong> is used. When excess HCl is added, <strong>4.18 g</strong> of CO₂ is actually collected. Molar masses: CaCO₃ = 100 g·mol⁻¹; CO₂ = 44 g·mol⁻¹.</div>
+          <div class="eq-box">
+            <div class="eq-label">Reaction equation — unbalanced (see 3.1)</div>
+            <div class="eq-main">CaCO₃ (s) + HCl (aq) → CaCl₂ (aq) + H₂O (ℓ) + CO₂ (g)</div>
+          </div>
+          <table class="data-tbl">
+            <thead><tr><th>Substance</th><th>Molar mass (g·mol⁻¹)</th><th>Quantity</th></tr></thead>
+            <tbody>
+              <tr><td>CaCO₃ (impure sample)</td><td>100</td><td>15.0 g sample</td></tr>
+              <tr><td>HCl (aq)</td><td>36.5</td><td>Excess</td></tr>
+              <tr><td>CO₂ (g) — actual yield</td><td>44</td><td>4.18 g collected</td></tr>
+            </tbody>
+          </table>
+          <div class="chain">
+            <div class="c-step">Balance<span>equation</span></div><div class="c-arrow">→</div>
+            <div class="c-step">n(CaCO₃)<span>from mass</span></div><div class="c-arrow">→</div>
+            <div class="c-step">n(CO₂)<span>molar ratio</span></div><div class="c-arrow">→</div>
+            <div class="c-step">Theoretical<span>yield</span></div><div class="c-arrow">→</div>
+            <div class="c-step">% yield<span>actual/theoretical</span></div>
+          </div>
+          <div class="sub-q"><span class="sub-num">3.1</span><span class="sub-text">Balance the chemical equation for this reaction.</span><span class="sub-mark">(2)</span></div>
+          <div class="sub-q"><span class="sub-num">3.2</span><span class="sub-text">Calculate the moles of CaCO₃ in 15.0 g, assuming the sample is pure.</span><span class="sub-mark">(2)</span></div>
+          <div class="sub-q"><span class="sub-num">3.3</span><span class="sub-text">Use the balanced equation and your answer to 3.2 to calculate the moles of CO₂ produced if the reaction went to completion.</span><span class="sub-mark">(2)</span></div>
+          <div class="sub-q"><span class="sub-num">3.4</span><span class="sub-text">Calculate the theoretical yield of CO₂ in grams.</span><span class="sub-mark">(2)</span></div>
+          <div class="sub-q"><span class="sub-num">3.5</span><span class="sub-text">Calculate the percentage yield of CO₂ using the actual mass of 4.18 g collected.</span><span class="sub-mark">(3)</span></div>
+          <div class="sub-q hidden" id="p-q3s6"><span class="sub-num">3.6</span><span class="sub-text">Using the actual CO₂ collected, calculate the mass of pure CaCO₃ present in the 15.0 g sample.</span><span class="sub-mark">(4)</span></div>
+          <div class="sub-q hidden" id="p-q3s7"><span class="sub-num">3.7</span><span class="sub-text">Give <strong>TWO</strong> reasons why actual yield differs from theoretical yield in a real laboratory investigation.</span><span class="sub-mark">(4)</span></div>
+          <div class="q-total-line" id="p-q3total">[11]</div>
+        </div>
+
+      </div><!-- /paper-body -->
+
+      <div class="paper-footer">
+        <span class="pf-txt">Revise It · reviseit.io · Generated for Greenfield High School</span>
+        <span class="pf-txt">CAPS-aligned · Grade 11 Physical Sciences</span>
+        <span class="pf-txt">June 2026</span>
+      </div>
+    </div><!-- /a4-paper -->
+  </div><!-- /act-paper -->
+
+</div><!-- /stage -->
+
+<!-- Beat progress dots -->
+<div class="beat-bar" id="beatBar">
+  <div class="beat">
+    <div class="beat-dot" id="bd1"></div>
+    <div class="beat-label" id="bl1">Catalogue</div>
+  </div>
+  <div class="beat">
+    <div class="beat-dot" id="bd2"></div>
+    <div class="beat-label" id="bl2">Selection</div>
+  </div>
+  <div class="beat">
+    <div class="beat-dot" id="bd3"></div>
+    <div class="beat-label" id="bl3">Ordered</div>
+  </div>
+  <div class="beat">
+    <div class="beat-dot" id="bd4"></div>
+    <div class="beat-label" id="bl4">Paper forms</div>
+  </div>
+  <div class="beat">
+    <div class="beat-dot" id="bd5"></div>
+    <div class="beat-label" id="bl5">Teacher<br>voice</div>
+  </div>
+  <div class="beat">
+    <div class="beat-dot" id="bd6"></div>
+    <div class="beat-label" id="bl6">Complete</div>
+  </div>
+</div>
+
+<button class="replay-btn" id="replayBtn">↺ Replay</button>
+
+<script>
+/* ═══════════════════════════════════════════
+   SEQUENCER
+   ═══════════════════════════════════════════ */
+
+const $ = id => document.getElementById(id);
+
+// ── Beat dot controller ──
+let currentBeat = 0;
+function setBeat(n){
+  // Mark previous beats as done, current as lit
+  for(let i = 1; i <= 6; i++){
+    const dot   = $('bd'+i);
+    const label = $('bl'+i);
+    dot.classList.remove('lit','done');
+    label.classList.remove('lit','done');
+    if(i < n){
+      dot.classList.add('done');
+      label.classList.add('done');
+    } else if(i === n){
+      dot.classList.add('lit');
+      label.classList.add('lit');
+    }
+  }
+  currentBeat = n;
+}
+
+function showEl(id)  { $(id).classList.add('visible'); }
+function hideEl(id)  { $(id).classList.remove('visible'); }
+function fadeEl(id)  { $(id).classList.add('fading'); }
+
+function showBubble(id){ const el=$(id); el.classList.remove('hide'); el.classList.add('show'); }
+function hideBubble(id){ const el=$(id); el.classList.remove('show'); el.classList.add('hide'); }
+
+function revealDiag(phId, diagId){
+  const ph=$(phId), diag=$(diagId);
+  ph.style.opacity='0';
+  setTimeout(()=>{ ph.style.display='none'; diag.classList.add('revealed'); diag.classList.add('pulse'); }, 500);
+}
+function revealSubQ(id){
+  const el=$(id);
+  el.classList.add('revealed');
+  setTimeout(()=>el.classList.add('pulse'),100);
+}
+function updateTotal(id, val){
+  const el=$(id);
+  el.style.opacity='0';
+  setTimeout(()=>{ el.textContent=val; el.style.opacity='1'; },350);
+}
+
+function resetAll(){
+  // acts
+  ['actCatalogue','actStack','actPaper'].forEach(id=>{
+    const el=$(id);
+    el.classList.remove('visible','fading');
+  });
+  // ticks
+  ['tick1','tick2','tick3'].forEach(id=>$(id).classList.remove('visible'));
+  ['cc-mech07','cc-em01','cc-chem03'].forEach(id=>$(id).classList.remove('ticked'));
+  // stacked cards
+  ['sc1','sc2','sc3'].forEach(id=>$(id).classList.remove('visible'));
+  // bubbles
+  ['b1','b2','b3','b4'].forEach(id=>{ const el=$(id); el.classList.remove('show','hide'); });
+  // placeholders
+  ['q1-ph','q2-ph'].forEach(id=>{ const el=$(id); el.style.display=''; el.style.opacity='1'; });
+  ['q1-diag','q2-diag'].forEach(id=>$(id).classList.remove('revealed','pulse'));
+  // hidden sub-qs
+  ['p-q1s5','p-q3s6','p-q3s7'].forEach(id=>{
+    const el=$(id); el.classList.remove('revealed','pulse');
+  });
+  // totals
+  $('p-q1total').textContent='[18]'; $('p-q1total').style.opacity='1';
+  $('p-q3total').textContent='[11]'; $('p-q3total').style.opacity='1';
+  // replay btn
+  $('replayBtn').classList.remove('visible');
+  // stage height reset
+  $('stage').style.minHeight = '520px';
+  // reset beat dots
+  for(let i=1;i<=6;i++){
+    $('bd'+i).classList.remove('lit','done');
+    $('bl'+i).classList.remove('lit','done');
+  }
+}
+
+function run(){
+  resetAll();
+
+  // ── ACT 1: catalogue fades in ──
+  setTimeout(()=>{ showEl('actCatalogue'); setBeat(1); }, 300);
+
+  // ── ACT 2: ticks appear one by one ──
+  setTimeout(()=>{ $('cc-mech07').classList.add('ticked'); $('tick1').classList.add('visible'); setBeat(2); }, 2800);
+  setTimeout(()=>{ $('cc-em01').classList.add('ticked');   $('tick2').classList.add('visible'); }, 4200);
+  setTimeout(()=>{ $('cc-chem03').classList.add('ticked'); $('tick3').classList.add('visible'); }, 5600);
+
+  // ── ACT 3: catalogue fades, stacked cards appear ──
+  setTimeout(()=>{
+    fadeEl('actCatalogue');
+    setBeat(3);
+    setTimeout(()=>{ hideEl('actCatalogue'); showEl('actStack'); $('stage').style.minHeight='320px'; }, 900);
+    setTimeout(()=> showEl('sc1'), 1200);
+    setTimeout(()=> showEl('sc2'), 1700);
+    setTimeout(()=> showEl('sc3'), 2200);
+  }, 7500);
+
+  // ── ACT 4: stacked cards fade, paper appears ──
+  setTimeout(()=>{
+    $('actStack').classList.add('fading');
+    setBeat(4);
+    setTimeout(()=>{
+      hideEl('actStack');
+      showEl('actPaper');
+      $('stage').style.minHeight='800px';
+    }, 800);
+  }, 12500);
+
+  // ── ACT 5+6: WhatsApp beats (same timing as scene 06, offset by +14s) ──
+  const T = 14500;
+  // Beat 1: Q1 diagram
+  setTimeout(()=>{ showBubble('b1'); setBeat(5); }, T + 1500);
+  setTimeout(()=> revealDiag('q1-ph','q1-diag'), T + 4000);
+  setTimeout(()=> hideBubble('b1'),       T + 6000);
+  // Beat 2: Q1 synthesis
+  setTimeout(()=> showBubble('b2'),       T + 9000);
+  setTimeout(()=>{ revealSubQ('p-q1s5'); updateTotal('p-q1total','[21]'); }, T + 11500);
+  setTimeout(()=> hideBubble('b2'),       T + 14000);
+  // Beat 3: Q2 diagram
+  setTimeout(()=> showBubble('b3'),       T + 17000);
+  setTimeout(()=> revealDiag('q2-ph','q2-diag'), T + 19500);
+  setTimeout(()=> hideBubble('b3'),       T + 22000);
+  // Beat 4: Q3 purity
+  setTimeout(()=> showBubble('b4'),       T + 25000);
+  setTimeout(()=>{
+    revealSubQ('p-q3s6');
+    setTimeout(()=> revealSubQ('p-q3s7'), 500);
+    updateTotal('p-q3total','[19]');
+  }, T + 27500);
+  setTimeout(()=> hideBubble('b4'),       T + 31000);
+
+  // ── Act 6: complete ──
+  setTimeout(()=> setBeat(6), T + 32000);
+
+  // ── Replay button appears ──
+  setTimeout(()=> $('replayBtn').classList.add('visible'), T + 33000);
+}
+
+window.addEventListener('load', ()=> setTimeout(run, 400));
+$('replayBtn').addEventListener('click', run);
+</script>
+</body>
+</html>
