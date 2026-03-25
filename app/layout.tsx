@@ -2,13 +2,13 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Revise It — Assessment Intelligence for South African Schools',
+  title: 'Revise It — Test Creation for Grade 11 Physical Sciences',
   description:
-    'Give your department the evidence, tools, and insights to lead where teachers thrive, students excel, and parents become true learning partners.',
+    'A complete 4-document assessment package for every question. CAPS-aligned, original, and ready to print. Free pilot for 20 teachers.',
   openGraph: {
-    title: 'Revise It — Assessment Intelligence for South African Schools',
+    title: 'Revise It — Test Creation for Grade 11 Physical Sciences',
     description:
-      'Stop managing in the dark. Start leading with evidence.',
+      'You know what a great assessment looks like. You just don\'t have time to build one. Join the free pilot.',
     url: 'https://reviseit.io',
     siteName: 'Revise It',
     locale: 'en_ZA',
