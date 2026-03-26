@@ -774,6 +774,20 @@ body {
 
 const $ = id => document.getElementById(id);
 
+// ── Height sync: act-paper is position:absolute so it doesn't push body height.
+//    Poll the paper's rendered height and keep stage min-height in sync so the
+//    page is actually scrollable to the paper's bottom. ──
+let _heightSync = null;
+function startHeightSync(){
+  _heightSync = setInterval(()=>{
+    const paper = document.querySelector('.a4-paper');
+    if(paper) $('stage').style.minHeight = (paper.offsetHeight + 60) + 'px';
+  }, 150);
+}
+function stopHeightSync(){
+  if(_heightSync){ clearInterval(_heightSync); _heightSync = null; }
+}
+
 // ── Beat dot controller ──
 let currentBeat = 0;
 function setBeat(n){
@@ -842,7 +856,8 @@ function resetAll(){
   $('p-q3total').textContent='[11]'; $('p-q3total').style.opacity='1';
   // replay btn
   $('replayBtn').classList.remove('visible');
-  // stage height reset
+  // stop height sync and reset stage
+  stopHeightSync();
   $('stage').style.minHeight = '520px';
   // reset beat dots
   for(let i=1;i<=4;i++){
@@ -882,6 +897,7 @@ function run(){
       hideEl('actStack');
       showEl('actPaper');
       $('stage').style.minHeight='800px';
+      startHeightSync();
     }, 800);
   }, 12500);
 
@@ -905,18 +921,13 @@ function run(){
     revealSubQ('p-q3s6');
     setTimeout(()=> revealSubQ('p-q3s7'), 500);
     updateTotal('p-q3total','[19]');
-    // scroll to paper bottom so Q3 total + footer are visible
-    // delay 2.5s to let sub-question expand animations finish,
-    // then add bottom-bar height so content clears the fixed overlay
-    setTimeout(()=>{
-      const barH = document.querySelector('.bottom-bar').offsetHeight;
-      window.scrollTo({top: document.body.scrollHeight + barH + 40, behavior:'smooth'});
-    }, 2500);
+    // scroll to paper bottom after expand animations finish
+    setTimeout(()=> window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'}), 2000);
   }, T + 27500);
   setTimeout(()=> hideBubble('b4'),       T + 31000);
 
   // ── Act 6: complete ──
-  setTimeout(()=> setBeat(4), T + 32000);
+  setTimeout(()=>{ setBeat(4); stopHeightSync(); }, T + 32000);
 
   // ── Replay button appears ──
   setTimeout(()=> $('replayBtn').classList.add('visible'), T + 33000);
