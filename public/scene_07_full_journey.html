@@ -749,27 +749,19 @@ body {
   <div class="beat-bar" id="beatBar">
     <div class="beat">
       <div class="beat-dot" id="bd1"></div>
-      <div class="beat-label" id="bl1">Catalogue</div>
+      <div class="beat-label" id="bl1">View<br>Catalogue</div>
     </div>
     <div class="beat">
       <div class="beat-dot" id="bd2"></div>
-      <div class="beat-label" id="bl2">Selection</div>
+      <div class="beat-label" id="bl2">Define<br>Order</div>
     </div>
     <div class="beat">
       <div class="beat-dot" id="bd3"></div>
-      <div class="beat-label" id="bl3">Ordered</div>
+      <div class="beat-label" id="bl3">Design<br>Specifications</div>
     </div>
     <div class="beat">
       <div class="beat-dot" id="bd4"></div>
-      <div class="beat-label" id="bl4">Paper forms</div>
-    </div>
-    <div class="beat">
-      <div class="beat-dot" id="bd5"></div>
-      <div class="beat-label" id="bl5">Teacher<br>voice</div>
-    </div>
-    <div class="beat">
-      <div class="beat-dot" id="bd6"></div>
-      <div class="beat-label" id="bl6">Complete</div>
+      <div class="beat-label" id="bl4">View Complete<br>Paper</div>
     </div>
   </div>
   <button class="replay-btn" id="replayBtn">↺ Replay</button>
@@ -786,7 +778,7 @@ const $ = id => document.getElementById(id);
 let currentBeat = 0;
 function setBeat(n){
   // Mark previous beats as done, current as lit
-  for(let i = 1; i <= 6; i++){
+  for(let i = 1; i <= 4; i++){
     const dot   = $('bd'+i);
     const label = $('bl'+i);
     dot.classList.remove('lit','done');
@@ -853,7 +845,7 @@ function resetAll(){
   // stage height reset
   $('stage').style.minHeight = '520px';
   // reset beat dots
-  for(let i=1;i<=6;i++){
+  for(let i=1;i<=4;i++){
     $('bd'+i).classList.remove('lit','done');
     $('bl'+i).classList.remove('lit','done');
   }
@@ -867,15 +859,15 @@ function run(){
   // ── ACT 1: catalogue fades in ──
   setTimeout(()=>{ showEl('actCatalogue'); setBeat(1); }, 300);
 
-  // ── ACT 2: ticks appear one by one ──
-  setTimeout(()=>{ $('cc-mech07').classList.add('ticked'); $('tick1').classList.add('visible'); setBeat(2); }, 2800);
+  // ── ACT 2: ticks appear one by one (still beat 1 — still in catalogue) ──
+  setTimeout(()=>{ $('cc-mech07').classList.add('ticked'); $('tick1').classList.add('visible'); }, 2800);
   setTimeout(()=>{ $('cc-em01').classList.add('ticked');   $('tick2').classList.add('visible'); }, 4200);
   setTimeout(()=>{ $('cc-chem03').classList.add('ticked'); $('tick3').classList.add('visible'); }, 5600);
 
   // ── ACT 3: catalogue fades, stacked cards appear ──
   setTimeout(()=>{
     fadeEl('actCatalogue');
-    setBeat(3);
+    setBeat(2);
     setTimeout(()=>{ hideEl('actCatalogue'); showEl('actStack'); $('stage').style.minHeight='320px'; }, 900);
     setTimeout(()=> showEl('sc1'), 1200);
     setTimeout(()=> showEl('sc2'), 1700);
@@ -885,7 +877,7 @@ function run(){
   // ── ACT 4: stacked cards fade, paper appears ──
   setTimeout(()=>{
     $('actStack').classList.add('fading');
-    setBeat(4);
+    setBeat(3);
     setTimeout(()=>{
       hideEl('actStack');
       showEl('actPaper');
@@ -895,8 +887,8 @@ function run(){
 
   // ── ACT 5+6: WhatsApp beats (same timing as scene 06, offset by +14s) ──
   const T = 14500;
-  // Beat 1: Q1 diagram
-  setTimeout(()=>{ showBubble('b1'); setBeat(5); }, T + 1500);
+  // Beat 1: Q1 diagram (still beat 3 — Design Specifications)
+  setTimeout(()=>{ showBubble('b1'); }, T + 1500);
   setTimeout(()=> revealDiag('q1-ph','q1-diag'), T + 4000);
   setTimeout(()=> hideBubble('b1'),       T + 6000);
   // Beat 2: Q1 synthesis
@@ -907,17 +899,19 @@ function run(){
   setTimeout(()=>{ showBubble('b3'); $('qblock2').scrollIntoView({behavior:'smooth',block:'start'}); }, T + 17000);
   setTimeout(()=> revealDiag('q2-ph','q2-diag'), T + 19500);
   setTimeout(()=> hideBubble('b3'),       T + 22000);
-  // Beat 4: Q3 purity — scroll Q3 into view
+  // Beat 4: Q3 purity — scroll Q3 into view, then scroll to paper bottom
   setTimeout(()=>{ showBubble('b4'); $('qblock3').scrollIntoView({behavior:'smooth',block:'start'}); }, T + 25000);
   setTimeout(()=>{
     revealSubQ('p-q3s6');
     setTimeout(()=> revealSubQ('p-q3s7'), 500);
     updateTotal('p-q3total','[19]');
+    // scroll to paper bottom so Q3 total + footer are visible
+    setTimeout(()=> window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'}), 1200);
   }, T + 27500);
   setTimeout(()=> hideBubble('b4'),       T + 31000);
 
   // ── Act 6: complete ──
-  setTimeout(()=> setBeat(6), T + 32000);
+  setTimeout(()=> setBeat(4), T + 32000);
 
   // ── Replay button appears ──
   setTimeout(()=> $('replayBtn').classList.add('visible'), T + 33000);
