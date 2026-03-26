@@ -906,7 +906,12 @@ function run(){
     setTimeout(()=> revealSubQ('p-q3s7'), 500);
     updateTotal('p-q3total','[19]');
     // scroll to paper bottom so Q3 total + footer are visible
-    setTimeout(()=> window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'}), 1200);
+    // delay 2.5s to let sub-question expand animations finish,
+    // then add bottom-bar height so content clears the fixed overlay
+    setTimeout(()=>{
+      const barH = document.querySelector('.bottom-bar').offsetHeight;
+      window.scrollTo({top: document.body.scrollHeight + barH + 40, behavior:'smooth'});
+    }, 2500);
   }, T + 27500);
   setTimeout(()=> hideBubble('b4'),       T + 31000);
 
