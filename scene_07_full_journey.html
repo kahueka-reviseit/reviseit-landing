@@ -280,8 +280,23 @@ body {
 .wa-bubble.hide { opacity:0; transform:translateX(20px) scale(0.96); transition:opacity 0.3s ease,transform 0.3s ease; }
 .wa-bubble::after { content:''; position:absolute; bottom:0; right:-6px; width:0; height:0; border-style:solid; border-width:0 0 10px 8px; border-color:transparent transparent #E8F5E9 transparent; }
 .wa-name  { font-size:7px; font-weight:700; color:#5B8A72; margin-bottom:3px; letter-spacing:0.3px; }
-.wa-quote { font-family:Georgia,serif; font-size:22px; color:#D4A574; line-height:0.5; display:block; margin-bottom:3px; opacity:0.6; }
 .wa-tick  { font-size:7px; color:#5B8A72; float:right; margin-left:6px; margin-top:2px; }
+
+/* Reply bubble — left side, white */
+.wa-reply {
+  position:absolute; left:18px; max-width:200px;
+  background:#FFFFFF; border-radius:12px 12px 12px 3px;
+  padding:8px 11px 7px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.12);
+  font-family:'Trebuchet MS',sans-serif; font-size:8px; color:#1A1A2E; line-height:1.45;
+  opacity:0; transform:translateX(-40px) scale(0.94);
+  transition:opacity 0.35s ease,transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+.wa-reply.show { opacity:1; transform:translateX(0) scale(1); }
+.wa-reply.hide { opacity:0; transform:translateX(-20px) scale(0.96); transition:opacity 0.3s ease,transform 0.3s ease; }
+.wa-reply::after { content:''; position:absolute; bottom:0; left:-6px; width:0; height:0; border-style:solid; border-width:0 8px 10px 0; border-color:transparent #FFFFFF transparent transparent; }
+.wa-reply-name { font-size:7px; font-weight:700; color:#1A1A2E; margin-bottom:3px; letter-spacing:0.3px; }
+.wa-reply-tick { font-size:7px; color:#A0C4B0; float:right; margin-left:6px; margin-top:2px; }
 
 @keyframes highlightPulse { 0%{background:rgba(212,165,116,0.2)} 60%{background:rgba(212,165,116,0.1)} 100%{background:transparent} }
 .pulse { animation:highlightPulse 1.4s ease forwards; border-radius:2px; }
@@ -551,27 +566,43 @@ body {
       <div class="bubble-layer">
         <div class="wa-bubble" id="b1" style="top:148px;">
           <div class="wa-name">Ms. Dlamini</div>
-          <span class="wa-quote">"</span>
           Block A on the slope, Block B hanging vertically — proper pulley setup.
           <span class="wa-tick">✓✓</span>
         </div>
+        <div class="wa-reply" id="r1" style="top:220px;">
+          <div class="wa-reply-name">Kahueka Huntley</div>
+          On it — adding the diagram now.
+          <span class="wa-reply-tick">✓</span>
+        </div>
         <div class="wa-bubble" id="b2" style="top:148px;">
           <div class="wa-name">Ms. Dlamini</div>
-          <span class="wa-quote">"</span>
           Add a synthesis question at the end — the learner claims the angle decreases tension. Deep thinking.
           <span class="wa-tick">✓✓</span>
         </div>
+        <div class="wa-reply" id="r2" style="top:230px;">
+          <div class="wa-reply-name">Kahueka Huntley</div>
+          Good call. Adding it.
+          <span class="wa-reply-tick">✓</span>
+        </div>
         <div class="wa-bubble" id="b3" style="top:560px;">
           <div class="wa-name">Ms. Dlamini</div>
-          <span class="wa-quote">"</span>
           I want a flux-time graph as the stimulus — show the coil being removed over time.
           <span class="wa-tick">✓✓</span>
         </div>
+        <div class="wa-reply" id="r3" style="top:630px;">
+          <div class="wa-reply-name">Kahueka Huntley</div>
+          Sure thing.
+          <span class="wa-reply-tick">✓</span>
+        </div>
         <div class="wa-bubble" id="b4" style="top:1020px;">
           <div class="wa-name">Ms. Dlamini</div>
-          <span class="wa-quote">"</span>
           Add a purity twist at the end — back-calculate the pure CaCO₃ from the actual yield.
           <span class="wa-tick">✓✓</span>
+        </div>
+        <div class="wa-reply" id="r4" style="top:1090px;">
+          <div class="wa-reply-name">Kahueka Huntley</div>
+          Can do.
+          <span class="wa-reply-tick">✓</span>
         </div>
       </div>
 
@@ -843,7 +874,7 @@ function resetAll(){
   // stacked cards
   ['sc1','sc2','sc3'].forEach(id=>$(id).classList.remove('visible'));
   // bubbles
-  ['b1','b2','b3','b4'].forEach(id=>{ const el=$(id); el.classList.remove('show','hide'); });
+  ['b1','b2','b3','b4','r1','r2','r3','r4'].forEach(id=>{ const el=$(id); el.classList.remove('show','hide'); });
   // placeholders
   ['q1-ph','q2-ph'].forEach(id=>{ const el=$(id); el.style.display=''; el.style.opacity='1'; });
   ['q1-diag','q2-diag'].forEach(id=>$(id).classList.remove('revealed','pulse'));
@@ -903,28 +934,31 @@ function run(){
 
   // ── ACT 5+6: WhatsApp beats (same timing as scene 06, offset by +14s) ──
   const T = 14500;
-  // Beat 1: Q1 diagram (still beat 3 — Design Specifications)
+  // Beat 1: Q1 diagram
   setTimeout(()=>{ showBubble('b1'); }, T + 1500);
-  setTimeout(()=> revealDiag('q1-ph','q1-diag'), T + 4000);
-  setTimeout(()=> hideBubble('b1'),       T + 6000);
+  setTimeout(()=>{ showBubble('r1'); }, T + 2800);   // Kahueka replies
+  setTimeout(()=> revealDiag('q1-ph','q1-diag'),     T + 4500);
+  setTimeout(()=>{ hideBubble('r1'); hideBubble('b1'); }, T + 6500);
   // Beat 2: Q1 synthesis
-  setTimeout(()=> showBubble('b2'),       T + 9000);
-  setTimeout(()=>{ revealSubQ('p-q1s5'); updateTotal('p-q1total','[21]'); }, T + 11500);
-  setTimeout(()=> hideBubble('b2'),       T + 14000);
+  setTimeout(()=> showBubble('b2'),                  T + 9000);
+  setTimeout(()=>{ showBubble('r2'); },              T + 10300); // Kahueka replies
+  setTimeout(()=>{ revealSubQ('p-q1s5'); updateTotal('p-q1total','[21]'); }, T + 12000);
+  setTimeout(()=>{ hideBubble('r2'); hideBubble('b2'); }, T + 14500);
   // Beat 3: Q2 diagram — scroll Q2 into view
   setTimeout(()=>{ showBubble('b3'); $('qblock2').scrollIntoView({behavior:'smooth',block:'start'}); }, T + 17000);
-  setTimeout(()=> revealDiag('q2-ph','q2-diag'), T + 19500);
-  setTimeout(()=> hideBubble('b3'),       T + 22000);
+  setTimeout(()=>{ showBubble('r3'); },              T + 18300); // Kahueka replies
+  setTimeout(()=> revealDiag('q2-ph','q2-diag'),     T + 20000);
+  setTimeout(()=>{ hideBubble('r3'); hideBubble('b3'); }, T + 22500);
   // Beat 4: Q3 purity — scroll Q3 into view, then scroll to paper bottom
   setTimeout(()=>{ showBubble('b4'); $('qblock3').scrollIntoView({behavior:'smooth',block:'start'}); }, T + 25000);
+  setTimeout(()=>{ showBubble('r4'); },              T + 26300); // Kahueka replies
   setTimeout(()=>{
     revealSubQ('p-q3s6');
     setTimeout(()=> revealSubQ('p-q3s7'), 500);
     updateTotal('p-q3total','[19]');
-    // scroll to paper bottom after expand animations finish
     setTimeout(()=> window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'}), 2000);
-  }, T + 27500);
-  setTimeout(()=> hideBubble('b4'),       T + 31000);
+  }, T + 27800);
+  setTimeout(()=>{ hideBubble('r4'); hideBubble('b4'); }, T + 31500);
 
   // ── Act 6: complete ──
   setTimeout(()=>{ setBeat(4); stopHeightSync(); }, T + 32000);
