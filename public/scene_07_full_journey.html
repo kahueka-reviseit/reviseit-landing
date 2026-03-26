@@ -17,6 +17,10 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Hide scrollbars while keeping programmatic scroll */
+html, body { scrollbar-width: none; -ms-overflow-style: none; }
+body::-webkit-scrollbar { display: none; }
+
 body {
   font-family: 'Georgia', 'Times New Roman', serif;
   background: #D8D4CC;
@@ -25,7 +29,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 24px 16px 40px;
+  padding: 24px 16px 90px;
 }
 
 .scene-label {
@@ -282,13 +286,25 @@ body {
 @keyframes highlightPulse { 0%{background:rgba(212,165,116,0.2)} 60%{background:rgba(212,165,116,0.1)} 100%{background:transparent} }
 .pulse { animation:highlightPulse 1.4s ease forwards; border-radius:2px; }
 
+/* Fixed bottom bar — holds progress dots + replay */
+.bottom-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(216, 212, 204, 0.96);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-top: 1px solid #B8B4AC;
+  z-index: 200;
+  padding: 10px 16px 14px;
+}
+
 /* Beat dots progress bar */
 .beat-bar {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0;
-  margin: 20px auto 0;
+  margin: 0 auto;
   width: 100%;
   max-width: 520px;
   position: relative;
@@ -346,7 +362,7 @@ body {
 
 /* Replay */
 .replay-btn {
-  display:block; margin:14px auto 0;
+  display:block; margin:7px auto 0;
   font-family:'Trebuchet MS',sans-serif; font-size:8px; font-weight:700;
   color:#1A1A2E; background:transparent;
   border:1px solid #C8C4BC; border-radius:4px;
@@ -625,7 +641,7 @@ body {
         </div>
 
         <!-- QUESTION 2 -->
-        <div class="q-block">
+        <div class="q-block" id="qblock2">
           <div class="q-num-row">
             <span class="q-num-p">QUESTION 2</span>
             <span class="q-title-p">ELECTROMAGNETIC INDUCTION</span>
@@ -681,7 +697,7 @@ body {
         </div>
 
         <!-- QUESTION 3 -->
-        <div class="q-block">
+        <div class="q-block" id="qblock3">
           <div class="q-num-row">
             <span class="q-num-p">QUESTION 3</span>
             <span class="q-title-p">STOICHIOMETRY — QUANTITATIVE ASPECTS</span>
@@ -728,35 +744,36 @@ body {
 
 </div><!-- /stage -->
 
-<!-- Beat progress dots -->
-<div class="beat-bar" id="beatBar">
-  <div class="beat">
-    <div class="beat-dot" id="bd1"></div>
-    <div class="beat-label" id="bl1">Catalogue</div>
+<!-- Fixed bottom bar: progress dots + replay -->
+<div class="bottom-bar">
+  <div class="beat-bar" id="beatBar">
+    <div class="beat">
+      <div class="beat-dot" id="bd1"></div>
+      <div class="beat-label" id="bl1">Catalogue</div>
+    </div>
+    <div class="beat">
+      <div class="beat-dot" id="bd2"></div>
+      <div class="beat-label" id="bl2">Selection</div>
+    </div>
+    <div class="beat">
+      <div class="beat-dot" id="bd3"></div>
+      <div class="beat-label" id="bl3">Ordered</div>
+    </div>
+    <div class="beat">
+      <div class="beat-dot" id="bd4"></div>
+      <div class="beat-label" id="bl4">Paper forms</div>
+    </div>
+    <div class="beat">
+      <div class="beat-dot" id="bd5"></div>
+      <div class="beat-label" id="bl5">Teacher<br>voice</div>
+    </div>
+    <div class="beat">
+      <div class="beat-dot" id="bd6"></div>
+      <div class="beat-label" id="bl6">Complete</div>
+    </div>
   </div>
-  <div class="beat">
-    <div class="beat-dot" id="bd2"></div>
-    <div class="beat-label" id="bl2">Selection</div>
-  </div>
-  <div class="beat">
-    <div class="beat-dot" id="bd3"></div>
-    <div class="beat-label" id="bl3">Ordered</div>
-  </div>
-  <div class="beat">
-    <div class="beat-dot" id="bd4"></div>
-    <div class="beat-label" id="bl4">Paper forms</div>
-  </div>
-  <div class="beat">
-    <div class="beat-dot" id="bd5"></div>
-    <div class="beat-label" id="bl5">Teacher<br>voice</div>
-  </div>
-  <div class="beat">
-    <div class="beat-dot" id="bd6"></div>
-    <div class="beat-label" id="bl6">Complete</div>
-  </div>
+  <button class="replay-btn" id="replayBtn">↺ Replay</button>
 </div>
-
-<button class="replay-btn" id="replayBtn">↺ Replay</button>
 
 <script>
 /* ═══════════════════════════════════════════
@@ -840,6 +857,8 @@ function resetAll(){
     $('bd'+i).classList.remove('lit','done');
     $('bl'+i).classList.remove('lit','done');
   }
+  // scroll back to top
+  window.scrollTo({top:0, behavior:'auto'});
 }
 
 function run(){
@@ -884,12 +903,12 @@ function run(){
   setTimeout(()=> showBubble('b2'),       T + 9000);
   setTimeout(()=>{ revealSubQ('p-q1s5'); updateTotal('p-q1total','[21]'); }, T + 11500);
   setTimeout(()=> hideBubble('b2'),       T + 14000);
-  // Beat 3: Q2 diagram
-  setTimeout(()=> showBubble('b3'),       T + 17000);
+  // Beat 3: Q2 diagram — scroll Q2 into view
+  setTimeout(()=>{ showBubble('b3'); $('qblock2').scrollIntoView({behavior:'smooth',block:'start'}); }, T + 17000);
   setTimeout(()=> revealDiag('q2-ph','q2-diag'), T + 19500);
   setTimeout(()=> hideBubble('b3'),       T + 22000);
-  // Beat 4: Q3 purity
-  setTimeout(()=> showBubble('b4'),       T + 25000);
+  // Beat 4: Q3 purity — scroll Q3 into view
+  setTimeout(()=>{ showBubble('b4'); $('qblock3').scrollIntoView({behavior:'smooth',block:'start'}); }, T + 25000);
   setTimeout(()=>{
     revealSubQ('p-q3s6');
     setTimeout(()=> revealSubQ('p-q3s7'), 500);

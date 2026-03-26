@@ -291,7 +291,6 @@ export default function Home() {
                 src="/scene_07_full_journey.html"
                 title="How Revise It works — full journey animation"
                 className={styles.animationIframe}
-                scrolling="no"
               />
             </div>
             <p className={styles.animationCaption}>
