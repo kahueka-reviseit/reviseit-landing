@@ -302,48 +302,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Social Proof — Nomsa's Story */}
-      {/* NOTE: Narrative illustration — replace with real pilot testimonial */}
-      <section className={styles.vision}>
-        <div className="container">
-          <p className={`eyebrow ${styles.visionEyebrow}`}>
-            From the Classroom
-          </p>
-          <blockquote className={styles.testimonialQuote}>
-            &ldquo;I coach netball, I coordinate Grade 9, and I teach three Physical
-            Sciences classes. Assessment used to get whatever energy I had left on
-            Sunday. Now it gets my best thinking on Tuesday — and takes 30 minutes.&rdquo;
-          </blockquote>
-          <p className={styles.testimonialAttribution}>
-            — Nomsa, Grade 11 Physical Sciences&nbsp;&nbsp;|&nbsp;&nbsp;Grade 9 Coordinator&nbsp;&nbsp;|&nbsp;&nbsp;Netball Coach
-          </p>
-        </div>
-      </section>
-
-      {/* Objection Handling */}
-      <section className={styles.objection}>
-        <div className="container">
-          <p className={`eyebrow eyebrow-terracotta ${styles.sectionEyebrow}`}>
-            A Fair Question
-          </p>
-          <h2 className={styles.objectionHeadline}>
-            &ldquo;But I want to create my own questions.&rdquo;
-          </h2>
-          <p className={styles.objectionBody}>
-            Good. That instinct is what makes you effective. Revise It doesn&apos;t
-            replace your judgement — it removes the execution burden your schedule
-            can&apos;t accommodate. You decide what to assess, at what cognitive level,
-            in what context. A school that loves rugby? Your projectile motion question
-            features a conversion kick at Loftus. The creative direction is yours. The
-            hours of formatting, memo construction, and learner-language translation?
-            That&apos;s what we take off your plate.
-          </p>
-          <p className={styles.objectionArchitect}>
-            An architect designs a building. They don&apos;t mix the concrete.
-          </p>
-        </div>
-      </section>
-
       {/* Pilot Offer */}
       <section id="pilot" className={styles.cta}>
         <div className="container">
