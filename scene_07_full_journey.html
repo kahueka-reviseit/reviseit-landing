@@ -962,12 +962,12 @@ function run(){
   setTimeout(()=>{ revealSubQ('p-q1s5'); updateTotal('p-q1total','[21]'); }, T + 12000);
   setTimeout(()=>{ hideBubble('r2'); hideBubble('b2'); undimPaper(); }, T + 14500);
   // Beat 3: Q2 diagram — scroll Q2 into view
-  setTimeout(()=>{ $('qblock2').scrollIntoView({behavior:'smooth',block:'start'}); dimPaper(); showBubble('b3'); }, T + 17000);
+  setTimeout(()=>{ window.scrollTo({top: $('qblock2').offsetTop - 16, behavior:'smooth'}); dimPaper(); showBubble('b3'); }, T + 17000);
   setTimeout(()=>{ showBubble('r3'); },                    T + 18300);
   setTimeout(()=> revealDiag('q2-ph','q2-diag'),           T + 20000);
   setTimeout(()=>{ hideBubble('r3'); hideBubble('b3'); undimPaper(); }, T + 22500);
   // Beat 4: Q3 purity — scroll Q3 into view, then scroll to paper bottom
-  setTimeout(()=>{ $('qblock3').scrollIntoView({behavior:'smooth',block:'start'}); dimPaper(); showBubble('b4'); }, T + 25000);
+  setTimeout(()=>{ window.scrollTo({top: $('qblock3').offsetTop - 16, behavior:'smooth'}); dimPaper(); showBubble('b4'); }, T + 25000);
   setTimeout(()=>{ showBubble('r4'); },                    T + 26300);
   setTimeout(()=>{
     revealSubQ('p-q3s6');
