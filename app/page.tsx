@@ -1,5 +1,6 @@
 import styles from './page.module.css';
-import TimeStarvation from './components/TimeStarvation/TimeStarvation';
+import AssessmentJourney from './components/AssessmentJourney/AssessmentJourney';
+import HeroCycler from './components/HeroCycler/HeroCycler';
 
 export default function Home() {
   return (
@@ -33,31 +34,36 @@ export default function Home() {
       {/* Hero */}
       <section className={styles.hero}>
         <div className="container">
-          <p className={`eyebrow eyebrow-sage ${styles.heroEyebrow}`}>
-            For Physical Sciences Teachers
-          </p>
-          <h1 className={styles.heroHeadline}>
-            You know what a great assessment looks like.<br />
-            You just don&apos;t have time to build one.
-          </h1>
-          <p className={styles.heroSub}>
-            You coach, you coordinate, you mentor, you teach. Assessment creation is
-            bread and butter — but it keeps losing to everything else on your plate.
-            Revise It delivers a complete 4-document assessment package so you can
-            give your assessments the quality they deserve, without giving up your weekend.
-          </p>
-          <div className={styles.heroCtas}>
-            <a
-              href="https://tally.so/r/n0vqEP"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.btnPrimary}
-            >
-              Join the Free Pilot
-            </a>
-            <a href="#how-it-works" className={styles.btnSecondary}>
-              See how it works
-            </a>
+          <div className={styles.heroInner}>
+            <p className={`eyebrow eyebrow-sage ${styles.heroEyebrow}`}>
+              For Physical Sciences Heads of Department
+            </p>
+            <h1 className={styles.heroHeadline}>
+              You know what a great assessment looks like.<br />
+              You just don&apos;t have time to build one.
+            </h1>
+            <p className={styles.heroSub}>
+              You coach, you coordinate, you mentor, you teach. Assessment creation
+              keeps losing to everything else on your plate. Revise It delivers a
+              complete 4-document package — the quality your assessments deserve,
+              without the weekend it used to cost.
+            </p>
+            <div className={styles.heroCyclerWrap}>
+              <HeroCycler />
+            </div>
+            <div className={styles.heroCtas}>
+              <a
+                href="https://tally.so/r/n0vqEP"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.btnPrimary}
+              >
+                Join the Free Pilot
+              </a>
+              <a href="#how-it-works" className={styles.btnSecondary}>
+                See how it works
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -105,25 +111,19 @@ export default function Home() {
               </p>
             </div>
 
-            <div className={styles.problemCard}>
-              <div className={styles.problemCardBorder} />
-              <p className="eyebrow eyebrow-terracotta">The Memo You Never Write</p>
-              <h3 className={styles.problemTitle}>
-                You know what a proper memo looks like. You never have time to write it.
-              </h3>
-              <p className={styles.problemBody}>
-                A proper memo anticipates every way a learner could go wrong. Remediation
-                should be personalised, not a rushed board review. But creating that
-                material takes hours you&apos;ve already spent on everything else your
-                school needs from you.
-              </p>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Time Starvation Animation */}
-      <TimeStarvation />
+      {/* How It Works — AssessmentJourney */}
+      <section id="how-it-works" className={styles.reveal}>
+        <div className="container-wide">
+          <p className={`eyebrow eyebrow-sage ${styles.sectionEyebrow}`}>
+            How It Works
+          </p>
+          <AssessmentJourney />
+        </div>
+      </section>
 
       {/* Transformation — Before/After */}
       <section className={styles.transformation}>
@@ -160,144 +160,6 @@ export default function Home() {
                 Your weekend was yours.
               </p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 4-Document Package */}
-      <section className={styles.levels}>
-        <div className="container">
-          <p className={`eyebrow eyebrow-sage ${styles.sectionEyebrow}`}>
-            What You Get
-          </p>
-          <h2 className={styles.sectionHeadline}>
-            Everything you&apos;d build if you had the time.
-          </h2>
-          <p className={styles.sectionIntro}>
-            You know what a complete assessment looks like. Design notes, original
-            questions, a memo that handles every wrong answer, remediation that reaches
-            every learner. You&apos;ve just never had time to build it all. Each question
-            you request generates four purpose-built documents.
-          </p>
-
-          <div className={styles.levelsStack}>
-            {[
-              {
-                n: '1',
-                bg: '#B85042',
-                color: '#fff',
-                phase: 'Design Phase',
-                label: "Teacher's Description",
-                desc: "Your blueprint. Bloom's taxonomy level, CAPS topic, cognitive demand, and mark allocation — so you design a balanced test before learners see a question.",
-              },
-              {
-                n: '2',
-                bg: '#5B8A72',
-                color: '#fff',
-                phase: 'Assessment Phase',
-                label: "Learner's Question",
-                desc: "Original, so tutors can't pre-drill. CAPS-aligned, formatted for the exam room, and exclusive to your school.",
-              },
-              {
-                n: '3',
-                bg: '#1A1A2E',
-                color: '#fff',
-                phase: 'Marking Phase',
-                label: 'Comprehensive Teacher Memo',
-                desc: "Every anticipated error scenario, consequential error protocols, partial mark allocation. The memo you'd write if you weren't also coaching on Thursday.",
-              },
-              {
-                n: '4',
-                bg: '#D4A574',
-                color: '#1A1A2E',
-                phase: 'Remediation Phase',
-                label: 'Learner-Facing Memo',
-                desc: "Step-by-step reasoning in learner language. The remediation you've always wanted to give but never had time to create.",
-              },
-            ].map((item) => (
-              <div key={item.n} className={styles.levelRow}>
-                <div
-                  className={styles.levelNum}
-                  style={{ background: item.bg, color: item.color }}
-                >
-                  {item.n}
-                </div>
-                <div className={styles.levelContent}>
-                  <p className={styles.levelPhase}>{item.phase}</p>
-                  <p className={styles.levelLabel}>{item.label}</p>
-                  <p className={styles.levelDesc}>{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section id="how-it-works" className={styles.workflow}>
-        <div className="container">
-          <p className={`eyebrow eyebrow-sage ${styles.sectionEyebrow}`}>
-            How It Works
-          </p>
-          <h2 className={styles.sectionHeadline}>Teacher decides, AI executes</h2>
-          <p className={styles.sectionIntro}>
-            Your expertise is irreplaceable. Your time is not unlimited.
-          </p>
-
-          <div className={styles.workflowGrid}>
-            <div className={styles.workflowCard}>
-              <p className={styles.workflowStepNum}>1</p>
-              <h3 className={styles.workflowCardTitle}>You Describe</h3>
-              <p className={styles.workflowCardBody}>
-                Tell us what you need — topic, cognitive level, mark allocation, any
-                context. The same brief you&apos;d give a trusted colleague.
-              </p>
-            </div>
-            <div className={styles.workflowCard}>
-              <p className={styles.workflowStepNum}>2</p>
-              <h3 className={styles.workflowCardTitle}>We Generate</h3>
-              <p className={styles.workflowCardBody}>
-                AI produces all four documents from master archetypes reverse-engineered
-                from real provincial assessments. Not a chatbot — a purpose-built
-                assessment engine.
-              </p>
-            </div>
-            <div className={styles.workflowCard}>
-              <p className={styles.workflowStepNum}>3</p>
-              <h3 className={styles.workflowCardTitle}>You Refine</h3>
-              <p className={styles.workflowCardBody}>
-                Review the package. Request changes. Approve when satisfied. Your
-                professional judgement stays central — we just removed the hours of
-                execution.
-              </p>
-            </div>
-          </div>
-
-          <p className={styles.workflowClosing}>
-            No app to learn. No platform to master. Just email — because you have
-            enough tools to manage already.
-          </p>
-
-          <div className={styles.animationBlock}>
-            <p className={`eyebrow eyebrow-sage ${styles.sectionEyebrow}`} style={{ marginBottom: '8px' }}>
-              See It In Action
-            </p>
-            <p className={styles.animationIntro}>
-              Watch a Grade 11 Physical Sciences paper come together — from question
-              catalogue to finished document, with a teacher refining it in real time.
-            </p>
-            <div className={styles.animationFrame}>
-              <iframe
-                src="/scene_07_full_journey.html"
-                title="How Revise It works — full journey animation"
-                className={styles.animationIframe}
-              />
-            </div>
-            <p className={styles.animationCaption}>
-              Three questions selected from the catalogue. Teacher adds a synthesis
-              sub-question, requests a diagram, adds a purity twist. Each change takes
-              seconds. The paper adjusts in real time.
-            </p>
           </div>
         </div>
       </section>

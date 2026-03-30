@@ -1,0 +1,191 @@
+/* ─── Root ───────────────────────────────────────────────────── */
+.root {
+  width: 100%;
+}
+
+/* ─── Button strip ───────────────────────────────────────────── */
+.tabStrip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+
+  /* Inactive: tinted phase-color background */
+  background: var(--phase-bg);
+  color: var(--phase-color);
+
+  transition:
+    background 0.17s ease,
+    color 0.17s ease,
+    transform 0.14s ease,
+    box-shadow 0.17s ease;
+}
+
+.tab:hover {
+  background: var(--phase-bg-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.10);
+}
+
+.tab:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Active: solid phase color, contrasting text */
+.tabActive {
+  background: var(--phase-color) !important;
+  color: var(--phase-text-active, #fff) !important;
+  font-weight: 600;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+  transform: none;
+}
+
+.tabActive:hover {
+  transform: none;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+}
+
+.tabStep {
+  font-size: 0.65rem;
+  font-weight: 700;
+  opacity: 0.55;
+  letter-spacing: 0.04em;
+}
+
+.tabActive .tabStep {
+  opacity: 0.75;
+}
+
+.tabLabel {
+  line-height: 1;
+}
+
+/* ─── Content: two-column on wide screens ────────────────────── */
+.content {
+  display: grid;
+  grid-template-columns: 1fr 570px;
+  gap: 40px;
+  align-items: start;
+}
+
+/* ─── Copy panel ─────────────────────────────────────────────── */
+.copyPanel {
+  transition: opacity 0.18s ease;
+  padding-top: 8px;
+}
+
+.copyFading {
+  opacity: 0;
+}
+
+.copyEyebrow {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  line-height: 1;
+}
+
+.copyHeadline {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #2D2D2D;
+  line-height: 1.3;
+  margin-bottom: 12px;
+}
+
+.copyTagline {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #2D2D2D;
+  line-height: 1.35;
+  margin-bottom: 12px;
+}
+
+.copyBody {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.95rem;
+  color: #5A5A5A;
+  line-height: 1.75;
+  margin-bottom: 14px;
+}
+
+.copyTransformation {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.8rem;
+  color: #9A9690;
+  font-style: italic;
+  line-height: 1.5;
+  padding-left: 12px;
+  border-left: 2px solid #D4D0C8;
+}
+
+/* ─── Iframe area ────────────────────────────────────────────── */
+.iframeOuter {
+  display: flex;
+  justify-content: center;
+}
+
+.iframeInner {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.11), 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.iframe {
+  display: block;
+  width: 570px;
+  height: 510px;
+  border: none;
+  background: #C8C2B8;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+
+  .copyPanel {
+    max-width: 620px;
+  }
+
+  .iframeOuter {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .tab {
+    padding: 8px 13px;
+    font-size: 0.78rem;
+  }
+
+  .iframeOuter {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

@@ -1,0 +1,130 @@
+.root {
+  width: 580px;
+  flex-shrink: 0;
+}
+
+/* ── Stacked iframes ─────────────────────────────────────── */
+.frames {
+  position: relative;
+  width: 580px;
+  height: 500px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.frame {
+  position: absolute;
+  inset: 0;
+  width: 580px;
+  height: 500px;
+  border: none;
+  opacity: 0;
+  transition: opacity 0.55s ease;
+  background: #C8C2B8;
+}
+
+.frameVisible {
+  opacity: 1;
+}
+
+/* ── Value copy ──────────────────────────────────────────── */
+.copy {
+  margin-top: 20px;
+  min-height: 84px;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.copyVisible {
+  opacity: 1;
+}
+
+.copyLabel {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  line-height: 1;
+}
+
+.copyHeadline {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2D2D2D;
+  line-height: 1.3;
+  margin-bottom: 5px;
+}
+
+.copySub {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.875rem;
+  color: #6A6A6A;
+  line-height: 1.65;
+}
+
+/* ── Dot navigation ──────────────────────────────────────── */
+.dots {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #D4D0C8;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.dot:hover {
+  background: #9A9A9A;
+}
+
+.dotActive {
+  transform: scale(1.3);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 1040px) {
+  .root,
+  .frames,
+  .frame {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .frames {
+    height: 480px;
+  }
+
+  .frame {
+    height: 480px;
+  }
+}
+
+@media (max-width: 640px) {
+  .root {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .frames {
+    width: 100%;
+    height: 380px;
+    overflow: hidden;
+  }
+
+  .frame {
+    width: 570px;
+    height: 500px;
+    transform: scale(0.72);
+    transform-origin: top left;
+  }
+}

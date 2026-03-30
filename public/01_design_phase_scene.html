@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transition — Catalogue to Teacher Description</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Trebuchet MS', sans-serif;
+  background: #C8C2B8;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 12px 16px;
+}
+
+/* ── Spread ── */
+.spread-wrap { position: relative; display: inline-block; }
+
+/* ── Page overlay (for teacher desc phase) ── */
+.paper-overlay {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(248,246,240,0.80);
+  z-index: 50; opacity: 0; pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+.paper-overlay.on { opacity: 1; }
+
+/* ── Catalogue cards ── */
+.cat-card {
+  border: 0.5px solid #D4D0C8; background: #fff; border-radius: 1px;
+  position: relative; overflow: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.4s ease, transform 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.card-wash {
+  position: absolute; inset: 0;
+  background: rgba(200,196,188,0.52);
+  opacity: 0; transition: opacity 0.35s ease;
+  pointer-events: none; z-index: 2;
+}
+.cat-card.rejected .card-wash { opacity: 1; }
+.cat-card.rejected { border-color: #C8C4BC; }
+.cat-card.selected { border-color: #3A8A5A; box-shadow: 0 0 0 1px rgba(58,138,90,0.25); }
+.cat-card.fading-out { opacity: 0; transform: scale(0.94); }
+
+/* ── Badge ── */
+.badge {
+  position: absolute; top: 4px; right: 4px;
+  width: 12px; height: 12px; border-radius: 50%;
+  border: 1.5px solid #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Trebuchet MS', sans-serif; font-size: 7px; font-weight: 700;
+  opacity: 0; transform: scale(0.3);
+  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.34,1.56,0.64,1);
+  z-index: 10; pointer-events: none;
+}
+.badge.reject-badge { background: #A8A098; color: #fff; }
+.badge.select-badge { background: #3A8A5A; color: #fff; }
+.badge.visible { opacity: 1; transform: scale(1); }
+
+/* ── Question blocks (teacher desc phase) ── */
+.q-block-wrap {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.q-block-wrap.visible { opacity: 1; }
+
+/* ── Header title text transition ── */
+.hdr-title {
+  font-family: Georgia, serif; font-size: 7.5px; font-weight: 700;
+  color: #fff; letter-spacing: 0.3px;
+  transition: opacity 0.4s ease;
+  position: absolute; left: 0; right: 0; text-align: center;
+}
+.hdr-title.hidden { opacity: 0; }
+.hdr-title-wrap { position: relative; flex: 1; height: 10px; }
+
+/* ── Sub-question incoming ── */
+.sub-incoming { visibility: hidden; }
+.sub-incoming.arrived { visibility: visible; }
+
+/* ── Bloom bar segments ── */
+.bar-seg {
+  width: 100%; display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  transition: height 0.7s cubic-bezier(0.4,0,0.2,1);
+}
+.bar-seg span { font-family: 'Trebuchet MS', sans-serif; font-size: 6px; font-weight: 700; white-space: nowrap; }
+
+/* ── WhatsApp bubbles ── */
+.bubble-layer {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none; z-index: 100; overflow: visible;
+}
+.wa {
+  position: absolute; left: 270px; max-width: 160px;
+  background: #E8F5E9; border-radius: 10px 10px 10px 3px;
+  padding: 7px 10px 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.16);
+  font-size: 7px; color: #1A1A2E; line-height: 1.45;
+  opacity: 0; transform: translateX(40px) scale(0.94);
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+.wa.show { opacity: 1; transform: translateX(0) scale(1); }
+.wa.hide { opacity: 0; transform: translateX(20px) scale(0.96); transition: opacity 0.28s ease, transform 0.28s ease; }
+.wa::before {
+  content: ''; position: absolute; bottom: 0; left: -6px;
+  width: 0; height: 0; border-style: solid;
+  border-width: 0 8px 10px 0;
+  border-color: transparent #E8F5E9 transparent transparent;
+}
+.wa-name { font-size: 6.5px; font-weight: 700; color: #5B8A72; margin-bottom: 2px; }
+.wa-q { font-family: Georgia, serif; font-size: 18px; color: #D4A574; line-height: 0.4; display: block; margin-bottom: 3px; opacity: 0.6; }
+.wa-tick { font-size: 6.5px; color: #5B8A72; float: right; margin-left: 4px; margin-top: 1px; }
+.wa-reply {
+  position: absolute; left: 10px; max-width: 150px;
+  background: #fff; border-radius: 10px 10px 10px 3px;
+  padding: 7px 10px 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  font-size: 7px; color: #1A1A2E; line-height: 1.45;
+  opacity: 0; transform: translateX(-20px) scale(0.94);
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+.wa-reply.show { opacity: 1; transform: translateX(0) scale(1); }
+.wa-reply.hide { opacity: 0; transform: translateX(-15px) scale(0.96); transition: opacity 0.28s ease, transform 0.28s ease; }
+.wa-reply::after {
+  content: ''; position: absolute; bottom: 0; right: -6px;
+  width: 0; height: 0; border-style: solid;
+  border-width: 0 0 10px 8px;
+  border-color: transparent transparent #fff transparent;
+}
+.wa-reply-name { font-size: 6.5px; font-weight: 700; color: #1A1A2E; margin-bottom: 2px; }
+.wa-reply-tick { font-size: 6.5px; color: #A0C4B0; float: right; margin-left: 4px; margin-top: 1px; }
+
+/* hl pulse */
+@keyframes hlPulse { 0%{background:rgba(212,165,116,0.3)} 100%{background:transparent} }
+.hl { animation: hlPulse 1.2s ease forwards; border-radius: 2px; }
+
+/* caption */
+.caption { margin-top: 18px; display:flex; align-items:center; justify-content:center; gap:12px; }
+.caption-text { font-family:Georgia,serif; font-size:11px; color:#6A5A4A; font-style:italic; }
+.caption-dots { display:flex; gap:5px; }
+.caption-dots span { width:6px; height:6px; border-radius:50%; background:#C8C2B8; }
+.caption-dots span.active { background:#D4A574; }
+.replay-btn {
+  display:block; margin:12px auto 0;
+  font-family:'Trebuchet MS',sans-serif; font-size:8px; font-weight:700;
+  color:#1A1A2E; background:transparent;
+  border:1px solid #C8C4BC; border-radius:4px;
+  padding:5px 16px; cursor:pointer; transition:background 0.2s;
+}
+.replay-btn:hover { background:#EDE9E2; }
+</style>
+</head>
+<body>
+
+<div class="spread-wrap" id="spreadWrap">
+
+  <!-- WhatsApp bubble layer (teacher desc phase) -->
+  <div class="bubble-layer">
+    <div class="wa" id="b1" style="top:148px;">
+      <div class="wa-name">Ms. Dlamini</div>
+      <span class="wa-q">"</span>
+      L2 is too light. I want a proper conceptual explanation question there, not just a one-liner.
+      <span class="wa-tick">✓✓</span>
+    </div>
+    <div class="wa-reply" id="r1" style="top:212px;">
+      <div class="wa-reply-name">Kahueka Huntley</div>
+      Good point. Bumping 1.2 to 5 marks now.
+      <span class="wa-reply-tick">✓</span>
+    </div>
+    <div class="wa" id="b2" style="top:148px;">
+      <div class="wa-name">Ms. Dlamini</div>
+      <span class="wa-q">"</span>
+      And L3 is way too heavy. Add an evaluation question at the end and pull some marks from 1.3.
+      <span class="wa-tick">✓✓</span>
+    </div>
+    <div class="wa-reply" id="r2" style="top:222px;">
+      <div class="wa-reply-name">Kahueka Huntley</div>
+      Adding 1.4 L4, trimming 1.3 down. Much better balance.
+      <span class="wa-reply-tick">✓</span>
+    </div>
+  </div>
+
+  <div style="background:#C8C2B8; border-radius:4px; padding:18px 10px 22px; display:inline-block;">
+    <div style="display:flex; flex-wrap:nowrap; width:530px;">
+
+      <!-- ══ LEFT PAGE ══ -->
+      <div id="leftPage" style="width:260px; flex-shrink:0; background:#F8F6F0; border-radius:2px 0 0 2px; border:0.5px solid #A8A098; border-right:none; box-shadow:-4px 0 8px rgba(0,0,0,0.18); display:flex; flex-direction:column; position:relative;">
+
+        <div class="paper-overlay" id="pageOverlay"></div>
+
+        <!-- Header -->
+        <div style="background:#1A1A2E; padding:6px 9px; display:flex; align-items:center; gap:6px; flex-shrink:0; position:relative; z-index:60;">
+          <div style="flex-shrink:0;">
+            <div style="font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#D4A574; letter-spacing:1.5px; text-transform:uppercase;">Revise It</div>
+            <div style="height:1.5px; background:#5B8A72; border-radius:1px; width:32px; margin-top:2px;"></div>
+          </div>
+          <!-- Swappable title -->
+          <div class="hdr-title-wrap">
+            <div class="hdr-title" id="titleCat1">Question Catalogue</div>
+            <div class="hdr-title hidden" id="titleDesc1">Teacher Description</div>
+          </div>
+          <div style="flex-shrink:0; text-align:right;">
+            <div style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#A7BEAE; line-height:1.6;">Physical Sciences</div>
+            <div style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#A7BEAE; line-height:1.6;">Grade 11 · CAPS</div>
+          </div>
+        </div>
+        <div style="height:2px; background:linear-gradient(to right,#D4A574,#5B8A72 40%,#1A1A2E); flex-shrink:0; position:relative; z-index:60;"></div>
+
+        <div style="padding:8px 9px; flex:1; position:relative; min-height:340px;">
+
+          <!-- ── CATALOGUE CARDS (left page) ── -->
+          <div id="catLeft">
+            <!-- Mechanics -->
+            <div style="display:flex; align-items:center; gap:4px; margin-bottom:3px;">
+              <div style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; font-weight:700; color:#5B8A72; letter-spacing:0.8px; text-transform:uppercase; white-space:nowrap;">Mechanics</div>
+              <div style="height:0.5px; background:#5B8A72; flex:1; opacity:0.4;"></div>
+            </div>
+            <div class="cat-card" id="c1" style="margin-bottom:4px;"><div class="card-wash"></div><div class="badge reject-badge" id="b_1">✕</div><div style="height:2.5px;background:#5B8A72;"></div><div style="padding:3px 6px 4px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5px;"><div style="height:3px;background:#5B8A72;border-radius:4px;width:30px;opacity:0.5;"></div><div style="height:3px;background:#1A1A2E;border-radius:4px;width:24px;opacity:0.5;"></div></div><div style="font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;margin-bottom:2.5px;">Equilibrium &amp; Suspended Objects</div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:78%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:88%;"></div></div></div>
+            <div class="cat-card" id="c2" style="margin-bottom:4px;"><div class="card-wash"></div><div class="badge select-badge" id="b_2">✓</div><div style="height:2.5px;background:#5B8A72;"></div><div style="padding:3px 6px 4px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5px;"><div style="height:3px;background:#5B8A72;border-radius:4px;width:30px;opacity:0.5;"></div><div style="height:3px;background:#1A1A2E;border-radius:4px;width:24px;opacity:0.5;"></div></div><div style="font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;margin-bottom:2.5px;">Connected Bodies — Inclined Plane</div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:65%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:72%;"></div></div></div>
+            <div class="cat-card" id="c3" style="margin-bottom:8px;"><div class="card-wash"></div><div class="badge reject-badge" id="b_3">✕</div><div style="height:2.5px;background:#5B8A72;"></div><div style="padding:3px 6px 4px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5px;"><div style="height:3px;background:#5B8A72;border-radius:4px;width:30px;opacity:0.5;"></div><div style="height:3px;background:#1A1A2E;border-radius:4px;width:24px;opacity:0.5;"></div></div><div style="font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;margin-bottom:2.5px;">Work, Energy &amp; Motion</div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:82%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:60%;"></div></div></div>
+            <!-- Waves & EM -->
+            <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;"><div style="font-family:'Trebuchet MS',sans-serif;font-size:5.5px;font-weight:700;color:#1A1A2E;letter-spacing:0.8px;text-transform:uppercase;white-space:nowrap;">Waves &amp; EM Induction</div><div style="height:0.5px;background:#1A1A2E;flex:1;opacity:0.25;"></div></div>
+            <div class="cat-card" id="c4" style="margin-bottom:4px;"><div class="card-wash"></div><div class="badge select-badge" id="b_4">✓</div><div style="height:2.5px;background:#1A1A2E;"></div><div style="padding:3px 6px 4px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5px;"><div style="height:3px;background:#1A1A2E;border-radius:4px;width:28px;opacity:0.4;"></div><div style="height:3px;background:#1A1A2E;border-radius:4px;width:24px;opacity:0.4;"></div></div><div style="font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;margin-bottom:2.5px;">Electromagnetic Induction</div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:70%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:75%;"></div></div></div>
+            <div class="cat-card" id="c5" style="margin-bottom:8px;"><div class="card-wash"></div><div class="badge reject-badge" id="b_5">✕</div><div style="height:2.5px;background:#1A1A2E;"></div><div style="padding:3px 6px 4px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5px;"><div style="height:3px;background:#1A1A2E;border-radius:4px;width:28px;opacity:0.4;"></div><div style="height:3px;background:#1A1A2E;border-radius:4px;width:24px;opacity:0.4;"></div></div><div style="font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;margin-bottom:2.5px;">Refraction &amp; Snell's Law</div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:55%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:50%;"></div></div></div>
+            <!-- Electrostatics -->
+            <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;"><div style="font-family:'Trebuchet MS',sans-serif;font-size:5.5px;font-weight:700;color:#2A6098;letter-spacing:0.8px;text-transform:uppercase;white-space:nowrap;">Electrostatics</div><div style="height:0.5px;background:#2A6098;flex:1;opacity:0.35;"></div></div>
+            <div class="cat-card" id="c6" style="margin-bottom:4px;"><div class="card-wash"></div><div class="badge reject-badge" id="b_6">✕</div><div style="height:2.5px;background:#2A6098;"></div><div style="padding:3px 6px 4px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5px;"><div style="height:3px;background:#2A6098;border-radius:4px;width:28px;opacity:0.5;"></div><div style="height:3px;background:#1A1A2E;border-radius:4px;width:24px;opacity:0.5;"></div></div><div style="font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;margin-bottom:2.5px;">Coulomb's Law</div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:77%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:62%;"></div></div></div>
+            <div class="cat-card" id="c7"><div class="card-wash"></div><div class="badge reject-badge" id="b_7">✕</div><div style="height:2.5px;background:#2A6098;"></div><div style="padding:3px 6px 4px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5px;"><div style="height:3px;background:#2A6098;border-radius:4px;width:28px;opacity:0.5;"></div><div style="height:3px;background:#1A1A2E;border-radius:4px;width:24px;opacity:0.5;"></div></div><div style="font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;margin-bottom:2.5px;">Electric Field &amp; Force</div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:83%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:58%;"></div></div></div>
+          </div><!-- /catLeft -->
+
+          <!-- ── TEACHER DESC CONTENT (left page) ── -->
+          <div id="qdLeft" style="position:absolute; inset:8px 9px;">
+
+            <!-- Q1 -->
+            <div id="qblock1" class="q-block-wrap" style="margin-bottom:10px;">
+              <div style="margin-bottom:4px;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;">QUESTION 1</span></div>
+              <div style="background:#F0EDE8;border-left:2px solid #D4A574;border-radius:0 1px 1px 0;padding:3px 5px;margin-bottom:5px;">
+                <div style="font-family:'Trebuchet MS',sans-serif;font-size:5px;color:#8A6020;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:2px;">Teacher description</div>
+                <div style="height:2.5px;background:#C8B898;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#C8B898;border-radius:1px;width:92%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#C8B898;border-radius:1px;width:78%;"></div>
+              </div>
+              <div style="margin-bottom:5px;"><div style="height:3.5px;background:#D4D0C8;border-radius:1px;margin-bottom:2.5px;width:100%;"></div><div style="height:3.5px;background:#D4D0C8;border-radius:1px;width:80%;"></div></div>
+              <div style="border:0.5px dashed #B8B4AC;background:#F2F0EC;border-radius:2px;height:32px;margin-bottom:5px;display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="12" height="12" viewBox="0 0 20 20" fill="none"><rect x="0.5" y="0.5" width="19" height="19" rx="2" stroke="#B0A898" stroke-width="1"/><line x1="0.5" y1="13" x2="19.5" y2="19.5" stroke="#B0A898" stroke-width="1"/><line x1="0.5" y1="19.5" x2="19.5" y2="13" stroke="#B0A898" stroke-width="1"/><circle cx="6" cy="7" r="2.5" stroke="#B0A898" stroke-width="1" fill="none"/></svg><span style="font-family:'Trebuchet MS',sans-serif;font-size:5.5px;color:#A8A098;text-transform:uppercase;letter-spacing:0.5px;">Diagram</span></div>
+              <div style="display:flex;gap:4px;align-items:center;margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;font-weight:700;color:#1A1A2E;min-width:14px;">1.1</span><div style="flex:1;height:3.5px;background:#D4D0C8;border-radius:1px;"></div><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;color:#1A1A2E;">(2)</span><span style="font-family:'Trebuchet MS',sans-serif;font-size:5px;font-weight:700;color:#fff;background:#5B8A72;border-radius:2px;padding:1px 3px;white-space:nowrap;">[Recall: L1]</span></div>
+              <div style="display:flex;gap:4px;align-items:flex-start;margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;font-weight:700;color:#1A1A2E;min-width:14px;padding-top:1px;">1.2</span><div style="flex:1;"><div style="height:3.5px;background:#D4D0C8;border-radius:1px;margin-bottom:2px;"></div><div style="height:3.5px;background:#D4D0C8;border-radius:1px;width:65%;"></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding-top:1px;"><span id="mark12" style="font-family:'Trebuchet MS',sans-serif;font-size:6px;color:#1A1A2E;">(2)</span><span style="font-family:'Trebuchet MS',sans-serif;font-size:5px;font-weight:700;color:#fff;background:#1A1A2E;border-radius:2px;padding:1px 3px;white-space:nowrap;">[Understanding: L2]</span></div></div>
+              <div style="display:flex;gap:4px;align-items:flex-start;margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;font-weight:700;color:#1A1A2E;min-width:14px;padding-top:1px;">1.3</span><div style="flex:1;"><div style="height:3.5px;background:#D4D0C8;border-radius:1px;margin-bottom:2px;"></div><div style="height:3.5px;background:#D4D0C8;border-radius:1px;width:78%;"></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding-top:1px;"><span id="mark13" style="font-family:'Trebuchet MS',sans-serif;font-size:6px;color:#1A1A2E;">(8)</span><span style="font-family:'Trebuchet MS',sans-serif;font-size:5px;font-weight:700;color:#1A1A2E;background:#D4A574;border-radius:2px;padding:1px 3px;white-space:nowrap;">[Application: L3]</span></div></div>
+              <div class="sub-incoming" id="sub14" style="display:flex;gap:4px;align-items:flex-start;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;font-weight:700;color:#1A1A2E;min-width:14px;padding-top:1px;">1.4</span><div style="flex:1;"><div style="height:3.5px;background:#D4D0C8;border-radius:1px;margin-bottom:2px;"></div><div style="height:3.5px;background:#D4D0C8;border-radius:1px;width:50%;"></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding-top:1px;"><span class="mark14" style="font-family:'Trebuchet MS',sans-serif;font-size:6px;color:#1A1A2E;">(2)</span><span style="font-family:'Trebuchet MS',sans-serif;font-size:5px;font-weight:700;color:#fff;background:#B85042;border-radius:2px;padding:1px 3px;white-space:nowrap;">[Evaluation: L4]</span></div></div>
+              <div class="q-total" id="q1total" style="text-align:right;font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;">[12]</div>
+            </div>
+            <!-- Q2 -->
+            <div id="q2-block" class="q-block-wrap">
+              <div style="margin-bottom:4px;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;">QUESTION 2</span></div>
+              <div style="background:#F0EDE8;border-left:2px solid #D4A574;border-radius:0 1px 1px 0;padding:3px 5px;margin-bottom:5px;"><div style="font-family:'Trebuchet MS',sans-serif;font-size:5px;color:#8A6020;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:2px;">Teacher description</div><div style="height:2.5px;background:#C8B898;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#C8B898;border-radius:1px;width:86%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#C8B898;border-radius:1px;width:70%;"></div></div>
+              <div style="margin-bottom:4px;"><div style="height:3.5px;background:#D4D0C8;border-radius:1px;margin-bottom:2px;"></div><div style="height:3.5px;background:#D4D0C8;border-radius:1px;width:70%;"></div></div>
+              <div style="border:0.5px dashed #B8B4AC;background:#F2F0EC;border-radius:2px;height:20px;margin-bottom:5px;display:flex;align-items:center;justify-content:center;gap:3px;"><svg width="9" height="9" viewBox="0 0 16 16" fill="none"><path d="M13 2H3l4.5 5.5L3 14h10" stroke="#B0A898" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span style="font-family:'Trebuchet MS',sans-serif;font-size:5.5px;color:#A8A098;text-transform:uppercase;">Formula</span></div>
+              <div style="display:flex;gap:4px;align-items:center;margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;font-weight:700;color:#1A1A2E;min-width:14px;">2.1</span><div style="flex:1;height:3.5px;background:#D4D0C8;border-radius:1px;"></div><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;color:#1A1A2E;">(2)</span><span style="font-family:'Trebuchet MS',sans-serif;font-size:5px;font-weight:700;color:#fff;background:#5B8A72;border-radius:2px;padding:1px 3px;white-space:nowrap;">[Recall: L1]</span></div>
+              <div style="display:flex;gap:4px;align-items:center;margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;font-weight:700;color:#1A1A2E;min-width:14px;">2.2</span><div style="flex:1;height:3.5px;background:#D4D0C8;border-radius:1px;"></div><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;color:#1A1A2E;">(4)</span><span style="font-family:'Trebuchet MS',sans-serif;font-size:5px;font-weight:700;color:#1A1A2E;background:#D4A574;border-radius:2px;padding:1px 3px;white-space:nowrap;">[Application: L3]</span></div>
+              <div style="display:flex;gap:4px;align-items:flex-start;margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;font-weight:700;color:#1A1A2E;min-width:14px;padding-top:1px;">2.3</span><div style="flex:1;"><div style="height:3.5px;background:#D4D0C8;border-radius:1px;margin-bottom:2px;"></div><div style="height:3.5px;background:#D4D0C8;border-radius:1px;width:60%;"></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding-top:1px;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;color:#1A1A2E;">(3)</span><span style="font-family:'Trebuchet MS',sans-serif;font-size:5px;font-weight:700;color:#fff;background:#1A1A2E;border-radius:2px;padding:1px 3px;white-space:nowrap;">[Understanding: L2]</span></div></div>
+              <div style="display:flex;gap:4px;align-items:flex-start;margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;font-weight:700;color:#1A1A2E;min-width:14px;padding-top:1px;">2.4</span><div style="flex:1;"><div style="height:3.5px;background:#D4D0C8;border-radius:1px;margin-bottom:2px;"></div><div style="height:3.5px;background:#D4D0C8;border-radius:1px;width:55%;"></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding-top:1px;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;color:#1A1A2E;">(3)</span><span style="font-family:'Trebuchet MS',sans-serif;font-size:5px;font-weight:700;color:#fff;background:#B85042;border-radius:2px;padding:1px 3px;white-space:nowrap;">[Evaluation: L4]</span></div></div>
+              <div style="text-align:right;font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;">[14]</div>
+            </div>
+          </div><!-- /qdLeft -->
+
+        </div><!-- /padding -->
+
+        <div style="background:#EDE9E2;padding:3px 9px;display:flex;justify-content:space-between;flex-shrink:0;position:relative;z-index:60;">
+          <span style="font-family:'Trebuchet MS',sans-serif;font-size:5.5px;color:#8A8A8A;">Revise It · reviseit.io</span>
+          <span style="font-family:'Trebuchet MS',sans-serif;font-size:5.5px;color:#8A8A8A;">Page 1</span>
+        </div>
+      </div><!-- /left page -->
+
+      <!-- SPINE -->
+      <div style="width:10px;flex-shrink:0;background:linear-gradient(to right,rgba(0,0,0,0.22) 0%,rgba(0,0,0,0.08) 35%,rgba(255,255,255,0.12) 50%,rgba(0,0,0,0.06) 65%,rgba(0,0,0,0.20) 100%);"></div>
+
+      <!-- ══ RIGHT PAGE ══ -->
+      <div id="rightPage" style="width:260px;flex-shrink:0;background:#F8F6F0;border-radius:0 2px 2px 0;border:0.5px solid #A8A098;border-left:none;box-shadow:4px 0 8px rgba(0,0,0,0.18);display:flex;flex-direction:column;position:relative;">
+
+        <!-- Header -->
+        <div style="background:#1A1A2E;padding:6px 9px;display:flex;align-items:center;gap:6px;flex-shrink:0;position:relative;z-index:60;">
+          <div style="flex-shrink:0;">
+            <div style="font-family:'Trebuchet MS',sans-serif;font-size:6px;color:#D4A574;letter-spacing:1.5px;text-transform:uppercase;">Revise It</div>
+            <div style="height:1.5px;background:#5B8A72;border-radius:1px;width:32px;margin-top:2px;"></div>
+          </div>
+          <div class="hdr-title-wrap">
+            <div class="hdr-title" id="titleCat2">Question Catalogue</div>
+            <div class="hdr-title hidden" id="titleDesc2">Teacher Description</div>
+          </div>
+          <div style="flex-shrink:0;text-align:right;">
+            <div style="font-family:'Trebuchet MS',sans-serif;font-size:5.5px;color:#A7BEAE;line-height:1.6;">Physical Sciences</div>
+            <div style="font-family:'Trebuchet MS',sans-serif;font-size:5.5px;color:#A7BEAE;line-height:1.6;">Grade 11 · CAPS</div>
+          </div>
+        </div>
+        <div style="height:2px;background:linear-gradient(to right,#D4A574,#5B8A72 40%,#1A1A2E);flex-shrink:0;position:relative;z-index:60;"></div>
+
+        <div style="padding:8px 9px;flex:1;position:relative;min-height:340px;">
+
+          <!-- ── CATALOGUE CARDS (right page) ── -->
+          <div id="catRight">
+            <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;"><div style="font-family:'Trebuchet MS',sans-serif;font-size:5.5px;font-weight:700;color:#B85042;letter-spacing:0.8px;text-transform:uppercase;white-space:nowrap;">Energy &amp; Reactions</div><div style="height:0.5px;background:#B85042;flex:1;opacity:0.4;"></div></div>
+            <div class="cat-card" id="c8" style="margin-bottom:4px;"><div class="card-wash"></div><div class="badge select-badge" id="b_8">✓</div><div style="height:2.5px;background:#B85042;"></div><div style="padding:3px 6px 4px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5px;"><div style="height:3px;background:#B85042;border-radius:4px;width:28px;opacity:0.5;"></div><div style="height:3px;background:#1A1A2E;border-radius:4px;width:24px;opacity:0.5;"></div></div><div style="font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;margin-bottom:2.5px;">Thermochemistry</div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:72%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:60%;"></div></div></div>
+            <div class="cat-card" id="c9" style="margin-bottom:4px;"><div class="card-wash"></div><div class="badge reject-badge" id="b_9">✕</div><div style="height:2.5px;background:#B85042;"></div><div style="padding:3px 6px 4px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5px;"><div style="height:3px;background:#B85042;border-radius:4px;width:28px;opacity:0.5;"></div><div style="height:3px;background:#1A1A2E;border-radius:4px;width:24px;opacity:0.5;"></div></div><div style="font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;margin-bottom:2.5px;">Acid-Base Reactions</div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:60%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:75%;"></div></div></div>
+            <div class="cat-card" id="c10" style="margin-bottom:8px;"><div class="card-wash"></div><div class="badge reject-badge" id="b_10">✕</div><div style="height:2.5px;background:#B85042;"></div><div style="padding:3px 6px 4px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5px;"><div style="height:3px;background:#B85042;border-radius:4px;width:28px;opacity:0.5;"></div><div style="height:3px;background:#1A1A2E;border-radius:4px;width:24px;opacity:0.5;"></div></div><div style="font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;margin-bottom:2.5px;">Redox Reactions</div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:68%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:50%;"></div></div></div>
+            <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;"><div style="font-family:'Trebuchet MS',sans-serif;font-size:5.5px;font-weight:700;color:#8A6020;letter-spacing:0.8px;text-transform:uppercase;white-space:nowrap;">Stoichiometry &amp; Structure</div><div style="height:0.5px;background:#D4A574;flex:1;opacity:0.5;"></div></div>
+            <div class="cat-card" id="c11" style="margin-bottom:4px;"><div class="card-wash"></div><div class="badge reject-badge" id="b_11">✕</div><div style="height:2.5px;background:#D4A574;"></div><div style="padding:3px 6px 4px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5px;"><div style="height:3px;background:#D4A574;border-radius:4px;width:28px;opacity:0.6;"></div><div style="height:3px;background:#1A1A2E;border-radius:4px;width:24px;opacity:0.5;"></div></div><div style="font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;margin-bottom:2.5px;">Stoichiometry Chain</div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:74%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:63%;"></div></div></div>
+            <div class="cat-card" id="c12" style="margin-bottom:8px;"><div class="card-wash"></div><div class="badge reject-badge" id="b_12">✕</div><div style="height:2.5px;background:#D4A574;"></div><div style="padding:3px 6px 4px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5px;"><div style="height:3px;background:#D4A574;border-radius:4px;width:28px;opacity:0.6;"></div><div style="height:3px;background:#1A1A2E;border-radius:4px;width:24px;opacity:0.5;"></div></div><div style="font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;margin-bottom:2.5px;">Molecular Structure Analysis</div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:58%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:70%;"></div></div></div>
+            <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;"><div style="font-family:'Trebuchet MS',sans-serif;font-size:5.5px;font-weight:700;color:#B85042;letter-spacing:0.8px;text-transform:uppercase;white-space:nowrap;">Gas Laws &amp; Concentration</div><div style="height:0.5px;background:#B85042;flex:1;opacity:0.35;"></div></div>
+            <div class="cat-card" id="c13" style="margin-bottom:4px;"><div class="card-wash"></div><div class="badge reject-badge" id="b_13">✕</div><div style="height:2.5px;background:#B85042;"></div><div style="padding:3px 6px 4px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5px;"><div style="height:3px;background:#B85042;border-radius:4px;width:28px;opacity:0.5;"></div><div style="height:3px;background:#1A1A2E;border-radius:4px;width:24px;opacity:0.5;"></div></div><div style="font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;margin-bottom:2.5px;">Gas Laws Application</div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:71%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:56%;"></div></div></div>
+            <div class="cat-card" id="c14"><div class="card-wash"></div><div class="badge reject-badge" id="b_14">✕</div><div style="height:2.5px;background:#B85042;"></div><div style="padding:3px 6px 4px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5px;"><div style="height:3px;background:#B85042;border-radius:4px;width:28px;opacity:0.5;"></div><div style="height:3px;background:#1A1A2E;border-radius:4px;width:24px;opacity:0.5;"></div></div><div style="font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;margin-bottom:2.5px;">Solution Concentration</div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:79%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:64%;"></div></div></div>
+          </div><!-- /catRight -->
+
+          <!-- ── TEACHER DESC CONTENT (right page) ── -->
+          <div id="qdRight" style="position:absolute;inset:8px 9px;">
+            <!-- Q3 -->
+            <div id="qblock3" class="q-block-wrap" style="margin-bottom:10px;">
+              <div style="margin-bottom:4px;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;">QUESTION 3</span></div>
+              <div style="background:#F0EDE8;border-left:2px solid #D4A574;border-radius:0 1px 1px 0;padding:3px 5px;margin-bottom:5px;"><div style="font-family:'Trebuchet MS',sans-serif;font-size:5px;color:#8A6020;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:2px;">Teacher description</div><div style="height:2.5px;background:#C8B898;border-radius:1px;width:100%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#C8B898;border-radius:1px;width:88%;margin-bottom:1.5px;"></div><div style="height:2.5px;background:#C8B898;border-radius:1px;width:74%;"></div></div>
+              <div style="margin-bottom:4px;"><div style="height:3.5px;background:#D4D0C8;border-radius:1px;margin-bottom:2px;"></div><div style="height:3.5px;background:#D4D0C8;border-radius:1px;width:60%;"></div></div>
+              <div style="margin-bottom:5px;border:0.5px solid #D4D0C8;border-radius:2px;overflow:hidden;"><div style="display:flex;background:#4A4A4A;"><div style="flex:2;padding:2.5px 4px;border-right:0.5px solid #5A5A5A;"><div style="height:3px;background:#9A9A9A;border-radius:1px;width:80%;"></div></div><div style="flex:1;padding:2.5px 4px;border-right:0.5px solid #5A5A5A;"><div style="height:3px;background:#9A9A9A;border-radius:1px;width:70%;"></div></div><div style="flex:1;padding:2.5px 4px;"><div style="height:3px;background:#9A9A9A;border-radius:1px;width:60%;"></div></div></div><div style="display:flex;background:#FEFDF9;border-top:0.5px solid #E8E4DC;"><div style="flex:2;padding:2px 4px;border-right:0.5px solid #E8E4DC;"><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:75%;"></div></div><div style="flex:1;padding:2px 4px;border-right:0.5px solid #E8E4DC;"><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:60%;"></div></div><div style="flex:1;padding:2px 4px;"><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:55%;"></div></div></div><div style="display:flex;background:#F6F4F0;border-top:0.5px solid #E8E4DC;"><div style="flex:2;padding:2px 4px;border-right:0.5px solid #E8E4DC;"><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:65%;"></div></div><div style="flex:1;padding:2px 4px;border-right:0.5px solid #E8E4DC;"><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:70%;"></div></div><div style="flex:1;padding:2px 4px;"><div style="height:2.5px;background:#D4D0C8;border-radius:1px;width:50%;"></div></div></div></div>
+              <div style="display:flex;gap:4px;align-items:center;margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;font-weight:700;color:#1A1A2E;min-width:14px;">3.1</span><div style="flex:1;height:3.5px;background:#D4D0C8;border-radius:1px;"></div><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;color:#1A1A2E;">(2)</span><span style="font-family:'Trebuchet MS',sans-serif;font-size:5px;font-weight:700;color:#fff;background:#5B8A72;border-radius:2px;padding:1px 3px;white-space:nowrap;">[Recall: L1]</span></div>
+              <div style="display:flex;gap:4px;align-items:center;margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;font-weight:700;color:#1A1A2E;min-width:14px;">3.2</span><div style="flex:1;height:3.5px;background:#D4D0C8;border-radius:1px;"></div><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;color:#1A1A2E;">(2)</span><span style="font-family:'Trebuchet MS',sans-serif;font-size:5px;font-weight:700;color:#fff;background:#1A1A2E;border-radius:2px;padding:1px 3px;white-space:nowrap;">[Understanding: L2]</span></div>
+              <div style="display:flex;gap:4px;align-items:flex-start;margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;font-weight:700;color:#1A1A2E;min-width:14px;padding-top:1px;">3.3</span><div style="flex:1;"><div style="height:3.5px;background:#D4D0C8;border-radius:1px;margin-bottom:2px;"></div><div style="height:3.5px;background:#D4D0C8;border-radius:1px;width:55%;"></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding-top:1px;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:6px;color:#1A1A2E;">(3)</span><span style="font-family:'Trebuchet MS',sans-serif;font-size:5px;font-weight:700;color:#1A1A2E;background:#D4A574;border-radius:2px;padding:1px 3px;white-space:nowrap;">[Application: L3]</span></div></div>
+              <div style="text-align:right;font-family:'Trebuchet MS',sans-serif;font-size:6.5px;font-weight:700;color:#1A1A2E;">[7]</div>
+            </div>
+            <!-- Bloom's summary -->
+            <div id="qblock4" class="q-block-wrap" style="display:flex;gap:6px;align-items:flex-start;">
+              <div style="flex-shrink:0;border:0.5px solid #D4D0C8;border-radius:2px;padding:4px 5px;background:#fff;">
+                <div style="font-family:'Trebuchet MS',sans-serif;font-size:5px;font-weight:700;color:#6A6A6A;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Bloom's key</div>
+                <svg width="90" height="62" viewBox="0 0 108 62" xmlns="http://www.w3.org/2000/svg">
+                  <polygon points="34,2 26.3,16 41.7,16" fill="#B85042"/><polygon points="26.3,16 41.7,16 49.4,30 18.6,30" fill="#D4A574"/><polygon points="18.6,30 49.4,30 57.1,44 10.9,44" fill="#1A1A2E"/><polygon points="10.9,44 57.1,44 66,58 2,58" fill="#5B8A72"/>
+                  <line x1="26.3" y1="16" x2="41.7" y2="16" stroke="#FEFDF9" stroke-width="0.6"/><line x1="18.6" y1="30" x2="49.4" y2="30" stroke="#FEFDF9" stroke-width="0.6"/><line x1="10.9" y1="44" x2="57.1" y2="44" stroke="#FEFDF9" stroke-width="0.6"/>
+                  <polygon points="34,2 66,58 2,58" fill="none" stroke="#C8C4BC" stroke-width="0.5"/>
+                  <rect x="0" y="6" width="9" height="6" rx="1" fill="#B85042"/><text x="2" y="10.5" font-family="Trebuchet MS,sans-serif" font-size="3.5" fill="#fff" font-weight="700">L4</text>
+                  <rect x="0" y="20" width="9" height="6" rx="1" fill="#D4A574"/><text x="2" y="24.5" font-family="Trebuchet MS,sans-serif" font-size="3.5" fill="#1A1A2E" font-weight="700">L3</text>
+                  <rect x="0" y="34" width="9" height="6" rx="1" fill="#1A1A2E"/><text x="2" y="38.5" font-family="Trebuchet MS,sans-serif" font-size="3.5" fill="#fff" font-weight="700">L2</text>
+                  <rect x="0" y="48" width="9" height="6" rx="1" fill="#5B8A72"/><text x="2" y="52.5" font-family="Trebuchet MS,sans-serif" font-size="3.5" fill="#fff" font-weight="700">L1</text>
+                  <line x1="41.7" y1="9" x2="69" y2="9" stroke="#D4D0C8" stroke-width="0.5" stroke-dasharray="1.5,1"/><text x="70" y="8" font-family="Trebuchet MS,sans-serif" font-size="5" fill="#1A1A2E" font-weight="700">Evaluate</text><text x="70" y="13" font-family="Trebuchet MS,sans-serif" font-size="3.5" fill="#A8A098">Create</text>
+                  <line x1="49.4" y1="23" x2="69" y2="23" stroke="#D4D0C8" stroke-width="0.5" stroke-dasharray="1.5,1"/><text x="70" y="22" font-family="Trebuchet MS,sans-serif" font-size="5" fill="#1A1A2E" font-weight="700">Analyse</text><text x="70" y="27" font-family="Trebuchet MS,sans-serif" font-size="3.5" fill="#A8A098">Apply+</text>
+                  <line x1="57.1" y1="37" x2="69" y2="37" stroke="#D4D0C8" stroke-width="0.5" stroke-dasharray="1.5,1"/><text x="70" y="36" font-family="Trebuchet MS,sans-serif" font-size="5" fill="#1A1A2E" font-weight="700">Understand</text><text x="70" y="41" font-family="Trebuchet MS,sans-serif" font-size="3.5" fill="#A8A098">Apply−</text>
+                  <line x1="66" y1="51" x2="69" y2="51" stroke="#D4D0C8" stroke-width="0.5" stroke-dasharray="1.5,1"/><text x="70" y="53" font-family="Trebuchet MS,sans-serif" font-size="5" fill="#1A1A2E" font-weight="700">Remember</text>
+                </svg>
+              </div>
+              <div style="flex:1;">
+                <div style="font-family:'Trebuchet MS',sans-serif;font-size:5px;font-weight:700;color:#6A6A6A;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Marks distribution</div>
+                <div style="display:flex;gap:4px;margin-bottom:3px;"><div style="flex:1;text-align:center;font-family:'Trebuchet MS',sans-serif;font-size:4.5px;color:#6A6A6A;">Actual</div><div style="flex:1;text-align:center;font-family:'Trebuchet MS',sans-serif;font-size:4.5px;color:#6A6A6A;">Target</div></div>
+                <div style="display:flex;gap:4px;height:60px;">
+                  <div style="flex:1;display:flex;flex-direction:column;border-radius:1px;overflow:hidden;">
+                    <div class="bar-seg" id="a-l4" style="height:6px;background:#B85042;"><span style="color:#fff;" id="a-l4-t">10%</span></div>
+                    <div class="bar-seg" id="a-l3" style="height:29px;background:#D4A574;"><span style="color:#1A1A2E;" id="a-l3-t">48%</span></div>
+                    <div class="bar-seg" id="a-l2" style="height:14px;background:#1A1A2E;"><span style="color:#fff;" id="a-l2-t">23%</span></div>
+                    <div class="bar-seg" id="a-l1" style="height:11px;background:#5B8A72;"><span style="color:#fff;" id="a-l1-t">19%</span></div>
+                  </div>
+                  <div style="flex:1;display:flex;flex-direction:column;border-radius:1px;overflow:hidden;">
+                    <div style="height:6px;background:#B85042;opacity:0.5;display:flex;align-items:center;justify-content:center;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:5.5px;color:#fff;font-weight:700;">10%</span></div>
+                    <div style="height:24px;background:#D4A574;opacity:0.5;display:flex;align-items:center;justify-content:center;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:5.5px;color:#1A1A2E;font-weight:700;">40%</span></div>
+                    <div style="height:21px;background:#1A1A2E;opacity:0.5;display:flex;align-items:center;justify-content:center;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:5.5px;color:#fff;font-weight:700;">35%</span></div>
+                    <div style="height:9px;background:#5B8A72;opacity:0.5;display:flex;align-items:center;justify-content:center;"><span style="font-family:'Trebuchet MS',sans-serif;font-size:5.5px;color:#fff;font-weight:700;">15%</span></div>
+                  </div>
+                </div>
+                <div style="height:0.5px;background:#D4D0C8;margin:3px 0;"></div>
+                <div style="display:flex;gap:4px;"><div style="flex:1;"></div><div style="flex:1;font-family:'Trebuchet MS',sans-serif;font-size:4px;color:#8A8A8A;text-align:center;">CAPS target</div></div>
+              </div>
+            </div>
+          </div><!-- /qdRight -->
+
+        </div><!-- /padding -->
+
+        <div style="background:#EDE9E2;padding:3px 9px;display:flex;justify-content:space-between;flex-shrink:0;position:relative;z-index:60;">
+          <span style="font-family:'Trebuchet MS',sans-serif;font-size:5.5px;color:#8A8A8A;">Revise It · reviseit.io</span>
+          <span style="font-family:'Trebuchet MS',sans-serif;font-size:5.5px;color:#8A8A8A;">Page 2</span>
+        </div>
+      </div><!-- /right page -->
+
+    </div>
+  </div>
+</div><!-- /spread-wrap -->
+
+<div class="caption">
+  <div class="caption-dots"><span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="caption-text" id="captionText">The teacher reads through the catalogue and selects three questions.</div>
+</div>
+<button class="replay-btn" id="replayBtn">↺ Replay</button>
+
+<script>
+(function() {
+const $ = id => document.getElementById(id);
+
+// -- Catalogue selection sequence --------------------------------------
+const catSequence = [
+  ['c1','reject',400], ['c2','select',750], ['c3','reject',1100],
+  ['c4','select',1450], ['c5','reject',1800], ['c6','reject',2150],
+  ['c7','reject',2500], ['c8','select',3000], ['c9','reject',3350],
+  ['c10','reject',3700], ['c11','reject',4050], ['c12','reject',4400],
+  ['c13','reject',4750], ['c14','reject',5100],
+];
+
+function applyCard(cardId, type) {
+  const card = $(cardId);
+  const num = cardId.replace('c','');
+  const badge = $('b_' + num);
+  card.classList.add(type === 'reject' ? 'rejected' : 'selected');
+  if (badge) badge.classList.add('visible');
+}
+
+// -- Transition phase --------------------------------------------------
+function swapHeader() {
+  ['titleCat1','titleCat2'].forEach(id => $( id).classList.add('hidden'));
+  ['titleDesc1','titleDesc2'].forEach(id => $(id).classList.remove('hidden'));
+}
+
+// -- Teacher description animation -------------------------------------
+const barStates = [
+  { l4:6,  l3:29, l2:14, l1:11, tl4:'10%', tl3:'48%', tl2:'23%', tl1:'19%' },
+  { l4:5,  l3:26, l2:17, l1:11, tl4:'9%',  tl3:'44%', tl2:'29%', tl1:'18%' },
+  { l4:9,  l3:22, l2:18, l1:11, tl4:'15%', tl3:'36%', tl2:'30%', tl1:'18%' },
+];
+function setBars(idx) {
+  const s = barStates[idx];
+  $('a-l4').style.height = s.l4+'px'; $('a-l3').style.height = s.l3+'px';
+  $('a-l2').style.height = s.l2+'px'; $('a-l1').style.height = s.l1+'px';
+  $('a-l4-t').textContent = s.tl4; $('a-l3-t').textContent = s.tl3;
+  $('a-l2-t').textContent = s.tl2; $('a-l1-t').textContent = s.tl1;
+}
+function tickMark(id, text) {
+  const el = $(id);
+  el.style.transition = 'opacity 0.3s'; el.style.opacity = '0';
+  setTimeout(() => { el.textContent = '('+text+')'; el.style.opacity = '1'; }, 320);
+}
+function setTotal(text) {
+  const el = $('q1total');
+  el.style.transition = 'opacity 0.35s'; el.style.opacity = '0';
+  setTimeout(() => { el.textContent = '['+text+']'; el.style.opacity = '1'; }, 320);
+}
+function showBubble(id) { const e=$(id); e.classList.remove('hide'); e.classList.add('show'); }
+function hideBubble(id) { const e=$(id); e.classList.remove('show'); e.classList.add('hide'); }
+function dimPage()   { $('pageOverlay').classList.add('on'); }
+function undimPage() { $('pageOverlay').classList.remove('on'); }
+
+// -- Full run ----------------------------------------------------------
+function runAnimation() {
+  // Reset catalogue cards
+  for (let i = 1; i <= 14; i++) {
+    const c = $('c'+i), b = $('b_'+i);
+    if (c) c.classList.remove('rejected','selected','fading-out');
+    if (b) b.classList.remove('visible');
+  }
+  // Reset headers
+  ['titleCat1','titleCat2'].forEach(id => $(id).classList.remove('hidden'));
+  ['titleDesc1','titleDesc2'].forEach(id => $(id).classList.add('hidden'));
+  // Reset teacher desc
+  $('catLeft').style.opacity = '1'; $('catLeft').style.transition = ''; $('catLeft').style.pointerEvents = '';
+  $('catRight').style.opacity = '1'; $('catRight').style.transition = ''; $('catRight').style.pointerEvents = '';
+  ['c2','c4','c8'].forEach(id => { const el=$(id); if(el){ el.style.boxShadow=''; el.style.transform=''; el.style.transition=''; } });
+  ['qblock1','q2-block','qblock3','qblock4'].forEach(id => $(id).classList.remove('visible'));
+  ['b1','b2','r1','r2'].forEach(id => { const e=$(id); e.classList.remove('show','hide'); });
+  const sub = $('sub14');
+  sub.classList.remove('arrived'); sub.classList.add('sub-incoming');
+  $('q1total').textContent = '[12]'; $('q1total').style.opacity = '1';
+  $('mark12').textContent = '(2)'; $('mark12').style.opacity = '1';
+  $('mark13').textContent = '(8)'; $('mark13').style.opacity = '1';
+  document.querySelector('.mark14').textContent = '(2)';
+  setBars(0);
+  $('captionText').textContent = 'The teacher reads through the catalogue and selects three questions.';
+
+  // Phase 1: catalogue selection
+  catSequence.forEach(([id, type, delay]) => setTimeout(() => applyCard(id, type), delay));
+
+  // Phase 2 (t=5.8s): fade out rejected cards
+  setTimeout(() => {
+    for (let i = 1; i <= 14; i++) {
+      const c = $('c'+i);
+      if (c && c.classList.contains('rejected')) c.classList.add('fading-out');
+    }
+  }, 5800);
+
+  // Phase 2b (t=6s): selected cards pulse gold then fade
+  setTimeout(() => {
+    ['c2','c4','c8'].forEach(id => {
+      const el = $(id);
+      el.style.transition = 'box-shadow 0.2s ease, transform 0.2s ease';
+      el.style.boxShadow = '0 0 0 2px #D4A574, 0 4px 16px rgba(212,165,116,0.4)';
+      el.style.transform = 'scale(1.03)';
+    });
+  }, 6000);
+
+  // Phase 3 (t=6.8s): everything fades, questions fade in, header swaps
+  setTimeout(() => {
+    // Fade all catalogue
+    $('catLeft').style.transition  = 'opacity 0.6s ease';
+    $('catLeft').style.opacity     = '0';
+    $('catLeft').style.pointerEvents = 'none';
+    $('catRight').style.transition = 'opacity 0.6s ease';
+    $('catRight').style.opacity    = '0';
+    $('catRight').style.pointerEvents = 'none';
+  }, 6800);
+
+  setTimeout(() => { swapHeader(); }, 7500);
+  setTimeout(() => { $('qblock1').classList.add('visible'); }, 7700);
+  setTimeout(() => { $('q2-block').classList.add('visible'); }, 8200);
+  setTimeout(() => { $('qblock3').classList.add('visible'); }, 8700);
+  setTimeout(() => {
+    $('qblock4').classList.add('visible');
+    $('captionText').textContent = "Each selected spec becomes a question with a Bloom's distribution to balance.";
+  }, 9200);
+
+  // Phase 4 (t=9.2s): teacher description animation begins
+  const T = 10200;
+  setTimeout(() => showBubble('b1'), T);
+  setTimeout(() => showBubble('r1'), T + 1300);
+  setTimeout(() => {
+    tickMark('mark12', 5); setTotal(15); setBars(1);
+    setTimeout(() => $('mark12').classList.add('hl'), 400);
+  }, T + 2500);
+  setTimeout(() => { hideBubble('b1'); hideBubble('r1'); }, T + 5000);
+  setTimeout(() => showBubble('b2'), T + 7500);
+  setTimeout(() => showBubble('r2'), T + 8800);
+  setTimeout(() => {
+    sub.classList.remove('sub-incoming'); sub.classList.add('arrived');
+    tickMark('mark13', 5); setTotal(14); setBars(2);
+  }, T + 10000);
+  setTimeout(() => { hideBubble('b2'); hideBubble('r2'); }, T + 12500);
+}
+
+window.addEventListener('load', () => setTimeout(runAnimation, 600));
+$('replayBtn').addEventListener('click', runAnimation);
+})();
+</script>
+
+</body>
+</html>

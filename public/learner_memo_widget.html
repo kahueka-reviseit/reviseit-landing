@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learner Memo Widget</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #C8C2B8; padding: 16px; display: inline-block; }
+.lsub-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; }
+.sub-num  { font-family:"Trebuchet MS",sans-serif; font-size:6.5px; font-weight:700; color:#1A1A2E; }
+.sub-rule { height:0.5px; background:#D4D0C8; flex:1; margin:0 6px; }
+.sub-marks { font-family:"Trebuchet MS",sans-serif; font-size:6px; color:#1A1A2E; }
+.step-lbl { font-family:"Trebuchet MS",sans-serif; font-size:5.5px; font-weight:700; color:#6A6A6A; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px; }
+.step { background:#F0EDE8; border-radius:1px; padding:2px 4px; margin-bottom:2px; display:flex; align-items:center; gap:3px; }
+.bar { border-radius:1px; }
+.tick { font-family:"Trebuchet MS",sans-serif; font-size:7px; color:#5B8A72; }
+.step-row { display:flex; align-items:center; gap:3px; }
+.lans { display:flex; align-items:center; gap:3px; padding-left:6px; }
+.lans-lbl { font-family:"Trebuchet MS",sans-serif; font-size:5.5px; font-weight:700; color:#1A1A2E; margin-right:3px; }
+.tip-green { background:#EEF5EE; border:0.5px solid #A7BEAE; border-radius:1px; padding:3px 5px; display:flex; gap:3px; align-items:flex-start; }
+.tip-title { font-family:"Trebuchet MS",sans-serif; font-size:5.5px; font-weight:700; color:#4A4A4A; margin-bottom:1.5px; }
+.mistake-box { background:#fff; border:0.5px solid #D4D0C8; border-radius:1px; padding:4px 6px; }
+.mistake-title { display:flex; align-items:center; gap:3px; margin-bottom:3px; }
+.mistake-lbl { font-family:"Trebuchet MS",sans-serif; font-size:5.5px; font-weight:700; color:#B85042; text-transform:uppercase; letter-spacing:0.5px; }
+.wrong-right { display:flex; gap:4px; }
+.wr-col { flex:1; background:#F8F6F0; border-radius:1px; padding:2px 4px; }
+.wr-lbl-w { font-family:"Trebuchet MS",sans-serif; font-size:5px; color:#B85042; font-weight:700; margin-bottom:1.5px; }
+.wr-lbl-r { font-family:"Trebuchet MS",sans-serif; font-size:5px; color:#3A6A52; font-weight:700; margin-bottom:1.5px; }
+.q-hdr { font-family:"Trebuchet MS",sans-serif; font-size:6.5px; font-weight:700; color:#1A1A2E; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:2px; }
+</style>
+</head>
+<body>
+
+<div style="background:#C8C2B8; border-radius:4px; padding:18px 10px 22px; display:inline-block;">
+  <div style="display:flex; flex-wrap:nowrap; width:530px;">
+
+    <!-- LEFT PAGE: Q1 (1.1, 1.2) -->
+    <div style="width:260px; flex-shrink:0; background:#FEFDF9; border-radius:2px 0 0 2px; border:0.5px solid #A8A098; border-right:none; box-shadow:-4px 0 8px rgba(0,0,0,0.18); display:flex; flex-direction:column; height:440px; overflow:hidden;">
+      <div style="background:#1A1A2E; padding:6px 9px; display:flex; align-items:center; gap:6px; flex-shrink:0;">
+        <div style="flex-shrink:0;"><div style="font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#D4A574; letter-spacing:1.5px; text-transform:uppercase;">Revise It</div><div style="height:1.5px; background:#5B8A72; border-radius:1px; width:32px; margin-top:2px;"></div></div>
+        <div style="flex:1; text-align:center;"><div style="font-family:Georgia,serif; font-size:7.5px; font-weight:700; color:#fff; letter-spacing:0.3px;">Learner Memo</div></div>
+        <div style="flex-shrink:0; text-align:right;"><div style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#A7BEAE; line-height:1.6;">Physical Sciences</div><div style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#A7BEAE; line-height:1.6;">Grade 11 &middot; CAPS</div></div>
+      </div>
+      <div style="height:2px; background:linear-gradient(to right,#D4A574,#5B8A72 40%,#1A1A2E); flex-shrink:0;"></div>
+      <div style="padding:7px 9px; flex:1; overflow:hidden;">
+
+        <div class="q-hdr">Question 1 &mdash; Newton&apos;s Laws</div>
+        <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:100%; margin-bottom:1.5px;"></div>
+        <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:85%; margin-bottom:7px;"></div>
+
+        <!-- 1.1 -->
+        <div style="margin-bottom:8px;">
+          <div class="lsub-hdr"><span class="sub-num">1.1</span><div class="sub-rule"></div><span class="sub-marks">(2)</span></div>
+          <div class="step-lbl">Step 1</div>
+          <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:90%; margin-bottom:1.5px;"></div>
+          <div class="step-row" style="margin-bottom:4px;"><div style="height:2.5px; background:#C4C0B8; border-radius:1px; width:72%;"></div><span class="tick">&#10003;</span></div>
+          <div class="step-lbl">Step 2</div>
+          <div class="step" style="margin-bottom:2px;"><div class="bar" style="height:2.5px; background:#B8B4AC; width:55%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:12%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:20%;"></div></div>
+          <div class="step-row" style="margin-bottom:4px;"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:80%;"></div><span class="tick">&#10003;</span></div>
+          <div class="step-lbl">Step 3</div>
+          <div class="step" style="margin-bottom:2px;"><div class="bar" style="height:2.5px; background:#B8B4AC; width:40%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:8%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:30%;"></div></div>
+          <div class="step-row" style="margin-bottom:4px;"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:65%;"></div><span class="tick">&#10003;</span></div>
+          <div class="lans" style="margin-top:2px;"><div class="lans-lbl">Answer:</div><div style="height:3px; background:#1A1A2E; border-radius:1px; width:50%; opacity:0.6;"></div><span class="tick">&#10003;</span></div>
+        </div>
+
+        <!-- 1.2 -->
+        <div>
+          <div class="lsub-hdr"><span class="sub-num">1.2</span><div class="sub-rule"></div><span class="sub-marks">(5)</span></div>
+          <div class="tip-green" style="margin-bottom:4px;"><span style="font-size:7px; flex-shrink:0; margin-top:0.5px;">&#129504;</span><div><div class="tip-title">Remember</div><div style="height:2.5px; background:#A7BEAE; border-radius:1px; width:100%; margin-bottom:1.5px;"></div><div style="height:2.5px; background:#A7BEAE; border-radius:1px; width:78%;"></div></div></div>
+          <div class="step-lbl">Step 1</div>
+          <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:95%; margin-bottom:1.5px;"></div>
+          <div class="step" style="margin-bottom:2px;"><div class="bar" style="height:2.5px; background:#B8B4AC; width:35%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:10%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:28%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:8%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:10%;"></div></div>
+          <div class="step-row" style="margin-bottom:4px;"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:75%;"></div><span class="tick">&#10003;</span></div>
+          <div class="step-lbl">Step 2</div>
+          <div class="step" style="margin-bottom:2px;"><div class="bar" style="height:2.5px; background:#B8B4AC; width:45%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:8%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:22%;"></div></div>
+          <div class="step-row" style="margin-bottom:4px;"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:60%;"></div><span class="tick">&#10003;</span></div>
+          <div class="step-lbl">Step 3 &mdash; Add equations</div>
+          <div class="step" style="margin-bottom:2px;"><div class="bar" style="height:2.5px; background:#B8B4AC; width:60%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:8%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:18%;"></div></div>
+          <div class="step-row" style="margin-bottom:4px;"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:85%;"></div><span class="tick">&#10003;</span></div>
+          <div class="lans"><div class="lans-lbl">Answer:</div><div style="height:3px; background:#1A1A2E; border-radius:1px; width:44%; opacity:0.6;"></div><span class="tick">&#10003;&#10003;</span></div>
+        </div>
+
+      </div>
+      <div style="background:#EDE9E2; padding:3px 9px; display:flex; justify-content:space-between; flex-shrink:0;">
+        <span style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#8A8A8A;">Revise It &middot; reviseit.io</span>
+        <span style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#8A8A8A;">Page 1</span>
+      </div>
+    </div>
+
+    <!-- SPINE -->
+    <div style="width:10px; flex-shrink:0; background:linear-gradient(to right,rgba(0,0,0,0.22) 0%,rgba(0,0,0,0.08) 35%,rgba(255,255,255,0.12) 50%,rgba(0,0,0,0.06) 65%,rgba(0,0,0,0.20) 100%);"></div>
+
+    <!-- RIGHT PAGE: 1.3 + common mistake + Q2 (2.1, 2.2 + remember + partial mistake) -->
+    <div style="width:260px; flex-shrink:0; background:#FEFDF9; border-radius:0 2px 2px 0; border:0.5px solid #A8A098; border-left:none; box-shadow:4px 0 8px rgba(0,0,0,0.18); display:flex; flex-direction:column; height:440px; overflow:hidden;">
+      <div style="background:#1A1A2E; padding:6px 9px; display:flex; align-items:center; gap:6px; flex-shrink:0;">
+        <div style="flex-shrink:0;"><div style="font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#D4A574; letter-spacing:1.5px; text-transform:uppercase;">Revise It</div><div style="height:1.5px; background:#5B8A72; border-radius:1px; width:32px; margin-top:2px;"></div></div>
+        <div style="flex:1; text-align:center;"><div style="font-family:Georgia,serif; font-size:7.5px; font-weight:700; color:#fff; letter-spacing:0.3px;">Learner Memo</div></div>
+        <div style="flex-shrink:0; text-align:right;"><div style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#A7BEAE; line-height:1.6;">Physical Sciences</div><div style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#A7BEAE; line-height:1.6;">Grade 11 &middot; CAPS</div></div>
+      </div>
+      <div style="height:2px; background:linear-gradient(to right,#D4A574,#5B8A72 40%,#1A1A2E); flex-shrink:0;"></div>
+      <div style="padding:7px 9px; flex:1; overflow:hidden;">
+
+        <!-- 1.3 -->
+        <div style="margin-bottom:6px;">
+          <div class="lsub-hdr"><span class="sub-num">1.3</span><div class="sub-rule"></div><span class="sub-marks">(5)</span></div>
+          <div class="step-lbl">Step 1 &mdash; Use Block B</div>
+          <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:90%; margin-bottom:1.5px;"></div>
+          <div class="step" style="margin-bottom:2px;"><div class="bar" style="height:2.5px; background:#B8B4AC; width:30%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:6%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:20%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:6%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:15%;"></div></div>
+          <div class="step-row" style="margin-bottom:4px;"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:68%;"></div><span class="tick">&#10003;</span></div>
+          <div class="step-lbl">Step 2</div>
+          <div class="step" style="margin-bottom:2px;"><div class="bar" style="height:2.5px; background:#B8B4AC; width:50%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:8%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:25%;"></div></div>
+          <div class="step-row" style="margin-bottom:4px;"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:55%;"></div><span class="tick">&#10003;</span></div>
+          <div class="lans" style="margin-bottom:3px;"><div class="lans-lbl">Answer:</div><div style="height:3px; background:#1A1A2E; border-radius:1px; width:36%; opacity:0.6;"></div><span class="tick">&#10003;&#10003;</span></div>
+          <div class="tip-green"><span style="font-size:7px; flex-shrink:0;">&#129504;</span><div><div class="tip-title">Remember</div><div style="height:2.5px; background:#A7BEAE; border-radius:1px; width:100%; margin-bottom:1.5px;"></div><div style="height:2.5px; background:#A7BEAE; border-radius:1px; width:82%;"></div></div></div>
+        </div>
+
+        <!-- Common mistake (Q1) -->
+        <div style="margin-bottom:6px;">
+          <div class="mistake-box">
+            <div class="mistake-title"><span style="font-size:7px;">&#9888;&#65039;</span><div class="mistake-lbl">Common mistake</div></div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:100%; margin-bottom:1.5px;"></div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:88%; margin-bottom:3px;"></div>
+            <div class="wrong-right">
+              <div class="wr-col"><div class="wr-lbl-w">&#10007; Wrong</div><div style="height:2px; background:#D4D0C8; border-radius:1px; width:80%; margin-bottom:1px;"></div><div style="height:2px; background:#D4D0C8; border-radius:1px; width:60%;"></div></div>
+              <div class="wr-col"><div class="wr-lbl-r">&#10003; Right</div><div style="height:2px; background:#D4D0C8; border-radius:1px; width:80%; margin-bottom:1px;"></div><div style="height:2px; background:#D4D0C8; border-radius:1px; width:60%;"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div>
+          <div class="q-hdr" style="margin-top:4px;">Question 2 &mdash; EM Induction</div>
+          <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:100%; margin-bottom:1.5px;"></div>
+          <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:70%; margin-bottom:7px;"></div>
+
+          <!-- 2.1 -->
+          <div style="margin-bottom:7px;">
+            <div class="lsub-hdr"><span class="sub-num">2.1</span><div class="sub-rule"></div><span class="sub-marks">(2)</span></div>
+            <div class="step-lbl">Step 1</div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:85%; margin-bottom:1.5px;"></div>
+            <div class="step-row" style="margin-bottom:4px;"><div style="height:2.5px; background:#C4C0B8; border-radius:1px; width:65%;"></div><span class="tick">&#10003;</span></div>
+            <div class="step-lbl">Step 2</div>
+            <div class="step" style="margin-bottom:2px;"><div class="bar" style="height:2.5px; background:#B8B4AC; width:40%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:8%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:28%;"></div></div>
+            <div class="step-row"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:72%;"></div><span class="tick">&#10003;</span></div>
+          </div>
+
+          <!-- 2.2 -->
+          <div>
+            <div class="lsub-hdr"><span class="sub-num">2.2</span><div class="sub-rule"></div><span class="sub-marks">(4)</span></div>
+            <div class="step-lbl">Step 1</div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:92%; margin-bottom:1.5px;"></div>
+            <div class="step" style="margin-bottom:2px;"><div class="bar" style="height:2.5px; background:#B8B4AC; width:30%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:6%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:22%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:6%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:18%;"></div></div>
+            <div class="step-row" style="margin-bottom:4px;"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:58%;"></div><span class="tick">&#10003;</span></div>
+            <div class="tip-green" style="margin-bottom:4px;"><span style="font-size:7px; flex-shrink:0;">&#129504;</span><div><div class="tip-title">Remember</div><div style="height:2.5px; background:#A7BEAE; border-radius:1px; width:100%; margin-bottom:1.5px;"></div><div style="height:2.5px; background:#A7BEAE; border-radius:1px; width:75%;"></div></div></div>
+            <div class="mistake-box">
+              <div class="mistake-title"><span style="font-size:7px;">&#9888;&#65039;</span><div class="mistake-lbl">Common mistake</div></div>
+              <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:100%; margin-bottom:1.5px;"></div>
+              <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:82%;"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div style="background:#EDE9E2; padding:3px 9px; display:flex; justify-content:space-between; flex-shrink:0;">
+        <span style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#8A8A8A;">Revise It &middot; reviseit.io</span>
+        <span style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#8A8A8A;">Page 2</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

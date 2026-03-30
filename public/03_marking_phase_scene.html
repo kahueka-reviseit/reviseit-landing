@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scene — Question Paper to Teacher Memo</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Trebuchet MS', sans-serif;
+  background: #C8C2B8;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 12px 16px;
+}
+
+/* Header title swap */
+.hdr-title-wrap { position: relative; flex: 1; height: 10px; }
+.hdr-title {
+  font-family: Georgia, serif; font-size: 7.5px; font-weight: 700;
+  color: #fff; letter-spacing: 0.3px;
+  transition: opacity 0.45s ease;
+  position: absolute; left: 0; right: 0; text-align: center; line-height: 10px;
+}
+.hdr-title.hidden { opacity: 0; pointer-events: none; }
+
+/* Content layers — each page has two absolute layers */
+.page-body { position: relative; flex: 1; overflow: hidden; }
+
+.layer {
+  position: absolute; inset: 0;
+  padding: 8px 9px;
+  transition: opacity 0.55s ease;
+}
+.layer.right-pad { padding: 7px 9px; }
+.layer.out { opacity: 0; pointer-events: none; }
+.layer.hidden-start { opacity: 0; }
+.layer.in { opacity: 1; }
+
+/* Q-block fade units within question paper layer */
+.qp-block { transition: opacity 0.45s ease; }
+.qp-block.faded { opacity: 0; }
+
+/* Memo Q-block reveal */
+.memo-block {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.6s ease, opacity 0.5s ease;
+  margin-bottom: 6px;
+}
+.memo-block.revealed { max-height: 600px; opacity: 1; }
+
+/* Shared sub-styles */
+.sub-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:3px; }
+.sub-num { font-family:'Trebuchet MS',sans-serif; font-size:6.5px; font-weight:700; color:#1A1A2E; }
+.sub-rule { height:0.5px; background:#D4D0C8; flex:1; margin:0 6px; }
+.sub-marks { font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#1A1A2E; }
+.scenario-lbl { font-family:'Trebuchet MS',sans-serif; font-size:5.5px; font-weight:700; color:#6A6A6A; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px; }
+.step { background:#F0EDE8; border-radius:1px; padding:2px 4px; margin-bottom:2px; display:flex; align-items:center; gap:3px; }
+.bar { border-radius:1px; }
+.tick { font-family:'Trebuchet MS',sans-serif; font-size:7px; color:#5B8A72; }
+.tok { font-family:'Trebuchet MS',sans-serif; font-size:5px; color:#8A8A8A; }
+.ans-row { display:flex; align-items:center; gap:3px; margin-bottom:3px; }
+.ans-lbl { font-family:'Trebuchet MS',sans-serif; font-size:5.5px; font-weight:700; color:#1A1A2E; margin-right:2px; }
+.err { background:#FFF0EE; border:0.5px solid #D4A0A0; border-left:2px solid #B85042; border-radius:1px; padding:2px 5px; display:flex; align-items:center; gap:3px; margin-bottom:2px; }
+.err-lbl { font-family:'Trebuchet MS',sans-serif; font-size:5.5px; font-weight:700; color:#B85042; }
+.ecf { background:#F4F2EE; border:0.5px solid #D4D0C8; border-left:2px solid #8A8A8A; border-radius:1px; padding:2px 5px; display:flex; align-items:center; gap:3px; }
+.ecf-lbl { font-family:'Trebuchet MS',sans-serif; font-size:5.5px; font-weight:700; color:#4A4A4A; }
+.q-hdr { font-family:'Trebuchet MS',sans-serif; font-size:6.5px; font-weight:700; color:#1A1A2E; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:2px; }
+.perm-hdr { background:#2D2D2D; display:flex; }
+.perm-row { display:flex; border-top:0.5px solid #E8E4DC; }
+.perm-cell-main { flex:5; padding:3px 5px; border-right:0.5px solid #E8E4DC; }
+.perm-cell { flex:1; padding:3px 4px; border-right:0.5px solid #E8E4DC; display:flex; align-items:center; justify-content:center; }
+.perm-cell-last { flex:1.5; padding:3px 4px; display:flex; align-items:center; justify-content:center; }
+.gold { font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#D4A574; text-align:center; font-weight:700; }
+.tick-r { font-family:'Trebuchet MS',sans-serif; font-size:7px; color:#B85042; }
+
+/* Caption */
+.caption { margin-top:18px; display:flex; align-items:center; justify-content:center; gap:12px; }
+.caption-text { font-family:Georgia,serif; font-size:11px; color:#6A5A4A; font-style:italic; }
+.caption-dots { display:flex; gap:5px; }
+.caption-dots span { width:6px; height:6px; border-radius:50%; background:#C8C2B8; }
+.caption-dots span.active { background:#D4A574; }
+.replay-btn {
+  display:block; margin:12px auto 0;
+  font-family:'Trebuchet MS',sans-serif; font-size:8px; font-weight:700;
+  color:#1A1A2E; background:transparent;
+  border:1px solid #C8C4BC; border-radius:4px;
+  padding:5px 16px; cursor:pointer; transition:background 0.2s;
+}
+.replay-btn:hover { background:#EDE9E2; }
+</style>
+</head>
+<body>
+
+<div style="background:#C8C2B8; border-radius:4px; padding:18px 10px 22px; display:inline-block;">
+  <div style="display:flex; flex-wrap:nowrap; width:530px;">
+
+    <!-- ══ LEFT PAGE ══ -->
+    <div style="width:260px; flex-shrink:0; background:#FEFDF9; border-radius:2px 0 0 2px; border:0.5px solid #A8A098; border-right:none; box-shadow:-4px 0 8px rgba(0,0,0,0.18); display:flex; flex-direction:column; height:440px; overflow:hidden;">
+      <div style="background:#1A1A2E; padding:6px 9px; display:flex; align-items:center; gap:6px; flex-shrink:0;">
+        <div style="flex-shrink:0;">
+          <div style="font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#D4A574; letter-spacing:1.5px; text-transform:uppercase;">Revise It</div>
+          <div style="height:1.5px; background:#5B8A72; border-radius:1px; width:32px; margin-top:2px;"></div>
+        </div>
+        <div class="hdr-title-wrap">
+          <div class="hdr-title" id="ltA">Question Paper</div>
+          <div class="hdr-title hidden" id="ltB">Teacher Memo</div>
+        </div>
+        <div style="flex-shrink:0; text-align:right;">
+          <div style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#A7BEAE; line-height:1.6;">Physical Sciences</div>
+          <div style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#A7BEAE; line-height:1.6;">Grade 11 · CAPS</div>
+        </div>
+      </div>
+      <div style="height:2px; background:linear-gradient(to right,#D4A574,#5B8A72 40%,#1A1A2E); flex-shrink:0;"></div>
+
+      <div class="page-body">
+
+        <!-- LAYER A: Question Paper content -->
+        <div class="layer" id="layerQPLeft">
+          <div class="qp-block" id="qp1">
+            <div style="margin-bottom:4px;"><span style="font-family:'Trebuchet MS',sans-serif; font-size:6.5px; font-weight:700; color:#1A1A2E;">QUESTION 1</span></div>
+            <div style="margin-bottom:5px;"><div style="height:3.5px; background:#D4D0C8; border-radius:1px; margin-bottom:2.5px; width:100%;"></div><div style="height:3.5px; background:#D4D0C8; border-radius:1px; width:80%;"></div></div>
+            <div style="border:0.5px dashed #B8B4AC; background:#F2F0EC; border-radius:2px; height:32px; margin-bottom:5px; display:flex; align-items:center; justify-content:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 20 20" fill="none"><rect x="0.5" y="0.5" width="19" height="19" rx="2" stroke="#B0A898" stroke-width="1"/><line x1="0.5" y1="13" x2="19.5" y2="19.5" stroke="#B0A898" stroke-width="1"/><line x1="0.5" y1="19.5" x2="19.5" y2="13" stroke="#B0A898" stroke-width="1"/><circle cx="6" cy="7" r="2.5" stroke="#B0A898" stroke-width="1" fill="none"/></svg><span style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#A8A098; text-transform:uppercase; letter-spacing:0.5px;">Diagram</span></div>
+            <div style="display:flex; gap:4px; align-items:center; margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; font-weight:700; color:#1A1A2E; min-width:14px;">1.1</span><div style="flex:1; height:3.5px; background:#D4D0C8; border-radius:1px;"></div><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#1A1A2E;">(2)</span></div>
+            <div style="display:flex; gap:4px; align-items:flex-start; margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; font-weight:700; color:#1A1A2E; min-width:14px; padding-top:1px;">1.2</span><div style="flex:1;"><div style="height:3.5px; background:#D4D0C8; border-radius:1px; margin-bottom:2px;"></div><div style="height:3.5px; background:#D4D0C8; border-radius:1px; width:65%;"></div></div><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#1A1A2E; padding-top:1px;">(5)</span></div>
+            <div style="display:flex; gap:4px; align-items:flex-start; margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; font-weight:700; color:#1A1A2E; min-width:14px; padding-top:1px;">1.3</span><div style="flex:1;"><div style="height:3.5px; background:#D4D0C8; border-radius:1px; margin-bottom:2px;"></div><div style="height:3.5px; background:#D4D0C8; border-radius:1px; width:78%;"></div></div><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#1A1A2E; padding-top:1px;">(5)</span></div>
+            <div style="display:flex; gap:4px; align-items:flex-start; margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; font-weight:700; color:#1A1A2E; min-width:14px; padding-top:1px;">1.4</span><div style="flex:1;"><div style="height:3.5px; background:#D4D0C8; border-radius:1px; margin-bottom:2px;"></div><div style="height:3.5px; background:#D4D0C8; border-radius:1px; width:50%;"></div></div><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#1A1A2E; padding-top:1px;">(2)</span></div>
+            <div style="text-align:right; font-family:'Trebuchet MS',sans-serif; font-size:6.5px; font-weight:700; color:#1A1A2E; margin-bottom:10px;">[14]</div>
+          </div>
+          <div class="qp-block" id="qp2">
+            <div style="margin-bottom:4px;"><span style="font-family:'Trebuchet MS',sans-serif; font-size:6.5px; font-weight:700; color:#1A1A2E;">QUESTION 2</span></div>
+            <div style="margin-bottom:4px;"><div style="height:3.5px; background:#D4D0C8; border-radius:1px; margin-bottom:2px;"></div><div style="height:3.5px; background:#D4D0C8; border-radius:1px; width:70%;"></div></div>
+            <div style="border:0.5px dashed #B8B4AC; background:#F2F0EC; border-radius:2px; height:20px; margin-bottom:5px; display:flex; align-items:center; justify-content:center; gap:3px;"><svg width="9" height="9" viewBox="0 0 16 16" fill="none"><path d="M13 2H3l4.5 5.5L3 14h10" stroke="#B0A898" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#A8A098; text-transform:uppercase;">Formula</span></div>
+            <div style="display:flex; gap:4px; align-items:center; margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; font-weight:700; color:#1A1A2E; min-width:14px;">2.1</span><div style="flex:1; height:3.5px; background:#D4D0C8; border-radius:1px;"></div><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#1A1A2E;">(2)</span></div>
+            <div style="display:flex; gap:4px; align-items:center; margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; font-weight:700; color:#1A1A2E; min-width:14px;">2.2</span><div style="flex:1; height:3.5px; background:#D4D0C8; border-radius:1px;"></div><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#1A1A2E;">(4)</span></div>
+            <div style="display:flex; gap:4px; align-items:flex-start; margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; font-weight:700; color:#1A1A2E; min-width:14px; padding-top:1px;">2.3</span><div style="flex:1;"><div style="height:3.5px; background:#D4D0C8; border-radius:1px; margin-bottom:2px;"></div><div style="height:3.5px; background:#D4D0C8; border-radius:1px; width:60%;"></div></div><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#1A1A2E; padding-top:1px;">(3)</span></div>
+            <div style="display:flex; gap:4px; align-items:flex-start; margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; font-weight:700; color:#1A1A2E; min-width:14px; padding-top:1px;">2.4</span><div style="flex:1;"><div style="height:3.5px; background:#D4D0C8; border-radius:1px; margin-bottom:2px;"></div><div style="height:3.5px; background:#D4D0C8; border-radius:1px; width:55%;"></div></div><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#1A1A2E; padding-top:1px;">(3)</span></div>
+            <div style="text-align:right; font-family:'Trebuchet MS',sans-serif; font-size:6.5px; font-weight:700; color:#1A1A2E;">[14]</div>
+          </div>
+        </div>
+
+        <!-- LAYER B: Teacher Memo content left -->
+        <div class="layer hidden-start" id="layerMemoLeft">
+
+          <!-- Q1 memo heading -->
+          <div class="memo-block" id="mq1hdr">
+            <div class="q-hdr">Question 1 — Newton's Laws</div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:100%; margin-bottom:1.5px;"></div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:75%; margin-bottom:5px;"></div>
+          </div>
+
+          <!-- 1.1 -->
+          <div class="memo-block" id="mq11">
+            <div class="sub-hdr"><span class="sub-num">1.1</span><div class="sub-rule"></div><span class="sub-marks">(2)</span></div>
+            <div class="scenario-lbl">Marking scenario</div>
+            <div style="margin-bottom:2px; display:flex; align-items:center; gap:3px;"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:75%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <div class="step"><div class="bar" style="height:2.5px; background:#B8B4AC; width:45%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:8%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:25%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <div class="err"><span style="font-size:7px;">⚠️</span><div class="err-lbl">Error protocol</div><div style="height:2px; background:#D4A8A0; border-radius:1px; flex:1;"></div></div>
+          </div>
+
+          <!-- 1.2 -->
+          <div class="memo-block" id="mq12">
+            <div class="sub-hdr"><span class="sub-num">1.2</span><div class="sub-rule"></div><span class="sub-marks">(5)</span></div>
+            <div class="scenario-lbl">Marking scenario</div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:90%; margin-bottom:2px;"></div>
+            <div class="step"><div class="bar" style="height:2.5px; background:#B8B4AC; width:30%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:8%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:22%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <div class="step"><div class="bar" style="height:2.5px; background:#B8B4AC; width:50%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:8%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:18%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <div class="step"><div class="bar" style="height:2.5px; background:#B8B4AC; width:55%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:6%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:16%;"></div><span class="tick">✓</span><div class="tok">(1A)</div></div>
+            <div class="ans-row"><div class="ans-lbl">Answer:</div><div style="height:3px; background:#1A1A2E; border-radius:1px; width:34%; opacity:0.6;"></div><span class="tick">✓✓</span><div class="tok">(1CA)</div></div>
+            <div class="ecf"><div class="ecf-lbl">ECF applies</div><div style="height:2px; background:#C8C4BC; border-radius:1px; flex:1;"></div></div>
+          </div>
+
+          <!-- 1.3 with permutations table directly below -->
+          <div class="memo-block" id="mq13">
+            <div class="sub-hdr"><span class="sub-num">1.3</span><div class="sub-rule"></div><span class="sub-marks">(5)</span></div>
+            <div class="scenario-lbl">Marking scenario</div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:88%; margin-bottom:2px;"></div>
+            <div class="step"><div class="bar" style="height:2.5px; background:#B8B4AC; width:28%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:6%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:18%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <div class="step"><div class="bar" style="height:2.5px; background:#B8B4AC; width:42%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <div class="ans-row"><div class="ans-lbl">Answer:</div><div style="height:3px; background:#1A1A2E; border-radius:1px; width:36%; opacity:0.6;"></div><span class="tick">✓✓</span><div class="tok">(2CA)</div></div>
+            <div class="ecf" style="margin-bottom:4px;"><div class="ecf-lbl">ECF applies</div><div style="height:2px; background:#C8C4BC; border-radius:1px; flex:1;"></div></div>
+            <!-- Permutations table directly below 1.3 answer -->
+            <div style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; font-weight:700; color:#1A1A2E; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:2px; margin-top:1px;">Marking permutations — 1.3</div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:55%; margin-bottom:3px;"></div>
+            <div style="border:0.5px solid #D4D0C8; border-radius:1px; overflow:hidden;">
+              <div class="perm-hdr">
+                <div style="flex:5; padding:3px 5px; border-right:0.5px solid #3A3A3A;"><div style="height:2.5px; background:#6A6A6A; border-radius:1px; width:70%;"></div></div>
+                <div style="flex:1; padding:3px 4px; border-right:0.5px solid #3A3A3A; text-align:center;"><div class="gold">M</div></div>
+                <div style="flex:1; padding:3px 4px; border-right:0.5px solid #3A3A3A; text-align:center;"><div class="gold">A</div></div>
+                <div style="flex:1.5; padding:3px 4px; text-align:center;"><div class="gold">CA</div></div>
+              </div>
+              <div class="perm-row" style="background:#FEFDF9;"><div class="perm-cell-main"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:92%; margin-bottom:1.5px;"></div><div style="height:2px; background:#E0DCD8; border-radius:1px; width:70%;"></div></div><div class="perm-cell"><span class="tick">✓</span></div><div class="perm-cell"><span class="tick">✓</span></div><div class="perm-cell-last"><span class="tick">✓</span></div></div>
+              <div class="perm-row" style="background:#F6F4F0;"><div class="perm-cell-main"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:85%; margin-bottom:1.5px;"></div><div style="height:2px; background:#E0DCD8; border-radius:1px; width:55%;"></div></div><div class="perm-cell"><span class="tick">✓</span></div><div class="perm-cell"><span class="tick">✓</span></div><div class="perm-cell-last"><span class="tick-r">✗</span></div></div>
+              <div class="perm-row" style="background:#FEFDF9;"><div class="perm-cell-main"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:88%; margin-bottom:1.5px;"></div><div style="height:2px; background:#E0DCD8; border-radius:1px; width:62%;"></div></div><div class="perm-cell"><span class="tick">✓</span></div><div class="perm-cell"><span class="tick-r">✗</span></div><div class="perm-cell-last"><span class="tick-r">✗</span></div></div>
+              <div class="perm-row" style="background:#F6F4F0;"><div class="perm-cell-main"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:80%; margin-bottom:1.5px;"></div><div style="height:2px; background:#E0DCD8; border-radius:1px; width:48%;"></div></div><div class="perm-cell"><span class="tick-r">✗</span></div><div class="perm-cell"><span class="tick">✓</span></div><div class="perm-cell-last"><span class="tick-r">✗</span></div></div>
+              <div class="perm-row" style="background:#FEFDF9;"><div class="perm-cell-main"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:75%; margin-bottom:1.5px;"></div><div style="height:2px; background:#E0DCD8; border-radius:1px; width:40%;"></div></div><div class="perm-cell"><span class="tick-r">✗</span></div><div class="perm-cell"><span class="tick-r">✗</span></div><div class="perm-cell-last"><span class="tick-r">✗</span></div></div>
+            </div>
+          </div>
+
+        </div><!-- /layerMemoLeft -->
+      </div><!-- /page-body -->
+
+      <div style="background:#EDE9E2; padding:3px 9px; display:flex; justify-content:space-between; flex-shrink:0;">
+        <span style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#8A8A8A;">Revise It · reviseit.io</span>
+        <span style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#8A8A8A;">Page 1</span>
+      </div>
+    </div><!-- /left page -->
+
+    <!-- SPINE -->
+    <div style="width:10px; flex-shrink:0; background:linear-gradient(to right,rgba(0,0,0,0.22) 0%,rgba(0,0,0,0.08) 35%,rgba(255,255,255,0.12) 50%,rgba(0,0,0,0.06) 65%,rgba(0,0,0,0.20) 100%);"></div>
+
+    <!-- ══ RIGHT PAGE ══ -->
+    <div style="width:260px; flex-shrink:0; background:#FEFDF9; border-radius:0 2px 2px 0; border:0.5px solid #A8A098; border-left:none; box-shadow:4px 0 8px rgba(0,0,0,0.18); display:flex; flex-direction:column; height:440px; overflow:hidden;">
+      <div style="background:#1A1A2E; padding:6px 9px; display:flex; align-items:center; gap:6px; flex-shrink:0;">
+        <div style="flex-shrink:0;">
+          <div style="font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#D4A574; letter-spacing:1.5px; text-transform:uppercase;">Revise It</div>
+          <div style="height:1.5px; background:#5B8A72; border-radius:1px; width:32px; margin-top:2px;"></div>
+        </div>
+        <div class="hdr-title-wrap">
+          <div class="hdr-title" id="rtA">Question Paper</div>
+          <div class="hdr-title hidden" id="rtB">Teacher Memo</div>
+        </div>
+        <div style="flex-shrink:0; text-align:right;">
+          <div style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#A7BEAE; line-height:1.6;">Physical Sciences</div>
+          <div style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#A7BEAE; line-height:1.6;">Grade 11 · CAPS</div>
+        </div>
+      </div>
+      <div style="height:2px; background:linear-gradient(to right,#D4A574,#5B8A72 40%,#1A1A2E); flex-shrink:0;"></div>
+
+      <div class="page-body">
+
+        <!-- LAYER A: Question Paper Q3 -->
+        <div class="layer right-pad" id="layerQPRight">
+          <div class="qp-block" id="qp3">
+            <div style="margin-bottom:4px;"><span style="font-family:'Trebuchet MS',sans-serif; font-size:6.5px; font-weight:700; color:#1A1A2E;">QUESTION 3</span></div>
+            <div style="margin-bottom:4px;"><div style="height:3.5px; background:#D4D0C8; border-radius:1px; margin-bottom:2px;"></div><div style="height:3.5px; background:#D4D0C8; border-radius:1px; width:60%;"></div></div>
+            <div style="margin-bottom:5px; border:0.5px solid #D4D0C8; border-radius:2px; overflow:hidden;">
+              <div style="display:flex; background:#4A4A4A;"><div style="flex:2; padding:2.5px 4px; border-right:0.5px solid #5A5A5A;"><div style="height:3px; background:#9A9A9A; border-radius:1px; width:80%;"></div></div><div style="flex:1; padding:2.5px 4px; border-right:0.5px solid #5A5A5A;"><div style="height:3px; background:#9A9A9A; border-radius:1px; width:70%;"></div></div><div style="flex:1; padding:2.5px 4px;"><div style="height:3px; background:#9A9A9A; border-radius:1px; width:60%;"></div></div></div>
+              <div style="display:flex; background:#FEFDF9; border-top:0.5px solid #E8E4DC;"><div style="flex:2; padding:2px 4px; border-right:0.5px solid #E8E4DC;"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:75%;"></div></div><div style="flex:1; padding:2px 4px; border-right:0.5px solid #E8E4DC;"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:60%;"></div></div><div style="flex:1; padding:2px 4px;"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:55%;"></div></div></div>
+              <div style="display:flex; background:#F6F4F0; border-top:0.5px solid #E8E4DC;"><div style="flex:2; padding:2px 4px; border-right:0.5px solid #E8E4DC;"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:65%;"></div></div><div style="flex:1; padding:2px 4px; border-right:0.5px solid #E8E4DC;"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:70%;"></div></div><div style="flex:1; padding:2px 4px;"><div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:50%;"></div></div></div>
+            </div>
+            <div style="display:flex; gap:4px; align-items:center; margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; font-weight:700; color:#1A1A2E; min-width:14px;">3.1</span><div style="flex:1; height:3.5px; background:#D4D0C8; border-radius:1px;"></div><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#1A1A2E;">(2)</span></div>
+            <div style="display:flex; gap:4px; align-items:center; margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; font-weight:700; color:#1A1A2E; min-width:14px;">3.2</span><div style="flex:1; height:3.5px; background:#D4D0C8; border-radius:1px;"></div><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#1A1A2E;">(2)</span></div>
+            <div style="display:flex; gap:4px; align-items:flex-start; margin-bottom:3px;"><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; font-weight:700; color:#1A1A2E; min-width:14px; padding-top:1px;">3.3</span><div style="flex:1;"><div style="height:3.5px; background:#D4D0C8; border-radius:1px; margin-bottom:2px;"></div><div style="height:3.5px; background:#D4D0C8; border-radius:1px; width:55%;"></div></div><span style="font-family:'Trebuchet MS',sans-serif; font-size:6px; color:#1A1A2E; padding-top:1px;">(3)</span></div>
+            <div style="text-align:right; font-family:'Trebuchet MS',sans-serif; font-size:6.5px; font-weight:700; color:#1A1A2E;">[7]</div>
+          </div>
+        </div>
+
+        <!-- LAYER B: Teacher Memo right page — 1.4 first, then Q2, then Q3 -->
+        <div class="layer right-pad hidden-start" id="layerMemoRight">
+
+          <!-- 1.4 continues from left page -->
+          <div class="memo-block" id="mq14">
+            <div class="q-hdr">Question 1 — Newton's Laws (cont.)</div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:100%; margin-bottom:1.5px;"></div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:60%; margin-bottom:5px;"></div>
+            <div class="sub-hdr"><span class="sub-num">1.4</span><div class="sub-rule"></div><span class="sub-marks">(2)</span></div>
+            <div class="scenario-lbl">Marking scenario</div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:80%; margin-bottom:2px;"></div>
+            <div class="step"><div class="bar" style="height:2.5px; background:#B8B4AC; width:60%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <div class="ans-row"><div class="ans-lbl">Answer:</div><div style="height:3px; background:#1A1A2E; border-radius:1px; width:30%; opacity:0.6;"></div><span class="tick">✓</span><div class="tok">(1CA)</div></div>
+          </div>
+
+          <div class="memo-block" id="mq22">
+            <div class="q-hdr">Question 2 — EM Induction</div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:100%; margin-bottom:1.5px;"></div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:68%; margin-bottom:5px;"></div>
+            <!-- 2.1 -->
+            <div class="sub-hdr"><span class="sub-num">2.1</span><div class="sub-rule"></div><span class="sub-marks">(2)</span></div>
+            <div class="scenario-lbl">Marking scenario</div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:85%; margin-bottom:2px;"></div>
+            <div style="display:flex; align-items:center; gap:3px; margin-bottom:2px;"><div class="bar" style="height:2.5px; background:#C4C0B8; width:62%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <div style="display:flex; align-items:center; gap:3px; margin-bottom:4px;"><div class="bar" style="height:2.5px; background:#C4C0B8; width:50%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <!-- 2.2 -->
+            <div class="sub-hdr"><span class="sub-num">2.2</span><div class="sub-rule"></div><span class="sub-marks">(4)</span></div>
+            <div class="scenario-lbl">Marking scenario</div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:92%; margin-bottom:2px;"></div>
+            <div class="step"><div class="bar" style="height:2.5px; background:#B8B4AC; width:28%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:6%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:20%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:6%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:16%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <div class="step"><div class="bar" style="height:2.5px; background:#B8B4AC; width:44%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:6%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:18%;"></div><span class="tick">✓</span><div class="tok">(1A)</div></div>
+            <div class="ans-row"><div class="ans-lbl">Answer:</div><div style="height:3px; background:#1A1A2E; border-radius:1px; width:36%; opacity:0.6;"></div><span class="tick">✓✓</span><div class="tok">(2CA)</div></div>
+            <div class="ecf" style="margin-bottom:4px;"><div class="ecf-lbl">ECF applies</div><div style="height:2px; background:#C8C4BC; border-radius:1px; flex:1;"></div></div>
+            <!-- 2.3 -->
+            <div class="sub-hdr"><span class="sub-num">2.3</span><div class="sub-rule"></div><span class="sub-marks">(3)</span></div>
+            <div class="scenario-lbl">Marking scenario</div>
+            <div class="step"><div class="bar" style="height:2.5px; background:#B8B4AC; width:50%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:6%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:22%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <div class="ans-row"><div class="ans-lbl">Answer:</div><div style="height:3px; background:#1A1A2E; border-radius:1px; width:32%; opacity:0.6;"></div><span class="tick">✓✓</span><div class="tok">(2CA)</div></div>
+            <div class="ecf" style="margin-bottom:4px;"><div class="ecf-lbl">ECF applies</div><div style="height:2px; background:#C8C4BC; border-radius:1px; flex:1;"></div></div>
+            <!-- 2.4 -->
+            <div class="sub-hdr"><span class="sub-num">2.4</span><div class="sub-rule"></div><span class="sub-marks">(3)</span></div>
+            <div class="scenario-lbl">Marking scenario</div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:88%; margin-bottom:2px;"></div>
+            <div class="step"><div class="bar" style="height:2.5px; background:#B8B4AC; width:60%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <div class="step"><div class="bar" style="height:2.5px; background:#B8B4AC; width:40%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <div class="ans-row"><div class="ans-lbl">Answer:</div><div style="height:3px; background:#1A1A2E; border-radius:1px; width:30%; opacity:0.6;"></div><span class="tick">✓</span><div class="tok">(1CA)</div></div>
+            <div class="err"><span style="font-size:7px;">⚠️</span><div class="err-lbl">Error protocol</div><div style="height:2px; background:#D4A8A0; border-radius:1px; flex:1;"></div></div>
+          </div>
+
+          <div class="memo-block" id="mq3hdr">
+            <div class="q-hdr" style="margin-top:5px;">Question 3 — Stoichiometry</div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:100%; margin-bottom:1.5px;"></div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:60%; margin-bottom:5px;"></div>
+            <!-- 3.1 -->
+            <div class="sub-hdr"><span class="sub-num">3.1</span><div class="sub-rule"></div><span class="sub-marks">(2)</span></div>
+            <div class="scenario-lbl">Marking scenario</div>
+            <div style="display:flex; align-items:center; gap:3px; margin-bottom:2px;"><div class="bar" style="height:2.5px; background:#C4C0B8; width:70%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <div style="display:flex; align-items:center; gap:3px; margin-bottom:4px;"><div class="bar" style="height:2.5px; background:#C4C0B8; width:55%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <!-- 3.2 -->
+            <div class="sub-hdr"><span class="sub-num">3.2</span><div class="sub-rule"></div><span class="sub-marks">(2)</span></div>
+            <div class="scenario-lbl">Marking scenario</div>
+            <div class="step"><div class="bar" style="height:2.5px; background:#B8B4AC; width:40%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:6%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:22%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <div class="ans-row"><div class="ans-lbl">Answer:</div><div style="height:3px; background:#1A1A2E; border-radius:1px; width:30%; opacity:0.6;"></div><span class="tick">✓</span><div class="tok">(1CA)</div></div>
+            <div class="ecf" style="margin-bottom:4px;"><div class="ecf-lbl">ECF applies</div><div style="height:2px; background:#C8C4BC; border-radius:1px; flex:1;"></div></div>
+            <!-- 3.3 -->
+            <div class="sub-hdr"><span class="sub-num">3.3</span><div class="sub-rule"></div><span class="sub-marks">(3)</span></div>
+            <div class="scenario-lbl">Marking scenario</div>
+            <div style="height:2.5px; background:#D4D0C8; border-radius:1px; width:90%; margin-bottom:2px;"></div>
+            <div class="step"><div class="bar" style="height:2.5px; background:#B8B4AC; width:50%;"></div><div class="bar" style="height:2px; background:#D4D0C8; width:6%;"></div><div class="bar" style="height:2.5px; background:#B8B4AC; width:18%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <div class="step"><div class="bar" style="height:2.5px; background:#B8B4AC; width:36%;"></div><span class="tick">✓</span><div class="tok">(1M)</div></div>
+            <div class="ans-row"><div class="ans-lbl">Answer:</div><div style="height:3px; background:#1A1A2E; border-radius:1px; width:34%; opacity:0.6;"></div><span class="tick">✓</span><div class="tok">(1CA)</div></div>
+            <div class="ecf"><div class="ecf-lbl">ECF applies</div><div style="height:2px; background:#C8C4BC; border-radius:1px; flex:1;"></div></div>
+          </div>
+
+        </div><!-- /layerMemoRight -->
+      </div><!-- /page-body -->
+
+      <div style="background:#EDE9E2; padding:3px 9px; display:flex; justify-content:space-between; flex-shrink:0;">
+        <span style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#8A8A8A;">Revise It · reviseit.io</span>
+        <span style="font-family:'Trebuchet MS',sans-serif; font-size:5.5px; color:#8A8A8A;">Page 2</span>
+      </div>
+    </div><!-- /right page -->
+
+  </div>
+</div>
+
+<div class="caption">
+  <div class="caption-dots"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="active"></span></div>
+  <div class="caption-text" id="captionText">The question paper transforms into the teacher marking memo.</div>
+</div>
+<button class="replay-btn" id="replayBtn">↺ Replay</button>
+
+<script>
+(function() {
+const $ = id => document.getElementById(id);
+
+function swapHeaders() {
+  ['ltA','rtA'].forEach(id => $(id).classList.add('hidden'));
+  ['ltB','rtB'].forEach(id => $(id).classList.remove('hidden'));
+}
+function reveal(id) { $(id).classList.add('revealed'); }
+function fadeBlock(id) { $(id).classList.add('faded'); }
+
+
+
+function runAnimation() {
+  // Reset
+  ['ltA','rtA'].forEach(id => $(id).classList.remove('hidden'));
+  ['ltB','rtB'].forEach(id => $(id).classList.add('hidden'));
+  ['qp1','qp2','qp3'].forEach(id => { $(id).classList.remove('faded'); $(id).style.opacity=''; });
+  $('layerQPLeft').classList.remove('out');
+  $('layerQPRight').classList.remove('out');
+  $('layerMemoLeft').classList.remove('in');  $('layerMemoLeft').classList.add('hidden-start');
+  $('layerMemoRight').classList.remove('in'); $('layerMemoRight').classList.add('hidden-start');
+  ['mq1hdr','mq11','mq12','mq13','mq14','mq22','mq3hdr'].forEach(id => { const el=$(id); if(el) el.classList.remove('revealed'); });
+  $('captionText').textContent = 'The question paper transforms into the teacher marking memo.';
+
+  // t=0.8s — all QP fades, both memo layers activate together
+  setTimeout(() => { fadeBlock('qp1'); fadeBlock('qp2'); fadeBlock('qp3'); }, 800);
+  setTimeout(() => {
+    $('layerMemoLeft').classList.remove('hidden-start');  $('layerMemoLeft').classList.add('in');
+    $('layerMemoRight').classList.remove('hidden-start'); $('layerMemoRight').classList.add('in');
+    reveal('mq1hdr');
+  }, 1200);
+
+  // Left page: Q1 memo builds with perms table embedded in mq13
+  setTimeout(() => reveal('mq11'), 1700);
+  setTimeout(() => reveal('mq12'), 2300);
+  setTimeout(() => reveal('mq13'), 2900); // 1.3 + perms table inside
+
+  // Right page: 1.4 appears
+  setTimeout(() => reveal('mq14'), 3800);
+
+  // Right page: full Q2 memo
+  setTimeout(() => reveal('mq22'), 5000);
+
+  // Right page: Q3 memo
+  setTimeout(() => { const el=$('mq3hdr'); if(el) reveal('mq3hdr'); }, 6500);
+
+  // t=7.2s — swap headers
+  setTimeout(() => {
+    swapHeaders();
+    $('captionText').textContent = 'Every mark is accounted for — the memo is ready.';
+  }, 7200);
+}
+
+window.addEventListener('load', () => setTimeout(runAnimation, 600));
+$('replayBtn').addEventListener('click', runAnimation);
+})();
+</script>
+
+</body>
+</html>
