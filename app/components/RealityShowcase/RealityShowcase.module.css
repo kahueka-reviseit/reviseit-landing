@@ -1,0 +1,138 @@
+/* ─── Root: two-column on wide screens ──────────────────────── */
+.root {
+  display: grid;
+  grid-template-columns: 1fr 460px;
+  gap: 48px;
+  align-items: start;
+  margin-top: 48px;
+}
+
+/* ─── Statement selector ─────────────────────────────────────── */
+.selector {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-left: 3px solid transparent;
+  padding: 20px 20px 20px 24px;
+  cursor: pointer;
+  border-radius: 0 4px 4px 0;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.card:hover {
+  border-left-color: var(--item-color);
+  background: var(--item-bg);
+}
+
+.cardActive {
+  border-left-color: var(--item-color) !important;
+  background: var(--item-bg) !important;
+}
+
+.cardLabel {
+  display: block;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--item-color);
+  margin-bottom: 8px;
+  opacity: 0.65;
+  transition: opacity 0.2s ease;
+}
+
+.cardActive .cardLabel,
+.card:hover .cardLabel {
+  opacity: 1;
+}
+
+.cardQuote {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  color: #5A5A5A;
+  line-height: 1.55;
+  transition: color 0.2s ease;
+}
+
+.cardQuoteMark {
+  font-size: 1.8rem;
+  line-height: 0;
+  vertical-align: -0.25em;
+  margin-right: 3px;
+  color: var(--item-color);
+  opacity: 0.45;
+  font-style: normal;
+  transition: opacity 0.2s ease;
+}
+
+.cardActive .cardQuote,
+.card:hover .cardQuote {
+  color: #1A1A1A;
+}
+
+.cardActive .cardQuoteMark,
+.card:hover .cardQuoteMark {
+  opacity: 0.85;
+}
+
+/* ─── Preview ────────────────────────────────────────────────── */
+.preview {
+  transition: opacity 0.2s ease;
+}
+
+.previewFading {
+  opacity: 0;
+}
+
+.iframeShell {
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.iframe {
+  display: block;
+  width: 460px;
+  height: 740px;
+  border: none;
+  background: #C8C2B8;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 1060px) {
+  .root {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .iframeShell {
+    max-width: 460px;
+  }
+}
+
+@media (max-width: 520px) {
+  .iframeShell {
+    overflow-x: auto;
+  }
+
+  .card {
+    padding: 16px 12px 16px 20px;
+  }
+
+  .cardQuote {
+    font-size: 0.97rem;
+  }
+}

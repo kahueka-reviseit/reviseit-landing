@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Remediation Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #1A1A2E;
+  --slate: #4A5568;
+  --dark-text: #1a1a1a;
+  --mid-text: #555;
+  --med-gray: #8a8a8a;
+  --light-gray: #e2e2e2;
+  --off-white: #f8f8f6;
+  --white: #fff;
+  --needs: #5B8A72;
+  --needs-bg: rgba(91,138,114,0.22);
+  --disengaged: #C98B2A;
+  --disengaged-bg: rgba(201,139,42,0.22);
+  --wood: #C4A265;
+  --wood-dark: #9E7A3A;
+  --block-fill: #9BAAB8;
+  --block-border: #6A7F94;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: #C8C2B8;
+  min-height: 100vh;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 32px 16px;
+  user-select: none;
+}
+
+/* ── Page 420×594 ── */
+.page {
+  width: 420px; height: 594px;
+  background: #F6F6F4;
+  border: 2px solid #444; border-radius: 2px;
+  box-shadow: 5px 5px 24px rgba(0,0,0,0.28), -2px 0 6px rgba(0,0,0,0.10);
+  display: flex; flex-direction: column;
+  position: relative; overflow: hidden; flex-shrink: 0;
+}
+.inner-border { position: absolute; inset: 7px; border: 1px solid #999; pointer-events: none; z-index: 1; }
+
+/* ── Header ── */
+.page-header {
+  background: #3A3A3A; padding: 9px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0; z-index: 10;
+}
+.ph-label { font-size: 7.5px; color: #AAA; letter-spacing: 1.4px; text-transform: uppercase; }
+.ph-title { font-size: 9px; font-weight: 700; color: #DDD; }
+.header-rule { height: 2px; background: #777; flex-shrink: 0; }
+
+/* ── Body: left panel + right panel ── */
+.body {
+  flex: 1; display: flex; min-height: 0;
+  padding: 10px 12px 6px;
+  gap: 10px;
+}
+
+/* ══════════════════════════════════
+   LEFT PANEL — timeline + classroom
+══════════════════════════════════ */
+.left-panel {
+  width: 210px; flex-shrink: 0;
+  display: flex; flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Section label ── */
+.sec-label {
+  font-size: 0.58rem; font-weight: 700; color: var(--slate);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+/* ── Vertical timeline ── */
+.timeline-wrap {
+  display: flex; gap: 6px; flex: 1; min-height: 0;
+}
+
+/* The vertical ruler column */
+.time-ruler {
+  width: 30px; flex-shrink: 0;
+  display: flex; flex-direction: column;
+  position: relative;
+}
+.ruler-tick {
+  font-size: 0.46rem; color: var(--med-gray);
+  line-height: 1; flex-shrink: 0;
+  margin-bottom: 0; white-space: nowrap;
+}
+
+/* The vertical track */
+.timeline-track {
+  flex: 1;
+  background: var(--off-white);
+  border: 1px solid var(--light-gray);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+
+/* Each added block stacks top-to-bottom */
+.t-block {
+  width: 100%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: flex-start;
+  padding: 0 6px;
+  background: #C8D0D8;
+  border-bottom: 1px solid rgba(255,255,255,0.5);
+  font-size: 0.52rem; font-weight: 600; color: #3A4A58;
+  overflow: hidden; white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+}
+.t-block:hover { background: #B8C4CE; }
+.t-block.previewing { background: #7A9AB0; color: #fff; }
+
+/* Empty remaining slot */
+.t-remaining {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.5rem; color: var(--light-gray);
+  font-style: italic;
+  border-top: 1px dashed var(--light-gray);
+}
+
+/* ── Classroom ── */
+.classroom-section { flex-shrink: 0; }
+
+.classroom-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 3px;
+  margin-top: 4px;
+}
+
+.seat {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end;
+  position: relative;
+  height: 22px;
+}
+.desk {
+  width: 22px; height: 14px;
+  background: var(--wood);
+  border: 1px solid var(--wood-dark);
+  border-radius: 1.5px;
+  position: relative;
+  transition: background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+.desk::after {
+  content: '';
+  position: absolute; inset: 2px 3px;
+  background: repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 3px);
+}
+.learner {
+  position: absolute;
+  top: 0; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center;
+}
+.l-head {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #D4A88A; border: 1px solid #B8866A;
+  transition: background 0.2s, border-color 0.2s;
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 5px; font-weight: 900; color: transparent;
+}
+.l-body {
+  width: 10px; height: 5px;
+  background: #9FB8D0; border: 1px solid #7A9AB8;
+  border-radius: 40% 40% 30% 30% / 50% 50% 30% 30%;
+  margin-top: -1px;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+/* Learner states */
+.seat.state-needs .desk       { background: var(--needs-bg); border-color: var(--needs); }
+.seat.state-needs .l-head     { background: var(--needs); border-color: #3d6b54; }
+.seat.state-needs .l-body     { background: var(--needs); border-color: #3d6b54; }
+
+.seat.state-covered .desk     { background: rgba(180,180,180,0.15); border-color: #CCC; }
+.seat.state-covered .l-head   { background: #C8C8C8; border-color: #AAAAAA; }
+.seat.state-covered .l-body   { background: #D8D8D8; border-color: #BBBBBB; }
+
+.seat.state-disengaged .desk  { background: var(--disengaged-bg); border-color: var(--disengaged); }
+.seat.state-disengaged .l-head{ background: var(--disengaged); border-color: #9a6510; }
+.seat.state-disengaged .l-body{ background: var(--disengaged); border-color: #9a6510; }
+.seat.state-disengaged .l-head::after {
+  content: '?'; position: absolute;
+  font-size: 5px; font-weight: 900; color: #fff;
+}
+
+/* ══════════════════════════════════
+   RIGHT PANEL — question list
+══════════════════════════════════ */
+.right-panel {
+  flex: 1; display: flex; flex-direction: column;
+  gap: 6px; min-height: 0;
+}
+
+.q-scroll {
+  flex: 1; overflow-y: auto; display: flex;
+  flex-direction: column; gap: 3px;
+  padding-right: 2px;
+}
+.q-scroll::-webkit-scrollbar { width: 3px; }
+.q-scroll::-webkit-scrollbar-thumb { background: var(--light-gray); border-radius: 2px; }
+
+/* Question row */
+.q-row {
+  display: flex; align-items: center;
+  gap: 4px; flex-shrink: 0;
+  padding: 4px 6px;
+  border: 1px solid var(--light-gray);
+  border-radius: 3px; background: var(--white);
+  transition: opacity 0.2s;
+}
+.q-row.added { opacity: 0.38; }
+.q-row.full-warn { animation: shake 0.3s ease; }
+
+@keyframes shake {
+  0%,100%{ transform:translateX(0); }
+  25%    { transform:translateX(-3px); }
+  75%    { transform:translateX(3px); }
+}
+
+.q-name {
+  flex: 1;
+  font-size: 0.6rem; font-weight: 600; color: var(--mid-text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.q-mins {
+  font-size: 0.52rem; color: var(--med-gray);
+  flex-shrink: 0; white-space: nowrap;
+}
+
+/* Preview btn */
+.q-prev {
+  font-size: 0.5rem; padding: 2px 4px;
+  border: 1px solid var(--light-gray);
+  border-radius: 2px; background: var(--off-white);
+  color: var(--med-gray); cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.q-prev.holding { background: #E8F0EC; border-color: var(--needs); color: var(--needs); }
+
+/* Add btn */
+.q-add {
+  font-size: 0.5rem; padding: 2px 6px;
+  border: 1px solid #AAAAAA;
+  border-radius: 2px; background: var(--off-white);
+  color: var(--slate); cursor: pointer; font-weight: 700;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.q-add:hover { background: #E0E0DC; }
+.q-row.added .q-add { pointer-events: none; }
+
+/* Hold hint */
+.hold-hint {
+  font-size: 0.48rem; color: var(--light-gray);
+  text-align: center; flex-shrink: 0;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+/* ── Key ── */
+.key-row {
+  padding: 4px 12px 3px;
+  display: flex; gap: 10px; align-items: center;
+  flex-shrink: 0; border-top: 1px solid var(--light-gray);
+}
+.key-item { display: flex; align-items: center; gap: 3px; }
+.key-dot  { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.key-lbl  { font-size: 0.5rem; color: var(--mid-text); }
+
+/* ── Toast ── */
+.toast {
+  position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+  background: #3A3A3A; color: #fff;
+  font-size: 0.58rem; font-weight: 600; padding: 4px 12px;
+  border-radius: 20px; white-space: nowrap; z-index: 20;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.toast.show { opacity: 1; }
+
+/* ── Footer ── */
+.page-footer {
+  background: #DDDDD8; padding: 4px 14px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-shrink: 0; z-index: 10;
+}
+.footer-label { font-size: 7.5px; color: #888; }
+.reset-btn {
+  font-family: 'Source Sans 3', sans-serif; font-size: 0.62rem; font-weight: 700;
+  color: #555; background: #EAEAE6; border: 1px solid #BABAB0;
+  border-radius: 3px; padding: 3px 10px; cursor: pointer;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  transition: background 0.15s;
+}
+.reset-btn:hover { background: #DADAD4; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="inner-border"></div>
+
+  <div class="page-header">
+    <span class="ph-label">Remediation Planner</span>
+    <span class="ph-title">45-min revision lesson</span>
+    <span class="ph-label" id="mins-left">45 min left</span>
+  </div>
+  <div class="header-rule"></div>
+
+  <div class="body">
+
+    <!-- ════ LEFT PANEL ════ -->
+    <div class="left-panel">
+
+      <!-- Vertical timeline -->
+      <div class="sec-label">Lesson plan</div>
+      <div class="timeline-wrap" id="timeline-wrap">
+        <div class="time-ruler" id="time-ruler"></div>
+        <div class="timeline-track" id="timeline-track">
+          <div class="t-remaining" id="t-remaining">Add questions →</div>
+        </div>
+      </div>
+
+      <!-- Classroom -->
+      <div class="classroom-section">
+        <div class="sec-label">Class · 24 learners</div>
+        <div class="classroom-grid" id="classroom"></div>
+      </div>
+
+    </div>
+
+    <!-- ════ RIGHT PANEL ════ -->
+    <div class="right-panel">
+      <div class="sec-label">Exam questions</div>
+      <div class="q-scroll" id="q-scroll"></div>
+      <div class="hold-hint">Hold the eye icon to preview who needs each question</div>
+    </div>
+
+  </div>
+
+  <!-- Key -->
+  <div class="key-row">
+    <div class="key-item">
+      <div class="key-dot" style="background:var(--needs);"></div>
+      <span class="key-lbl">Needs revision</span>
+    </div>
+    <div class="key-item">
+      <div class="key-dot" style="background:#C8C8C8;"></div>
+      <span class="key-lbl">Already solid</span>
+    </div>
+    <div class="key-item">
+      <div class="key-dot" style="background:var(--disengaged);"></div>
+      <span class="key-lbl">Not engaged</span>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Lesson full — remove a block to add more</div>
+
+  <div class="page-footer">
+    <span class="footer-label">Ms T. Dlamini · Term 2 Week 4</span>
+    <button class="reset-btn" onclick="resetAll()">↺ Reset</button>
+  </div>
+</div>
+
+<script>
+/* ── Data ── */
+const TOTAL = 45; // minutes
+const DISENGAGED = new Set([2, 9, 18]);
+
+const QUESTIONS = [
+  { id:'q1',  label:'Question 1',            mins: 8,  needs:[0,1,3,7,8,11,13,16,22,23] },
+  { id:'q2',  label:'Question 2',            mins: 7,  needs:[4,6,10,12,15,17,19,21] },
+  { id:'q3',  label:'Question 3',            mins:10,  needs:[0,4,7,11,13,15,17,19,22] },
+  { id:'q4',  label:'Question 4',            mins: 8,  needs:[1,3,6,8,10,12,16,21,23] },
+  { id:'q5',  label:'Question 5',            mins: 7,  needs:[0,4,7,11,13,22,23] },
+  { id:'q6',  label:'Question 6',            mins: 9,  needs:[3,6,8,10,12,17,19,21] },
+  { id:'mcq1',label:'Multiple Choice 1',     mins: 5,  needs:[1,4,7,16,22,23] },
+  { id:'mcq2',label:'Multiple Choice 2',     mins: 4,  needs:[0,3,6,13,15,19] },
+  { id:'mcq3',label:'Multiple Choice 3',     mins: 5,  needs:[1,8,10,12,17,21,23] },
+];
+
+let minutesUsed = 0;
+let addedIds = [];
+let timelineBlocks = [];
+
+/* ── Build classroom ── */
+const classroomEl = document.getElementById('classroom');
+for (let i = 0; i < 24; i++) {
+  const seat = document.createElement('div');
+  seat.className = 'seat';
+  seat.id = `seat-${i}`;
+  seat.innerHTML = `
+    <div class="learner">
+      <div class="l-head" id="lh-${i}"></div>
+      <div class="l-body"></div>
+    </div>
+    <div class="desk"></div>`;
+  classroomEl.appendChild(seat);
+}
+
+function resetLearners() {
+  for (let i = 0; i < 24; i++) {
+    document.getElementById(`seat-${i}`).className = 'seat';
+  }
+}
+
+function showLearners(qId) {
+  const q = QUESTIONS.find(x => x.id === qId);
+  if (!q) return;
+  const needsSet = new Set(q.needs);
+  for (let i = 0; i < 24; i++) {
+    const seat = document.getElementById(`seat-${i}`);
+    seat.className = 'seat ' + (
+      DISENGAGED.has(i) ? 'state-disengaged' :
+      needsSet.has(i)   ? 'state-needs' :
+                          'state-covered'
+    );
+  }
+}
+
+/* ── Build time ruler ── */
+function buildRuler() {
+  const ruler = document.getElementById('time-ruler');
+  ruler.innerHTML = '';
+  // total track height is set by flex; we place ticks at proportional positions via JS after render
+  // For simplicity: label every 5 min as absolute inside the ruler
+}
+
+/* ── Render timeline ── */
+function renderTimeline() {
+  const track = document.getElementById('timeline-track');
+  track.innerHTML = '';
+
+  const PX_PER_MIN = track.offsetHeight / TOTAL || 4;
+
+  timelineBlocks.forEach(b => {
+    const h = (b.mins / TOTAL) * 100;
+    const div = document.createElement('div');
+    div.className = 't-block';
+    div.id = `tb-${b.id}`;
+    div.style.height = h + '%';
+    div.style.minHeight = '14px';
+    div.textContent = b.label;
+
+    div.addEventListener('mousedown', e => { e.preventDefault(); showLearners(b.id); highlightTB(b.id, true); });
+    div.addEventListener('mouseup',   () => { resetLearners(); highlightTB(b.id, false); });
+    div.addEventListener('mouseleave',() => { resetLearners(); highlightTB(b.id, false); });
+    div.addEventListener('touchstart', e => { e.preventDefault(); showLearners(b.id); highlightTB(b.id, true); }, {passive:false});
+    div.addEventListener('touchend',  () => { resetLearners(); highlightTB(b.id, false); });
+
+    track.appendChild(div);
+  });
+
+  // Remaining gap
+  if (minutesUsed < TOTAL) {
+    const rem = document.createElement('div');
+    rem.className = 't-remaining';
+    rem.id = 't-remaining';
+    const left = TOTAL - minutesUsed;
+    rem.textContent = left + ' min free';
+    track.appendChild(rem);
+  }
+
+  // Build ruler ticks
+  const ruler = document.getElementById('time-ruler');
+  ruler.innerHTML = '';
+  ruler.style.position = 'relative';
+  const trackH = track.parentElement.offsetHeight || 180;
+  const LESSON_START_H = 10, LESSON_START_M = 0;
+  for (let m = 0; m <= TOTAL; m += 5) {
+    const totalMins = LESSON_START_H * 60 + LESSON_START_M + m;
+    const hh = Math.floor(totalMins / 60).toString().padStart(2, '0');
+    const mm = (totalMins % 60).toString().padStart(2, '0');
+    const tick = document.createElement('div');
+    tick.style.cssText = `position:absolute;top:${(m/TOTAL)*100}%;font-size:0.42rem;color:var(--med-gray);line-height:1;white-space:nowrap;transform:translateY(-50%);`;
+    tick.textContent = hh + ':' + mm;
+    ruler.appendChild(tick);
+  }
+
+  // Update header mins
+  document.getElementById('mins-left').textContent = (TOTAL - minutesUsed) + ' min left';
+}
+
+function highlightTB(id, on) {
+  document.querySelectorAll('.t-block').forEach(b => b.classList.remove('previewing'));
+  if (on) {
+    const el = document.getElementById(`tb-${id}`);
+    if (el) el.classList.add('previewing');
+  }
+}
+
+/* ── Build question rows ── */
+const qScroll = document.getElementById('q-scroll');
+
+QUESTIONS.forEach(q => {
+  const row = document.createElement('div');
+  row.className = 'q-row';
+  row.id = `qrow-${q.id}`;
+  row.innerHTML = `
+    <span class="q-name">${q.label}</span>
+    <span class="q-mins">${q.mins}m</span>
+    <button class="q-prev" id="prev-${q.id}" title="Hold to preview"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    <button class="q-add" id="add-${q.id}" onclick="addQ('${q.id}')">+</button>`;
+  qScroll.appendChild(row);
+
+  const prevBtn = row.querySelector('.q-prev');
+
+  function startPrev(e) {
+    e.preventDefault();
+    prevBtn.classList.add('holding');
+    showLearners(q.id);
+  }
+  function endPrev(e) {
+    e.preventDefault();
+    prevBtn.classList.remove('holding');
+    resetLearners();
+  }
+
+  prevBtn.addEventListener('mousedown', startPrev);
+  prevBtn.addEventListener('touchstart', startPrev, {passive:false});
+  prevBtn.addEventListener('mouseup', endPrev);
+  prevBtn.addEventListener('mouseleave', endPrev);
+  prevBtn.addEventListener('touchend', endPrev);
+  prevBtn.addEventListener('touchcancel', endPrev);
+});
+
+/* ── Add question ── */
+function addQ(id) {
+  if (addedIds.includes(id)) return;
+  const q = QUESTIONS.find(x => x.id === id);
+  if (minutesUsed + q.mins > TOTAL) {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    document.getElementById(`qrow-${id}`).classList.add('full-warn');
+    setTimeout(() => { toast.classList.remove('show'); document.getElementById(`qrow-${id}`).classList.remove('full-warn'); }, 1800);
+    return;
+  }
+  addedIds.push(id);
+  minutesUsed += q.mins;
+  timelineBlocks.push(q);
+  document.getElementById(`qrow-${id}`).classList.add('added');
+  renderTimeline();
+}
+
+/* ── Reset ── */
+function resetAll() {
+  addedIds = []; minutesUsed = 0; timelineBlocks = [];
+  resetLearners();
+  document.querySelectorAll('.q-row').forEach(r => r.classList.remove('added','full-warn'));
+  document.getElementById('mins-left').textContent = TOTAL + ' min left';
+  renderTimeline();
+}
+
+/* ── Init ── */
+renderTimeline();
+window.addEventListener('resize', renderTimeline);
+</script>
+</body>
+</html>

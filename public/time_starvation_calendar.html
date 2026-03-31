@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Time Starvation — Teacher Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --terracotta: #B85042;
+  --terracotta-light: rgba(184,80,66,0.12);
+  --navy: #1A1A2E;
+  --sage: #5B8A72;
+  --sage-light: rgba(91,138,114,0.13);
+  --amber: #C98B2A;
+  --amber-light: rgba(201,139,42,0.12);
+  --slate: #4A5568;
+  --dark-text: #1a1a1a;
+  --mid-text: #555;
+  --med-gray: #8a8a8a;
+  --light-gray: #e2e2e2;
+  --off-white: #f8f8f6;
+  --white: #fff;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: #C8C2B8;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+/* ── Page shell: exactly 420×594 to match flipbook ── */
+.page {
+  width: 420px;
+  height: 594px;
+  background: #F6F6F4;
+  border: 2px solid #444;
+  border-radius: 2px;
+  box-shadow: 5px 5px 24px rgba(0,0,0,0.28), -2px 0 6px rgba(0,0,0,0.10);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.inner-border {
+  position: absolute; inset: 7px;
+  border: 1px solid #999;
+  pointer-events: none; z-index: 1;
+}
+
+/* ── Header ── */
+.page-header {
+  background: #3A3A3A; padding: 9px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0; position: relative; z-index: 10;
+}
+.ph-label { font-size: 7.5px; color: #AAA; letter-spacing: 1.4px; text-transform: uppercase; }
+.ph-title { font-size: 9px; font-weight: 700; color: #DDD; letter-spacing: 0.3px; }
+.header-rule { height: 2px; background: #777; flex-shrink: 0; }
+
+/* ── Intro ── */
+.intro-block { padding: 9px 16px 7px; flex-shrink: 0; position: relative; z-index: 2; }
+.intro-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.9rem; font-weight: 700; color: var(--navy);
+  margin-bottom: 3px; line-height: 1.3;
+}
+.intro-sub { font-size: 0.7rem; color: var(--mid-text); line-height: 1.5; }
+
+/* ── Calendar ── */
+.cal-wrap {
+  margin: 0 11px; border: 1.5px solid var(--light-gray);
+  border-radius: 5px; overflow: hidden; background: var(--white);
+  flex: 1; display: flex; flex-direction: column;
+  position: relative; z-index: 2; min-height: 0;
+}
+.week-bar {
+  background: var(--off-white); border-bottom: 1px solid var(--light-gray);
+  padding: 4px 10px; display: flex; align-items: center;
+  justify-content: space-between; flex-shrink: 0;
+}
+.week-label { font-size: 0.6rem; font-weight: 700; color: var(--slate); letter-spacing: 0.05em; text-transform: uppercase; }
+.week-tag   { font-size: 0.58rem; color: var(--med-gray); font-style: italic; transition: color 0.3s; }
+.cal-header {
+  display: flex; background: var(--off-white);
+  border-bottom: 1px solid var(--light-gray); flex-shrink: 0;
+}
+.gutter-head { width: 38px; flex-shrink: 0; border-right: 1px solid var(--light-gray); }
+.day-head {
+  flex: 1; text-align: center; padding: 5px 4px;
+  border-right: 1px solid var(--light-gray);
+  font-size: 0.6rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--mid-text);
+}
+.day-head:last-child { border-right: none; }
+.day-head-sun { color: var(--terracotta); background: rgba(184,80,66,0.04); }
+.day-head-sat { color: var(--med-gray); }
+.day-num { display: block; font-size: 0.85rem; font-weight: 600; color: var(--dark-text); margin-top: 1px; line-height: 1; }
+.day-head-sun .day-num { color: var(--terracotta); }
+.day-head-sat .day-num { color: var(--med-gray); }
+
+/* ── Grid ── */
+.grid-scroll { overflow-y: auto; overflow-x: hidden; flex: 1; min-height: 0; }
+.grid-scroll::-webkit-scrollbar { width: 3px; }
+.grid-scroll::-webkit-scrollbar-thumb { background: var(--light-gray); border-radius: 2px; }
+.grid-inner { display: flex; position: relative; }
+.time-col { width: 38px; flex-shrink: 0; position: relative; border-right: 1px solid var(--light-gray); background: var(--off-white); }
+.time-label { position: absolute; right: 5px; font-size: 0.5rem; color: var(--med-gray); line-height: 1; white-space: nowrap; transform: translateY(-50%); }
+.day-cols { flex: 1; display: flex; position: relative; }
+.day-col { flex: 1; position: relative; border-right: 1px solid var(--light-gray); }
+.day-col:last-child { border-right: none; }
+.day-col-sun { background: rgba(184,80,66,0.03); }
+.day-col-sat { background: rgba(138,138,138,0.03); }
+.h-line { position: absolute; left: 0; right: 0; height: 1px; background: var(--light-gray); pointer-events: none; z-index: 0; }
+.h-line-half { background: #f0f0f0; }
+
+/* ── Events ── */
+.block { position: absolute; left: 2px; right: 2px; border-radius: 2px; border-left: 2.5px solid transparent; padding: 2px 4px; overflow: hidden; z-index: 2; }
+.block-label { display: block; font-size: 0.57rem; font-weight: 600; color: var(--dark-text); line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.block-sub   { display: block; font-size: 0.51rem; color: var(--mid-text); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ev-navy  { background: rgba(26,26,46,0.08);   border-left-color: var(--navy);    } .ev-navy  .block-label { color: var(--navy); }
+.ev-sage  { background: var(--sage-light);       border-left-color: var(--sage);    } .ev-sage  .block-label { color: #2d6b52; }
+.ev-amber { background: var(--amber-light);      border-left-color: var(--amber);   } .ev-amber .block-label { color: #7a5210; }
+.ev-gray  { background: rgba(138,138,138,0.09); border-left-color: var(--med-gray);} .ev-gray  .block-label { color: var(--med-gray); font-style: italic; }
+
+/* ── Clickable gaps ── */
+.gap-slot {
+  position: absolute; left: 2px; right: 2px; border-radius: 3px;
+  border: 1.5px dashed #AAAAAA; overflow: hidden;
+  cursor: pointer; transition: border-color 0.2s, background 0.2s;
+  z-index: 2;
+}
+.gap-slot:hover { border-color: var(--sage); background: rgba(91,138,114,0.04); }
+.gap-slot:hover .gap-hatch { opacity: 0.45; }
+.gap-slot:hover .gap-invite { color: var(--sage); }
+.gap-hatch {
+  position: absolute; inset: 0; opacity: 0.28; pointer-events: none;
+  background-image: repeating-linear-gradient(45deg, #BBBBBB 0px, #BBBBBB 1px, transparent 1px, transparent 6px);
+  transition: opacity 0.2s;
+}
+.gap-invite {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; color: #999; font-size: 0.53rem; font-weight: 600;
+  letter-spacing: 0.04em; text-align: center; text-transform: uppercase;
+  transition: color 0.2s; pointer-events: none; line-height: 1.3;
+}
+.gap-plus { font-size: 0.85rem; font-weight: 300; line-height: 1; display: block; }
+
+/* ── Urgent filled ── */
+.ev-urgent {
+  position: absolute; left: 2px; right: 2px; border-radius: 3px;
+  border-left: 2.5px solid var(--terracotta);
+  background: var(--terracotta-light); padding: 2px 4px; overflow: hidden;
+  animation: fillIn 0.45s cubic-bezier(0.34,1.45,0.64,1) forwards;
+  z-index: 2;
+}
+.ev-urgent .block-label { color: var(--terracotta); font-size: 0.57rem; }
+.ev-urgent .block-sub   { font-size: 0.51rem; color: #c4695d; }
+@keyframes fillIn {
+  0%   { opacity: 0; transform: scaleY(0.75); }
+  100% { opacity: 1; transform: scaleY(1); }
+}
+
+/* ── Exam gap ── */
+.gap-exam {
+  position: absolute; left: 2px; right: 2px; border-radius: 3px;
+  border: 1.5px dashed var(--terracotta); overflow: hidden;
+  animation: examPulse 2.5s ease-in-out infinite;
+  cursor: pointer;
+  z-index: 3;
+  transition: top 0.55s cubic-bezier(0.4,0,0.2,1), height 0.55s cubic-bezier(0.4,0,0.2,1), background 0.4s ease;
+}
+.gap-exam .gap-hatch {
+  opacity: 1;
+  background-image: repeating-linear-gradient(45deg, rgba(184,80,66,0.16) 0px, rgba(184,80,66,0.16) 1px, transparent 1px, transparent 6px);
+}
+.gap-exam .gap-invite { color: var(--terracotta); font-size: 0.54rem; }
+@keyframes examPulse {
+  0%,100% { border-color: rgba(184,80,66,0.4); }
+  50%     { border-color: rgba(184,80,66,1); }
+}
+.gap-exam.filled {
+  animation: none;
+  border-style: solid;
+  border-color: var(--terracotta);
+  background: rgba(184,80,66,0.11);
+  cursor: default;
+}
+
+/* ── Ripple ── */
+.ripple-ring {
+  position: absolute; border-radius: 50%; width: 30px; height: 30px;
+  background: var(--terracotta); top: 50%; left: 50%; pointer-events: none;
+  animation: ripple 0.5s ease-out forwards;
+}
+@keyframes ripple {
+  0%   { transform: translate(-50%,-50%) scale(0); opacity: 0.5; }
+  100% { transform: translate(-50%,-50%) scale(2.5); opacity: 0; }
+}
+
+/* ── Caption ── */
+.caption-area { padding: 5px 16px 4px; min-height: 42px; flex-shrink: 0; position: relative; z-index: 2; }
+.caption-text { font-size: 0.68rem; color: var(--mid-text); line-height: 1.5; opacity: 0; transform: translateY(5px); transition: opacity 0.4s, transform 0.4s; }
+.caption-text.visible { opacity: 1; transform: translateY(0); }
+.caption-head { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: var(--terracotta); margin-bottom: 2px; }
+
+/* ── Footer ── */
+.page-footer {
+  background: #DDDDD8; padding: 5px 14px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-shrink: 0; position: relative; z-index: 10;
+}
+.nav-btn {
+  font-family: 'Source Sans 3', sans-serif; font-size: 0.64rem; font-weight: 700;
+  color: #555; background: #EAEAE6; border: 1px solid #BABAB0;
+  border-radius: 3px; padding: 4px 12px; cursor: pointer;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  transition: background 0.15s, color 0.15s;
+}
+.nav-btn:hover { background: #DADAD4; color: #333; }
+.nav-btn:disabled { opacity: 0.3; cursor: default; }
+.nav-btn.primary { background: var(--terracotta); color: #fff; border-color: var(--terracotta); }
+.nav-btn.primary:hover { background: #9e3f32; border-color: #9e3f32; }
+.progress-dots { display: flex; gap: 5px; align-items: center; }
+.dot { width: 5px; height: 5px; border-radius: 50%; background: var(--light-gray); transition: background 0.3s; }
+.dot.active { background: var(--terracotta); }
+
+/* ── Views ── */
+.view { display: none; flex-direction: column; flex: 1; min-height: 0; }
+.view.active { display: flex; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="inner-border"></div>
+
+  <div class="page-header">
+    <span class="ph-label">Teacher Planning</span>
+    <span class="ph-title">The Teacher's Week</span>
+    <span class="ph-label">Interactive</span>
+  </div>
+  <div class="header-rule"></div>
+
+  <div class="intro-block">
+    <div class="intro-headline">Where does the time go?</div>
+    <div class="intro-sub">Every gap in a teacher's week is a target. Click the open slots — watch what happens to your planning time.</div>
+  </div>
+
+  <!-- ══ VIEW 1: Tue / Wed / Thu ══ -->
+  <div class="view active" id="view1">
+    <div class="cal-wrap">
+      <div class="week-bar">
+        <span class="week-label">Week 3 · Term 2</span>
+        <span class="week-tag" id="week-tag1">3 planning windows available</span>
+      </div>
+      <div class="cal-header">
+        <div class="gutter-head"></div>
+        <div class="day-head">Tue<span class="day-num">14</span></div>
+        <div class="day-head">Wed<span class="day-num">15</span></div>
+        <div class="day-head">Thu<span class="day-num">16</span></div>
+      </div>
+      <div class="grid-scroll" id="grid1">
+        <div class="grid-inner">
+          <div class="time-col" id="tcol1"></div>
+          <div class="day-cols" id="dcols1">
+
+            <!-- TUESDAY — gap at 11:30 (top:198, h:36) -->
+            <div class="day-col">
+              <div class="block ev-navy"  style="top:36px;height:36px;"><span class="block-label">Morning admin</span><span class="block-sub">Registers, notices</span></div>
+              <div class="block ev-sage"  style="top:72px;height:36px;"><span class="block-label">Gr 11 Physics</span><span class="block-sub">Newton's Laws</span></div>
+              <div class="block ev-sage"  style="top:108px;height:36px;"><span class="block-label">Gr 10 Science</span><span class="block-sub">Matter &amp; Materials</span></div>
+              <div class="block ev-gray"  style="top:144px;height:18px;"><span class="block-label">Break</span></div>
+              <div class="block ev-sage"  style="top:162px;height:36px;"><span class="block-label">Gr 12 Chemistry</span><span class="block-sub">Organic molecules</span></div>
+              <div class="block ev-gray"  style="top:234px;height:18px;"><span class="block-label">Lunch</span></div>
+              <div class="block ev-sage"  style="top:252px;height:36px;"><span class="block-label">Gr 11 Physics</span><span class="block-sub">Practical</span></div>
+              <div class="block ev-sage"  style="top:288px;height:36px;"><span class="block-label">Gr 9 Science</span><span class="block-sub">Energy &amp; Change</span></div>
+              <div class="block ev-sage"  style="top:324px;height:36px;"><span class="block-label">Gr 11 Physics</span><span class="block-sub">Remedial group</span></div>
+              <div class="gap-slot" id="gap-tue" style="top:198px;height:36px;" onclick="fillGap('gap-tue','parent')">
+                <div class="gap-hatch"></div>
+                <div class="gap-invite"><span class="gap-plus">+</span><span>Click to block<br>planning time</span></div>
+              </div>
+            </div>
+
+            <!-- WEDNESDAY — gap at 13:00 (top:252, h:54) -->
+            <div class="day-col">
+              <div class="block ev-amber" style="top:36px;height:36px;"><span class="block-label">Staff briefing</span><span class="block-sub">HOD updates</span></div>
+              <div class="block ev-sage"  style="top:72px;height:36px;"><span class="block-label">Gr 11 Physics</span><span class="block-sub">Waves &amp; Sound</span></div>
+              <div class="block ev-sage"  style="top:108px;height:36px;"><span class="block-label">Gr 10 Science</span><span class="block-sub">Chemical reactions</span></div>
+              <div class="block ev-gray"  style="top:144px;height:18px;"><span class="block-label">Break</span></div>
+              <div class="block ev-sage"  style="top:162px;height:36px;"><span class="block-label">Gr 12 Physics</span><span class="block-sub">Electrodynamics</span></div>
+              <div class="block ev-sage"  style="top:198px;height:36px;"><span class="block-label">Gr 11 Chemistry</span><span class="block-sub">Stoichiometry</span></div>
+              <div class="block ev-gray"  style="top:234px;height:18px;"><span class="block-label">Lunch</span></div>
+              <div class="block ev-sage"  style="top:306px;height:36px;"><span class="block-label">Gr 12 Chemistry</span><span class="block-sub">Electrochemistry</span></div>
+              <div class="block ev-sage"  style="top:342px;height:36px;"><span class="block-label">Gr 10 Science</span><span class="block-sub">Revision session</span></div>
+              <div class="gap-slot" id="gap-wed" style="top:252px;height:54px;" onclick="fillGap('gap-wed','meeting')">
+                <div class="gap-hatch"></div>
+                <div class="gap-invite"><span class="gap-plus">+</span><span>Click to block<br>planning time</span></div>
+              </div>
+            </div>
+
+            <!-- THURSDAY — gap at 15:00 (top:324, h:54) -->
+            <div class="day-col">
+              <div class="block ev-sage"  style="top:36px;height:36px;"><span class="block-label">Gr 12 Physics</span><span class="block-sub">Doppler effect</span></div>
+              <div class="block ev-sage"  style="top:72px;height:36px;"><span class="block-label">Gr 11 Chemistry</span><span class="block-sub">Acids &amp; Bases</span></div>
+              <div class="block ev-amber" style="top:108px;height:36px;"><span class="block-label">Dept marking</span><span class="block-sub">Moderation</span></div>
+              <div class="block ev-gray"  style="top:144px;height:18px;"><span class="block-label">Break</span></div>
+              <div class="block ev-sage"  style="top:162px;height:36px;"><span class="block-label">Gr 10 Science</span><span class="block-sub">Practical prep</span></div>
+              <div class="block ev-sage"  style="top:198px;height:36px;"><span class="block-label">Gr 9 Science</span><span class="block-sub">Waves intro</span></div>
+              <div class="block ev-gray"  style="top:234px;height:18px;"><span class="block-label">Lunch</span></div>
+              <div class="block ev-sage"  style="top:252px;height:36px;"><span class="block-label">Gr 11 Physics</span><span class="block-sub">Problem sets</span></div>
+              <div class="block ev-amber" style="top:288px;height:36px;"><span class="block-label">Parent meetings</span><span class="block-sub">Scheduled</span></div>
+              <div class="gap-slot" id="gap-thu" style="top:324px;height:54px;" onclick="fillGap('gap-thu','incident')">
+                <div class="gap-hatch"></div>
+                <div class="gap-invite"><span class="gap-plus">+</span><span>Click to block<br>planning time</span></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="caption-area">
+      <div class="caption-text" id="caption1"></div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW 2: Fri / Sat / Sun ══ -->
+  <div class="view" id="view2">
+    <div class="cal-wrap">
+      <div class="week-bar">
+        <span class="week-label">Week 3 · Term 2</span>
+        <span class="week-tag">Fri – Sun · 1 window left</span>
+      </div>
+      <div class="cal-header">
+        <div class="gutter-head"></div>
+        <div class="day-head">Fri<span class="day-num">17</span></div>
+        <div class="day-head day-head-sat">Sat<span class="day-num">18</span></div>
+        <div class="day-head day-head-sun">Sun<span class="day-num">19</span></div>
+      </div>
+      <div class="grid-scroll" id="grid2">
+        <div class="grid-inner">
+          <div class="time-col" id="tcol2"></div>
+          <div class="day-cols" id="dcols2">
+
+            <!-- FRIDAY — wall to wall -->
+            <div class="day-col">
+              <div class="block ev-navy"  style="top:36px;height:36px;"><span class="block-label">Assembly duty</span><span class="block-sub">Supervise learners</span></div>
+              <div class="block ev-sage"  style="top:72px;height:36px;"><span class="block-label">Gr 11 Physics</span><span class="block-sub">Test review</span></div>
+              <div class="block ev-sage"  style="top:108px;height:36px;"><span class="block-label">Gr 12 Chemistry</span><span class="block-sub">Exam prep</span></div>
+              <div class="block ev-gray"  style="top:144px;height:18px;"><span class="block-label">Break</span></div>
+              <div class="block ev-amber" style="top:162px;height:36px;"><span class="block-label">SGB Meeting</span><span class="block-sub">Curriculum update</span></div>
+              <div class="block ev-sage"  style="top:198px;height:36px;"><span class="block-label">Gr 10 Science</span><span class="block-sub">Assessment prep</span></div>
+              <div class="block ev-gray"  style="top:234px;height:18px;"><span class="block-label">Lunch</span></div>
+              <div class="block ev-amber" style="top:252px;height:36px;"><span class="block-label">Report writing</span><span class="block-sub">Learner comments</span></div>
+              <div class="block ev-sage"  style="top:288px;height:36px;"><span class="block-label">Gr 9 Science</span><span class="block-sub">Catch-up class</span></div>
+              <div class="block ev-amber" style="top:324px;height:54px;"><span class="block-label">Admin &amp; emails</span><span class="block-sub">End of week</span></div>
+            </div>
+
+            <!-- SATURDAY -->
+            <div class="day-col day-col-sat">
+              <div class="block ev-gray"  style="top:36px;height:108px;"><span class="block-label">Family time</span><span class="block-sub">Non-negotiable</span></div>
+              <div class="block ev-amber" style="top:144px;height:36px;"><span class="block-label">Marking</span><span class="block-sub">Gr 11 workbooks</span></div>
+              <div class="block ev-amber" style="top:216px;height:54px;"><span class="block-label">Marking</span><span class="block-sub">Gr 12 essays</span></div>
+              <div class="block ev-gray"  style="top:270px;height:108px;"><span class="block-label">Rest</span></div>
+            </div>
+
+            <!-- SUNDAY — the only gap -->
+            <div class="day-col day-col-sun">
+              <div class="block ev-gray"  style="top:36px;height:90px;"><span class="block-label">Church / rest</span></div>
+              <div class="block ev-amber" style="top:144px;height:36px;"><span class="block-label">Lesson planning</span><span class="block-sub">Week 4 prep</span></div>
+              <div class="block ev-amber" style="top:216px;height:18px;"><span class="block-label">Emails</span></div>
+              <div class="gap-exam" id="gap-exam" style="top:252px;height:90px;" onclick="fillExamSlot()">
+                <div class="gap-hatch"></div>
+                <div class="gap-invite" id="exam-invite">
+                  <span style="font-size:0.95rem;line-height:1;display:block;color:var(--terracotta);">✎</span>
+                  <span style="color:var(--terracotta);font-weight:700;line-height:1.4;text-align:center;font-size:0.56rem;">Create<br>June Exam</span>
+                  <span style="color:#c4695d;font-size:0.5rem;font-weight:400;text-transform:none;letter-spacing:0;">Your only window</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="caption-area">
+      <div class="caption-text visible" id="caption2">
+        <div class="caption-head">One window. The whole exam.</div>
+        <div>Sunday afternoon is the only unbroken time left in the week. This is when Ms Dlamini must draft an entire Grade 11 Physics paper.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Footer nav ── -->
+  <div class="page-footer">
+    <button class="nav-btn" id="btn-back" onclick="goBack()" disabled>← Back</button>
+    <div class="progress-dots">
+      <div class="dot active" id="dot1"></div>
+      <div class="dot" id="dot2"></div>
+    </div>
+    <button class="nav-btn primary" id="btn-next" onclick="goNext()" disabled>Try next 3 days →</button>
+  </div>
+
+</div>
+
+<script>
+const HOUR_H = 36, START_H = 6, HOURS = 12;
+
+const URGENT = {
+  parent:   { label: 'Parent: unannounced visit',  sub: 'Mr Abrahams re: Liam — urgent'     },
+  meeting:  { label: 'Dept meeting — pulled fwd',  sub: 'HOD: June exam structure NOW'       },
+  incident: { label: 'Incident report',            sub: 'Fight: playground — file by 16:00'  }
+};
+
+const CAPTIONS = [
+  null,
+  { head: 'There it goes.',             body: 'A parent arrived unannounced. That planning window is gone.' },
+  { head: "The meeting couldn't wait.", body: 'HOD pulled the department meeting forward. Two windows down.' },
+  { head: 'No time to think.',          body: 'An incident report needs filing before home time. All three gaps — taken.' }
+];
+
+let clicked = 0, view = 1;
+
+function buildGrid(tId, dId) {
+  const tc = document.getElementById(tId);
+  const dc = document.getElementById(dId);
+  const total = HOURS * HOUR_H;
+  tc.style.height = total + 'px';
+  dc.style.height = total + 'px';
+  dc.querySelectorAll('.day-col').forEach(col => { col.style.height = total + 'px'; });
+
+  for (let i = 0; i <= HOURS; i++) {
+    const lbl = document.createElement('div');
+    lbl.className = 'time-label';
+    lbl.style.top = (i * HOUR_H) + 'px';
+    lbl.textContent = String(START_H + i).padStart(2,'0') + ':00';
+    tc.appendChild(lbl);
+
+    dc.querySelectorAll('.day-col').forEach(col => {
+      const line = document.createElement('div');
+      line.className = 'h-line';
+      line.style.top = (i * HOUR_H) + 'px';
+      col.appendChild(line);
+      if (i < HOURS) {
+        const half = document.createElement('div');
+        half.className = 'h-line h-line-half';
+        half.style.top = ((i + 0.5) * HOUR_H) + 'px';
+        col.appendChild(half);
+      }
+    });
+  }
+}
+
+buildGrid('tcol1','dcols1');
+buildGrid('tcol2','dcols2');
+document.getElementById('grid1').scrollTop = HOUR_H;
+document.getElementById('grid2').scrollTop = HOUR_H;
+
+function fillGap(gapId, type) {
+  const gap = document.getElementById(gapId);
+  if (!gap || gap.dataset.filled) return;
+  gap.dataset.filled = 'true';
+
+  const ripple = document.createElement('div');
+  ripple.className = 'ripple-ring';
+  gap.appendChild(ripple);
+
+  setTimeout(() => {
+    gap.style.opacity = '0';
+    gap.style.pointerEvents = 'none';
+    const ev = URGENT[type];
+    const el = document.createElement('div');
+    el.className = 'ev-urgent';
+    el.style.top    = gap.style.top;
+    el.style.height = gap.style.height;
+    el.innerHTML = `<span class="block-label">${ev.label}</span><span class="block-sub">${ev.sub}</span>`;
+    gap.parentElement.appendChild(el);
+
+    clicked++;
+    const cap = document.getElementById('caption1');
+    const c = CAPTIONS[clicked];
+    if (c) {
+      cap.innerHTML = `<div class="caption-head">${c.head}</div><div>${c.body}</div>`;
+      cap.classList.add('visible');
+    }
+    if (clicked >= 3) {
+      document.getElementById('btn-next').disabled = false;
+      const tag = document.getElementById('week-tag1');
+      tag.textContent = '0 planning windows left';
+      tag.style.color = 'var(--terracotta)';
+    }
+  }, 200);
+}
+
+function goNext() {
+  if (view !== 1 || clicked < 3) return;
+  document.getElementById('view1').classList.remove('active');
+  document.getElementById('view2').classList.add('active');
+  document.getElementById('dot1').classList.remove('active');
+  document.getElementById('dot2').classList.add('active');
+  document.getElementById('btn-back').disabled = false;
+  document.getElementById('btn-next').disabled = true;
+  setTimeout(() => { document.getElementById('grid2').scrollTop = HOUR_H; }, 40);
+  view = 2;
+}
+
+let examFilled = false;
+
+function fillExamSlot() {
+  if (examFilled) return;
+  examFilled = true;
+
+  const slot = document.getElementById('gap-exam');
+  const sunCol = slot.parentElement;
+  const totalH = HOURS * HOUR_H;
+
+  // Fade out every sibling block in the Sunday column
+  Array.from(sunCol.children).forEach(child => {
+    if (child !== slot) {
+      child.style.transition = 'opacity 0.35s ease';
+      child.style.opacity = '0';
+      child.style.pointerEvents = 'none';
+    }
+  });
+
+  // Expand to fill the full column
+  slot.classList.add('filled');
+  slot.style.top = '0px';
+  slot.style.height = totalH + 'px';
+
+  // Update slot content after expansion is underway
+  setTimeout(() => {
+    const invite = document.getElementById('exam-invite');
+    invite.innerHTML = `
+      <span style="font-size:1.1rem;line-height:1;display:block;color:var(--terracotta);margin-bottom:6px;">✎</span>
+      <span style="color:var(--terracotta);font-weight:700;font-size:0.62rem;line-height:1.6;text-align:center;display:block;">Physical Sciences P1<br>June Exam</span>
+      <span style="display:block;color:#c4695d;font-size:0.52rem;margin-top:5px;text-transform:none;letter-spacing:0;font-weight:400;">Sunday — start to finish.</span>
+    `;
+  }, 280);
+
+  // Swap the caption to the finale
+  const cap = document.getElementById('caption2');
+  cap.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+  cap.style.opacity = '0';
+  cap.style.transform = 'translateY(5px)';
+  setTimeout(() => {
+    cap.innerHTML = `<div class="caption-head">Your entire Sunday. One exam.</div><div>Every other commitment took the week. This was all that was left — and the whole paper had to come from it.</div>`;
+    cap.style.opacity = '1';
+    cap.style.transform = 'translateY(0)';
+  }, 380);
+}
+
+function goBack() {
+  if (view !== 2) return;
+  document.getElementById('view2').classList.remove('active');
+  document.getElementById('view1').classList.add('active');
+  document.getElementById('dot2').classList.remove('active');
+  document.getElementById('dot1').classList.add('active');
+  document.getElementById('btn-back').disabled = true;
+  document.getElementById('btn-next').disabled = clicked < 3;
+  view = 1;
+}
+</script>
+</body>
+</html>

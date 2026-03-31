@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Physical Sciences P1 — Cape Town High School — November 2018</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #C8C4BC;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px 40px;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+  }
+
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  /* A4 ratio 1:1.4142 → 480×679 */
+  .page {
+    width: 420px;
+    height: 594px;
+    background: #F6F6F4;
+    border: 2.5px solid #444;
+    border-radius: 2px;
+    box-shadow: 6px 6px 24px rgba(0,0,0,0.28), -2px 0 6px rgba(0,0,0,0.10);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .page.hidden { display: none; opacity: 0; }
+  .page.flip-out { animation: flipOut 0.55s cubic-bezier(.7,0,.3,1) forwards; }
+  .page.flip-in  { animation: flipIn  0.55s cubic-bezier(.3,0,.7,1) forwards; }
+
+  @keyframes flipOut {
+    0%   { transform: rotateY(0deg)   translateX(0);     opacity: 1; }
+    50%  { transform: rotateY(-42deg) translateX(-30px); opacity: 0.15; }
+    100% { transform: rotateY(0deg)   translateX(0);     opacity: 0; }
+  }
+  @keyframes flipIn {
+    0%   { transform: rotateY(0deg)  translateX(0);    opacity: 0; }
+    50%  { transform: rotateY(42deg) translateX(30px); opacity: 0.15; }
+    100% { transform: rotateY(0deg)  translateX(0);    opacity: 1; }
+  }
+
+  .inner-border { position: absolute; inset: 7px; border: 1px solid #999; pointer-events: none; z-index: 1; }
+
+  .wm { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; pointer-events: none; overflow: hidden; }
+  .wm-text { font-size: 38px; font-weight: 900; color: rgba(80,80,80,0.055); letter-spacing: 5px; text-transform: uppercase; transform: rotate(-32deg); white-space: nowrap; user-select: none; }
+
+  /* COVER */
+  .cover-body { flex: 1; padding: 20px 28px 16px; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 3; }
+  .name-row { width: 100%; display: flex; justify-content: space-between; margin-bottom: 16px; }
+  .name-field { font-size: 11px; font-weight: 700; color: #1A1A1A; letter-spacing: 0.3px; }
+  .name-line { display: inline-block; width: 120px; border-bottom: 1px solid #333; margin-left: 4px; }
+  .school-box { width: 94%; border: 2.5px solid #444; border-radius: 7px; padding: 8px 14px; text-align: center; margin-bottom: 14px; }
+  .school-name { font-size: 14px; font-weight: 700; color: #111; letter-spacing: 0.5px; }
+  .grade-box { border: 2.5px solid #444; border-radius: 10px; padding: 6px 30px; text-align: center; margin-bottom: 12px; }
+  .grade-text { font-size: 15px; font-weight: 700; color: #111; }
+  .subject-panel { width: 94%; border: 2.5px dashed #555; padding: 12px 18px; text-align: center; margin-bottom: 16px; }
+  .subject-text { font-size: 13px; font-weight: 700; color: #111; line-height: 1.9; letter-spacing: 0.3px; }
+  .meta-block { width: 100%; display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .meta-left { font-size: 10px; color: #1A1A1A; line-height: 2.2; }
+  .meta-right { font-size: 10px; color: #1A1A1A; line-height: 1.9; }
+  .meta-label { font-weight: 700; }
+  .footnote { font-size: 9.5px; font-style: italic; color: #333; width: 100%; margin-top: auto; }
+
+  /* HEADER / FOOTER */
+  .pg-header { background: #3A3A3A; padding: 11px 16px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; position: relative; z-index: 10; }
+  .pg-footer { background: #DDDDD8; padding: 5px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 9px; color: #777; flex-shrink: 0; position: relative; z-index: 3; }
+  .lbl-muted { font-size: 8px; color: #AAA; letter-spacing: 1.5px; text-transform: uppercase; }
+  .lbl-main  { font-size: 10.5px; font-weight: 700; color: #DDD; letter-spacing: 0.3px; }
+
+  /* QUESTIONS */
+  .body { padding: 14px 16px; position: relative; z-index: 2; flex: 1; overflow: hidden; }
+  .q-block { margin-bottom: 12px; }
+  .q-title { font-size: 9px; font-weight: 700; color: #222; margin-bottom: 5px; letter-spacing: 0.2px; }
+  .text-line { height: 3.5px; background: #CECEC8; border-radius: 1px; margin-bottom: 3px; }
+  .divider { height: 0.5px; background: #DADAD4; margin: 9px 0; }
+  .sub-row { display: flex; gap: 6px; align-items: center; margin-bottom: 3.5px; }
+  .sub-num { font-size: 8px; font-weight: 700; color: #333; min-width: 26px; }
+  .sub-line { flex: 1; height: 3px; background: #CECEC8; border-radius: 1px; }
+  .sub-mark { font-size: 8px; color: #555; white-space: nowrap; }
+  .q-total { text-align: right; font-size: 8px; color: #777; margin-top: 2px; }
+  .diag-box { border: 0.5px dashed #BABAB0; background: #EAEAE6; border-radius: 2px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+  .diag-label { font-size: 7.5px; color: #AAA; text-transform: uppercase; letter-spacing: 0.4px; }
+  .mcq-opt { display: flex; gap: 5px; align-items: center; margin-bottom: 2.5px; }
+  .mcq-ltr { font-size: 8px; font-weight: 700; color: #555; min-width: 10px; }
+  .mcq-line { height: 3px; background: #DEDED8; border-radius: 1px; }
+
+  /* NAV */
+  .nav-row { display: flex; align-items: center; justify-content: space-between; width: 420px; }
+  .nav-btn { font-size: 11px; font-weight: 700; color: #555; background: #E8E6E0; border: 0.5px solid #BABAB0; border-radius: 3px; padding: 7px 18px; cursor: pointer; letter-spacing: 0.4px; text-transform: uppercase; transition: background 0.15s, color 0.15s; }
+  .nav-btn:hover { background: #D8D6D0; color: #222; }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .pg-ind { font-size: 10px; color: #777; }
+
+  /* ─── STICKY NOTES ─────────────────────────────────────── */
+  .sticky {
+    position: absolute;
+    background: linear-gradient(135deg, #FFFDE0 0%, #FFF176 100%);
+    padding: 7px 9px 10px;
+    max-width: 155px;
+    font-family: Arial, sans-serif;
+    z-index: 25;
+    pointer-events: none;
+    border-radius: 1px;
+    box-shadow:
+      3px 4px 10px rgba(0,0,0,0.18),
+      1px 1px 3px rgba(0,0,0,0.10),
+      0 1px 0 rgba(255,255,255,0.55) inset;
+    opacity: 0;
+    transition:
+      opacity 0.32s ease,
+      transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .sticky::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3.5px;
+    background: rgba(0,0,0,0.07);
+    border-radius: 1px 1px 0 0;
+  }
+  .sticky-author {
+    font-size: 7px;
+    font-weight: 700;
+    color: #857500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid rgba(0,0,0,0.09);
+  }
+  .sticky-body {
+    font-size: 8px;
+    color: #2A2A10;
+    line-height: 1.5;
+  }
+
+  /* per-sticky initial rotation + scale-in on .show */
+  #sc1      { transform: rotate(-2deg)   scale(0.8); }
+  #sc1.show { transform: rotate(-2deg)   scale(1); opacity: 1; }
+  #sc2      { transform: rotate(2.5deg)  scale(0.8); }
+  #sc2.show { transform: rotate(2.5deg)  scale(1); opacity: 1; }
+  #sc3      { transform: rotate(-1.2deg) scale(0.8); }
+  #sc3.show { transform: rotate(-1.2deg) scale(1); opacity: 1; }
+
+  #sq1      { transform: rotate(-1.8deg) scale(0.8); }
+  #sq1.show { transform: rotate(-1.8deg) scale(1); opacity: 1; }
+  #sq2      { transform: rotate(2deg)    scale(0.8); }
+  #sq2.show { transform: rotate(2deg)    scale(1); opacity: 1; }
+  #sq3      { transform: rotate(1.2deg)  scale(0.8); }
+  #sq3.show { transform: rotate(1.2deg)  scale(1); opacity: 1; }
+
+  /* Questions button invite pulse */
+  @keyframes pulse-invite {
+    0%, 100% { background: #E8E6E0; color: #555; box-shadow: none; border-color: #BABAB0; }
+    50%       { background: #FFE033; color: #1A1A00; box-shadow: 0 0 12px rgba(255,210,0,0.55); border-color: #D4B200; }
+  }
+  .nav-btn.invite { animation: pulse-invite 0.95s ease-in-out infinite; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- PAGE 1: COVER -->
+  <div class="page" id="page-cover">
+    <div class="inner-border"></div>
+    <div class="wm"><div class="wm-text">PHYSICAL SCIENCES GRADE 11</div></div>
+
+    <div class="cover-body">
+      <div class="name-row">
+        <div class="name-field">NAME: <span class="name-line">&nbsp;</span></div>
+        <div class="name-field">TEACHER: <span class="name-line">&nbsp;</span></div>
+      </div>
+
+      <div class="school-box">
+        <div class="school-name">CAPE TOWN HIGH SCHOOL</div>
+      </div>
+
+      <!-- Coat of Arms -->
+      <svg width="160" height="192" viewBox="0 0 160 192" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:12px;flex-shrink:0;">
+        <path d="M12 10 L148 10 L148 106 Q148 142 80 164 Q12 142 12 106 Z" fill="#E6E6E4" stroke="#555" stroke-width="2.2"/>
+        <path d="M20 18 L140 18 L140 104 Q140 136 80 156 Q20 136 20 104 Z" fill="none" stroke="#AAAAAA" stroke-width="0.8" stroke-dasharray="3 2"/>
+        <line x1="20" y1="18" x2="140" y2="120" stroke="#D0D0CE" stroke-width="2"/>
+        <line x1="140" y1="18" x2="20" y2="120" stroke="#D0D0CE" stroke-width="2"/>
+        <text x="44"  y="68"  text-anchor="middle" font-family="Arial" font-size="18" font-weight="700" fill="#4A4A4A">C</text>
+        <text x="116" y="68"  text-anchor="middle" font-family="Arial" font-size="18" font-weight="700" fill="#4A4A4A">T</text>
+        <text x="44"  y="104" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700" fill="#4A4A4A">H</text>
+        <text x="116" y="104" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700" fill="#4A4A4A">S</text>
+        <circle cx="80" cy="86" r="30" fill="#EFEFED" stroke="#777" stroke-width="1.4"/>
+        <clipPath id="cc"><circle cx="80" cy="86" r="29"/></clipPath>
+        <g clip-path="url(#cc)">
+          <path d="
+            M51 100 L52 99 L53 97 L54 94 L55 91 L56 88
+            L57 85 L58 83 L59 81 L60 80 L61 79 L62 79
+            L63 80 L64 79 L65 77 L66 75 L67 74 L68 74
+            L69 74 L70 74 L71 74 L72 74 L73 74 L74 74
+            L75 74 L76 74 L77 74 L78 74 L79 74 L80 74
+            L81 74 L82 74 L83 74 L84 74 L85 75 L86 76
+            L87 77 L88 78 L89 78 L90 77 L91 76 L92 75
+            L93 75 L94 76 L95 78 L96 80 L97 82 L98 84
+            L99 87 L100 90 L101 93 L102 96 L103 98 L104 100
+            L51 100 Z" fill="#888" opacity="0.85"/>
+          <line x1="66" y1="73" x2="84" y2="73" stroke="#CCCCCC" stroke-width="1.5"/>
+          <rect x="51" y="100" width="53" height="5" fill="#AAAAAA" opacity="0.3"/>
+        </g>
+        <polygon points="80,3 87,12 80,9 73,12" fill="#999" stroke="#777" stroke-width="0.8"/>
+        <circle cx="12"  cy="10" r="4" fill="#C0C0BE" stroke="#888" stroke-width="0.8"/>
+        <circle cx="148" cy="10" r="4" fill="#C0C0BE" stroke="#888" stroke-width="0.8"/>
+        <!-- Scroll detached below shield -->
+        <path d="M26 176 Q80 171 134 176 L134 187 Q80 192 26 187 Z" fill="#C8C8C6" stroke="#888" stroke-width="0.9"/>
+        <path d="M26 176 L17 172 L17 183 L26 187 Z" fill="#AAAAAA" stroke="#888" stroke-width="0.7"/>
+        <path d="M17 172 L21 173.5 L21 182 L17 183 Z" fill="#BBBBBA"/>
+        <path d="M134 176 L143 172 L143 183 L134 187 Z" fill="#AAAAAA" stroke="#888" stroke-width="0.7"/>
+        <path d="M143 172 L139 173.5 L139 182 L143 183 Z" fill="#BBBBBA"/>
+        <text x="80" y="184" text-anchor="middle" font-family="Arial" font-size="8" font-weight="700" font-style="italic" fill="#1A1A1A" letter-spacing="0.8">Potes melius agere</text>
+      </svg>
+
+      <div class="grade-box"><div class="grade-text">GRADE 11</div></div>
+
+      <div class="subject-panel">
+        <div class="subject-text">PHYSICAL SCIENCES: PHYSICS (P1)<br>NOVEMBER 2018</div>
+      </div>
+
+      <div class="meta-block">
+        <div class="meta-left">
+          <div><span class="meta-label">MARKS: </span>150</div>
+          <div style="margin-top:6px;"><span class="meta-label">TIME: </span>3 HOURS</div>
+        </div>
+        <div class="meta-right">
+          <div><span class="meta-label">EXAMINERS: </span>N DLAMINI</div>
+          <div style="padding-left:74px;">T NKOSI</div>
+          <div style="padding-left:74px;">P FOURIE</div>
+          <div style="padding-left:74px;">S VAN WYK</div>
+          <div style="margin-top:4px;"><span class="meta-label">MODERATOR: </span>R HENDRICKS</div>
+        </div>
+      </div>
+
+      <div class="footnote">This question paper consists of 15 pages and 2 data sheets.</div>
+    </div>
+
+    <div class="pg-footer">
+      <span>Copyright reserved</span>
+      <span>Please turn over</span>
+    </div>
+
+    <!-- STICKIES — COVER -->
+    <div class="sticky" id="sc1" style="top:308px; left:14px;">
+      <div class="sticky-author">N Dlamini</div>
+      <div class="sticky-body">Hey, I found this. Our old paper from 2008. I think we should recycle questions from this one.</div>
+    </div>
+    <div class="sticky" id="sc2" style="top:362px; right:12px;">
+      <div class="sticky-author">T Nkosi</div>
+      <div class="sticky-body">Yeah okay, but other teachers might have used that. I don't know if some tutors have access. We'll see.</div>
+    </div>
+    <div class="sticky" id="sc3" style="top:438px; left:18px;">
+      <div class="sticky-author">P Fourie</div>
+      <div class="sticky-body">Oh, I know a few tutors at the school had this paper. Some of this year's learners might have it.</div>
+    </div>
+  </div>
+
+  <!-- PAGE 2: QUESTIONS -->
+  <div class="page hidden" id="page-questions">
+    <div class="pg-header">
+      <div style="flex-shrink:0;">
+        <div class="lbl-muted">Physical Sciences / P1</div>
+        <div style="height:1px;background:#888;width:42px;margin-top:2px;"></div>
+      </div>
+      <div style="flex:1;text-align:center;"><div class="lbl-main">CAPS – Grade 11</div></div>
+      <div style="flex-shrink:0;text-align:right;"><div class="lbl-muted">DBE / Nov 2018</div></div>
+    </div>
+    <div style="height:2.5px;background:#666;flex-shrink:0;"></div>
+
+    <div class="body">
+
+      <div class="q-block">
+        <div class="q-title">QUESTION 1 — MULTIPLE-CHOICE QUESTIONS</div>
+        <div class="text-line" style="width:100%;"></div>
+        <div class="text-line" style="width:72%;margin-bottom:6px;"></div>
+        <div class="sub-row">
+          <span class="sub-num">1.1</span>
+          <div style="flex:1;">
+            <div class="text-line" style="width:90%;"></div>
+            <div class="text-line" style="width:62%;margin-bottom:3px;"></div>
+            <div class="mcq-opt"><span class="mcq-ltr">A</span><div class="mcq-line" style="width:36%;"></div></div>
+            <div class="mcq-opt"><span class="mcq-ltr">B</span><div class="mcq-line" style="width:50%;"></div></div>
+            <div class="mcq-opt"><span class="mcq-ltr">C</span><div class="mcq-line" style="width:28%;"></div></div>
+            <div class="mcq-opt"><span class="mcq-ltr">D</span><div class="mcq-line" style="width:44%;"></div></div>
+          </div>
+          <span class="sub-mark">(2)</span>
+        </div>
+        <div class="sub-row" style="margin-top:4px;">
+          <span class="sub-num">1.2</span>
+          <div style="flex:1;">
+            <div class="text-line" style="width:86%;"></div>
+            <div class="text-line" style="width:55%;margin-bottom:3px;"></div>
+            <div class="mcq-opt"><span class="mcq-ltr">A</span><div class="mcq-line" style="width:28%;"></div></div>
+            <div class="mcq-opt"><span class="mcq-ltr">B</span><div class="mcq-line" style="width:58%;"></div></div>
+            <div class="mcq-opt"><span class="mcq-ltr">C</span><div class="mcq-line" style="width:38%;"></div></div>
+            <div class="mcq-opt"><span class="mcq-ltr">D</span><div class="mcq-line" style="width:46%;"></div></div>
+          </div>
+          <span class="sub-mark">(2)</span>
+        </div>
+        <div class="sub-row" style="margin-top:4px;">
+          <span class="sub-num">1.3</span>
+          <div style="flex:1;">
+            <div class="text-line" style="width:80%;"></div>
+            <div class="diag-box" style="height:22px;margin-bottom:3px;"><span class="diag-label">Diagram — trolley, 150 N at 45°</span></div>
+            <div class="mcq-opt"><span class="mcq-ltr">A</span><div class="mcq-line" style="width:22%;"></div></div>
+            <div class="mcq-opt"><span class="mcq-ltr">B</span><div class="mcq-line" style="width:30%;"></div></div>
+            <div class="mcq-opt"><span class="mcq-ltr">C</span><div class="mcq-line" style="width:22%;"></div></div>
+            <div class="mcq-opt"><span class="mcq-ltr">D</span><div class="mcq-line" style="width:30%;"></div></div>
+          </div>
+          <span class="sub-mark">(2)</span>
+        </div>
+        <div class="sub-row" style="margin-top:4px;">
+          <span class="sub-num">1.4</span>
+          <div style="flex:1;">
+            <div class="text-line" style="width:92%;"></div>
+            <div class="text-line" style="width:65%;margin-bottom:3px;"></div>
+            <div class="mcq-opt"><span class="mcq-ltr">A</span><div class="mcq-line" style="width:40%;"></div></div>
+            <div class="mcq-opt"><span class="mcq-ltr">B</span><div class="mcq-line" style="width:32%;"></div></div>
+            <div class="mcq-opt"><span class="mcq-ltr">C</span><div class="mcq-line" style="width:44%;"></div></div>
+            <div class="mcq-opt"><span class="mcq-ltr">D</span><div class="mcq-line" style="width:36%;"></div></div>
+          </div>
+          <span class="sub-mark">(2)</span>
+        </div>
+        <div class="q-total" style="margin-top:3px;">1.5 – 1.10 on following pages &nbsp;·&nbsp; [20]</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="q-block">
+        <div class="q-title">QUESTION 2 — Vectors &amp; Resultant</div>
+        <div class="text-line" style="width:95%;"></div>
+        <div class="text-line" style="width:68%;margin-bottom:5px;"></div>
+        <div class="diag-box" style="height:30px;"><span class="diag-label">Force diagram — 50 N &amp; 80 N at 30°</span></div>
+        <div class="sub-row"><span class="sub-num">2.1</span><div class="sub-line"></div><span class="sub-mark">(1)</span></div>
+        <div class="sub-row"><span class="sub-num">2.2.1</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="sub-row"><span class="sub-num">2.2.2</span><div class="sub-line"></div><span class="sub-mark">(5)</span></div>
+        <div class="sub-row"><span class="sub-num">2.2.3</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="q-total">[10]</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="q-block">
+        <div class="q-title">QUESTION 3 — Newton's Laws &amp; Friction</div>
+        <div class="text-line" style="width:90%;margin-bottom:5px;"></div>
+        <div class="diag-box" style="height:28px;"><span class="diag-label">Box 45 kg, 90 N at 50°, constant velocity</span></div>
+        <div class="sub-row"><span class="sub-num">3.1</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="sub-row"><span class="sub-num">3.2</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="sub-row"><span class="sub-num">3.3</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="sub-row"><span class="sub-num">3.4</span><div class="sub-line"></div><span class="sub-mark">(4)</span></div>
+        <div class="sub-row"><span class="sub-num">3.5</span><div class="sub-line"></div><span class="sub-mark">(4)</span></div>
+        <div class="sub-row"><span class="sub-num">3.6</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="q-total">[16]</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="q-block">
+        <div class="q-title">QUESTION 4 — Newton's 2nd Law Graph</div>
+        <div class="text-line" style="width:88%;margin-bottom:5px;"></div>
+        <div class="diag-box" style="height:34px;"><span class="diag-label">Graph: 1/a (m·s⁻²)⁻¹ vs mass (kg)</span></div>
+        <div class="sub-row"><span class="sub-num">4.1</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="sub-row"><span class="sub-num">4.2</span><div class="sub-line"></div><span class="sub-mark">(3)</span></div>
+        <div class="sub-row"><span class="sub-num">4.3</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="sub-row"><span class="sub-num">4.4</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="q-total">[9]</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="q-block">
+        <div class="q-title">QUESTION 5 — Inclined Plane</div>
+        <div class="text-line" style="width:92%;margin-bottom:5px;"></div>
+        <div class="diag-box" style="height:28px;"><span class="diag-label">Crate 25 kg, A–B frictionless, B–C rough, 15°</span></div>
+        <div class="sub-row"><span class="sub-num">5.1</span><div class="sub-line"></div><span class="sub-mark">(3)</span></div>
+        <div class="sub-row"><span class="sub-num">5.2</span><div class="sub-line"></div><span class="sub-mark">(4)</span></div>
+        <div class="sub-row"><span class="sub-num">5.3</span><div class="sub-line"></div><span class="sub-mark">(1)</span></div>
+        <div class="sub-row"><span class="sub-num">5.4</span><div class="sub-line"></div><span class="sub-mark">(4)</span></div>
+        <div class="q-total">[12]</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="q-block">
+        <div class="q-title">QUESTION 6 — Universal Gravitation</div>
+        <div class="text-line" style="width:95%;"></div>
+        <div class="text-line" style="width:70%;margin-bottom:5px;"></div>
+        <div class="sub-row"><span class="sub-num">6.1</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="sub-row"><span class="sub-num">6.2</span><div class="sub-line"></div><span class="sub-mark">(4)</span></div>
+        <div class="sub-row"><span class="sub-num">6.3</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="q-total">[8]</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="q-block">
+        <div class="q-title">QUESTION 7 — Refraction &amp; Snell's Law</div>
+        <div class="text-line" style="width:90%;margin-bottom:5px;"></div>
+        <div class="diag-box" style="height:28px;"><span class="diag-label">Light ray: air → water → glass prism, angle θ</span></div>
+        <div class="sub-row"><span class="sub-num">7.1</span><div class="sub-line"></div><span class="sub-mark">(1)</span></div>
+        <div class="sub-row"><span class="sub-num">7.2</span><div class="sub-line"></div><span class="sub-mark">(4)</span></div>
+        <div class="sub-row"><span class="sub-num">7.3</span><div class="sub-line"></div><span class="sub-mark">(3)</span></div>
+        <div class="sub-row"><span class="sub-num">7.4</span><div class="sub-line"></div><span class="sub-mark">(5)</span></div>
+        <div class="sub-row"><span class="sub-num">7.5</span><div class="sub-line"></div><span class="sub-mark">(3)</span></div>
+        <div class="sub-row"><span class="sub-num">7.6</span><div class="sub-line" style="width:30%;"></div><span class="sub-mark">(1)</span></div>
+        <div class="q-total">[17]</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="q-block">
+        <div class="q-title">QUESTION 8 — Diffraction</div>
+        <div class="text-line" style="width:88%;margin-bottom:5px;"></div>
+        <div class="diag-box" style="height:22px;"><span class="diag-label">Slit experiment — wavelength vs degree of diffraction</span></div>
+        <div class="sub-row"><span class="sub-num">8.1</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="sub-row"><span class="sub-num">8.2</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="sub-row"><span class="sub-num">8.3</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="sub-row"><span class="sub-num">8.4</span><div class="sub-line" style="width:25%;"></div><span class="sub-mark">(1)</span></div>
+        <div class="sub-row"><span class="sub-num">8.5</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="q-total">[9]</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="q-block">
+        <div class="q-title">QUESTION 9 — Coulomb's Law</div>
+        <div class="text-line" style="width:92%;margin-bottom:5px;"></div>
+        <div class="diag-box" style="height:22px;"><span class="diag-label">Sphere A (+7×10⁻⁹ C) &amp; B (−8×10⁻⁹ C), 3 cm apart</span></div>
+        <div class="sub-row"><span class="sub-num">9.1</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="sub-row"><span class="sub-num">9.2</span><div class="sub-line"></div><span class="sub-mark">(4)</span></div>
+        <div class="sub-row"><span class="sub-num">9.3</span><div class="sub-line"></div><span class="sub-mark">(4)</span></div>
+        <div class="sub-row"><span class="sub-num">9.4</span><div class="sub-line"></div><span class="sub-mark">(3)</span></div>
+        <div class="q-total">[13]</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="q-block">
+        <div class="q-title">QUESTION 10 — Electric Fields</div>
+        <div class="text-line" style="width:85%;margin-bottom:5px;"></div>
+        <div class="diag-box" style="height:22px;"><span class="diag-label">Charge Q, points P &amp; T, 3 mm apart</span></div>
+        <div class="sub-row"><span class="sub-num">10.1</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="sub-row"><span class="sub-num">10.2.1</span><div class="sub-line"></div><span class="sub-mark">(1)</span></div>
+        <div class="sub-row"><span class="sub-num">10.2.2</span><div class="sub-line"></div><span class="sub-mark">(4)</span></div>
+        <div class="sub-row"><span class="sub-num">10.2.3</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="q-total">[9]</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="q-block">
+        <div class="q-title">QUESTION 11 — Electromagnetic Induction</div>
+        <div class="text-line" style="width:90%;margin-bottom:5px;"></div>
+        <div class="diag-box" style="height:22px;"><span class="diag-label">Square coil 3 cm, 400 turns, rotated 45° in 0,08 s, emf = 7 V</span></div>
+        <div class="sub-row"><span class="sub-num">11.1</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="sub-row"><span class="sub-num">11.2</span><div class="sub-line"></div><span class="sub-mark">(3)</span></div>
+        <div class="sub-row"><span class="sub-num">11.3</span><div class="sub-line"></div><span class="sub-mark">(4)</span></div>
+        <div class="sub-row"><span class="sub-num">11.4</span><div class="sub-line" style="width:20%;"></div><span class="sub-mark">(1)</span></div>
+        <div class="sub-row"><span class="sub-num">11.5</span><div class="sub-line"></div><span class="sub-mark">(1)</span></div>
+        <div class="sub-row"><span class="sub-num">11.6</span><div class="sub-line" style="width:18%;"></div><span class="sub-mark">(1)</span></div>
+        <div class="sub-row"><span class="sub-num">11.7</span><div class="sub-line" style="width:25%;"></div><span class="sub-mark">(1)</span></div>
+        <div class="q-total">[13]</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="q-block">
+        <div class="q-title">QUESTION 12 — Circuit Analysis</div>
+        <div class="text-line" style="width:85%;margin-bottom:5px;"></div>
+        <div class="diag-box" style="height:28px;"><span class="diag-label">Circuit: R, 3R, 2R, 4R with voltmeter</span></div>
+        <div class="sub-row"><span class="sub-num">12.1</span><div class="sub-line"></div><span class="sub-mark">(3)</span></div>
+        <div class="sub-row"><span class="sub-num">12.2</span><div class="sub-line"></div><span class="sub-mark">(5)</span></div>
+        <div class="sub-row"><span class="sub-num">12.3</span><div class="sub-line"></div><span class="sub-mark">(3)</span></div>
+        <div class="sub-row"><span class="sub-num">12.4</span><div class="sub-line" style="width:18%;"></div><span class="sub-mark">(1)</span></div>
+        <div class="sub-row"><span class="sub-num">12.5</span><div class="sub-line"></div><span class="sub-mark">(2)</span></div>
+        <div class="q-total">[14]</div>
+      </div>
+
+      <div class="divider"></div>
+      <div style="text-align:right;font-size:9.5px;font-weight:700;color:#111;padding-top:3px;">TOTAL: 150</div>
+
+    </div>
+
+    <div class="pg-footer">
+      <span>Copyright reserved</span>
+      <span>Page 2 of 2</span>
+      <span>Please turn over</span>
+    </div>
+
+    <!-- STICKIES — QUESTIONS -->
+    <!-- over Q3 area ~330px from top -->
+    <div class="sticky" id="sq1" style="top:318px; left:12px;">
+      <div class="sticky-author">T Nkosi</div>
+      <div class="sticky-body">Okay let's reuse Question 3, just change the numbers.</div>
+    </div>
+    <div class="sticky" id="sq2" style="top:356px; right:12px;">
+      <div class="sticky-author">S van Wyk</div>
+      <div class="sticky-body">Oh, can't we just keep the numbers the same?</div>
+    </div>
+    <!-- over Q1 MCQ area ~65px from top -->
+    <div class="sticky" id="sq3" style="top:62px; left:14px;">
+      <div class="sticky-author">N Dlamini</div>
+      <div class="sticky-body">Okay, let's also reuse this one. Q1 MCQs look fine.</div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="nav-row">
+    <button class="nav-btn" id="btn-prev" onclick="go(-1)" disabled>&#8592; Cover</button>
+    <span class="pg-ind" id="pg-ind">Page 1 of 2</span>
+    <button class="nav-btn" id="btn-next" onclick="go(1)">Questions &#8594;</button>
+  </div>
+
+</div>
+<script>
+  var cur = 0;
+  var pages  = ['page-cover', 'page-questions'];
+  var labels = ['Page 1 of 2', 'Page 2 of 2'];
+  var questionsAnimated = false;
+
+  function showSticky(id, delay) {
+    setTimeout(function() {
+      var el = document.getElementById(id);
+      if (el) el.classList.add('show');
+    }, delay);
+  }
+
+  // Cover sticky sequence — starts 1.5s after load
+  showSticky('sc1', 1500);
+  showSticky('sc2', 3300);
+  showSticky('sc3', 5100);
+  // Pulse the Questions button after the last sticky settles
+  setTimeout(function() {
+    document.getElementById('btn-next').classList.add('invite');
+  }, 6600);
+
+  function go(dir) {
+    var next = cur + dir;
+    if (next < 0 || next >= pages.length) return;
+
+    // Stop the invite pulse when user clicks through
+    document.getElementById('btn-next').classList.remove('invite');
+
+    var outEl = document.getElementById(pages[cur]);
+    var inEl  = document.getElementById(pages[next]);
+    outEl.classList.add('flip-out');
+    setTimeout(function () {
+      outEl.classList.remove('flip-out');
+      outEl.classList.add('hidden');
+      inEl.classList.remove('hidden');
+      inEl.style.opacity = '0';
+      inEl.classList.add('flip-in');
+      setTimeout(function () {
+        inEl.style.opacity = '1';
+        inEl.classList.remove('flip-in');
+        cur = next;
+        document.getElementById('btn-prev').disabled = (cur === 0);
+        document.getElementById('btn-next').disabled = (cur === pages.length - 1);
+        document.getElementById('pg-ind').textContent = labels[cur];
+
+        // Questions sticky sequence — only on first visit
+        if (cur === 1 && !questionsAnimated) {
+          questionsAnimated = true;
+          showSticky('sq3', 700);   // Q1 MCQ sticky appears first
+          showSticky('sq1', 1900);  // Q3 reuse sticky
+          showSticky('sq2', 3200);  // "keep numbers" reply
+        }
+      }, 320);
+    }, 300);
+  }
+</script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 import styles from './page.module.css';
 import AssessmentJourney from './components/AssessmentJourney/AssessmentJourney';
 import HeroCycler from './components/HeroCycler/HeroCycler';
+import RealityShowcase from './components/RealityShowcase/RealityShowcase';
 
 export default function Home() {
   return (
@@ -70,7 +71,7 @@ export default function Home() {
 
       {/* Pain — The Multi-Role Reality */}
       <section className={styles.problems}>
-        <div className="container">
+        <div className="container-wide">
           <p className={`eyebrow eyebrow-terracotta ${styles.sectionEyebrow}`}>
             The Reality
           </p>
@@ -82,36 +83,7 @@ export default function Home() {
             the test is due Monday, assessment gets whatever time and energy is left over.
           </p>
 
-          <div className={styles.problemGrid}>
-            <div className={styles.problemCard}>
-              <div className={styles.problemCardBorder} />
-              <p className="eyebrow eyebrow-terracotta">The Rational Compromise</p>
-              <h3 className={styles.problemTitle}>
-                Recycling isn&apos;t laziness. It&apos;s the only option the schedule allows.
-              </h3>
-              <p className={styles.problemBody}>
-                You know recycling last year&apos;s test isn&apos;t ideal. But it&apos;s 9pm,
-                you&apos;ve just returned from a Saturday fixture, and Term 2 assessments
-                are due. So you pull up last year&apos;s file, change the numbers, and hope
-                the tutors haven&apos;t already drilled it with your learners.
-              </p>
-            </div>
-
-            <div className={styles.problemCard}>
-              <div className={styles.problemCardBorder} />
-              <p className="eyebrow eyebrow-terracotta">The Circulation Problem</p>
-              <h3 className={styles.problemTitle}>
-                When teachers recycle, tests enter circulation.
-              </h3>
-              <p className={styles.problemBody}>
-                Tutors get copies. Learners prepare for specific questions. Your assessment
-                stops measuring understanding and starts measuring preparation. The validity
-                erodes — not because the questions are bad, but because they&apos;re no
-                longer exclusive.
-              </p>
-            </div>
-
-          </div>
+          <RealityShowcase />
         </div>
       </section>
 
