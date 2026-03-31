@@ -31,16 +31,28 @@
 }
 
 .navInner {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   height: 60px;
 }
 
-.navActions {
+.navCenter {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--mid-text);
+  text-align: center;
+  transition: color 0.15s ease;
+}
+
+.navCenter:hover {
+  color: var(--dark-text);
+}
+
+.navRight {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  justify-content: flex-end;
 }
 
 .navLogin {
@@ -51,33 +63,6 @@
 }
 
 .navLogin:hover {
-  color: var(--dark-text);
-}
-
-.navCta {
-  font-family: 'Source Sans 3', sans-serif;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #fff;
-  background: var(--sage);
-  border-radius: 4px;
-  padding: 7px 18px;
-  transition: background 0.15s ease;
-}
-
-.navCta:hover {
-  background: #4a7360;
-}
-
-.navLink {
-  font-family: 'Source Sans 3', sans-serif;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--mid-text);
-  transition: color 0.15s ease;
-}
-
-.navLink:hover {
   color: var(--dark-text);
 }
 

@@ -17,15 +17,12 @@ export default function Home() {
               <span className={styles.logoRevise}>REVISE</span>{' '}
               <span className={styles.logoIt}>IT</span>
             </span>
-            <div className={styles.navActions}>
+            <a href="#how-it-works" className={styles.navCenter}>
+              How it works
+            </a>
+            <div className={styles.navRight}>
               <a href="https://app.reviseit.io" className={styles.navLogin}>
                 Log in
-              </a>
-              <a href="#how-it-works" className={styles.navLink}>
-                How it works
-              </a>
-              <a href="#pilot" className={styles.navCta}>
-                Join the Pilot
               </a>
             </div>
           </div>
