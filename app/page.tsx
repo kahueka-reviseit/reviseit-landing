@@ -51,9 +51,7 @@ export default function Home() {
             </div>
             <div className={styles.heroCtas}>
               <a
-                href="https://tally.so/r/n0vqEP"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#tally-open=n0vqEP&tally-emoji-text=✏️&tally-emoji-animation=wave"
                 className={styles.btnPrimary}
               >
                 Join the Free Pilot
@@ -240,63 +238,59 @@ export default function Home() {
         <div className="container">
           <div className={styles.ctaInner}>
             <p className={`eyebrow eyebrow-sage`} style={{ marginBottom: '16px' }}>
-              Free Pilot
+              2026 Pilot
             </p>
             <h2 className={styles.ctaHeadline}>
-              Your assessments deserve your best thinking —<br className={styles.ctaBr} />
-              not your last energy.
+              You don&apos;t have time to do it all.
             </h2>
-            <p className={styles.ctaSub}>
-              Join the free pilot and get complete 4-document assessment packages for
-              all your Grade 11 Physical Sciences formal assessments this year.
-            </p>
 
-            <div className={styles.pilotLists}>
-              <div>
-                <p className={styles.pilotListTitle}>What you get</p>
-                <ul className={styles.pilotListSage}>
-                  <li>Complete 4-document packages for all formal assessments</li>
-                  <li>Unlimited revision rounds until you&apos;re satisfied</li>
-                  <li>Direct email support — no platform to learn</li>
-                  <li>CAPS-aligned master archetypes, exclusive to your school</li>
-                </ul>
-              </div>
-              <div>
-                <p className={styles.pilotListTitle}>What we ask</p>
-                <ul className={styles.pilotListTerracotta}>
-                  <li>10-minute feedback form after each assessment</li>
-                  <li>Permission to use anonymised feedback to improve the system</li>
-                  <li>Honest critique — what works, what doesn&apos;t</li>
-                </ul>
+            <div className={styles.pilotBody}>
+              <p className={styles.ctaSub}>
+                The &ldquo;Gold Standard&rdquo; of assessment is clear: you should be designing fresh,
+                un-googleable questions, marking with total consistency, and providing individualised
+                remediation for every student. But between the hockey field, house duties, and a full
+                teaching load, there aren&apos;t enough hours in the weekend to execute it all.
+              </p>
+              <p className={styles.ctaSub} style={{ marginBottom: 0 }}>
+                We&apos;ve built the 2026 Pilot to close that gap. We take your specific
+                parameters — like a Newton&apos;s Second Law connected-body scenario — and build
+                the full 4-document journey for you. You bring the professional vision; we handle
+                the AI-amplified production so your learners get the results they deserve without
+                costing you your Sunday.
+              </p>
+            </div>
+
+            <div className={styles.pilotSummaryBlock}>
+              <p className={styles.pilotSummaryEyebrow}>Quick Pilot Summary</p>
+              <div className={styles.pilotSummaryGrid}>
+                <div className={`${styles.pilotSummaryItem} ${styles.pilotSummaryItemSage}`}>
+                  <p className={styles.pilotSummaryLabel}>The Goal</p>
+                  <p className={styles.pilotSummaryText}>We are partnering with 2–3 Physical Science departments for the 2026 academic year.</p>
+                </div>
+                <div className={`${styles.pilotSummaryItem} ${styles.pilotSummaryItemGold}`}>
+                  <p className={styles.pilotSummaryLabel}>The Deliverable</p>
+                  <p className={styles.pilotSummaryText}>A complete 4-document package (Design, Assessment, Marking, and Remediation) for every formal Grade 11 test and exam.</p>
+                </div>
+                <div className={`${styles.pilotSummaryItem} ${styles.pilotSummaryItemTerracotta}`}>
+                  <p className={styles.pilotSummaryLabel}>The Cost</p>
+                  <p className={styles.pilotSummaryText}>Entirely free in exchange for your department&apos;s honest feedback and permission to share anonymized results.</p>
+                </div>
               </div>
             </div>
 
-            <a
-              href="https://tally.so/r/n0vqEP"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.btnCtaPrimary}
-            >
-              Join the Free Pilot
-            </a>
-            <p className={styles.pilotSmall}>
-              Limited to 20 teachers. Email-based — because you have enough platforms
-              to manage already.
-            </p>
+            <div className={styles.pilotCta}>
+              <p className={styles.pilotCtaQuestion}>Ready to reclaim your weekends?</p>
+              <a
+                href="#tally-open=n0vqEP&tally-emoji-text=✏️&tally-emoji-animation=wave"
+                className={styles.btnCtaPrimary}
+              >
+                Join the Pilot
+              </a>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Ecosystem Hint */}
-      <section className={styles.ecosystemHint}>
-        <div className="container">
-          <p className={styles.ecosystemText}>
-            Test Creation gives your assessments the quality they deserve.
-            Departmental Assessments gives your department the intelligence it needs.
-            Join the pilot to shape what comes next.
-          </p>
-        </div>
-      </section>
 
       {/* Footer */}
       <footer className={styles.footer}>
@@ -309,7 +303,7 @@ export default function Home() {
             <p className={styles.footerCopy}>
               &copy; {new Date().getFullYear()} Revise It. Built for teachers who do more than teach.
             </p>
-            <a href="#pilot" className={styles.footerLink}>
+            <a href="#tally-open=n0vqEP&tally-emoji-text=✏️&tally-emoji-animation=wave" className={styles.footerLink}>
               Join the Pilot &rarr;
             </a>
           </div>

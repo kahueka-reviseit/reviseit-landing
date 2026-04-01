@@ -84,6 +84,7 @@ export default function RealityShowcase() {
               <span className={styles.cardQuote}>
                 <span className={styles.cardQuoteMark}>&ldquo;</span>
                 {item.quote}
+                <span className={styles.cardQuoteMark}>&rdquo;</span>
               </span>
             </button>
           );
