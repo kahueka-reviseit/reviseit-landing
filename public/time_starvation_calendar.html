@@ -138,6 +138,21 @@ body {
 .gap-slot:hover { border-color: var(--sage); background: rgba(91,138,114,0.04); }
 .gap-slot:hover .gap-hatch { opacity: 0.45; }
 .gap-slot:hover .gap-invite { color: var(--sage); }
+
+/* ── First-gap yellow pulse (matches flipbook invite pulse) ── */
+@keyframes pulse-gap-yellow {
+  0%, 100% { border-color: #AAAAAA; background: transparent; }
+  50%       { border-color: #D4B200; background: rgba(255,224,51,0.15); box-shadow: 0 0 8px rgba(255,210,0,0.35); }
+}
+#gap-tue:not([data-filled]) {
+  animation: pulse-gap-yellow 1.1s ease-in-out infinite;
+}
+#gap-tue:not([data-filled]) .gap-invite {
+  color: #8a6c00;
+}
+#gap-tue:not([data-filled]) .gap-hatch {
+  background-image: repeating-linear-gradient(45deg, rgba(180,160,0,0.2) 0px, rgba(180,160,0,0.2) 1px, transparent 1px, transparent 6px);
+}
 .gap-hatch {
   position: absolute; inset: 0; opacity: 0.28; pointer-events: none;
   background-image: repeating-linear-gradient(45deg, #BBBBBB 0px, #BBBBBB 1px, transparent 1px, transparent 6px);

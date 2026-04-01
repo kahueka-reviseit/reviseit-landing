@@ -159,6 +159,86 @@
   margin-bottom: 48px;
 }
 
+/* ─── Perfect World cards ───────────────────────────────────── */
+.perfectWorldGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  margin: 32px 0 48px;
+}
+
+.perfectWorldCard {
+  background: var(--off-white);
+  border-radius: 8px;
+  padding: 28px 24px;
+  border-top: 4px solid transparent;
+}
+
+.perfectWorldCard p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--mid-text);
+  margin: 0;
+}
+
+.perfectWorldLabel {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.perfectWorldCardGold {
+  border-top-color: var(--gold);
+}
+.perfectWorldCardGold .perfectWorldLabel {
+  color: var(--gold);
+}
+
+.perfectWorldCardTerracotta {
+  border-top-color: var(--terracotta);
+}
+.perfectWorldCardTerracotta .perfectWorldLabel {
+  color: var(--terracotta);
+}
+
+.perfectWorldCardSage {
+  border-top-color: var(--sage);
+}
+.perfectWorldCardSage .perfectWorldLabel {
+  color: var(--sage);
+}
+
+/* ─── Reality bridge ────────────────────────────────────────── */
+.realityBridge {
+  margin: 8px 0 24px;
+}
+
+.realityBridgeText {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--dark-text);
+  margin: 4px 0 8px;
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+.realityBridgeHint {
+  font-size: 0.875rem;
+  color: var(--med-gray);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.realityBridgeHint::before {
+  content: '↓';
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
 /* ─── Problem section ───────────────────────────────────────── */
 .problems {
   padding: 80px 0;
@@ -241,45 +321,186 @@
   line-height: 1.6;
 }
 
-/* ─── Transformation section ────────────────────────────────── */
-.transformation {
+/* ─── How We Work Together ──────────────────────────────────── */
+.workTogether {
   padding: 80px 0;
   background: var(--off-white);
+  border-top: 1px solid var(--light-gray);
 }
 
-.transformationCols {
+.workflowList {
+  display: flex;
+  flex-direction: column;
+  margin-top: 40px;
+}
+
+.workflowStep {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0;
-  border: 1.5px solid var(--light-gray);
+  border: 1px solid var(--light-gray);
   border-radius: 8px;
+  background: #fff;
   overflow: hidden;
 }
 
-.transformationCol {
-  padding: 40px 36px;
+.workflowLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 28px 28px;
 }
 
-.transformationColBefore {
-  border-top: 4px solid var(--terracotta);
-  border-right: 1px solid var(--light-gray);
-  background: #fff;
+.workflowRight {
+  display: flex;
+  align-items: center;
+  padding: 28px 32px;
+  border-left: 3px solid transparent;
 }
 
-.transformationColAfter {
-  border-top: 4px solid var(--sage);
-  background: var(--off-white);
+.workflowRightSage        { border-left-color: var(--sage); }
+.workflowRightTerracotta  { border-left-color: var(--terracotta); }
+.workflowRightGold        { border-left-color: var(--gold); }
+.workflowRightNavy        { border-left-color: var(--navy); }
+
+.workflowIcon {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.transformationText {
-  font-size: 1rem;
-  line-height: 1.75;
-  color: var(--mid-text);
-}
+.workflowIconSage        { background: var(--sage); }
+.workflowIconTerracotta  { background: var(--terracotta); }
+.workflowIconGold        { background: var(--gold); }
+.workflowIconNavy        { background: var(--navy); }
 
-.transformationText em {
-  font-style: italic;
+.workflowStepTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
   color: var(--dark-text);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.workflowStepBody {
+  font-size: 0.9rem;
+  color: var(--mid-text);
+  line-height: 1.6;
+}
+
+.workflowQuote {
+  font-style: italic;
+  color: var(--med-gray);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.workflowArrow {
+  text-align: left;
+  padding: 8px 0 8px 44px;
+  color: var(--med-gray);
+  font-size: 1.1rem;
+}
+
+.workflowFooterBar {
+  margin-top: 28px;
+  background: var(--navy);
+  border-radius: 6px;
+  padding: 20px 32px;
+  text-align: center;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 400;
+}
+
+.workflowFooterGold {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+/* ─── How We Measure Success ────────────────────────────────── */
+.successMeasure {
+  padding: 80px 0;
+  background: #fff;
+  border-top: 1px solid var(--light-gray);
+}
+
+.successGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.successCard {
+  background: var(--off-white);
+  border-radius: 8px;
+  padding: 40px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-top: 4px solid transparent;
+}
+
+.successCardTerracotta  { border-top-color: var(--terracotta); }
+.successCardSage        { border-top-color: var(--sage); }
+.successCardGold        { border-top-color: var(--gold); }
+
+.successIconWrap {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.successIconTerracotta  { background: var(--terracotta); }
+.successIconSage        { background: var(--sage); }
+.successIconGold        { background: var(--gold); }
+
+.successCardTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--dark-text);
+  margin-bottom: 20px;
+  line-height: 1.35;
+}
+
+.successCardBody {
+  font-size: 0.9rem;
+  color: var(--mid-text);
+  line-height: 1.65;
+  flex: 1;
+  margin-bottom: 24px;
+}
+
+.successFeedbackBtn {
+  width: 100%;
+  padding: 10px 0;
+  background: var(--light-gray);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: var(--med-gray);
+  text-align: center;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.successClosing {
+  text-align: center;
+  margin-top: 40px;
+  font-style: italic;
+  font-family: 'Playfair Display', serif;
+  color: var(--mid-text);
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 /* ─── Levels / 4-Document section ──────────────────────────── */

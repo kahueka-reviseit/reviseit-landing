@@ -34,11 +34,11 @@ export default function Home() {
         <div className="container">
           <div className={styles.heroInner}>
             <p className={`eyebrow eyebrow-sage ${styles.heroEyebrow}`}>
-              For Physical Sciences Heads of Department
+              For Heads of Department
             </p>
             <h1 className={styles.heroHeadline}>
-              You know what a great assessment looks like.<br />
-              You just don&apos;t have time to build one.
+              Not Just Questions.<br />
+              A Complete Package.
             </h1>
             <p className={styles.heroSub}>
               You coach, you coordinate, you mentor, you teach. Assessment creation
@@ -69,16 +69,30 @@ export default function Home() {
       {/* Pain — The Multi-Role Reality */}
       <section className={styles.problems}>
         <div className="container-wide">
-          <p className={`eyebrow eyebrow-terracotta ${styles.sectionEyebrow}`}>
-            The Reality
-          </p>
-          <h2 className={styles.sectionHeadline}>Assessment always comes last.</h2>
-          <p className={styles.sectionIntro}>
-            You&apos;re not just a Physical Sciences teacher. You&apos;re a grade coordinator,
-            a housemaster, a sports coach, a mentor. You contribute to your school in
-            ways that go far beyond the classroom. But when Sunday evening arrives and
-            the test is due Monday, assessment gets whatever time and energy is left over.
-          </p>
+          <h2 className={styles.sectionHeadline}>In a perfect world...</h2>
+          <div className={styles.perfectWorldGrid}>
+            <div className={`${styles.perfectWorldCard} ${styles.perfectWorldCardGold}`}>
+              <span className={styles.perfectWorldLabel}>Assessment Creation</span>
+              <p>You'd design fresh questions for every test, guaranteeing that you're testing for <em>understanding</em>, not preparation.</p>
+            </div>
+            <div className={`${styles.perfectWorldCard} ${styles.perfectWorldCardTerracotta}`}>
+              <span className={styles.perfectWorldLabel}>Marking & Moderation</span>
+              <p>You'd create memos that anticipate every creative mistake a learner could make, limiting time spent on post-marking moderation.</p>
+            </div>
+            <div className={`${styles.perfectWorldCard} ${styles.perfectWorldCardSage}`}>
+              <span className={styles.perfectWorldLabel}>Feedback & Remediation</span>
+              <p>You'd ensure every learner received step-by-step feedback on every question, turning the test into a legitimate teaching tool.</p>
+            </div>
+          </div>
+
+          <div className={styles.realityBridge}>
+            <p className={styles.realityBridgeText}>
+              But in reality, you don't have time to do it all.
+            </p>
+            <p className={styles.realityBridgeHint}>
+              Do these situations resonate? Each one is interactive — click through to see what it actually looks like.
+            </p>
+          </div>
 
           <RealityShowcase />
         </div>
@@ -94,41 +108,129 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Transformation — Before/After */}
-      <section className={styles.transformation}>
-        <div className="container">
-          <p className={`eyebrow eyebrow-sage ${styles.sectionEyebrow}`}>
-            The Transformation
-          </p>
-          <h2 className={styles.sectionHeadline}>
-            What if assessment didn&apos;t need your weekend?
-          </h2>
-          <div className={styles.transformationCols}>
-            <div className={`${styles.transformationCol} ${styles.transformationColBefore}`}>
-              <p className="eyebrow eyebrow-terracotta" style={{ marginBottom: '16px' }}>
-                The Compromise
-              </p>
-              <p className={styles.transformationText}>
-                It&apos;s Sunday. You spent Saturday at the U16A hockey semifinal. Friday
-                was the Grade 9 social you organised. The test is due Monday. You open
-                last year&apos;s file, change the scenario, adjust two values, and export.
-                You know it could be better. But you&apos;ve given this weekend to your
-                school six different ways already.
-              </p>
+      {/* How We Work Together */}
+      <section className={styles.workTogether}>
+        <div className="container-wide">
+          <p className={`eyebrow eyebrow-sage ${styles.sectionEyebrow}`}>How We Work Together</p>
+          <h2 className={styles.sectionHeadline}>You Design. We Build. You Teach.</h2>
+
+          <div className={styles.workflowList}>
+
+            {/* Step 1 */}
+            <div className={styles.workflowStep}>
+              <div className={styles.workflowLeft}>
+                <div className={`${styles.workflowIcon} ${styles.workflowIconSage}`}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M3 5h2v2H3V5zm0 4h2v2H3V9zm0 4h2v2H3v-2zm4-8h14v2H7V5zm0 4h14v2H7V9zm0 4h14v2H7v-2z"/></svg>
+                </div>
+                <div>
+                  <p className={styles.workflowStepTitle}>Choose from the catalogue</p>
+                  <p className={styles.workflowStepBody}>Pick question types from our library of structured questions and MCQs</p>
+                </div>
+              </div>
+              <div className={`${styles.workflowRight} ${styles.workflowRightSage}`}>
+                <p className={styles.workflowQuote}>&ldquo;I want a Newton&apos;s 2nd Law connected bodies question and a momentum collision MCQ&rdquo;</p>
+              </div>
             </div>
-            <div className={`${styles.transformationCol} ${styles.transformationColAfter}`}>
-              <p className="eyebrow eyebrow-sage" style={{ marginBottom: '16px' }}>
-                The Alternative
-              </p>
-              <p className={styles.transformationText}>
-                It&apos;s Tuesday, free period. You open your email.{' '}
-                <em>&ldquo;I need a Newton&apos;s Second Law question — connected bodies,
-                8 marks, application level. Make the scenario about a mining conveyor
-                belt.&rdquo;</em>{' '}
-                By Thursday, you have four documents. You review it over coffee.
-                Your weekend was yours.
-              </p>
+
+            <div className={styles.workflowArrow}>↓</div>
+
+            {/* Step 2 */}
+            <div className={styles.workflowStep}>
+              <div className={styles.workflowLeft}>
+                <div className={`${styles.workflowIcon} ${styles.workflowIconTerracotta}`}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
+                </div>
+                <div>
+                  <p className={styles.workflowStepTitle}>Define your parameters</p>
+                  <p className={styles.workflowStepBody}>Answer follow-up questions that make each question uniquely yours</p>
+                </div>
+              </div>
+              <div className={`${styles.workflowRight} ${styles.workflowRightTerracotta}`}>
+                <p className={styles.workflowQuote}>&ldquo;Make it a 5 kg trolley on a surface with a 20 kg hanging crate, &mu;k = 0.4&rdquo;</p>
+              </div>
             </div>
+
+            <div className={styles.workflowArrow}>↓</div>
+
+            {/* Step 3 */}
+            <div className={styles.workflowStep}>
+              <div className={styles.workflowLeft}>
+                <div className={`${styles.workflowIcon} ${styles.workflowIconGold}`}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                </div>
+                <div>
+                  <p className={styles.workflowStepTitle}>We co-create via email</p>
+                  <p className={styles.workflowStepBody}>Review drafts, give feedback, iterate until you&apos;re satisfied</p>
+                </div>
+              </div>
+              <div className={`${styles.workflowRight} ${styles.workflowRightGold}`}>
+                <p className={styles.workflowQuote}>&ldquo;Questions first, then memos. Collaborative, not handed down&rdquo;</p>
+              </div>
+            </div>
+
+            <div className={styles.workflowArrow}>↓</div>
+
+            {/* Step 4 */}
+            <div className={styles.workflowStep}>
+              <div className={styles.workflowLeft}>
+                <div className={`${styles.workflowIcon} ${styles.workflowIconNavy}`}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg>
+                </div>
+                <div>
+                  <p className={styles.workflowStepTitle}>Receive your 4-document package</p>
+                  <p className={styles.workflowStepBody}>All documents loaded into the platform with Bloom&apos;s analysis per sub-question</p>
+                </div>
+              </div>
+              <div className={`${styles.workflowRight} ${styles.workflowRightNavy}`}>
+                <p className={styles.workflowQuote}>&ldquo;Browse, adjust the balance, request edits, export when ready&rdquo;</p>
+              </div>
+            </div>
+
+          </div>
+
+          <div className={styles.workflowFooterBar}>
+            <span className={styles.workflowFooterGold}>You bring the vision.</span>
+            {' '}I handle the AI.{' '}
+            <strong>Your learners get the result.</strong>
+          </div>
+        </div>
+      </section>
+
+      {/* How We Measure Success */}
+      <section className={styles.successMeasure}>
+        <div className="container-wide">
+          <p className={`eyebrow eyebrow-sage ${styles.sectionEyebrow}`}>How We Measure Success</p>
+          <h2 className={styles.sectionHeadline}>Value Means Something Specific</h2>
+
+          <div className={styles.successGrid}>
+
+            {/* Card 1 */}
+            <div className={`${styles.successCard} ${styles.successCardTerracotta}`}>
+              <div className={`${styles.successIconWrap} ${styles.successIconTerracotta}`}>
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="white"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+              </div>
+              <h3 className={styles.successCardTitle}>Less time,<br/>better assessments</h3>
+              <p className={styles.successCardBody}>Did teachers spend less time creating and preparing tests while feeling the quality was higher than what they&apos;d normally produce?</p>
+            </div>
+
+            {/* Card 2 */}
+            <div className={`${styles.successCard} ${styles.successCardSage}`}>
+              <div className={`${styles.successIconWrap} ${styles.successIconSage}`}>
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="white"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+              </div>
+              <h3 className={styles.successCardTitle}>Less time after<br/>the test, too</h3>
+              <p className={styles.successCardBody}>Did the teacher memo reduce marking time and moderation disputes? Did teachers spend less time creating post-assessment remediation materials?</p>
+            </div>
+
+            {/* Card 3 */}
+            <div className={`${styles.successCard} ${styles.successCardGold}`}>
+              <div className={`${styles.successIconWrap} ${styles.successIconGold}`}>
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="white"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
+              </div>
+              <h3 className={styles.successCardTitle}>This year&apos;s learners<br/>outperform previous years</h3>
+              <p className={styles.successCardBody}>Did learners understand their mistakes faster? Can this be the benchmark for years to come?</p>
+            </div>
+
           </div>
         </div>
       </section>

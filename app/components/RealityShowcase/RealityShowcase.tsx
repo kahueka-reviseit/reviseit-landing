@@ -16,20 +16,20 @@ interface ShowcaseItem {
 
 const ITEMS: ShowcaseItem[] = [
   {
-    key: 'recycling',
-    label: 'Assessment Creation',
-    color: '#B85042',
-    bgActive: 'rgba(184,80,66,0.06)',
-    quote: "I often reuse old questions from old tests because I don't have time to create a new one.",
-    src: '/nsc_p1_2018_flipbook.html',
-  },
-  {
     key: 'planning',
     label: 'Test Planning',
     color: '#1A1A2E',
     bgActive: 'rgba(26,26,46,0.05)',
     quote: "It's hard to block out sufficient time to create new tests.",
     src: '/time_starvation_calendar.html',
+  },
+  {
+    key: 'recycling',
+    label: 'Assessment Creation',
+    color: '#B85042',
+    bgActive: 'rgba(184,80,66,0.06)',
+    quote: "I often reuse old questions from old tests because I don't have time to create a new one.",
+    src: '/nsc_p1_2018_flipbook.html',
   },
   {
     key: 'remediation',
@@ -42,7 +42,7 @@ const ITEMS: ShowcaseItem[] = [
 ];
 
 export default function RealityShowcase() {
-  const [activeKey, setActiveKey] = useState<ItemKey>('recycling');
+  const [activeKey, setActiveKey] = useState<ItemKey>('planning');
   const [clickCount, setClickCount] = useState(0);
   const [isPreviewFading, setIsPreviewFading] = useState(false);
 
