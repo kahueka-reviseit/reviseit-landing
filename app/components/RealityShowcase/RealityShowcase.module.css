@@ -12,6 +12,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .card {
@@ -64,6 +65,8 @@
   font-style: italic;
   color: #5A5A5A;
   line-height: 1.55;
+  overflow-wrap: break-word;
+  word-break: break-word;
   transition: color 0.2s ease;
 }
 
@@ -105,7 +108,8 @@
 
 .iframe {
   display: block;
-  width: 460px;
+  width: 100%;
+  max-width: 460px;
   height: 740px;
   border: none;
   background: #C8C2B8;
