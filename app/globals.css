@@ -25,7 +25,9 @@ html {
 }
 
 body {
+  background: #F8F6F0;
   background: var(--off-white);
+  color: #2D2D2D;
   color: var(--dark-text);
   font-family: 'Source Sans 3', sans-serif;
   font-weight: 400;
@@ -37,10 +39,12 @@ h1, h2, h3, h4 {
   font-family: 'Playfair Display', serif;
   font-weight: 700;
   line-height: 1.2;
+  color: #2D2D2D;
   color: var(--dark-text);
 }
 
 p {
+  color: #4A4A4A;
   color: var(--mid-text);
 }
 
@@ -51,6 +55,7 @@ a {
 
 .sage-bar {
   height: 6px;
+  background: #5B8A72;
   background: var(--sage);
   width: 100%;
 }
@@ -76,9 +81,11 @@ a {
 }
 
 .eyebrow-terracotta {
+  color: #B85042;
   color: var(--terracotta);
 }
 
 .eyebrow-sage {
+  color: #5B8A72;
   color: var(--sage);
 }

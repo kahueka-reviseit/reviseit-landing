@@ -1,0 +1,355 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #F8F6F0;
+}
+
+/* ─── Nav ────────────────────────────────────────────────────── */
+.nav {
+  padding: 16px 24px;
+  background: #1A1A2E;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navLogo {
+  text-decoration: none;
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+}
+
+.logoRevise { color: #ffffff; }
+.logoIt { color: #A7BEAE; }
+
+.navHome {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.85rem;
+  color: #A7BEAE;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.navHome:hover { color: #fff; }
+
+/* ─── Hero ───────────────────────────────────────────────────── */
+.hero {
+  background: #1A1A2E;
+  padding: 72px 0 80px;
+}
+
+.heroEyebrow {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #A7BEAE;
+  margin-bottom: 20px;
+}
+
+.heroHeadline {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.15;
+  margin-bottom: 24px;
+}
+
+.heroSub {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 1.1rem;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 620px;
+  margin-bottom: 0;
+}
+
+.deadline {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #D4A574;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+.btnApply {
+  display: inline-block;
+  background: #B85042;
+  color: #ffffff;
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 14px 32px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+.btnApply:hover { background: #9e4238; }
+
+/* ─── Section shared ─────────────────────────────────────────── */
+.sectionEyebrow {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5B8A72;
+  margin-bottom: 12px;
+}
+
+.sectionHeadline {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: #2D2D2D;
+  margin-bottom: 40px;
+  line-height: 1.2;
+}
+
+/* ─── Offer ──────────────────────────────────────────────────── */
+.offer {
+  padding: 72px 0;
+  background: #F8F6F0;
+}
+
+.offerGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.offerCard {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 32px 28px;
+  border-top: 4px solid transparent;
+}
+
+.offerCardTerracotta { border-top-color: #B85042; }
+.offerCardSage { border-top-color: #5B8A72; }
+.offerCardGold { border-top-color: #D4A574; }
+.offerCardNavy { border-top-color: #1A1A2E; }
+
+.offerCardNumber {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #F0EDE6;
+  margin-bottom: 12px;
+  line-height: 1;
+}
+
+.offerCardTitle {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2D2D2D;
+  margin-bottom: 10px;
+}
+
+.offerCardBody {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #4A4A4A;
+  margin: 0;
+}
+
+/* ─── Exchange ───────────────────────────────────────────────── */
+.exchange {
+  padding: 72px 0;
+  background: #F0EDE6;
+}
+
+.exchangeSub {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 1rem;
+  font-style: italic;
+  color: #4A4A4A;
+  margin-bottom: 40px;
+}
+
+.exchangeList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 640px;
+}
+
+.exchangeItem {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.exchangeDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #5B8A72;
+  margin-top: 8px;
+  flex-shrink: 0;
+}
+
+.exchangeItemText {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #2D2D2D;
+  margin: 0;
+}
+
+.exchangeItemText strong {
+  color: #2D2D2D;
+  font-weight: 600;
+}
+
+/* ─── Success ────────────────────────────────────────────────── */
+.success {
+  padding: 72px 0;
+  background: #F8F6F0;
+}
+
+.successGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.successCard {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 32px 28px;
+}
+
+.successIconWrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.successIconTerracotta { background: #B85042; }
+.successIconSage { background: #5B8A72; }
+.successIconGold { background: #D4A574; }
+
+.successCardTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2D2D2D;
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+
+.successCardBody {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #4A4A4A;
+  margin: 0;
+}
+
+/* ─── Spots ──────────────────────────────────────────────────── */
+.spots {
+  padding: 72px 0;
+  background: #1A1A2E;
+  text-align: center;
+}
+
+.spotsHeadline {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 16px;
+}
+
+.spotsSub {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.65);
+  max-width: 560px;
+  margin: 0 auto 40px;
+}
+
+.spotsCount {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+}
+
+.spotPill {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #A7BEAE;
+}
+
+.spotPillTaken {
+  color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.08);
+  text-decoration: line-through;
+}
+
+/* ─── Form ───────────────────────────────────────────────────── */
+.formSection {
+  padding: 72px 0 96px;
+  background: #F8F6F0;
+}
+
+.formHeadline {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: #2D2D2D;
+  margin-bottom: 8px;
+}
+
+.formSub {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 1rem;
+  color: #4A4A4A;
+  margin-bottom: 40px;
+}
+
+.formWrap {
+  max-width: 720px;
+}
+
+/* ─── Footer ─────────────────────────────────────────────────── */
+.footer {
+  padding: 24px 0;
+  background: #1A1A2E;
+  text-align: center;
+}
+
+.footerCopy {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.8rem;
+  color: #8A8A8A;
+}
+
+.footerLink {
+  color: #A7BEAE;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.footerLink:hover { color: #fff; }

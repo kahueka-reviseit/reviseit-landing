@@ -1,7 +1,10 @@
 import styles from './page.module.css';
 import AssessmentJourney from './components/AssessmentJourney/AssessmentJourney';
+import CatalogueExplorer from './components/CatalogueExplorer/CatalogueExplorer';
 import HeroCycler from './components/HeroCycler/HeroCycler';
 import RealityShowcase from './components/RealityShowcase/RealityShowcase';
+import TrackedCTA from './components/TrackedCTA/TrackedCTA';
+import Footer from './components/Footer/Footer';
 
 export default function Home() {
   return (
@@ -17,9 +20,13 @@ export default function Home() {
               <span className={styles.logoRevise}>REVISE</span>{' '}
               <span className={styles.logoIt}>IT</span>
             </span>
-            <a href="#how-it-works" className={styles.navCenter}>
-              How it works
-            </a>
+            <div className={styles.navCenter}>
+              <a href="#how-it-works" className={styles.navCenterLink}>How it works</a>
+              <span className={styles.navDivider}>·</span>
+              <a href="#catalogue" className={styles.navCenterLink}>Catalogue</a>
+              <span className={styles.navDivider}>·</span>
+              <a href="/pilot" className={styles.navCenterLink}>Pilot Programme</a>
+            </div>
             <div className={styles.navRight}>
               <a href="https://app.reviseit.io" className={styles.navLogin}>
                 Log in
@@ -41,24 +48,25 @@ export default function Home() {
               A Complete Package.
             </h1>
             <p className={styles.heroSub}>
-              You coach, you coordinate, you mentor, you teach. Assessment creation
-              keeps losing to everything else on your plate. Revise It delivers a
-              complete 4-document package — the quality your assessments deserve,
-              without the weekend it used to cost.
+              It starts with the catalogue. You choose the questions that matter
+              for your department, set the balance, define what your learners need.
+              We build the full assessment package from there — test to memo to
+              remediation guide.
             </p>
             <div className={styles.heroCyclerWrap}>
               <HeroCycler />
             </div>
             <div className={styles.heroCtas}>
-              <a
-                href="#tally-open=n0vqEP&tally-emoji-text=✏️&tally-emoji-animation=wave"
-                className={styles.btnPrimary}
+              <a href="#catalogue" className={styles.btnPrimary}>
+                View the Catalogue &rarr;
+              </a>
+              <TrackedCTA
+                href="#tally-open=A7qv6z&tally-emoji-text=✏️&tally-emoji-animation=wave"
+                eventName="pilot_form_opened"
+                className={styles.btnSecondary}
               >
                 Join the Free Pilot
-              </a>
-              <a href="#how-it-works" className={styles.btnSecondary}>
-                See how it works
-              </a>
+              </TrackedCTA>
             </div>
           </div>
         </div>
@@ -69,17 +77,21 @@ export default function Home() {
         <div className="container-wide">
           <h2 className={styles.sectionHeadline}>In a perfect world...</h2>
           <div className={styles.perfectWorldGrid}>
+            <div className={`${styles.perfectWorldCard} ${styles.perfectWorldCardNavy}`}>
+              <span className={styles.perfectWorldLabel}>Question Design</span>
+              <p>Every sub-question would have an intentional Bloom&apos;s level — and in aggregate, the paper would meet the standards set by the curriculum. Every mark allocation a deliberate decision, not an afterthought.</p>
+            </div>
             <div className={`${styles.perfectWorldCard} ${styles.perfectWorldCardGold}`}>
               <span className={styles.perfectWorldLabel}>Assessment Creation</span>
-              <p>You'd design fresh questions for every test, guaranteeing that you're testing for <em>understanding</em>, not preparation.</p>
+              <p>Learners would face questions they&apos;ve never seen before, set in scenarios that are relevant to their world — because you designed the context, not just the calculation.</p>
             </div>
             <div className={`${styles.perfectWorldCard} ${styles.perfectWorldCardTerracotta}`}>
               <span className={styles.perfectWorldLabel}>Marking & Moderation</span>
-              <p>You'd create memos that anticipate every creative mistake a learner could make, limiting time spent on post-marking moderation.</p>
+              <p>Marking would be faster and fairer — memos detailed enough that every teacher in the department awards marks the same way, with no disputes left to resolve after the fact.</p>
             </div>
             <div className={`${styles.perfectWorldCard} ${styles.perfectWorldCardSage}`}>
               <span className={styles.perfectWorldLabel}>Feedback & Remediation</span>
-              <p>You'd ensure every learner received step-by-step feedback on every question, turning the test into a legitimate teaching tool.</p>
+              <p>Every learner would understand exactly where they went wrong and why — turning the test into a teaching moment, not just a measurement.</p>
             </div>
           </div>
 
@@ -122,7 +134,7 @@ export default function Home() {
                 </div>
                 <div>
                   <p className={styles.workflowStepTitle}>Choose from the catalogue</p>
-                  <p className={styles.workflowStepBody}>Pick question types from our library of structured questions and MCQs</p>
+                  <p className={styles.workflowStepBody}>Browse question specs by topic — each one defines a question type&apos;s structure, Bloom&apos;s level, and mark range. You decide which ones belong in your test.</p>
                 </div>
               </div>
               <div className={`${styles.workflowRight} ${styles.workflowRightSage}`}>
@@ -188,103 +200,36 @@ export default function Home() {
 
           <div className={styles.workflowFooterBar}>
             <span className={styles.workflowFooterGold}>You bring the vision.</span>
-            {' '}I handle the AI.{' '}
+            {' '}We handle the AI.{' '}
             <strong>Your learners get the result.</strong>
           </div>
         </div>
       </section>
 
-      {/* How We Measure Success */}
-      <section className={styles.successMeasure}>
+      {/* Catalogue Explorer */}
+      <section id="catalogue" className={styles.catalogueSection}>
         <div className="container-wide">
-          <p className={`eyebrow eyebrow-sage ${styles.sectionEyebrow}`}>How We Measure Success</p>
-          <h2 className={styles.sectionHeadline}>Value Means Something Specific</h2>
-
-          <div className={styles.successGrid}>
-
-            {/* Card 1 */}
-            <div className={`${styles.successCard} ${styles.successCardTerracotta}`}>
-              <div className={`${styles.successIconWrap} ${styles.successIconTerracotta}`}>
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="white"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
-              </div>
-              <h3 className={styles.successCardTitle}>Less time,<br/>better assessments</h3>
-              <p className={styles.successCardBody}>Did teachers spend less time creating and preparing tests while feeling the quality was higher than what they&apos;d normally produce?</p>
-            </div>
-
-            {/* Card 2 */}
-            <div className={`${styles.successCard} ${styles.successCardSage}`}>
-              <div className={`${styles.successIconWrap} ${styles.successIconSage}`}>
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="white"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-              </div>
-              <h3 className={styles.successCardTitle}>Less time after<br/>the test, too</h3>
-              <p className={styles.successCardBody}>Did the teacher memo reduce marking time and moderation disputes? Did teachers spend less time creating post-assessment remediation materials?</p>
-            </div>
-
-            {/* Card 3 */}
-            <div className={`${styles.successCard} ${styles.successCardGold}`}>
-              <div className={`${styles.successIconWrap} ${styles.successIconGold}`}>
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="white"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
-              </div>
-              <h3 className={styles.successCardTitle}>This year&apos;s learners<br/>outperform previous years</h3>
-              <p className={styles.successCardBody}>Did learners understand their mistakes faster? Can this be the benchmark for years to come?</p>
-            </div>
-
-          </div>
+          <CatalogueExplorer />
         </div>
       </section>
 
-      {/* Pilot Offer */}
-      <section id="pilot" className={styles.cta}>
+      {/* Pilot Teaser */}
+      <section className={styles.pilotTeaser}>
         <div className="container">
-          <div className={styles.ctaInner}>
-            <p className={`eyebrow eyebrow-sage`} style={{ marginBottom: '16px' }}>
-              2026 Pilot
-            </p>
-            <h2 className={styles.ctaHeadline}>
-              You don&apos;t have time to do it all.
-            </h2>
-
-            <div className={styles.pilotBody}>
-              <p className={styles.ctaSub}>
-                The &ldquo;Gold Standard&rdquo; of assessment is clear: you should be designing fresh,
-                un-googleable questions, marking with total consistency, and providing individualised
-                remediation for every student. But between the hockey field, house duties, and a full
-                teaching load, there aren&apos;t enough hours in the weekend to execute it all.
-              </p>
-              <p className={styles.ctaSub} style={{ marginBottom: 0 }}>
-                We&apos;ve built the 2026 Pilot to close that gap. We take your specific
-                parameters — like a Newton&apos;s Second Law connected-body scenario — and build
-                the full 4-document journey for you. You bring the professional vision; we handle
-                the AI-amplified production so your learners get the results they deserve without
-                costing you your Sunday.
+          <div className={styles.pilotTeaserInner}>
+            <div className={styles.pilotTeaserLeft}>
+              <p className={`eyebrow eyebrow-sage`}>2026 Pilot Programme</p>
+              <p className={styles.pilotTeaserText}>
+                We&apos;re partnering with three Physical Sciences departments for a full
+                calendar year — every formal assessment built end-to-end, questions adapted
+                to your school&apos;s style, and preferential pricing locked in before we
+                have a model.
               </p>
             </div>
-
-            <div className={styles.pilotSummaryBlock}>
-              <p className={styles.pilotSummaryEyebrow}>Quick Pilot Summary</p>
-              <div className={styles.pilotSummaryGrid}>
-                <div className={`${styles.pilotSummaryItem} ${styles.pilotSummaryItemSage}`}>
-                  <p className={styles.pilotSummaryLabel}>The Goal</p>
-                  <p className={styles.pilotSummaryText}>We are partnering with 2–3 Physical Science departments for the 2026 academic year.</p>
-                </div>
-                <div className={`${styles.pilotSummaryItem} ${styles.pilotSummaryItemGold}`}>
-                  <p className={styles.pilotSummaryLabel}>The Deliverable</p>
-                  <p className={styles.pilotSummaryText}>A complete 4-document package (Design, Assessment, Marking, and Remediation) for every formal Grade 11 test and exam.</p>
-                </div>
-                <div className={`${styles.pilotSummaryItem} ${styles.pilotSummaryItemTerracotta}`}>
-                  <p className={styles.pilotSummaryLabel}>The Cost</p>
-                  <p className={styles.pilotSummaryText}>Entirely free in exchange for your department&apos;s honest feedback and permission to share anonymized results.</p>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.pilotCta}>
-              <p className={styles.pilotCtaQuestion}>Ready to reclaim your weekends?</p>
-              <a
-                href="#tally-open=n0vqEP&tally-emoji-text=✏️&tally-emoji-animation=wave"
-                className={styles.btnCtaPrimary}
-              >
-                Join the Pilot
+            <div className={styles.pilotTeaserRight}>
+              <p className={styles.pilotTeaserDeadline}>Applications close 15 Aug 2026</p>
+              <a href="/pilot" className={styles.btnPilotTeaser}>
+                Learn more &rarr;
               </a>
             </div>
           </div>
@@ -293,22 +238,7 @@ export default function Home() {
 
 
       {/* Footer */}
-      <footer className={styles.footer}>
-        <div className="container">
-          <div className={styles.footerInner}>
-            <span className={styles.footerLogo}>
-              <span className={styles.logoRevise}>REVISE</span>{' '}
-              <span className={styles.logoIt}>IT</span>
-            </span>
-            <p className={styles.footerCopy}>
-              &copy; {new Date().getFullYear()} Revise It. Built for teachers who do more than teach.
-            </p>
-            <a href="#tally-open=n0vqEP&tally-emoji-text=✏️&tally-emoji-animation=wave" className={styles.footerLink}>
-              Join the Pilot &rarr;
-            </a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       {/* Bottom sage bar */}
       <div className="sage-bar" />

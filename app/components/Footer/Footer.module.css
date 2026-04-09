@@ -1,0 +1,80 @@
+.footer {
+  padding: 24px 0 16px;
+  background: #1A1A2E;
+  background: var(--navy);
+}
+
+.footerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footerLogo {
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+}
+
+.logoRevise {
+  color: #fff;
+}
+
+.logoIt {
+  color: #A7BEAE;
+  color: var(--sage-light);
+}
+
+.footerCopy {
+  font-size: 0.8rem;
+  color: #8A8A8A;
+  color: var(--med-gray);
+}
+
+.footerLinks {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.footerLink {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #A7BEAE;
+  color: var(--sage-light);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.footerLink:hover {
+  color: #fff;
+}
+
+/* ─── Legal row ──────────────────────────────────────────────── */
+.footerLegal {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
+}
+
+.footerLegalLink {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #8A8A8A;
+  color: var(--med-gray);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.footerLegalLink:hover {
+  color: #fff;
+}
