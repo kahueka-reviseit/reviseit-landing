@@ -60,7 +60,7 @@
 .cardQuote {
   display: block;
   font-family: 'Playfair Display', serif;
-  font-size: 1.05rem;
+  font-size: clamp(0.82rem, 2.2vw, 1.05rem);
   font-style: italic;
   color: #5A5A5A;
   line-height: 1.55;
@@ -68,7 +68,7 @@
 }
 
 .cardQuoteMark {
-  font-size: 1.8rem;
+  font-size: clamp(1.2rem, 3.5vw, 1.8rem);
   line-height: 0;
   vertical-align: -0.25em;
   margin-right: 3px;
@@ -123,16 +123,29 @@
   }
 }
 
+@media (max-width: 768px) {
+  .card {
+    padding: 16px 16px 16px 20px;
+  }
+}
+
 @media (max-width: 520px) {
   .iframeShell {
     overflow-x: auto;
   }
 
   .card {
-    padding: 16px 12px 16px 20px;
+    padding: 12px 12px 12px 16px;
+  }
+}
+
+@media (max-width: 400px) {
+  .card {
+    padding: 10px 8px 10px 14px;
   }
 
-  .cardQuote {
-    font-size: 0.97rem;
+  .cardLabel {
+    font-size: 0.62rem;
+    margin-bottom: 6px;
   }
 }
