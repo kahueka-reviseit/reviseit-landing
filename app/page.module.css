@@ -1159,6 +1159,16 @@
 }
 
 /* ─── Responsive ────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .navInner {
+    grid-template-columns: 1fr auto;
+  }
+
+  .navCenter {
+    display: none;
+  }
+}
+
 @media (max-width: 860px) {
   .successGrid {
     grid-template-columns: 1fr 1fr;
