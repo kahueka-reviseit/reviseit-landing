@@ -161,6 +161,207 @@
   margin: 0;
 }
 
+/* ─── Journey (Three-layer) ──────────────────────────────────── */
+.journey {
+  padding: 72px 0;
+  background: #F8F6F0;
+}
+
+.journeyIntro {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: #4A4A4A;
+  max-width: 600px;
+  margin-bottom: 48px;
+}
+
+.journeyList {
+  display: flex;
+  flex-direction: column;
+  max-width: 780px;
+}
+
+.journeyItem {
+  display: flex;
+  gap: 28px;
+  padding: 32px 0;
+  border-bottom: 1px solid #E8E4DC;
+}
+
+.journeyItem:last-child {
+  border-bottom: none;
+}
+
+.journeyAccent {
+  width: 4px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.journeyAccentTerracotta { background: #B85042; }
+.journeyAccentSage { background: #5B8A72; }
+.journeyAccentGold { background: #D4A574; }
+
+.journeyContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.journeyBadge {
+  display: inline-block;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 100px;
+  margin-bottom: 10px;
+  align-self: flex-start;
+}
+
+.journeyBadgeReady {
+  background: rgba(91, 138, 114, 0.12);
+  color: #3d6b55;
+}
+
+.journeyBadgeDeploying {
+  background: rgba(212, 165, 116, 0.18);
+  color: #8a5e2a;
+}
+
+.journeyBadgeBuilding {
+  background: rgba(26, 26, 46, 0.07);
+  color: #5A5A6A;
+}
+
+.journeyTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #2D2D2D;
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+
+.journeyBody {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: #4A4A4A;
+  margin: 0;
+}
+
+/* ─── Compare (Interactive module) ──────────────────────────── */
+.compare {
+  padding: 72px 0;
+  background: #F0EDE6;
+}
+
+.compareTabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.compareTab {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 10px 22px;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.compareTabTodayActive {
+  background: #B85042;
+  color: #ffffff;
+}
+
+.compareTabReviseActive {
+  background: #5B8A72;
+  color: #ffffff;
+}
+
+.compareTabInactive {
+  background: rgba(45, 45, 45, 0.08);
+  color: #6A6A6A;
+}
+
+.compareRows {
+  display: flex;
+  flex-direction: column;
+  max-width: 780px;
+}
+
+.compareRow {
+  display: flex;
+  gap: 32px;
+  padding: 28px 0;
+  border-bottom: 1px solid #D4CFC7;
+  align-items: flex-start;
+}
+
+.compareRow:last-child {
+  border-bottom: none;
+}
+
+.compareRowLeft {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 88px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.compareRowIconWrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.compareRowIconWrapToday { background: #B85042; }
+.compareRowIconWrapRevise { background: #5B8A72; }
+
+.compareRowDimension {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #2D2D2D;
+  line-height: 1.4;
+}
+
+@keyframes compareFadeIn {
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.compareRowBody {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: #4A4A4A;
+  margin: 0;
+  flex: 1;
+  padding-top: 6px;
+  animation: compareFadeIn 0.18s ease;
+}
+
 /* ─── Exchange ───────────────────────────────────────────────── */
 .exchange {
   padding: 72px 0;
@@ -208,6 +409,14 @@
 .exchangeItemText strong {
   color: #2D2D2D;
   font-weight: 600;
+}
+
+.exchangeBody {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: #4A4A4A;
+  max-width: 560px;
 }
 
 /* ─── Success ────────────────────────────────────────────────── */

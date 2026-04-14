@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import CountdownTimer from '../components/CountdownTimer/CountdownTimer';
+import CompareModule from './CompareModule';
 import styles from './pilot.module.css';
 
 export const metadata = {
@@ -44,92 +45,78 @@ export default function PilotPage() {
         </div>
       </section>
 
-      {/* What your department gets */}
-      <section className={styles.offer}>
+      {/* What we're building with you */}
+      <section className={styles.journey}>
         <div className="container">
-          <p className={styles.sectionEyebrow}>What Your Department Gets</p>
-          <h2 className={styles.sectionHeadline}>A full year. Your department. Your style.</h2>
-          <div className={styles.offerGrid}>
+          <p className={styles.sectionEyebrow}>What We&apos;re Building With You</p>
+          <h2 className={styles.sectionHeadline}>More than a test paper service.</h2>
+          <p className={styles.journeyIntro}>
+            Revise It touches every stage of the assessment cycle — from question paper
+            to department-wide insight. The pilot gives your department access to all three layers.
+          </p>
+          <div className={styles.journeyList}>
 
-            <div className={`${styles.offerCard} ${styles.offerCardTerracotta}`}>
-              <p className={styles.offerCardNumber}>01</p>
-              <p className={styles.offerCardTitle}>Every formal assessment, end-to-end</p>
-              <p className={styles.offerCardBody}>
-                From mid-Term 3 2026 through Term 3 2027, every formal Physical
-                Sciences assessment your department needs — question paper, teacher
-                memo, marking guide, and learner remediation document — built
-                completely, for every grade you teach.
-              </p>
+            <div className={styles.journeyItem}>
+              <div className={`${styles.journeyAccent} ${styles.journeyAccentTerracotta}`} />
+              <div className={styles.journeyContent}>
+                <span className={`${styles.journeyBadge} ${styles.journeyBadgeReady}`}>Fully operational</span>
+                <h3 className={styles.journeyTitle}>Bespoke assessments</h3>
+                <p className={styles.journeyBody}>
+                  Every formal Physical Sciences assessment your department needs — question paper,
+                  comprehensive teacher memo, marking guide, and a learner-facing document that
+                  explains the reasoning behind every correct answer. Delivered in five days.
+                  CAPS-aligned, original, and built to your school&apos;s style.
+                </p>
+              </div>
             </div>
 
-            <div className={`${styles.offerCard} ${styles.offerCardSage}`}>
-              <p className={styles.offerCardNumber}>02</p>
-              <p className={styles.offerCardTitle}>Questions built to your school&apos;s style</p>
-              <p className={styles.offerCardBody}>
-                Your preferred question patterns, your scenarios, your level of
-                challenge — fed back into our platform as we build. The longer we
-                work together, the better the fit. By the end of the year, the
-                platform knows what your department values.
-              </p>
+            <div className={styles.journeyItem}>
+              <div className={`${styles.journeyAccent} ${styles.journeyAccentSage}`} />
+              <div className={styles.journeyContent}>
+                <span className={`${styles.journeyBadge} ${styles.journeyBadgeDeploying}`}>Ready to deploy with you</span>
+                <h3 className={styles.journeyTitle}>The departmental platform</h3>
+                <p className={styles.journeyBody}>
+                  Mark entry question by question. Sub-topic performance dashboards for every
+                  teacher. A HoD command view that lets you see the whole department — and drill
+                  down to any individual learner. The platform is already built. Pilot schools
+                  are the first departments to run on it.
+                </p>
+              </div>
             </div>
 
-            <div className={`${styles.offerCard} ${styles.offerCardGold}`}>
-              <p className={styles.offerCardNumber}>03</p>
-              <p className={styles.offerCardTitle}>A direct say in what we build next</p>
-              <p className={styles.offerCardBody}>
-                What frustrates you becomes our next feature. What you love becomes
-                the standard. Pilot schools have a direct line to the founding team
-                and real input into the platform&apos;s development. You&apos;re not
-                a customer — you&apos;re a co-builder.
-              </p>
-            </div>
-
-            <div className={`${styles.offerCard} ${styles.offerCardNavy}`}>
-              <p className={styles.offerCardNumber}>04</p>
-              <p className={styles.offerCardTitle}>Preferential pricing. In writing.</p>
-              <p className={styles.offerCardBody}>
-                We don&apos;t have a commercial pricing model yet. But pilot schools
-                won&apos;t pay full price when we do. We&apos;ll agree on your rate
-                before we launch commercially — and put it in writing before a single
-                invoice is raised.
-              </p>
+            <div className={styles.journeyItem}>
+              <div className={`${styles.journeyAccent} ${styles.journeyAccentGold}`} />
+              <div className={styles.journeyContent}>
+                <span className={`${styles.journeyBadge} ${styles.journeyBadgeBuilding}`}>Co-building in 2026</span>
+                <h3 className={styles.journeyTitle}>Five structured revision papers a year</h3>
+                <p className={styles.journeyBody}>
+                  Five progressive assessments released through the year — covering 20%, 40%, 60%,
+                  80%, then the full curriculum. Learners complete them, self-mark, and see where
+                  they stand sub-topic by sub-topic. Memos are released on a set schedule after
+                  each marking window. The platform can also generate variations of past questions —
+                  same concepts, different numbers and scenarios — so revision stays fresh.
+                  These papers don&apos;t exist yet. Pilot schools will help define what they become.
+                </p>
+              </div>
             </div>
 
           </div>
         </div>
       </section>
 
-      {/* The exchange */}
+      <CompareModule />
+
+      {/* A good partnership starts with a conversation */}
       <section className={styles.exchange}>
         <div className="container">
-          <h2 className={styles.sectionHeadline}>The exchange.</h2>
-          <p className={styles.exchangeSub}>This isn&apos;t a free trial. It&apos;s a founding partnership — and we take that seriously on both sides.</p>
-          <div className={styles.exchangeList}>
-            <div className={styles.exchangeItem}>
-              <div className={styles.exchangeDot} />
-              <p className={styles.exchangeItemText}>
-                <strong>Honest feedback at each stage</strong> — what&apos;s working,
-                what isn&apos;t, and what you wish it could do. One short feedback
-                call per term, plus informal input as we go.
-              </p>
-            </div>
-            <div className={styles.exchangeItem}>
-              <div className={styles.exchangeDot} />
-              <p className={styles.exchangeItemText}>
-                <strong>Permission to use anonymized data</strong> — assessment
-                structures, question performance, and learner outcomes, used to
-                improve the platform and inform our research. Never identifiable.
-              </p>
-            </div>
-            <div className={styles.exchangeItem}>
-              <div className={styles.exchangeDot} />
-              <p className={styles.exchangeItemText}>
-                <strong>The journey</strong> — we&apos;re early, and we&apos;re
-                honest about that. Pilot schools accept that we&apos;re building
-                something together, not receiving a finished product.
-              </p>
-            </div>
-          </div>
+          <h2 className={styles.sectionHeadline}>A good partnership starts with a conversation.</h2>
+          <p className={styles.exchangeSub}>We&apos;re only working with three departments — so after you apply, we&apos;ll arrange a short meeting with your team.</p>
+          <p className={styles.exchangeBody}>
+            We&apos;ll be direct about where each layer of the programme stands today, what
+            we&apos;ll be building together, and what we&apos;d need from your side. You&apos;ll
+            have everything you need to decide if this is right for your department — and
+            we&apos;ll be honest if we don&apos;t think the fit is there.
+          </p>
         </div>
       </section>
 
