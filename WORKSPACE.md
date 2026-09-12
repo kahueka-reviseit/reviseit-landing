@@ -23,4 +23,4 @@ Future publishing must import only reviewed summaries from the existing private 
 
 `npm run check` covers type checking, application/database tests, build and ordinary desktop/mobile browser checks. `npm run test:auth:integration` uses a disposable local Supabase instance, never the hosted project. The development server uses `.next-dev`, independently of the production build in `.next`, so a live preview cannot corrupt browser-test output.
 
-The initial workspace verification passed 72 application/database tests and 16 ordinary browser tests locally. The expanded identity integration runs in GitHub Actions because Docker is not installed on this machine. No production merge, deployment, payment or real school curriculum assignment is included.
+The initial workspace verification passed 74 application/database tests and 16 ordinary browser tests locally. The expanded identity integration runs in GitHub Actions because Docker is not installed on this machine. No production merge, deployment, payment or real school curriculum assignment is included.

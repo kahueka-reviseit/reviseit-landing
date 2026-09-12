@@ -1,12 +1,12 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 import WorkspaceView from '../../app/(accounts)/teacher/workspace';
-import {workspace} from '../fixtures/workspace';
+import {workspace,sampleWorkspace} from '../fixtures/workspace';
 import type { Workspace } from '../../lib/workspace/contracts';
 import '../../app/globals.css';
 // Isolated UI harness: sample data only, no authentication bypass in the actual app.
 const saved:Record<string,Workspace>=JSON.parse(localStorage.getItem('reviseit-workspace-demo') || '{}');
-const get=(id:string)=>saved[id] || {...workspace,module:workspace.curricula.find(m=>m.id===id)!};
+const get=(id:string)=>saved[id] || sampleWorkspace(id);
 window.fetch=async(input,options)=>{
  const url=String(input);
  if(!url.startsWith('/api/teacher/workspace')) throw new Error('Only synthetic workspace requests are supported');
