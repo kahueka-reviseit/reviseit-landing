@@ -85,7 +85,7 @@ test('real signup, email confirmation, team approval, suspension and password re
     await page.reload();
     await page.getByRole('button',{name:'School formatting',exact:true}).click();
     await expect(page.getByLabel('School heading')).toHaveValue('SYNTHETIC SCHOOL SCIENCE');
-    await page.getByLabel('Curriculum',{exact:true}).selectOption('demo-grade-11-sciences');
+    await page.getByRole('combobox',{name:'Curriculum',exact:true}).selectOption('demo-grade-11-sciences');
     await expect(page.getByLabel('School heading')).toHaveValue('');
     await page.getByRole('button',{name:'Question catalogue'}).click();
     await expect(page.getByLabel('Select Interpreting a force diagram')).not.toBeChecked();
