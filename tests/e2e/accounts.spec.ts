@@ -28,6 +28,9 @@ test('protected pages cannot be opened without a connected authenticated account
     await page.goto(path);
     await expect(page).toHaveURL(/\/login/);
   }
+  const workspace=await request.get('/api/teacher/workspace');
+  expect([401,503]).toContain(workspace.status());
+  expect(workspace.headers()['cache-control']).toContain('no-store');
   const response=await request.get('/api/teacher/session');
   expect([401,503]).toContain(response.status());
   expect(response.headers()['cache-control']).toContain('no-store');

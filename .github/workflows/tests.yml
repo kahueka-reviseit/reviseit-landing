@@ -63,8 +63,8 @@ jobs:
       - run: supabase db reset --local
       - run: npm run build
       - run: npm run test:auth:integration
-      - name: Save synthetic browser failure screenshots
-        if: failure()
+      - name: Save synthetic workspace screenshots
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: identity-test-results
