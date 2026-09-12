@@ -2,13 +2,19 @@ import React from 'react';
 import {createRoot} from 'react-dom/client';
 import WorkspaceView from '../../app/(accounts)/teacher/workspace';
 import {workspace,sampleWorkspace} from '../fixtures/workspace';
+import {searchTerms} from '../../lib/workspace/catalogue';
 import type { Workspace } from '../../lib/workspace/contracts';
 import '../../app/globals.css';
 // Isolated UI harness: sample data only, no authentication bypass in the actual app.
 const saved:Record<string,Workspace>=JSON.parse(localStorage.getItem('reviseit-workspace-demo') || '{}');
-const get=(id:string)=>saved[id] || sampleWorkspace(id);
+const get=(id:string)=>({...sampleWorkspace(id),...(saved[id] ? {formatting:saved[id].formatting,selection:saved[id].selection}: {})});
 window.fetch=async(input,options)=>{
  const url=String(input);
+ if(url.startsWith('/api/teacher/catalogue/search')) {
+  const terms=searchTerms(new URL(url,location.origin).searchParams.get('q') || '');
+  const matches=workspace.curricula.flatMap(module=>sampleWorkspace(module.id).entries.filter(entry=>terms.every(t=>[module.id,module.name,entry.id,entry.title,entry.topic,entry.description].join(' ').toLowerCase().includes(t))).map(entry=>({module,entry})));
+  return new Response(JSON.stringify({matches:matches.slice(0,50),hasMore:matches.length>50}));
+ }
  if(!url.startsWith('/api/teacher/workspace')) throw new Error('Only synthetic workspace requests are supported');
  if(options?.method==='PUT'){
   const body=JSON.parse(String(options.body)),current=get(body.moduleId);

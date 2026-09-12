@@ -1,17 +1,49 @@
 'use client';
 import { useEffect, useState } from 'react';
-import type { Formatting, Workspace, WorkspaceWrite } from '../../../lib/workspace/contracts';
+import type { Formatting, Workspace, WorkspaceWrite, CatalogueSearch, CatalogueEntry } from '../../../lib/workspace/contracts';
 import styles from './workspace.module.css';
+import {formatMarks,totalMarks} from '../../../lib/workspace/catalogue';
+function CatalogueDiagram({thumbnail}:{thumbnail:CatalogueEntry['thumbnail']}) {
+  const [failed,setFailed]=useState(false);
+  useEffect(()=>setFailed(false),[thumbnail?.src]);
+  if(!thumbnail) return null;
+  return failed ? <span className={styles.diagramFallback}>Diagram preview unavailable</span> :
+    <img className={styles.diagram} src={thumbnail.src} alt={thumbnail.alt} loading="lazy" decoding="async" onError={()=>setFailed(true)}/>;
+}
 export default function WorkspaceView({initial}:{initial:Workspace}) {
   const [data,setData]=useState(initial);
   const [preferences,setPreferences]=useState<Formatting>(initial.formatting.preferences);
   const [ids,setIds]=useState(initial.selection.release===initial.module?.release ? initial.selection.entryIds : []);
   const [busy,setBusy]=useState(false), [error,setError]=useState(''), [notice,setNotice]=useState('');
+  const [query,setQuery]=useState('');
+  const [search,setSearch]=useState<{query:string;result:CatalogueSearch;error:string}|null>(null);
   const [tab,setTab]=useState<'catalogue'|'formatting'>('catalogue');
   const formattingDirty=JSON.stringify(preferences)!==JSON.stringify(data.formatting.preferences);
   const selectionDirty=!!data.module && (JSON.stringify(ids)!==JSON.stringify(data.selection.entryIds) || data.selection.release!==data.module.release);
   const dirty=formattingDirty || selectionDirty;
   const chosen=data.entries.filter(e=>ids.includes(e.id));
+  const selectedMarks=totalMarks(chosen);
+  const searchQuery=query.trim();
+  const searching=!!searchQuery && search?.query!==searchQuery;
+  const matches=search?.query===searchQuery ? search.result.matches : [];
+  const visibleEntries=searchQuery ? matches.filter(m=>m.module.id===data.module?.id && m.module.release===data.module?.release).map(m=>m.entry) : data.entries;
+  const otherModules=data.curricula.filter(m=>m.id!==data.module?.id && matches.some(r=>r.module.id===m.id));
+  const hiddenSelected=chosen.filter(e=>!visibleEntries.some(v=>v.id===e.id)).length;
+  useEffect(()=>{
+    if(!searchQuery){setSearch(null);return;}
+    const controller=new AbortController();
+    const timer=setTimeout(async()=>{
+      try {
+        const response=await fetch(`/api/teacher/catalogue/search?q=${encodeURIComponent(searchQuery)}`,{cache:'no-store',signal:controller.signal});
+        const result=await response.json();
+        if(!response.ok) throw new Error(result.error || 'Search is unavailable. Please try again.');
+        if(!controller.signal.aborted) setSearch({query:searchQuery,result,error:''});
+      } catch(e) {
+        if(!controller.signal.aborted) setSearch({query:searchQuery,result:{matches:[],hasMore:false},error:e instanceof Error?e.message:'Search is unavailable. Please try again.'});
+      }
+    },250);
+    return()=>{clearTimeout(timer);controller.abort();};
+  },[searchQuery]);
   const stale=data.selection.revision>0 && data.selection.release!==data.module?.release;
   useEffect(()=> {
     const guard=(event:BeforeUnloadEvent)=>{if(dirty){event.preventDefault();event.returnValue='';}};
@@ -51,15 +83,31 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
       {error && <p role="alert" className={styles.error}>{error} <a href="/teacher">Reload workspace</a></p>}
       {tab==='catalogue' ? <div className={styles.columns}>
         <section aria-labelledby="catalogue-heading"><div className={styles.sectionHeading}><div><h2 id="catalogue-heading">Choose your questions</h2><p>Select up to 30 questions. Your choices stay private to your account.</p></div></div>
+          <div className={styles.search} role="search">
+            <label htmlFor="catalogue-search">Search topics or curricula</label>
+            <div className={styles.searchInput}><input id="catalogue-search" type="search" maxLength={120} value={query} placeholder="Try electricity, motion or Grade 11" onChange={e=>setQuery(e.target.value)} aria-describedby="search-scope"/>{query && <button type="button" onClick={()=>setQuery('')}>Clear search</button>}</div>
+            <p id="search-scope">Search all curricula available to your school. Searching does not change your paper selection.</p>
+          </div>
+          {searchQuery && <div aria-live="polite" className={styles.searchStatus}>
+            {searching ? 'Searching…' : search?.error ? <p role="alert">{search.error}</p> : <p>{matches.length} {search?.result.hasMore?'shown matching':'matching'} {matches.length===1?'question':'questions'}{search?.result.hasMore?'. Refine your search to see more.':'.'}</p>}
+          </div>}
+          {searchQuery && !searching && !search?.error && matches.length===0 && <div className={styles.empty}><h3>No matching questions</h3><p>Try a broader topic or a curriculum name.</p><button type="button" className={styles.textButton} onClick={()=>setQuery('')}>Show all questions in this curriculum</button></div>}
+          {hiddenSelected>0 && searchQuery && <p className={styles.searchStatus}>{hiddenSelected} selected {hiddenSelected===1?'question is':'questions are'} outside these results. Your selection is unchanged.</p>}
           {stale && <p className={styles.error}>The catalogue has changed since you saved. Review the current entries and save a new selection. Your previous selection stays saved until then.</p>}
           {data.entries.length===0 && <p className={styles.empty}>There are no published questions for this curriculum yet.</p>}
-          <div className={styles.entries}>{data.entries.map(entry=><label className={`${styles.entry} ${ids.includes(entry.id)?styles.selected:''}`} key={`${data.module!.id}:${entry.id}`}>
+          <div className={styles.entries}>{visibleEntries.map(entry=><label className={`${styles.entry} ${ids.includes(entry.id)?styles.selected:''}`} key={`${data.module!.id}:${entry.id}`}>
             <input type="checkbox" disabled={busy || (!ids.includes(entry.id) && ids.length>=30)} checked={ids.includes(entry.id)} onChange={e=>{setNotice('');setIds(e.target.checked?[...ids,entry.id]:ids.filter(id=>id!==entry.id));}} aria-label={`Select ${entry.title}`} />
-            <span><span className={styles.topic}>{entry.topic}</span><strong>{entry.title}</strong><span className={styles.description}>{entry.description}</span><span className={styles.marks}>{entry.marks} marks</span></span>
+            <span><span className={styles.topic}>{entry.topic}</span><strong>{entry.title}</strong><span className={styles.marks}>{formatMarks(entry.marks)} marks</span><span className={styles.description}>{entry.description}</span><CatalogueDiagram thumbnail={entry.thumbnail}/></span>
           </label>)}</div>
+          {otherModules.map(module=><section key={module.id} className={styles.otherCurriculum} aria-label={`Results in ${module.name}`}>
+            <h3>{module.name}</h3><p>Switch curriculum to select these questions. Each curriculum has its own saved paper.</p>
+            <button type="button" className={styles.textButton} disabled={busy} onClick={()=>void switchCurriculum(module.id)}>Browse {module.name}</button>
+            <div className={styles.entries}>{matches.filter(m=>m.module.id===module.id).map(({entry})=><article key={entry.id} className={styles.searchCard}><span className={styles.topic}>{entry.topic}</span><h4>{entry.title}</h4><span className={styles.marks}>{formatMarks(entry.marks)} marks</span><p>{entry.description}</p><CatalogueDiagram thumbnail={entry.thumbnail}/></article>)}</div>
+          </section>)}
         </section>
-        <aside className={styles.summary} aria-labelledby="selection-heading"><span className={styles.eyebrow}>Your paper</span><h2 id="selection-heading">Selection summary</h2><div className={styles.total}><strong>{chosen.reduce((n,e)=>n+e.marks,0)}</strong><span>total marks · {chosen.length} {chosen.length===1?'question':'questions'}</span></div>
-          {chosen.length ? <ul>{chosen.map(e=><li key={e.id}><span>{e.title}</span><span>{e.marks}</span></li>)}</ul>:<p>Select a question to start planning your paper.</p>}
+        <aside className={styles.summary} aria-labelledby="selection-heading"><span className={styles.eyebrow}>Your paper</span><h2 id="selection-heading">Selection summary</h2><div className={styles.total}><strong>{formatMarks(selectedMarks)}</strong><span>{selectedMarks.min===selectedMarks.max?'total marks':'possible marks'} · {chosen.length} {chosen.length===1?'question':'questions'}</span></div>
+          {chosen.length ? <ul>{chosen.map(e=><li key={e.id}><span>{e.title}</span><span>{formatMarks(e.marks)}</span></li>)}</ul>:<p>Select a question to start planning your paper.</p>}
+          {selectedMarks.min!==selectedMarks.max && <p className={styles.rangeNote}>Final mark allocations are confirmed before payment.</p>}
           <p className={styles.saveState}>{selectionDirty?'Unsaved changes':data.selection.revision?'Selection saved':'No saved selection yet'}</p>
           <button className={styles.primary} disabled={busy || !selectionDirty} onClick={()=>void save('selection')}>{busy?'Please wait…':'Save selection'}</button>
           <div className={styles.next}><h3>Next: your quote</h3><p>Pricing and checkout are being prepared. Saving does not place an order or charge your school.</p><p>After payment, you will answer the parameter questions for your purchased paper.</p></div>

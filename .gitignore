@@ -38,3 +38,5 @@ blob-report/
 !.env.example
 supabase/.temp/
 supabase/.branches/
+
+/workspace-test-results/

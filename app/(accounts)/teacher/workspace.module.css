@@ -58,3 +58,25 @@
 .previewWrap>p { font-size:13px; }
 @media(max-width:720px) { .columns,.formatting { grid-template-columns:1fr; gap:24px; } .summary{position:static;} .hero {padding-top:8px;} .toolbar {padding:18px;} .entry {padding:18px;} .tabs {gap:20px;} .fieldPair {grid-template-columns:1fr;} }
 @media(max-width:720px) { .toolbar { display:grid; grid-template-columns:minmax(0,1fr); } .toolbar label { max-width:none; } .badge { justify-self:start; } }
+
+.search { margin:0 0 22px; }
+.search>label { display:block; font-weight:600; margin-bottom:8px; }
+.searchInput { display:flex; gap:8px; align-items:stretch; }
+.searchInput input { flex:1; }
+.searchInput button { background:white; border:1px solid #898780; padding:8px 12px; white-space:nowrap; }
+.search>p,.searchStatus { font-size:14px; color:#4A4A4A; margin:10px 0 16px; }
+.entry>span { display:block; min-width:0; width:100%; }
+.diagram { display:block; width:100%; height:190px; object-fit:contain; background:#fff; border:1px solid #eee; margin-top:18px; padding:10px; }
+.diagramFallback { display:block; font-size:13px; color:#4A4A4A; padding:16px 0; }
+.otherCurriculum { margin-top:30px; padding-top:24px; border-top:2px solid #A7BEAE; }
+.otherCurriculum h3 { font-size:22px; margin-bottom:10px; }
+.otherCurriculum>p { font-size:14px; }
+.textButton { background:transparent; border:0; color:#365642; text-decoration:underline; text-underline-offset:4px; padding:10px 0; text-align:left; }
+.otherCurriculum>.textButton { margin:6px 0 14px; }
+.searchCard { background:white; border:1px solid #dedbd1; padding:24px; }
+.searchCard h4 { font-family:Georgia,serif; font-size:21px; font-weight:normal; margin:8px 0 10px; }
+@media(max-width:480px) { .searchInput { flex-wrap:wrap; } .searchInput input { flex-basis:100%; } .diagram { height:160px; } .searchCard { padding:18px; } }
+
+.marks { margin:8px 0 12px; font-size:16px; }
+.total { flex-wrap:wrap; }
+.rangeNote { font-size:14px; color:#4A4A4A; margin-top:14px; }
