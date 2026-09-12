@@ -66,6 +66,12 @@ export default function CatalogueExplorer() {
 
   function handleSelect(e: React.ChangeEvent<HTMLSelectElement>) {
     const id = e.target.value;
+    if (!id) {
+      setSelectedId('');
+      setPreviewVisible(false);
+      setStatsActive(false);
+      return;
+    }
     const entry = CATALOGUES.find((c) => c.id === id);
     if (!entry || entry.status === 'coming-soon') return;
     setSelectedId(id);
