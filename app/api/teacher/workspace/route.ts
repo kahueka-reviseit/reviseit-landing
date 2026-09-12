@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { accountContext } from '../../../../lib/auth/access';
+import { authConfig } from '../../../../lib/supabase/config';
 import { canEnterWorkspace } from '../../../../lib/auth/policy';
 import { isWorkspaceWrite } from '../../../../lib/workspace/contracts';
 import { readWorkspace } from '../../../../lib/workspace/server';
@@ -22,7 +23,9 @@ export async function GET(request:NextRequest) {
 }
 export async function PUT(request:NextRequest) {
   // Cookie-authenticated mutations require a same-origin browser request.
-  if(request.headers.get('origin')!==request.nextUrl.origin) return reply({error:'Request origin rejected'},403);
+  const config=authConfig();
+  if(!config) return reply({error:'Workspace unavailable'},503);
+  if(request.headers.get('origin')!==config.siteUrl) return reply({error:'Request origin rejected'},403);
   const c=await access(); if(c instanceof NextResponse) return c;
   const raw=await request.text(); if(raw.length>8192) return reply({error:'Request too large'},413);
   let body:unknown; try { body=JSON.parse(raw); } catch { return reply({error:'Invalid request'},400); }

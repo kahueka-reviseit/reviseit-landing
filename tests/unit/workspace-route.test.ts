@@ -2,13 +2,14 @@
 import { test,expect,vi,beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 vi.mock('server-only',()=>({}));
-const mocks=vi.hoisted(()=>({context:vi.fn(),read:vi.fn(),rpc:vi.fn()}));
+const mocks=vi.hoisted(()=>({context:vi.fn(),read:vi.fn(),rpc:vi.fn(),config:vi.fn()}));
+vi.mock('../../lib/supabase/config',()=>({authConfig:mocks.config}));
 vi.mock('../../lib/auth/access',()=>({accountContext:mocks.context}));
 vi.mock('../../lib/workspace/server',()=>({readWorkspace:mocks.read}));
 import { GET,PUT } from '../../app/api/teacher/workspace/route';
 const body={kind:'selection',moduleId:'demo-grade-10-sciences',revision:0,release:'demo-1',entryIds:['DEMO_01']};
 function request(payload:unknown=body,origin='http://localhost:3000'){return new NextRequest('http://localhost:3000/api/teacher/workspace',{method:'PUT',headers:{origin,'Content-Type':'application/json'},body:JSON.stringify(payload)});}
-beforeEach(()=>{vi.resetAllMocks();mocks.context.mockResolvedValue({kind:'authenticated',user:{id:'teacher',email:'teacher@school.example',email_confirmed_at:'confirmed'},account:{status:'approved',email:'teacher@school.example',school_id:'school',department_id:'department'},supabase:{rpc:mocks.rpc}});mocks.rpc.mockResolvedValue({data:1,error:null});});
+beforeEach(()=>{vi.resetAllMocks();mocks.config.mockReturnValue({siteUrl:'http://localhost:3000'});mocks.context.mockResolvedValue({kind:'authenticated',user:{id:'teacher',email:'teacher@school.example',email_confirmed_at:'confirmed'},account:{status:'approved',email:'teacher@school.example',school_id:'school',department_id:'department'},supabase:{rpc:mocks.rpc}});mocks.rpc.mockResolvedValue({data:1,error:null});});
 test.each(['anonymous','unavailable'])('%s cannot load workspace',async kind=>{mocks.context.mockResolvedValue({kind});const r=await GET(new NextRequest('http://localhost:3000/api/teacher/workspace'));expect(r.status).toBe(kind==='anonymous'?401:503);expect(mocks.read).not.toHaveBeenCalled();expect(r.headers.get('cache-control')).toContain('no-store');});
 test('pending accounts cannot call the save endpoint directly',async()=>{const c=await mocks.context();c.account.status='pending';mocks.context.mockResolvedValue(c);expect((await PUT(request())).status).toBe(403);expect(mocks.rpc).not.toHaveBeenCalled();});
 test('cross-origin mutations are rejected',async()=>{expect((await PUT(request(body,'https://foreign.example'))).status).toBe(403);expect(mocks.context).not.toHaveBeenCalled();});
@@ -19,3 +20,6 @@ test('database failures do not claim success or expose internals',async()=>{mock
 
 test('unexpected read failures never expose internal error messages',async()=>{mocks.read.mockRejectedValue(new Error('private database details'));const r=await GET(new NextRequest('http://localhost:3000/api/teacher/workspace'));expect(r.status).toBe(503);expect(await r.text()).not.toContain('private database details');});
 test('array values cannot masquerade as valid formatting strings',async()=>{const r=await PUT(request({kind:'formatting',moduleId:body.moduleId,revision:0,preferences:{font:['Arial'],fontSize:12,spacing:'normal',header:'',answerLines:true}}));expect(r.status).toBe(400);expect(mocks.rpc).not.toHaveBeenCalled();});
+
+test('configured site origin is accepted even when the framework normalises its internal request URL',async()=>{mocks.config.mockReturnValue({siteUrl:'http://127.0.0.1:3101'});const req=new NextRequest('http://localhost:3101/api/teacher/workspace',{method:'PUT',headers:{origin:'http://127.0.0.1:3101'},body:JSON.stringify(body)});expect((await PUT(req)).status).toBe(200);});
+test('a missing site configuration fails closed before any write',async()=>{mocks.config.mockReturnValue(null);expect((await PUT(request())).status).toBe(503);expect(mocks.rpc).not.toHaveBeenCalled();});
