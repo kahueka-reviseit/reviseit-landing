@@ -18,8 +18,8 @@ test.each(['anonymous','pending','suspended'])('%s cannot search or fetch diagra
  expect(mocks.rpc).not.toHaveBeenCalled();expect(mocks.from).not.toHaveBeenCalled();
 });
 test('search projects safe fields and caps responses at fifty',async()=>{
- const row={module_id:'grade-10',module_name:'Grade 10',release:'1',is_demo:false,entry_id:'Q1',title:'Example',topic:'Topic',description:'Description',marks:2,thumbnail_alt:'Circuit',thumbnail_png:'PRIVATE_BYTES',specification:'PRIVATE_SPEC'};
- mocks.rpc.mockResolvedValue({data:Array(51).fill(row)});const response=await search(req());const result=await response.json();expect(result.matches).toHaveLength(50);expect(result.hasMore).toBe(true);expect(JSON.stringify(result)).not.toContain('PRIVATE_');expect(result.matches[0].entry.thumbnail.src).toMatch(/^\/api\/teacher\/catalogue\/thumbnail\?/);
+ const row={module_id:'grade-10',module_name:'Grade 10',release:'1',is_demo:false,entry_id:'Q1',title:'Example',topic:'Topic',description:'Description',marks_min:9,marks_max:18,thumbnail_alt:'Circuit',thumbnail_png:'PRIVATE_BYTES',specification:'PRIVATE_SPEC'};
+ mocks.rpc.mockResolvedValue({data:Array(51).fill(row)});const response=await search(req());const result=await response.json();expect(result.matches).toHaveLength(50);expect(result.hasMore).toBe(true);expect(result.matches[0].entry.marks).toEqual({min:9,max:18});expect(JSON.stringify(result)).not.toContain('PRIVATE_');expect(result.matches[0].entry.thumbnail.src).toMatch(/^\/api\/teacher\/catalogue\/thumbnail\?/);
 });
 test.each(['','x'.repeat(121)])('invalid search is rejected before database access',async q=>{expect((await search(req('search?q='+q))).status).toBe(400);expect(mocks.rpc).not.toHaveBeenCalled();});
 test('unknown or inaccessible thumbnail returns no image',async()=>{expect((await thumbnail(req('thumbnail?curriculum=grade-10&release=1&entry=Q1'))).status).toBe(404);});

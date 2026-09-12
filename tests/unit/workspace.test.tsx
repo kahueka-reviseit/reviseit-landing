@@ -7,7 +7,7 @@ afterEach(()=>vi.unstubAllGlobals());
 test('selection totals reflect marks and saving sends only catalogue references',async()=>{
  const fetch=vi.fn().mockResolvedValue({ok:true,json:async()=>({revision:1})});vi.stubGlobal('fetch',fetch);
  render(<WorkspaceView initial={workspace}/>);const user=userEvent.setup();await user.click(screen.getByLabelText('Select Reading a motion graph'));await user.click(screen.getByLabelText('Select Comparing circuit measurements'));
- const summary=screen.getByRole('complementary');expect(within(summary).getByText('25')).toBeVisible();
+ const summary=screen.getByRole('complementary');expect(within(summary).getByText('20–30')).toBeVisible();
  await user.click(screen.getByRole('button',{name:'Save selection'}));await screen.findByRole('status');
  expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({kind:'selection',moduleId:workspace.module!.id,revision:0,release:'demo-1',entryIds:['DEMO_01','DEMO_02']});expect(screen.getByRole('button',{name:'Save selection'})).toBeDisabled();
  expect(screen.queryByText(/parameter_questions|generation_prompt/)).not.toBeInTheDocument();
@@ -44,4 +44,11 @@ test('no matches offers a clear way back to the catalogue',async()=>{
 });
 test('cards display descriptive diagram images and still support missing thumbnails',()=>{
  render(<WorkspaceView initial={{...workspace,entries:[workspace.entries[0],{...workspace.entries[1],thumbnail:undefined}]}}/>);expect(screen.getByRole('img',{name:workspace.entries[0].thumbnail!.alt})).toBeVisible();expect(screen.getAllByRole('img')).toHaveLength(1);expect(screen.getAllByRole('checkbox')).toHaveLength(2);
+});
+
+test('fixed-mark questions display a single allocation alongside ranged items',()=>{
+ const entries=[workspace.entries[0],{...workspace.entries[1],marks:{min:2,max:2}}];
+ render(<WorkspaceView initial={{...workspace,entries,selection:{revision:1,release:'demo-1',entryIds:entries.map(e=>e.id)}}}/>);
+ expect(screen.getByText('8–12 marks')).toBeVisible();expect(screen.getByText('2 marks',{exact:true})).toBeVisible();expect(screen.queryByText('2–2 marks')).not.toBeInTheDocument();
+ expect(within(screen.getByRole('complementary')).getByText('10–14')).toBeVisible();expect(screen.getByText(/possible marks/)).toBeVisible();
 });

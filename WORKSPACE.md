@@ -1,6 +1,6 @@
 # Teacher workspace
 
-Approved teachers can choose an assigned curriculum, browse safe catalogue summaries, save a personal paper selection and share formatting preferences with teachers at the same school for that curriculum. Selections show question count and total marks. There is no price calculation, checkout, parameter access or content generation in this slice.
+Approved teachers can choose an assigned curriculum, browse safe catalogue summaries, save a personal paper selection and share formatting preferences with teachers at the same school for that curriculum. Selections show question count and the combined minimum-to-maximum mark range. There is no price calculation, checkout, parameter access or content generation in this slice.
 
 ## Data and access
 
@@ -36,3 +36,7 @@ Apply migration `202609120003_catalogue_discovery.sql` after the workspace migra
 The isolated demonstration has six synthetic illustrations. Existing curriculum thumbnail sources remain in the private content repositories pending reviewed publication; they have not been copied into this public application's assets. This branch does not connect the real catalogue, migrate hosted data or deploy to production.
 
 Run `npm run test:workspace:e2e` for desktop/mobile diagram loading, search, curriculum switching and preserved selections. The real Supabase identity journey also checks authenticated thumbnail loading, database-backed search and access denial after suspension.
+
+## Mark ranges
+
+Migration `202609120004_catalogue_mark_ranges.sql` replaces the fixed mark column with non-null `marks_min` and `marks_max`, preserving previous fixed allocations as equal bounds. Catalogue and search responses use `marks: {min, max}`, matching the private draft catalogue contract. Cards, search results and selected-item rows display the range; the paper summary sums both bounds and labels a ranged result as possible marks. A fixed value is shown once, not as `2–2`. Search and filtering never alter this total. Final supported mark allocations must be resolved before payment; a source range does not assert that every integer within it is feasible.

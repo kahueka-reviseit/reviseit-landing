@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import type { Formatting, Workspace, WorkspaceWrite, CatalogueSearch, CatalogueEntry } from '../../../lib/workspace/contracts';
 import styles from './workspace.module.css';
+import {formatMarks,totalMarks} from '../../../lib/workspace/catalogue';
 function CatalogueDiagram({thumbnail}:{thumbnail:CatalogueEntry['thumbnail']}) {
   const [failed,setFailed]=useState(false);
   useEffect(()=>setFailed(false),[thumbnail?.src]);
@@ -21,6 +22,7 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
   const selectionDirty=!!data.module && (JSON.stringify(ids)!==JSON.stringify(data.selection.entryIds) || data.selection.release!==data.module.release);
   const dirty=formattingDirty || selectionDirty;
   const chosen=data.entries.filter(e=>ids.includes(e.id));
+  const selectedMarks=totalMarks(chosen);
   const searchQuery=query.trim();
   const searching=!!searchQuery && search?.query!==searchQuery;
   const matches=search?.query===searchQuery ? search.result.matches : [];
@@ -95,16 +97,17 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
           {data.entries.length===0 && <p className={styles.empty}>There are no published questions for this curriculum yet.</p>}
           <div className={styles.entries}>{visibleEntries.map(entry=><label className={`${styles.entry} ${ids.includes(entry.id)?styles.selected:''}`} key={`${data.module!.id}:${entry.id}`}>
             <input type="checkbox" disabled={busy || (!ids.includes(entry.id) && ids.length>=30)} checked={ids.includes(entry.id)} onChange={e=>{setNotice('');setIds(e.target.checked?[...ids,entry.id]:ids.filter(id=>id!==entry.id));}} aria-label={`Select ${entry.title}`} />
-            <span><span className={styles.topic}>{entry.topic}</span><strong>{entry.title}</strong><span className={styles.description}>{entry.description}</span><CatalogueDiagram thumbnail={entry.thumbnail}/><span className={styles.marks}>{entry.marks} marks</span></span>
+            <span><span className={styles.topic}>{entry.topic}</span><strong>{entry.title}</strong><span className={styles.marks}>{formatMarks(entry.marks)} marks</span><span className={styles.description}>{entry.description}</span><CatalogueDiagram thumbnail={entry.thumbnail}/></span>
           </label>)}</div>
           {otherModules.map(module=><section key={module.id} className={styles.otherCurriculum} aria-label={`Results in ${module.name}`}>
             <h3>{module.name}</h3><p>Switch curriculum to select these questions. Each curriculum has its own saved paper.</p>
             <button type="button" className={styles.textButton} disabled={busy} onClick={()=>void switchCurriculum(module.id)}>Browse {module.name}</button>
-            <div className={styles.entries}>{matches.filter(m=>m.module.id===module.id).map(({entry})=><article key={entry.id} className={styles.searchCard}><span className={styles.topic}>{entry.topic}</span><h4>{entry.title}</h4><p>{entry.description}</p><CatalogueDiagram thumbnail={entry.thumbnail}/><span className={styles.marks}>{entry.marks} marks</span></article>)}</div>
+            <div className={styles.entries}>{matches.filter(m=>m.module.id===module.id).map(({entry})=><article key={entry.id} className={styles.searchCard}><span className={styles.topic}>{entry.topic}</span><h4>{entry.title}</h4><span className={styles.marks}>{formatMarks(entry.marks)} marks</span><p>{entry.description}</p><CatalogueDiagram thumbnail={entry.thumbnail}/></article>)}</div>
           </section>)}
         </section>
-        <aside className={styles.summary} aria-labelledby="selection-heading"><span className={styles.eyebrow}>Your paper</span><h2 id="selection-heading">Selection summary</h2><div className={styles.total}><strong>{chosen.reduce((n,e)=>n+e.marks,0)}</strong><span>total marks · {chosen.length} {chosen.length===1?'question':'questions'}</span></div>
-          {chosen.length ? <ul>{chosen.map(e=><li key={e.id}><span>{e.title}</span><span>{e.marks}</span></li>)}</ul>:<p>Select a question to start planning your paper.</p>}
+        <aside className={styles.summary} aria-labelledby="selection-heading"><span className={styles.eyebrow}>Your paper</span><h2 id="selection-heading">Selection summary</h2><div className={styles.total}><strong>{formatMarks(selectedMarks)}</strong><span>{selectedMarks.min===selectedMarks.max?'total marks':'possible marks'} · {chosen.length} {chosen.length===1?'question':'questions'}</span></div>
+          {chosen.length ? <ul>{chosen.map(e=><li key={e.id}><span>{e.title}</span><span>{formatMarks(e.marks)}</span></li>)}</ul>:<p>Select a question to start planning your paper.</p>}
+          {selectedMarks.min!==selectedMarks.max && <p className={styles.rangeNote}>Final mark allocations are confirmed before payment.</p>}
           <p className={styles.saveState}>{selectionDirty?'Unsaved changes':data.selection.revision?'Selection saved':'No saved selection yet'}</p>
           <button className={styles.primary} disabled={busy || !selectionDirty} onClick={()=>void save('selection')}>{busy?'Please wait…':'Save selection'}</button>
           <div className={styles.next}><h3>Next: your quote</h3><p>Pricing and checkout are being prepared. Saving does not place an order or charge your school.</p><p>After payment, you will answer the parameter questions for your purchased paper.</p></div>
