@@ -14,7 +14,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "check": "npm run typecheck && npm test && npm run build && npm run test:e2e",
-    "test:auth:integration": "node scripts/test-auth-integration.mjs"
+    "test:auth:integration": "node scripts/test-auth-integration.mjs",
+    "preview:workspace": "vite tests/preview --config tests/preview/vite.config.mts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -42,6 +43,7 @@
     "jsdom": "^29.1.1",
     "pg": "^8.23.0",
     "typescript": "^5",
+    "vite": "8.3.0",
     "vitest": "^5.0.0"
   },
   "engines": {
