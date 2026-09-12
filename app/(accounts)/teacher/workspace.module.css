@@ -57,3 +57,4 @@
 .answerLines hr { margin:24px 0; }
 .previewWrap>p { font-size:13px; }
 @media(max-width:720px) { .columns,.formatting { grid-template-columns:1fr; gap:24px; } .summary{position:static;} .hero {padding-top:8px;} .toolbar {padding:18px;} .entry {padding:18px;} .tabs {gap:20px;} .fieldPair {grid-template-columns:1fr;} }
+@media(max-width:720px) { .toolbar { display:grid; grid-template-columns:minmax(0,1fr); } .toolbar label { max-width:none; } .badge { justify-self:start; } }
