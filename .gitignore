@@ -30,3 +30,10 @@ coverage/
 playwright-report/
 test-results/
 blob-report/
+
+# Credentials and local Supabase state
+.env
+.env.*
+!.env.example
+supabase/.temp/
+supabase/.branches/
