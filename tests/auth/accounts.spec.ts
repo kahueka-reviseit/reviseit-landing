@@ -1,12 +1,15 @@
 import { test, expect, type Page } from '@playwright/test';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { Client } from 'pg';
 const url = process.env.SUPABASE_URL || '';
 const key = process.env.AUTH_TEST_SERVICE_KEY || '';
 const database = process.env.AUTH_TEST_DATABASE_URL || '';
 // No skips: missing local infrastructure must be an explicit test failure.
-if (![url,database].every(v => v && ['localhost','127.0.0.1'].includes(new URL(v).hostname)) || !key) throw new Error('Run npm run test:auth:integration with disposable local Supabase running.');
-const admin = createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
+let admin: SupabaseClient;
+test.beforeAll(() => {
+  if (![url,database].every(v => v && ['localhost','127.0.0.1'].includes(new URL(v).hostname)) || !key) throw new Error('Run npm run test:auth:integration with disposable local Supabase running.');
+  admin = createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
+});
 const password = 'Synthetic-Test-Password-123!';
 async function login(page: Page, email: string, pass = password) {
   await page.goto('/login');

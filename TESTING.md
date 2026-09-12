@@ -53,7 +53,7 @@ Add behavioural tests as each feature is implemented: quote locking, verified pa
 
 ## Account tests
 
-Account registration screens, server validation and unauthenticated page protection run in both browser sizes. Endpoint tests cover pending, rejected, suspended and approved accounts. The real migration is executed in PostgreSQL tests to check permissions and review history. A separate GitHub Actions job runs the full account journey with a disposable real Supabase instance. See [AUTH.md](AUTH.md) for setup and the remaining hosted-email check. Neither suite uses live school data.
+Account registration screens, server validation and unauthenticated page protection run in both browser sizes. Endpoint tests cover pending, rejected, suspended and approved accounts. The real migration is executed in PostgreSQL tests to check permissions and review history. A separate GitHub Actions job runs the full account journey with a disposable real Supabase instance. The separate `identity.config.ts` is run explicitly by the integration command, so the editor’s normal Run All does not require Docker. See [AUTH.md](AUTH.md) for setup and the remaining hosted-email check. Neither suite uses live school data.
 
 ## Dependency maintenance
 
