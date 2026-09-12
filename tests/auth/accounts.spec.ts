@@ -60,7 +60,7 @@ test('real signup, email confirmation, team approval, suspension and password re
     await schoolForm.getByRole('button',{name:'Save school department'}).click();
     await expect(schoolForm.getByRole('status')).toContainText('available');
     const account = reviewPage.locator('article').filter({hasText:email});
-    await account.getByLabel('Decision',{exact:true}).selectOption('approved');
+    await account.getByRole('combobox',{name:/^Decision/}).selectOption('approved');
     await account.getByLabel('Verified school and department').selectOption({label:'Synthetic School · Physical Sciences'});
     await account.getByLabel('Verification evidence or reason').fill('Confirmed affiliation using synthetic test evidence.');
     await account.getByRole('button',{name:'Save verification decision'}).click();
@@ -68,7 +68,7 @@ test('real signup, email confirmation, team approval, suspension and password re
     await page.goto('/teacher');
     await expect(page.getByRole('heading',{name:'Welcome to your workspace'})).toBeVisible();
     expect((await page.request.get('/api/teacher/session')).status()).toBe(200);
-    await account.getByLabel('Decision',{exact:true}).selectOption('suspended');
+    await account.getByRole('combobox',{name:/^Decision/}).selectOption('suspended');
     await account.getByLabel('Verification evidence or reason').fill('Synthetic suspension test.');
     await account.getByRole('button',{name:'Save verification decision'}).click();
     await expect(account.getByText('Status: suspended')).toBeVisible();
@@ -88,5 +88,5 @@ test('real signup, email confirmation, team approval, suspension and password re
     await expect(page).toHaveURL(/\/login\?message=password-updated$/);
     await login(page,email,`${password}new`);
     await expect(page.getByRole('heading',{name:'Your account access is paused'})).toBeVisible();
-  } finally { await reviewContext.close(); await db.end(); }
+  } finally { await Promise.allSettled([reviewContext.close(), db.end()]); }
 });
