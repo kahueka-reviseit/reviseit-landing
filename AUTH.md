@@ -8,7 +8,7 @@ This branch implements Supabase email/password accounts and an independently ver
 2. Supabase sends an email confirmation. `/auth/confirm` asks the teacher to continue before consuming the link, so ordinary email scanners do not use it by opening the address.
 3. Confirmed teachers can log in and see their pending account at `/account`.
 4. An authorised human checks affiliation, assigns the correct shared school department and records evidence at `/admin/accounts`. Decisions are audited with reviewer, timestamp and revision. A reviewer cannot approve themselves.
-5. An approved teacher can enter `/teacher`. That workspace is a protected starting page; catalogue selection, payments and paper generation are not implemented here.
+5. An approved teacher can enter `/teacher`. The workspace supports assigned curricula, safe catalogue selection and saved school formatting; see [WORKSPACE.md](WORKSPACE.md) for its separate migration and setup. Payments and paper generation are not implemented.
 6. Updating school details or the account email revokes approval. Suspension takes effect on the next request, including with an already issued session. Password recovery does not clear a suspension.
 
 The account pages contain no marketing widgets. Confirmation tokens use a fixed destination, private responses are not cached, and signup metadata cannot grant permissions.
