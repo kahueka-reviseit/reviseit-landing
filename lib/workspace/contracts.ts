@@ -1,6 +1,6 @@
 export type Formatting = { font: 'Arial' | 'Times New Roman'; fontSize: 11 | 12; spacing: 'normal' | 'relaxed'; header: string; answerLines: boolean };
 export const defaultFormatting: Formatting = { font:'Arial', fontSize:12, spacing:'normal', header:'', answerLines:true };
-export type CatalogueEntry = { id:string; title:string; topic:string; description:string; marks:number };
+export type CatalogueEntry = { id:string; title:string; topic:string; description:string; marks:number; thumbnail?:{src:string; alt:string} };
 export type Curriculum = { id:string; name:string; release:string; isDemo:boolean };
 export type Workspace = {
   schoolName:string; curricula:Curriculum[]; module:Curriculum | null; entries:CatalogueEntry[];
@@ -24,3 +24,6 @@ export function isWorkspaceWrite(value: unknown): value is WorkspaceWrite {
   return v.kind==='selection' && typeof v.release==='string' && v.release.length>0 && v.release.length<100 &&
     Array.isArray(v.entryIds) && v.entryIds.length<=30 && new Set(v.entryIds).size===v.entryIds.length && v.entryIds.every(x=>typeof x==='string' && x.length>0 && x.length<=120);
 }
+
+export type CatalogueMatch = { module:Curriculum; entry:CatalogueEntry };
+export type CatalogueSearch = { matches:CatalogueMatch[]; hasMore:boolean };

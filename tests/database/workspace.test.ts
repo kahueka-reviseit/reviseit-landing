@@ -15,7 +15,7 @@ beforeAll(async()=>{
  create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz,raw_user_meta_data jsonb default '{}');
  create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
  grant usage on schema auth,public to authenticated,anon;grant execute on function auth.uid() to authenticated,anon;`);
- for(const f of ['supabase/migrations/202609120001_teacher_accounts.sql','supabase/migrations/202609120002_teacher_workspace.sql','tests/fixtures/workspace.sql']) await db.exec(readFileSync(f,'utf8'));
+ for(const f of ['supabase/migrations/202609120001_teacher_accounts.sql','supabase/migrations/202609120002_teacher_workspace.sql','supabase/migrations/202609120003_catalogue_discovery.sql','tests/fixtures/workspace.sql']) await db.exec(readFileSync(f,'utf8'));
  for(const id of [teacher,other,colleague]) await db.query("insert into auth.users(id,email,email_confirmed_at) values($1,$2,now())",[id,`${id}@synthetic.example`]);
  for(const [id,name] of [[school,'First'],[second,'Second']]){
   await db.query('insert into public.schools(id,slug,name) values($1,$2,$3)',[id,name.toLowerCase(),name]);
@@ -45,3 +45,24 @@ test('cannot save against an outdated catalogue release',async()=>{await asUser(
 test('stale selection cannot overwrite a newer save',async()=>{await asUser(teacher);await select();await select(['DEMO_02'],1);await expect(select(['DEMO_01'],1)).rejects.toThrow(/Selection changed/);});
 test('can clear a saved selection and refresh preserves that empty draft',async()=>{await asUser(teacher);await select();await select([],1);expect((await db.query<{entry_ids:string[];revision:number}>('select entry_ids,revision from public.paper_selections')).rows[0]).toEqual({entry_ids:[],revision:2});});
 test('cannot omit the expected revision',async()=>{await asUser(teacher);await expect(select(['DEMO_01'],null)).rejects.toThrow(/Refresh/);});
+
+test('search matches topics across assigned curricula and combines literal words',async()=>{
+ await asUser(teacher);
+ const all=await db.query<{module_id:string}>("select * from public.search_teacher_catalogue('ELECTRICITY')");
+ expect(all.rows.map(r=>r.module_id)).toEqual(['demo-grade-10-sciences','demo-grade-11-sciences']);
+ expect((await db.query("select * from public.search_teacher_catalogue('grade 11 electricity')")).rows).toHaveLength(1);
+ expect((await db.query("select * from public.search_teacher_catalogue('%')")).rows).toHaveLength(0);
+});
+test('search never returns an unassigned curriculum or older release',async()=>{
+ await db.query("update public.school_curriculum_access set active=false where school_id=$1 and module_id='demo-grade-11-sciences'",[school]);
+ await db.query("insert into public.catalogue_summaries(module_id,release,entry_id,title,topic,description,marks) values($1,'old','OLD','Hidden electricity','Electricity','Older release',2)",[module]);
+ await asUser(teacher);const rows=(await db.query<{module_id:string;release:string}>("select * from public.search_teacher_catalogue('electricity')")).rows;
+ expect(rows).toHaveLength(1);expect(rows[0]).toMatchObject({module_id:module,release:'demo-1'});
+});
+test('suspension removes search results and access to diagram bytes',async()=>{
+ await db.query("update public.teacher_accounts set status='suspended' where user_id=$1",[teacher]);await asUser(teacher);
+ expect((await db.query("select * from public.search_teacher_catalogue('grade')")).rows).toHaveLength(0);
+ expect((await db.query('select thumbnail_png from public.catalogue_summaries')).rows).toHaveLength(0);
+});
+test('anonymous search procedure execution is denied',async()=>{await db.exec('set role anon');await expect(db.query("select * from public.search_teacher_catalogue('grade')")).rejects.toThrow(/permission denied/);});
+test('search excludes image bytes from the result schema',async()=>{await asUser(teacher);const row=(await db.query<Record<string,unknown>>("select * from public.search_teacher_catalogue('motion')")).rows[0];expect(row.thumbnail_alt).toBeTruthy();expect(row).not.toHaveProperty('thumbnail_png');});

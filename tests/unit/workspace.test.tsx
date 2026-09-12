@@ -27,3 +27,21 @@ test('curriculum changes load separate saved settings and selections',async()=>{
 });
 test('catalogue changes require review rather than silently reusing old selections',()=>{render(<WorkspaceView initial={{...workspace,selection:{revision:1,release:'old',entryIds:['DEMO_01']}}}/>);expect(screen.getByText(/catalogue has changed since you saved/)).toBeVisible();expect(screen.getByLabelText('Select Reading a motion graph')).not.toBeChecked();});
 test('no assigned curriculum shows a useful empty state',()=>{render(<WorkspaceView initial={{...workspace,module:null,curricula:[],entries:[]}}/>);expect(screen.getByRole('heading',{name:'Your curricula will appear here'})).toBeVisible();expect(screen.queryByRole('button',{name:'Save selection'})).not.toBeInTheDocument();});
+
+test('search hides cards without clearing the selected paper',async()=>{
+ const entry=workspace.entries[1];vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({matches:[{module:workspace.module,entry}],hasMore:false})}));
+ render(<WorkspaceView initial={{...workspace,selection:{revision:1,release:'demo-1',entryIds:['DEMO_01']}}}/>);
+ const user=userEvent.setup();await user.type(screen.getByRole('searchbox'),'electricity');await screen.findByText('1 matching question.');
+ expect(screen.queryByLabelText('Select Reading a motion graph')).not.toBeInTheDocument();expect(within(screen.getByRole('complementary')).getByText('Reading a motion graph')).toBeVisible();
+ expect(screen.getByText(/1 selected question is outside/)).toBeVisible();await user.click(screen.getByRole('button',{name:'Clear search'}));expect(screen.getByLabelText('Select Reading a motion graph')).toBeChecked();
+});
+test('module search shows other curricula without selecting into the wrong paper',async()=>{
+ vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({matches:[{module:workspace.curricula[1],entry:workspace.entries[0]}],hasMore:false})}));render(<WorkspaceView initial={workspace}/>);
+ await userEvent.type(screen.getByRole('searchbox'),'Grade 11');await screen.findByText('1 matching question.');expect(screen.getByRole('button',{name:`Browse ${workspace.curricula[1].name}`})).toBeVisible();expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+});
+test('no matches offers a clear way back to the catalogue',async()=>{
+ vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({matches:[],hasMore:false})}));render(<WorkspaceView initial={workspace}/>);await userEvent.type(screen.getByRole('searchbox'),'unknown');await screen.findByText('No matching questions');await userEvent.click(screen.getByRole('button',{name:'Show all questions in this curriculum'}));expect(screen.getAllByRole('checkbox')).toHaveLength(3);
+});
+test('cards display descriptive diagram images and still support missing thumbnails',()=>{
+ render(<WorkspaceView initial={{...workspace,entries:[workspace.entries[0],{...workspace.entries[1],thumbnail:undefined}]}}/>);expect(screen.getByRole('img',{name:workspace.entries[0].thumbnail!.alt})).toBeVisible();expect(screen.getAllByRole('img')).toHaveLength(1);expect(screen.getAllByRole('checkbox')).toHaveLength(2);
+});

@@ -15,7 +15,8 @@
     "test:e2e:ui": "playwright test --ui",
     "check": "npm run typecheck && npm test && npm run build && npm run test:e2e",
     "test:auth:integration": "node scripts/test-auth-integration.mjs",
-    "preview:workspace": "vite tests/preview --config tests/preview/vite.config.mts"
+    "preview:workspace": "vite tests/preview --config tests/preview/vite.config.mts",
+    "test:workspace:e2e": "playwright test --config playwright.workspace.config.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

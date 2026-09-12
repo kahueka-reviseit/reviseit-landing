@@ -73,6 +73,14 @@ test('real signup, email confirmation, team approval, suspension and password re
     await db.query("insert into public.school_curriculum_access(school_id,module_id) select school_id,m.id from public.teacher_accounts cross join public.curriculum_modules m where user_id=$1",[(await db.query('select id from auth.users where email=$1',[email])).rows[0].id]);
     await page.goto('/teacher');
     await expect(page.getByRole('heading',{name:'Plan your next paper'})).toBeVisible();
+    const diagram=page.getByRole('img',{name:'Velocity against time graph with a rising line followed by a horizontal line'});
+    await expect(diagram).toBeVisible();
+    await expect.poll(()=>diagram.evaluate((image:HTMLImageElement)=>image.naturalWidth)).toBeGreaterThan(0);
+    const diagramUrl=(await diagram.getAttribute('src'))!;
+    expect((await page.request.get(diagramUrl)).status()).toBe(200);
+    await page.getByRole('searchbox').fill('Grade 11 electricity');
+    await expect(page.getByRole('button',{name:'Browse Grade 11 Physical Sciences · demonstration'})).toBeVisible();
+    await page.getByRole('button',{name:'Clear search'}).click();
     await page.getByLabel('Select Reading a motion graph').check();
     await page.getByRole('button',{name:'Save selection',exact:true}).click();
     await expect(page.getByRole('status')).toContainText('selection is saved');
@@ -103,6 +111,8 @@ test('real signup, email confirmation, team approval, suspension and password re
     await expect(account.getByText('Status: suspended')).toBeVisible();
     expect((await page.request.get('/api/teacher/session')).status()).toBe(403);
     expect((await page.request.get('/api/teacher/workspace')).status()).toBe(403);
+    expect((await page.request.get('/api/teacher/catalogue/search?q=electricity')).status()).toBe(403);
+    expect((await page.request.get(diagramUrl)).status()).toBe(403);
     await page.goto('/teacher');
     await expect(page.getByRole('heading',{name:'Your account access is paused'})).toBeVisible();
     await page.getByRole('button',{name:'Log out',exact:true}).click();
