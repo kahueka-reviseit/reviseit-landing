@@ -18,7 +18,7 @@ The dependency lockfile belongs in Git. `npm run check` performs the type check,
 
 Open this repository as a folder, or add it to your existing workspace. Install the recommended **Vitest** (`vitest.explorer`) and **Playwright Test for VSCode** (`ms-playwright.playwright`) extensions.
 
-Open the Testing panel (the beaker). Vitest discovers `tests/unit/*.test.tsx`. Playwright discovers `tests/e2e/*.spec.ts` through `playwright.config.ts`; select the desktop and mobile projects in its test settings as needed. Refresh the panel after first installation. If the folder is in Restricted Mode, review and trust this checkout to enable its test runners.
+Open the Testing panel (the beaker). Vitest discovers component and account tests under `tests/unit/`, and database permission tests under `tests/database/`. Playwright discovers `tests/e2e/*.spec.ts` through `playwright.config.ts`; select the desktop and mobile projects in its test settings as needed. Refresh the panel after first installation. If the folder is in Restricted Mode, review and trust this checkout to enable its test runners.
 
 Component tests run directly from the panel. Before running browser tests there, run **Tasks: Run Task → Build for browser tests** (or `npm run build`). Repeat the build after application changes: these tests deliberately exercise the production output. Playwright starts/stops its own local server. Use **Tasks: Run Test Task → Check everything** for the full sequence with a fresh build.
 
@@ -26,13 +26,14 @@ Component tests run directly from the panel. Before running browser tests there,
 
 | Command | Purpose |
 |---|---|
-| `npm test` | Run component tests once |
+| `npm test` | Run component, endpoint and database tests once |
 | `npm run test:watch` | Rerun component tests as files change |
 | `npm run typecheck` | Check TypeScript |
 | `npm run build` | Build production output for browser testing |
 | `npm run test:e2e` | Run desktop/mobile browser tests against that build |
 | `npm run test:e2e:ui` | Open Playwright's interactive runner |
-| `npm run check` | Run every required check, including a fresh build |
+| `npm run check` | Run the local suite, including a fresh build |
+| `npm run test:auth:integration` | Run real Supabase/browser account tests with disposable local Supabase |
 
 ## What is covered
 
@@ -50,6 +51,10 @@ The GitHub Actions workflow runs the same checks on pushes and pull requests, an
 
 Add behavioural tests as each feature is implemented: quote locking, verified payment before parameter access, school isolation, duplicate-event recovery, persistent generation budgets and all-four-document release. Keep real specifications, parameter libraries, private prompts and school documents out of this public repository and its test output. Use synthetic fixtures here and private reviewed content evaluations in the content service.
 
-## Existing dependency maintenance
+## Account tests
 
-The initial install on 12 September 2026 reported four dependency audit findings in the existing application dependency tree (Next.js, marked, PostCSS and postcss-selector-parser), including a critical Next.js finding. The application still uses Next.js 14.2.5. This test setup does not resolve those advisories or certify deployment security; review and update the application dependencies before building the authenticated/payment service.
+Account registration screens, server validation and unauthenticated page protection run in both browser sizes. Endpoint tests cover pending, rejected, suspended and approved accounts. The real migration is executed in PostgreSQL tests to check permissions and review history. A separate GitHub Actions job runs the full account journey with a disposable real Supabase instance. See [AUTH.md](AUTH.md) for setup and the remaining hosted-email check. Neither suite uses live school data.
+
+## Dependency maintenance
+
+The account change updates Next.js to 15.5.25 and marked to 18.0.12, and applies compatible PostCSS and selector-parser fixes. The dependency audit on 12 September 2026 reports zero known vulnerabilities after these changes. The PostCSS override keeps the patched compatible version in Next.js 15; review it when upgrading Next.js again.

@@ -1,3 +1,4 @@
+import Script from 'next/script';
 import styles from './page.module.css';
 import AssessmentJourney from './components/AssessmentJourney/AssessmentJourney';
 import CatalogueExplorer from './components/CatalogueExplorer/CatalogueExplorer';
@@ -28,7 +29,7 @@ export default function Home() {
               <a href="/pilot" className={styles.navCenterLink}>Pilot Programme</a>
             </div>
             <div className={styles.navRight}>
-              <a href="https://app.reviseit.io" className={styles.navLogin}>
+              <a href="/login" className={styles.navLogin}>
                 Log in
               </a>
             </div>
@@ -237,6 +238,7 @@ export default function Home() {
       </section>
 
 
+      <Script src="https://tally.so/widgets/embed.js" strategy="afterInteractive" />
       {/* Footer */}
       <Footer />
 
