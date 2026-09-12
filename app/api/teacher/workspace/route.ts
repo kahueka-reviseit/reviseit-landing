@@ -15,7 +15,10 @@ async function access() {
 export async function GET(request:NextRequest) {
   const c=await access(); if(c instanceof NextResponse) return c;
   try { return reply(await readWorkspace(c.supabase,c.account.school_id!,request.nextUrl.searchParams.get('curriculum') || undefined)); }
-  catch(e) { return reply({error:e instanceof Error ? e.message : 'Workspace unavailable'},e instanceof Error && e.message==='Curriculum access required'?403:503); }
+  catch(e) {
+    const forbidden=e instanceof Error && e.message==='Curriculum access required';
+    return reply({error:forbidden?'Curriculum access required':'Workspace unavailable'},forbidden?403:503);
+  }
 }
 export async function PUT(request:NextRequest) {
   // Cookie-authenticated mutations require a same-origin browser request.
