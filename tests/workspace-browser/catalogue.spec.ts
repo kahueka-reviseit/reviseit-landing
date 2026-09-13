@@ -24,3 +24,15 @@ test('curriculum search offers a switch into the matching paper',async({page})=>
  await page.getByLabel('Select Investigating a circuit').check();
  await expect(page.getByRole('complementary').getByText('Investigating a circuit')).toBeVisible();
 });
+
+test('outline reveals by keyboard while counts and selection remain independent',async({page},info)=>{
+ await page.goto('/');const card=page.getByRole('article',{name:'Reading a motion graph'});
+ await expect(card.getByText('3–5 subquestions')).toBeVisible();await expect(card.getByText('Recall a concept')).toBeHidden();
+ const reveal=card.getByRole('button',{name:'Reveal more'});await reveal.focus();await page.keyboard.press('Enter');
+ await expect(card.getByText('Remember',{exact:true})).toBeVisible();await expect(card.getByText('Evaluate',{exact:true})).toBeVisible();
+ await expect(page.getByLabel('Select Reading a motion graph')).not.toBeChecked();await page.getByLabel('Select Reading a motion graph').check();
+ await expect(card.getByRole('button',{name:'Show less'})).toHaveAttribute('aria-expanded','true');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await page.screenshot({path:`workspace-test-results/catalogue-outline-${info.project.name}.png`,fullPage:true});
+ await card.getByRole('button',{name:'Show less'}).click();await expect(card.getByText('Recall a concept')).toBeHidden();await expect(page.getByLabel('Select Reading a motion graph')).toBeChecked();
+});

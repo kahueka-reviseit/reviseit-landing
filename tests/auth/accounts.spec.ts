@@ -81,6 +81,10 @@ test('real signup, email confirmation, team approval, suspension and password re
     await page.getByRole('searchbox').fill('Grade 11 electricity');
     await expect(page.getByRole('button',{name:'Browse Grade 11 Physical Sciences · demonstration'})).toBeVisible();
     await page.getByRole('button',{name:'Clear search'}).click();
+    const outlineCard=page.getByRole('article',{name:'Reading a motion graph'});
+    await expect(outlineCard.getByText('3–5 subquestions')).toBeVisible();
+    await outlineCard.getByRole('button',{name:'Reveal more'}).click();
+    await expect(outlineCard.getByText('Remember',{exact:true})).toBeVisible();
     await page.getByLabel('Select Reading a motion graph').check();
     await page.getByRole('button',{name:'Save selection',exact:true}).click();
     await expect(page.getByRole('status')).toContainText('selection is saved');
