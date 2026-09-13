@@ -20,6 +20,8 @@ test('concurrent publications serialize without exposing incomplete rows or regr
  const id1=randomUUID(),id2=randomUUID(),id3=randomUUID();
  try{
   await recordReceipt(owner,id1,r1);await recordReceipt(owner,id2,r2,'1');await recordReceipt(owner,id3,r3,'1');
+  // Explicit test-only membership; creating a role does not imply permission to SET ROLE.
+  await owner.query('grant reviseit_catalogue_publisher to current_user');
   await a.query('set role reviseit_catalogue_publisher');await b.query('set role reviseit_catalogue_publisher');
   await importCatalogue(a,id1,r1,{apply:true});
   await a.query('begin');await a.query('select public.import_catalogue_release($1,$2::jsonb)',[id2,JSON.stringify(r2)]);

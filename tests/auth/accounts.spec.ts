@@ -110,6 +110,8 @@ test('real signup, email confirmation, team approval, suspension and password re
     const release=publication('published-2','demo-grade-10-sciences');
     release.module.name='Grade 10 Physical Sciences · demonstration';
     const receiptId=randomUUID();await recordReceipt(db,receiptId,release,'demo-1');
+    // Supabase's test administrator can manage roles but does not automatically inherit new ones.
+    await db.query('grant reviseit_catalogue_publisher to current_user');
     await db.query('set role reviseit_catalogue_publisher');
     await db.query('select public.import_catalogue_release($1,$2::jsonb)',[receiptId,JSON.stringify(release)]);
     await db.query('reset role');
