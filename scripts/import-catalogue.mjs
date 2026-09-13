@@ -4,19 +4,7 @@ import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 
 // Operational CLI only. No route or credential is added to the teacher application.
-export async function importCatalogue(client,approvalId,manifest,{apply=false}={}) {
-  await client.query('begin');
-  try {
-    await client.query("set local statement_timeout='30s'");
-    await client.query("set local lock_timeout='10s'");
-    const {rows}=await client.query('select public.import_catalogue_release($1,$2::jsonb) as result',[approvalId,JSON.stringify(manifest)]);
-    await client.query(apply?'commit':'rollback');
-    return {mode:apply?'applied':'dry-run',...rows[0].result};
-  } catch(error) {
-    await client.query('rollback');
-    throw error;
-  }
-}
+import {importCatalogue} from './catalogue-import.mjs';
 
 if(process.argv[1] && import.meta.url===pathToFileURL(resolve(process.argv[1])).href) {
   const [file,approvalId,...flags]=process.argv.slice(2);

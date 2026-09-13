@@ -1,8 +1,13 @@
 import {test,expect} from '@playwright/test';
 import {Client} from 'pg';
 import {randomUUID} from 'node:crypto';
+import {mkdtemp,writeFile,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {execFile} from 'node:child_process';
+import {promisify} from 'node:util';
 import {publication,recordReceipt} from '../fixtures/publication';
-import {importCatalogue} from '../../scripts/import-catalogue.mjs';
+import {importCatalogue} from '../../scripts/catalogue-import.mjs';
 const database=process.env.AUTH_TEST_DATABASE_URL||'';
 function client(name:string){
  if(!database || !['localhost','127.0.0.1'].includes(new URL(database).hostname))throw Error('Disposable local PostgreSQL required');
@@ -28,13 +33,22 @@ test('concurrent publications serialize without exposing incomplete rows or regr
   expect((await owner.query('select release from private.catalogue_imported_releases where module_id=$1 order by release',[module])).rows).toEqual([{release:'1'},{release:'2'}]);
  }finally{await Promise.allSettled([a.query('rollback'),b.query('rollback')]);await Promise.allSettled([owner.end(),a.end(),b.end()]);}
 });
-test('command-line delivery defaults to rollback and does not activate a release',async()=>{
- const owner=client('publication-dry-run-owner'),publisher=client('publication-dry-run');await Promise.all([owner.connect(),publisher.connect()]);
+test('command-line delivery defaults to rollback using a restricted publisher login',async()=>{
+ const owner=client('publication-dry-run-owner');await owner.connect();
  const manifest=publication('1','synthetic-dry-run-'+Date.now()),id=randomUUID();
+ const login='synthetic_publisher_'+randomUUID().replaceAll('-',''),password=randomUUID();
+ const directory=await mkdtemp(join(tmpdir(),'catalogue-publication-'));
  try{
-  await recordReceipt(owner,id,manifest);await publisher.query('set role reviseit_catalogue_publisher');
-  expect(await importCatalogue(publisher,id,manifest)).toMatchObject({mode:'dry-run',status:'imported'});
+  await recordReceipt(owner,id,manifest);
+  const ddl=await owner.query("select format('create role %I login password %L in role reviseit_catalogue_publisher',$1::text,$2::text) as sql",[login,password]);
+  await owner.query(ddl.rows[0].sql);
+  const connection=new URL(database);connection.username=login;connection.password=password;
+  const file=join(directory,'synthetic.json');await writeFile(file,JSON.stringify(manifest),{mode:0o600});
+  const {stdout}=await promisify(execFile)(process.execPath,['scripts/import-catalogue.mjs',file,id],{env:{...process.env,CATALOGUE_DATABASE_URL:connection.toString()},timeout:15000});
+  expect(JSON.parse(stdout)).toMatchObject({mode:'dry-run',status:'imported'});
   expect((await owner.query('select * from public.curriculum_modules where id=$1',[manifest.module.id])).rows).toHaveLength(0);
   expect((await owner.query('select * from private.catalogue_imported_releases where approval_id=$1',[id])).rows).toHaveLength(0);
- }finally{await Promise.allSettled([owner.end(),publisher.end()]);}
+ }finally{
+  try{await owner.query(`drop role if exists ${login}`);}finally{await Promise.allSettled([owner.end(),rm(directory,{recursive:true,force:true})]);}
+ }
 });
