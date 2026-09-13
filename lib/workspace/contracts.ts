@@ -1,5 +1,5 @@
 export type Formatting = { font: 'Arial' | 'Times New Roman'; fontSize: 11 | 12; spacing: 'normal' | 'relaxed'; header: string; answerLines: boolean };
-export const defaultFormatting: Formatting = { font:'Arial', fontSize:12, spacing:'normal', header:'', answerLines:true };
+export const defaultFormatting: Formatting = { font:'Arial', fontSize:12, spacing:'normal', header:'', answerLines:false };
 export type CatalogueEntry = { id:string; title:string; topic:string; description:string; marks:{min:number;max:number}; thumbnail?:{src:string; alt:string}; preview?:CataloguePreview };
 export type Curriculum = { id:string; name:string; release:string; isDemo:boolean };
 export type Workspace = {
@@ -12,7 +12,7 @@ export function isFormatting(value: unknown): value is Formatting {
   const v = value as Record<string,unknown>;
   return Object.keys(v).length === 5 && ['font','fontSize','spacing','header','answerLines'].every(k => Object.hasOwn(v,k)) &&
     typeof v.font==='string' && ['Arial','Times New Roman'].includes(v.font) && [11,12].includes(v.fontSize as number) &&
-    typeof v.spacing==='string' && ['normal','relaxed'].includes(v.spacing) && typeof v.header === 'string' && v.header.length <= 160 && typeof v.answerLines === 'boolean';
+    typeof v.spacing==='string' && ['normal','relaxed'].includes(v.spacing) && typeof v.header === 'string' && v.header.length <= 160 && !/[\u0000-\u001f\u007f]/.test(v.header) && typeof v.answerLines === 'boolean';
 }
 export type WorkspaceWrite = { kind:'formatting'; moduleId:string; revision:number; preferences:Formatting } |
   { kind:'selection'; moduleId:string; revision:number; release:string; entryIds:string[] };

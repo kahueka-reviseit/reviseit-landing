@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { PGlite } from '@electric-sql/pglite';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { beforeAll,beforeEach,afterEach,afterAll,test,expect } from 'vitest';
 let db:PGlite;
 const teacher='00000000-0000-4000-8000-000000000002',other='00000000-0000-4000-8000-000000000003',colleague='00000000-0000-4000-8000-000000000004';
@@ -15,7 +15,7 @@ beforeAll(async()=>{
  create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz,raw_user_meta_data jsonb default '{}');
  create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
  grant usage on schema auth,public to authenticated,anon;grant execute on function auth.uid() to authenticated,anon;`);
- for(const f of ['supabase/migrations/202609120001_teacher_accounts.sql','supabase/migrations/202609120002_teacher_workspace.sql','supabase/migrations/202609120003_catalogue_discovery.sql','supabase/migrations/202609120004_catalogue_mark_ranges.sql','supabase/migrations/202609130005_catalogue_preview.sql','tests/fixtures/workspace.sql']) await db.exec(readFileSync(f,'utf8'));
+ for(const f of ['supabase/migrations/202609120001_teacher_accounts.sql','supabase/migrations/202609120002_teacher_workspace.sql','supabase/migrations/202609120003_catalogue_discovery.sql','supabase/migrations/202609120004_catalogue_mark_ranges.sql','supabase/migrations/202609130005_catalogue_preview.sql','supabase/migrations/202609130007_render_formatting.sql','tests/fixtures/workspace.sql']) await db.exec(readFileSync(f,'utf8'));
  for(const id of [teacher,other,colleague]) await db.query("insert into auth.users(id,email,email_confirmed_at) values($1,$2,now())",[id,`${id}@synthetic.example`]);
  for(const [id,name] of [[school,'First'],[second,'Second']]){
   await db.query('insert into public.schools(id,slug,name) values($1,$2,$3)',[id,name.toLowerCase(),name]);
@@ -90,3 +90,18 @@ test.each([
  await expect(db.query('update public.catalogue_summaries set preview=$1 where module_id=$2',[JSON.stringify(preview),module])).rejects.toThrow(/check constraint/);
 });
 test('a teacher cannot rewrite catalogue outlines',async()=>{await asUser(teacher);await expect(db.query("update public.catalogue_summaries set preview=null")).rejects.toThrow(/permission denied/);});
+
+async function snapshot(revision=0,m=module){return (await db.query<{snapshot:any}>('select public.read_render_formatting($1,$2) as snapshot',[m,revision])).rows[0].snapshot;}
+test('missing settings use the default marker, not another school profile',async()=>{await asUser(teacher);await format();await asUser(other);expect(await snapshot()).toMatchObject({schoolId:second,revision:0,preferences:null});});
+test('format snapshot is scoped to school and curriculum and remains stable after a later save',async()=>{await asUser(teacher);await format();const first=await snapshot(1);await format(1,{...settings,font:'Times New Roman'});expect(first.preferences.font).toBe('Arial');expect(await snapshot(2)).toMatchObject({schoolId:school,moduleId:module,revision:2,preferences:{font:'Times New Roman'}});expect(await snapshot(0,'demo-grade-11-sciences')).toMatchObject({revision:0,preferences:null});});
+test('a stale render revision is rejected',async()=>{await asUser(teacher);await format();await expect(snapshot(0)).rejects.toThrow(/Formatting changed/);});
+test('revoked curriculum cannot export a saved profile',async()=>{await asUser(teacher);await format();await db.exec('reset role');await db.query('update public.school_curriculum_access set active=false where school_id=$1',[school]);await asUser(teacher);await expect(snapshot(1)).rejects.toThrow(/access required/);});
+test.each(['pending','suspended','rejected'])('%s account cannot export formatting',async status=>{await db.query('update public.teacher_accounts set status=$1 where user_id=$2',[status,teacher]);await asUser(teacher);await expect(snapshot()).rejects.toThrow(/access required/);});
+test('anonymous formatting export is denied',async()=>{await db.exec('set role anon');await expect(snapshot()).rejects.toThrow(/permission denied/);});
+
+test('saved database profile can be consumed by the Python renderer contract',async()=>{
+ await asUser(teacher);await format(0,{font:'Times New Roman',fontSize:11,spacing:'relaxed',header:'First School Sciences Department',answerLines:true});
+ const value=await snapshot(1);expect(value.preferences.font).toBe('Times New Roman');
+ // Explicit opt-in local export; ordinary test runs have no artifact side effects.
+ if(process.env.REVISEIT_FORMATTING_FIXTURE) writeFileSync(process.env.REVISEIT_FORMATTING_FIXTURE,JSON.stringify(value,null,2)+'\n');
+});

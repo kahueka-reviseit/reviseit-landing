@@ -63,3 +63,16 @@ The diagram and both ranges stay visible. Reveal more expands the numbered outli
 Real preview metadata must arrive through reviewed publication, with its release fixed alongside the catalogue. This section describes the consumer contract and user interface. The subsequent [publication adapter](PUBLICATION.md) adds governed import delivery; human approval, completed private forms and a hosted import remain outstanding. The demonstration remains synthetic. Private source-derived proposals must not be copied into this public repository or used as test fixtures.
 
 Coverage includes nested-field exclusion, invalid count/category rejection, direct write denial, protected search projection, keyboard disclosure independent of selection, missing metadata and mobile layout. The disposable real Supabase journey also exercises database-backed outline delivery.
+
+
+## Saved formatting and the render boundary
+
+`GET /api/teacher/formatting?curriculum=<module-id>&revision=<saved-revision>` exports one closed, versioned snapshot for the authenticated approved teacher's school. It uses `read_render_formatting` from migration `202609130007`; no service-role client or caller-supplied school identifier is accepted. The database reads school identity, curriculum access and preferences in one statement under existing row policies. A stale revision returns 409, revoked access 403, and unsupported stored settings 422.
+
+A missing row is revision zero with `preferences: null`. This means the user-selected default Word standards, including no automatic answer lines. Existing saved profiles keep their explicit values. Profiles contain all five settings; blank custom heading retains the normal header. Unknown settings, partial profiles and control characters in headings are rejected. A4 is currently fixed, not a selectable paper-size setting.
+
+The local four-document worker lives in the business repository at `our product/school-formatting/render_bundle.py`. It consumes this snapshot and separate trusted job school/curriculum identifiers, verifies all four input configurations belong to that identity and paper revision, and exposes a complete output directory only when every document succeeds. The snapshot is not a payment receipt or permission to generate. Future order orchestration must capture it server-side, store it with the immutable order/job, and enforce entitlement before dispatch. Never accept a browser-submitted snapshot as generation authority.
+
+Font, body size, spacing and heading apply across all four documents. Answer lines apply to written response leaves in the paper and teacher description, with existing authored drawing areas retained; they do not add blank writing space to the memos. Supported explicit legacy school layouts take precedence. Named or uploaded templates require a separately registered renderer and are not silently approximated.
+
+This slice is local and unmerged. The migration has not been applied to hosted development. No hosted worker, generation endpoint or purchase flow is introduced. The business repository's `our product/school-formatting/index.md` records the database-to-Word trial and remaining Linux/font checks.
