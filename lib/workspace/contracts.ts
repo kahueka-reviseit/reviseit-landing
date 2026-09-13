@@ -1,6 +1,6 @@
 export type Formatting = { font: 'Arial' | 'Times New Roman'; fontSize: 11 | 12; spacing: 'normal' | 'relaxed'; header: string; answerLines: boolean };
 export const defaultFormatting: Formatting = { font:'Arial', fontSize:12, spacing:'normal', header:'', answerLines:true };
-export type CatalogueEntry = { id:string; title:string; topic:string; description:string; marks:{min:number;max:number}; thumbnail?:{src:string; alt:string} };
+export type CatalogueEntry = { id:string; title:string; topic:string; description:string; marks:{min:number;max:number}; thumbnail?:{src:string; alt:string}; preview?:CataloguePreview };
 export type Curriculum = { id:string; name:string; release:string; isDemo:boolean };
 export type Workspace = {
   schoolName:string; curricula:Curriculum[]; module:Curriculum | null; entries:CatalogueEntry[];
@@ -27,3 +27,30 @@ export function isWorkspaceWrite(value: unknown): value is WorkspaceWrite {
 
 export type CatalogueMatch = { module:Curriculum; entry:CatalogueEntry };
 export type CatalogueSearch = { matches:CatalogueMatch[]; hasMore:boolean };
+
+export const bloomCategories = ['Remember','Understand','Apply','Analyse','Evaluate','Create'] as const;
+export type BloomCategory = typeof bloomCategories[number];
+export type CataloguePreview = {
+  subquestions:{min:number;max:number};
+  outline?:{summary:string;bloom:BloomCategory;marks?:{min:number;max:number}}[];
+};
+function exactKeys(value:unknown,required:string[],optional:string[]=[]):value is Record<string,unknown> {
+  return !!value && typeof value==='object' && !Array.isArray(value) &&
+    required.every(k=>Object.hasOwn(value,k)) && Object.keys(value).every(k=>required.includes(k)||optional.includes(k));
+}
+function validRange(value:unknown,limit:number):boolean {
+  return exactKeys(value,['min','max']) && Number.isSafeInteger(value.min) && Number.isSafeInteger(value.max) &&
+    Number(value.min)>=1 && Number(value.max)>=Number(value.min) && Number(value.max)<=limit;
+}
+// A closed shape prevents private metadata in nested JSON from reaching the browser.
+// Invalid/missing preview data is unavailable, never inferred from curriculum bands.
+export function cataloguePreview(value:unknown):CataloguePreview|undefined {
+  if(!exactKeys(value,['subquestions'],['outline']) || !validRange(value.subquestions,30)) return undefined;
+  if(Object.hasOwn(value,'outline')) {
+    const outline=value.outline,range=value.subquestions as {min:number;max:number};
+    if(!Array.isArray(outline) || outline.length<range.min || outline.length>range.max || !outline.every(row=>
+      exactKeys(row,['summary','bloom'],['marks']) && typeof row.summary==='string' && row.summary.trim().length>0 && row.summary.length<=160 &&
+      bloomCategories.includes(row.bloom as BloomCategory) && (!Object.hasOwn(row,'marks')||validRange(row.marks,100)))) return undefined;
+  }
+  return value as CataloguePreview;
+}

@@ -1,14 +1,38 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useId } from 'react';
 import type { Formatting, Workspace, WorkspaceWrite, CatalogueSearch, CatalogueEntry } from '../../../lib/workspace/contracts';
 import styles from './workspace.module.css';
 import {formatMarks,totalMarks} from '../../../lib/workspace/catalogue';
-function CatalogueDiagram({thumbnail}:{thumbnail:CatalogueEntry['thumbnail']}) {
-  const [failed,setFailed]=useState(false);
-  useEffect(()=>setFailed(false),[thumbnail?.src]);
-  if(!thumbnail) return null;
-  return failed ? <span className={styles.diagramFallback}>Diagram preview unavailable</span> :
-    <img className={styles.diagram} src={thumbnail.src} alt={thumbnail.alt} loading="lazy" decoding="async" onError={()=>setFailed(true)}/>;
+const bloomStyles:Record<string,string>={Remember:styles.remember,Understand:styles.understand,Apply:styles.apply,Analyse:styles.analyse,Evaluate:styles.evaluate,Create:styles.create};
+function CatalogueCard({entry,selected=false,disabled=false,onSelect}:{entry:CatalogueEntry;selected?:boolean;disabled?:boolean;onSelect?:(checked:boolean)=>void}) {
+  const [failed,setFailed]=useState(false),[expanded,setExpanded]=useState(false);
+  const detailId=useId(),titleId=useId();
+  useEffect(()=>setFailed(false),[entry.thumbnail?.src]);
+  const preview=entry.preview;
+  return <article className={`${styles.entry} ${selected?styles.selected:''}`} aria-labelledby={titleId}>
+    <div className={styles.cardHeading}>
+      <div><span className={styles.topic}>{entry.topic}</span><h3 id={titleId}>{entry.title}</h3></div>
+      {onSelect && <input type="checkbox" disabled={disabled} checked={selected} onChange={e=>onSelect(e.target.checked)} aria-label={`Select ${entry.title}`}/>}
+    </div>
+    <div className={styles.cardMetrics}><span className={styles.marks}>{formatMarks(entry.marks)} marks</span>
+      {preview ? <span className={styles.subquestionCount}>{formatMarks(preview.subquestions)} {preview.subquestions.max===1?'subquestion':'subquestions'}</span> : <span className={styles.subquestionCount}>Subquestion range not yet available</span>}
+    </div>
+    <p className={styles.description}>{entry.description}</p>
+    {entry.thumbnail && (failed ? <p className={styles.diagramFallback}>Diagram preview unavailable</p> : <img className={styles.diagram} src={entry.thumbnail.src} alt={entry.thumbnail.alt} loading="lazy" decoding="async" onError={()=>setFailed(true)}/>)}
+    {preview?.outline ? <>
+      <button type="button" className={styles.reveal} aria-expanded={expanded} aria-controls={detailId} onClick={()=>setExpanded(!expanded)}>{expanded?'Show less':'Reveal more'}<span aria-hidden="true">{expanded?'−':'+'}</span></button>
+      <div id={detailId} hidden={!expanded} className={styles.outline}>
+        <p className={styles.outlineHeading}>What learners would do · example structure</p>
+        <ol>{preview.outline.map((row,i)=><li key={i} className={styles.outlineRow}>
+          <span className={styles.partNumber} aria-label={`Subquestion ${i+1}`}>1.{i+1}</span>
+          <div><p>{row.summary}</p><span aria-hidden="true" className={styles.redaction}><i/><i/></span><span className={`${styles.bloom} ${bloomStyles[row.bloom]}`}>{row.bloom}</span></div>
+          {row.marks && <span className={styles.partMarks}>({formatMarks(row.marks)})</span>}
+        </li>)}</ol>
+        <p className={styles.previewNote}>One possible structure. The final subquestions and mark allocations can vary within the published ranges.</p>
+        <p className={styles.previewNote}>Your paper is created after payment and parameter selection.</p>
+      </div>
+    </> : <p className={styles.previewNote}>Question outline not yet available.</p>}
+  </article>;
 }
 export default function WorkspaceView({initial}:{initial:Workspace}) {
   const [data,setData]=useState(initial);
@@ -95,14 +119,11 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
           {hiddenSelected>0 && searchQuery && <p className={styles.searchStatus}>{hiddenSelected} selected {hiddenSelected===1?'question is':'questions are'} outside these results. Your selection is unchanged.</p>}
           {stale && <p className={styles.error}>The catalogue has changed since you saved. Review the current entries and save a new selection. Your previous selection stays saved until then.</p>}
           {data.entries.length===0 && <p className={styles.empty}>There are no published questions for this curriculum yet.</p>}
-          <div className={styles.entries}>{visibleEntries.map(entry=><label className={`${styles.entry} ${ids.includes(entry.id)?styles.selected:''}`} key={`${data.module!.id}:${entry.id}`}>
-            <input type="checkbox" disabled={busy || (!ids.includes(entry.id) && ids.length>=30)} checked={ids.includes(entry.id)} onChange={e=>{setNotice('');setIds(e.target.checked?[...ids,entry.id]:ids.filter(id=>id!==entry.id));}} aria-label={`Select ${entry.title}`} />
-            <span><span className={styles.topic}>{entry.topic}</span><strong>{entry.title}</strong><span className={styles.marks}>{formatMarks(entry.marks)} marks</span><span className={styles.description}>{entry.description}</span><CatalogueDiagram thumbnail={entry.thumbnail}/></span>
-          </label>)}</div>
+          <div className={styles.entries}>{visibleEntries.map(entry=><CatalogueCard key={`${data.module!.id}:${data.module!.release}:${entry.id}`} entry={entry} selected={ids.includes(entry.id)} disabled={busy || (!ids.includes(entry.id) && ids.length>=30)} onSelect={checked=>{setNotice('');setIds(checked?[...ids,entry.id]:ids.filter(id=>id!==entry.id));}}/>)}</div>
           {otherModules.map(module=><section key={module.id} className={styles.otherCurriculum} aria-label={`Results in ${module.name}`}>
             <h3>{module.name}</h3><p>Switch curriculum to select these questions. Each curriculum has its own saved paper.</p>
             <button type="button" className={styles.textButton} disabled={busy} onClick={()=>void switchCurriculum(module.id)}>Browse {module.name}</button>
-            <div className={styles.entries}>{matches.filter(m=>m.module.id===module.id).map(({entry})=><article key={entry.id} className={styles.searchCard}><span className={styles.topic}>{entry.topic}</span><h4>{entry.title}</h4><span className={styles.marks}>{formatMarks(entry.marks)} marks</span><p>{entry.description}</p><CatalogueDiagram thumbnail={entry.thumbnail}/></article>)}</div>
+            <div className={styles.entries}>{matches.filter(m=>m.module.id===module.id).map(({entry})=><CatalogueCard key={`${module.id}:${module.release}:${entry.id}`} entry={entry}/>)}</div>
           </section>)}
         </section>
         <aside className={styles.summary} aria-labelledby="selection-heading"><span className={styles.eyebrow}>Your paper</span><h2 id="selection-heading">Selection summary</h2><div className={styles.total}><strong>{formatMarks(selectedMarks)}</strong><span>{selectedMarks.min===selectedMarks.max?'total marks':'possible marks'} · {chosen.length} {chosen.length===1?'question':'questions'}</span></div>

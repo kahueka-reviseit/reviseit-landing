@@ -52,3 +52,23 @@ test('fixed-mark questions display a single allocation alongside ranged items',(
  expect(screen.getByText('8–12 marks')).toBeVisible();expect(screen.getByText('2 marks',{exact:true})).toBeVisible();expect(screen.queryByText('2–2 marks')).not.toBeInTheDocument();
  expect(within(screen.getByRole('complementary')).getByText('10–14')).toBeVisible();expect(screen.getByText(/possible marks/)).toBeVisible();
 });
+
+test('revealing the outline does not select a question or fetch protected forms',async()=>{
+ const fetch=vi.fn();vi.stubGlobal('fetch',fetch);render(<WorkspaceView initial={workspace}/>);
+ const card=screen.getByRole('article',{name:'Reading a motion graph'});const user=userEvent.setup();
+ expect(within(card).getByText('3–5 subquestions')).toBeVisible();expect(within(card).getByText('8–12 marks')).toBeVisible();
+ const reveal=within(card).getByRole('button',{name:'Reveal more'});expect(reveal).toHaveAttribute('aria-expanded','false');
+ expect(within(card).queryByText('Recall a concept')).not.toBeVisible();await user.click(reveal);
+ expect(within(card).getByText('Remember')).toBeVisible();expect(within(card).getByText('Evaluate')).toBeVisible();
+ expect(screen.getByLabelText('Select Reading a motion graph')).not.toBeChecked();expect(fetch).not.toHaveBeenCalled();
+ await user.click(screen.getByLabelText('Select Reading a motion graph'));expect(reveal).toHaveAttribute('aria-expanded','true');
+ await user.click(within(card).getByRole('button',{name:'Show less'}));expect(reveal).toHaveAttribute('aria-expanded','false');
+ expect(screen.getByLabelText('Select Reading a motion graph')).toBeChecked();
+});
+test('missing metadata stays explicit without invented counts or Bloom categories',()=>{
+ render(<WorkspaceView initial={workspace}/>);
+ const partial=screen.getByRole('article',{name:'Comparing circuit measurements'});
+ expect(within(partial).getByText('3–6 subquestions')).toBeVisible();expect(within(partial).queryByRole('button',{name:'Reveal more'})).not.toBeInTheDocument();
+ const missing=screen.getByRole('article',{name:'Explaining a change of state'});
+ expect(within(missing).getByText('Subquestion range not yet available')).toBeVisible();expect(within(missing).queryByText('Remember')).not.toBeInTheDocument();
+});

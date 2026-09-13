@@ -15,7 +15,7 @@ beforeAll(async()=>{
  create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz,raw_user_meta_data jsonb default '{}');
  create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
  grant usage on schema auth,public to authenticated,anon;grant execute on function auth.uid() to authenticated,anon;`);
- for(const f of ['supabase/migrations/202609120001_teacher_accounts.sql','supabase/migrations/202609120002_teacher_workspace.sql','supabase/migrations/202609120003_catalogue_discovery.sql','supabase/migrations/202609120004_catalogue_mark_ranges.sql','tests/fixtures/workspace.sql']) await db.exec(readFileSync(f,'utf8'));
+ for(const f of ['supabase/migrations/202609120001_teacher_accounts.sql','supabase/migrations/202609120002_teacher_workspace.sql','supabase/migrations/202609120003_catalogue_discovery.sql','supabase/migrations/202609120004_catalogue_mark_ranges.sql','supabase/migrations/202609130005_catalogue_preview.sql','tests/fixtures/workspace.sql']) await db.exec(readFileSync(f,'utf8'));
  for(const id of [teacher,other,colleague]) await db.query("insert into auth.users(id,email,email_confirmed_at) values($1,$2,now())",[id,`${id}@synthetic.example`]);
  for(const [id,name] of [[school,'First'],[second,'Second']]){
   await db.query('insert into public.schools(id,slug,name) values($1,$2,$3)',[id,name.toLowerCase(),name]);
@@ -71,3 +71,22 @@ test.each([[12,8],[8,101],[0,8]])('rejects invalid catalogue bounds %j',async(mi
  await expect(db.query('update public.catalogue_summaries set marks_min=$1,marks_max=$2 where module_id=$3',[min,max,module])).rejects.toThrow(/check constraint/);
 });
 test('database search preserves both mark bounds',async()=>{await asUser(teacher);const rows=(await db.query<{marks_min:number;marks_max:number}>("select * from public.search_teacher_catalogue('grade 10 motion')")).rows;expect(rows).toHaveLength(1);expect(rows[0]).toMatchObject({marks_min:8,marks_max:12});});
+
+test('reviewed preview is available through the existing protected search',async()=>{
+ await asUser(teacher);const row=(await db.query<{preview:unknown}>("select * from public.search_teacher_catalogue('motion')")).rows[0];
+ expect(row.preview).toMatchObject({subquestions:{min:3,max:5},outline:[{bloom:'Remember'},{bloom:'Understand'},{bloom:'Apply'},{bloom:'Evaluate'}]});
+});
+test.each([
+ {subquestions:{min:1,max:2},parameter_questions:['PRIVATE_FORM']},
+ {subquestions:{min:1,max:2},outline:[{summary:'Example',bloom:'Remember',prompt:'PRIVATE_PROMPT'}]},
+ {subquestions:{min:1,max:2},outline:[{summary:'Example',bloom:'L1'}]},
+ {subquestions:{min:1,max:2},outline:[{summary:'Example',bloom:'Apply/Analyze'}]},
+ {subquestions:{min:1,max:2},outline:[{summary:null,bloom:'Apply'}]},
+ {subquestions:{min:1,max:2},outline:[{summary:'Example',bloom:'Apply',marks:{min:null,max:3}}]},
+ {subquestions:{min:1,max:2},outline:[]},
+ {subquestions:{min:3,max:2}}, {subquestions:{min:1.5,max:3}}, {subquestions:{min:1,max:31}},
+ {subquestions:null}, {subquestions:{min:1,max:2},outline:null}
+])('database rejects unsafe or malformed preview %j',async preview=>{
+ await expect(db.query('update public.catalogue_summaries set preview=$1 where module_id=$2',[JSON.stringify(preview),module])).rejects.toThrow(/check constraint/);
+});
+test('a teacher cannot rewrite catalogue outlines',async()=>{await asUser(teacher);await expect(db.query("update public.catalogue_summaries set preview=null")).rejects.toThrow(/permission denied/);});

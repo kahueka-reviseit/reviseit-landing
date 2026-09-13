@@ -30,3 +30,11 @@ test('thumbnail returns only a PNG with private caching rules',async()=>{
 });
 test('SVG or invalid image bytes cannot be served as a diagram',async()=>{mocks.one.mockResolvedValue({data:{thumbnail_png:Buffer.from('<svg onload="alert(1)"/>').toString('base64')}});const r=await thumbnail(req('thumbnail?curriculum=grade-10&release=1&entry=Q1'));expect(r.status).toBe(503);expect(await r.text()).not.toContain('svg');});
 test('internal failures do not disclose private details',async()=>{mocks.rpc.mockRejectedValue(new Error('PRIVATE_CONFIGURATION'));const r=await search(req());expect(r.status).toBe(503);expect(await r.text()).not.toContain('PRIVATE_');});
+
+test('search rejects nested private fields and accepts an explicitly safe preview',async()=>{
+ const row={module_id:'grade-11',module_name:'Grade 11',release:'1',is_demo:false,entry_id:'Q1',title:'Example',topic:'Topic',description:'Description',marks_min:9,marks_max:18,thumbnail_alt:null};
+ const preview={subquestions:{min:1,max:2},outline:[{summary:'Compare observations',bloom:'Analyse'}]};
+ mocks.rpc.mockResolvedValue({data:[{...row,preview}]});expect((await (await search(req())).json()).matches[0].entry.preview).toEqual(preview);
+ mocks.rpc.mockResolvedValue({data:[{...row,preview:{...preview,outline:[{...preview.outline[0],parameter_questions:['PRIVATE_FORM']}]}}]});
+ const result=await (await search(req())).json();expect(result.matches[0].entry).not.toHaveProperty('preview');expect(JSON.stringify(result)).not.toContain('PRIVATE_');
+});

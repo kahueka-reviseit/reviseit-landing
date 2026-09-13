@@ -80,3 +80,30 @@
 .marks { margin:8px 0 12px; font-size:16px; }
 .total { flex-wrap:wrap; }
 .rangeNote { font-size:14px; color:#4A4A4A; margin-top:14px; }
+
+/* Approved outline card: the disclosure and selection controls are independent. */
+.entry { display:block; cursor:default; border-top:3px solid #5B8A72; padding:22px; min-width:0; }
+.cardHeading { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
+.cardHeading h3 { font:normal 23px/1.25 Georgia,serif; margin:8px 0 14px; }
+.cardHeading input { cursor:pointer; }
+.cardMetrics { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-bottom:14px; }
+.cardMetrics .marks { margin:0; display:inline-block; padding:5px 9px; background:#E9F0EA; color:#345442; }
+.subquestionCount { font-size:13px; color:#62625B; }
+.entry .description { font-size:15px; margin:0 0 16px; }
+.entry .diagram { max-height:185px; background:#F8F7F3; border:1px solid #E6E4DB; }
+.reveal { display:flex; width:100%; align-items:center; justify-content:space-between; border:0; border-top:1px solid #DEDCD3; padding:14px 0 0; margin-top:18px; background:transparent; color:#436B56; text-align:left; }
+.reveal span { font-size:21px; }
+.outline { margin-top:18px; }
+.outline[hidden] { display:none; }
+.outlineHeading { font-size:11px; color:#62625B; text-transform:uppercase; letter-spacing:1px; }
+.outline ol { padding:0; margin:0; list-style:none; }
+.outlineRow { display:grid; grid-template-columns:26px minmax(0,1fr) auto; gap:10px; padding:14px 0; border-bottom:1px solid #EEECE5; }
+.outlineRow p { font-size:14px; margin:0; }
+.partNumber,.partMarks { font-size:12px; }
+.partNumber { font-weight:600; }
+.redaction { display:block; margin:8px 0; }
+.redaction i { display:block; height:5px; background:#D7D4CC; margin:4px 0; }
+.redaction i+i { width:68%; }
+.bloom { display:inline-block; font:11px/1.2 'Trebuchet MS',sans-serif; padding:4px 7px; }
+.remember { background:#436B56; color:white; }.understand { background:#1A1A2E; color:white; }.apply { background:#D4A574; color:#292323; }.analyse { background:#3B5F8A; color:white; }.evaluate { background:#B85042; color:white; }.create { background:#735B79; color:white; }
+.previewNote { margin:14px 0 0; font-size:12px; line-height:1.45; color:#62625B; }

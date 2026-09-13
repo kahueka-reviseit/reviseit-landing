@@ -40,3 +40,26 @@ Run `npm run test:workspace:e2e` for desktop/mobile diagram loading, search, cur
 ## Mark ranges
 
 Migration `202609120004_catalogue_mark_ranges.sql` replaces the fixed mark column with non-null `marks_min` and `marks_max`, preserving previous fixed allocations as equal bounds. Catalogue and search responses use `marks: {min, max}`, matching the private draft catalogue contract. Cards, search results and selected-item rows display the range; the paper summary sums both bounds and labels a ranged result as possible marks. A fixed value is shown once, not as `2–2`. Search and filtering never alter this total. Final supported mark allocations must be resolved before payment; a source range does not assert that every integer within it is feasible.
+
+## Question outlines and Bloom’s categories
+
+Migration `202609130005_catalogue_preview.sql` adds optional, strictly validated `preview` metadata. Apply it after the four existing migrations. It has been tested in disposable databases and is not applied to hosted development.
+
+```json
+{
+  "subquestions": {"min": 3, "max": 5},
+  "outline": [
+    {"summary": "Recall a concept", "bloom": "Remember", "marks": {"min": 2, "max": 2}},
+    {"summary": "Interpret a graph", "bloom": "Understand"},
+    {"summary": "Apply a relationship", "bloom": "Apply"}
+  ]
+}
+```
+
+This example is synthetic. `subquestions` is an authored integer range from 1 to 30. An optional `outline` is one possible structure whose row count lies within that range. Each row has a non-empty plain-text summary of at most 160 characters, one of `Remember`, `Understand`, `Apply`, `Analyse`, `Evaluate`, `Create`, and optional integer mark bounds from 1 to 100. No unknown keys are permitted at any nesting level. The database rejects invalid metadata; response projection omits invalid legacy/mocked values instead of serializing arbitrary nested objects. This validation protects the shape, not the meaning of arbitrary prose: the existing human publication review still decides whether a summary is safe and accurate.
+
+The diagram and both ranges stay visible. Reveal more expands the numbered outline; Show less closes it. Disclosure does not select an item, place an order or request parameter forms. Redaction bars are decorative empty elements. Missing data is shown as unavailable, never manufactured. A known count can be shown without an outline. Search results use the same card and safe metadata contract. The source-specific cognitive bands remain separate from Bloom’s classification; the application never converts `L1` through `L4` into Bloom’s names.
+
+Real preview metadata must arrive through reviewed publication, with its release fixed alongside the catalogue. This change provides the consumer contract and user interface, not the publisher, human approval, completed private forms or a hosted import. The demonstration remains synthetic. Private source-derived proposals must not be copied into this public repository or used as test fixtures.
+
+Coverage includes nested-field exclusion, invalid count/category rejection, direct write denial, protected search projection, keyboard disclosure independent of selection, missing metadata and mobile layout. The disposable real Supabase journey also exercises database-backed outline delivery.
