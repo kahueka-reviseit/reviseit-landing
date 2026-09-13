@@ -1,6 +1,8 @@
 import { test, expect, type Page } from '@playwright/test';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { Client } from 'pg';
+import {publication,recordReceipt} from '../fixtures/publication';
+import {randomUUID} from 'node:crypto';
 import { readFileSync } from 'node:fs';
 const url = process.env.SUPABASE_URL || '';
 const key = process.env.AUTH_TEST_SERVICE_KEY || '';
@@ -104,6 +106,24 @@ test('real signup, email confirmation, team approval, suspension and password re
     const catalogueResponse=await page.request.get('/api/teacher/workspace');
     expect(catalogueResponse.status()).toBe(200);
     expect(await catalogueResponse.text()).not.toMatch(/parameter_questions|specification|generation_prompt/);
+    // One build remains running: an approved import changes the catalogue on the next read.
+    const release=publication('published-2','demo-grade-10-sciences');
+    release.module.name='Grade 10 Physical Sciences · demonstration';
+    const receiptId=randomUUID();await recordReceipt(db,receiptId,release,'demo-1');
+    await db.query('set role reviseit_catalogue_publisher');
+    await db.query('select public.import_catalogue_release($1,$2::jsonb)',[receiptId,JSON.stringify(release)]);
+    await db.query('reset role');
+    await page.getByRole('combobox',{name:'Curriculum',exact:true}).selectOption('demo-grade-10-sciences');
+    await expect(page.getByRole('article',{name:'Published example published-2'})).toBeVisible();
+    await expect(page.getByText(/catalogue has changed since you saved/)).toBeVisible();
+    await expect(page.getByLabel('Select Published example published-2')).not.toBeChecked();
+    const publishedResponse=await page.request.get('/api/teacher/workspace');
+    const publishedBody=await publishedResponse.text();expect(publishedBody).toContain('published-2');
+    expect(publishedBody).not.toMatch(/forms_digest|gate_record_id|reviewer_id|contentDigest|parameter_questions/);
+    expect((await page.request.get(diagramUrl)).status()).toBe(404);
+    await page.getByRole('searchbox').fill('Published example');
+    await expect(page.getByText('1 matching question.')).toBeVisible();
+    await page.getByRole('button',{name:'Clear search'}).click();
     await page.screenshot({path:'test-results/teacher-workspace-desktop.png',fullPage:true});
     await page.setViewportSize({width:390,height:844});
     await expect(page.getByRole('heading',{name:'Selection summary'})).toBeVisible();

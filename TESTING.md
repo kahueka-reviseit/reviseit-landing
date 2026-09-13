@@ -1,6 +1,6 @@
 # Running the tests
 
-This is the test foundation for the existing landing site. It does not yet test the planned payment gate, private questionnaires, school accounts or content generation, because those features are not implemented here.
+The suite covers the landing site, school account verification, protected teacher workspace and catalogue publication adapter. Payment, private questionnaires and content generation remain unimplemented.
 
 ## First setup
 
@@ -58,3 +58,10 @@ Account registration screens, server validation and unauthenticated page protect
 ## Dependency maintenance
 
 The account change updates Next.js to 15.5.25 and marked to 18.0.12, and applies compatible PostCSS and selector-parser fixes. The dependency audit on 12 September 2026 reports zero known vulnerabilities after these changes. The PostCSS override keeps the patched compatible version in Next.js 15; review it when upgrading Next.js again.
+
+
+## Catalogue publication tests
+
+`tests/database/publication.test.ts` exercises the full migration stack, restricted delivery permissions, exact approval receipts, immutable releases, stale predecessor rejection and rollback after a partial insertion failure. All payloads are synthetic.
+
+The separate integration command also runs `tests/auth/publication.spec.ts`: two independent publisher connections prove transaction isolation and ordering, and the operational importer is checked for rollback by default. The account journey imports a new synthetic release while the same application process stays running, checks the updated catalogue, and confirms old selections require review. See [PUBLICATION.md](PUBLICATION.md) for the publication boundary and remaining gate integration.
