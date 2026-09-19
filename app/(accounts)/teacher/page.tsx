@@ -8,5 +8,5 @@ export default async function Teacher() {
   let initial;
   try { initial=await readWorkspace(supabase,account.school_id!); }
   catch { return <section className={styles.card}><h1>Your workspace is temporarily unavailable</h1><p>We could not load your curricula. Your saved work is safe. Please try again shortly.</p><a href="/teacher">Try again</a></section>; }
-  return <WorkspaceView initial={initial}/>;
+  return <><p style={{maxWidth:1200,margin:"20px auto"}}><a href="/teacher/orders">Your paper requests</a></p><WorkspaceView initial={initial}/></>;
 }

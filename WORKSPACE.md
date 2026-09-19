@@ -76,3 +76,7 @@ The local four-document worker lives in the business repository at `our product/
 Font, body size, spacing and heading apply across all four documents. Answer lines apply to written response leaves in the paper and teacher description, with existing authored drawing areas retained; they do not add blank writing space to the memos. Supported explicit legacy school layouts take precedence. Named or uploaded templates require a separately registered renderer and are not silently approximated.
 
 This slice is local and unmerged. The migration has not been applied to hosted development. No hosted worker, generation endpoint or purchase flow is introduced. The business repository's `our product/school-formatting/index.md` records the database-to-Word trial and remaining Linux/font checks.
+
+## Teacher order integration
+
+The internal-order submission, worker checkpoints, reviewer release and protected four-document downloads are documented in [JOBS.md](JOBS.md). This adds a local internal-order proof; checkout and hosted rollout remain separate.
