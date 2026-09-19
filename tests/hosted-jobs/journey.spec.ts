@@ -14,6 +14,12 @@ async function operator(action: 'inspect' | 'restart-at-memo' | 'report', order:
   const result = await execute('python3', [driver, action, order], {timeout:300000,maxBuffer:2_000_000});
   return JSON.parse(result.stdout);
 }
+async function orderState(order: string) {
+  // Inspection fails closed while a call or checkpoint is being written.
+  // Poll again; never interpret incomplete evidence as a completed state.
+  try { return (await operator('inspect', order)).orderState; }
+  catch { return 'inspection_pending'; }
+}
 async function protectedContext(context: BrowserContext) {
   // Never send the preview bypass credential to a redirect or another origin.
   await context.route('**/*', async route => {
@@ -69,7 +75,7 @@ test('hosted order survives server reboot and releases only to its school', asyn
     expect(await duplicate.json()).toEqual({id:fixture.order});
     expect((await get(page,path+'/documents/paper')).status()).toBe(404);
     await page.close();
-    await expect.poll(async()=> (await operator('inspect',fixture.order)).orderState,{timeout:180000,intervals:[2000,5000]}).toBe('awaiting_memo_review');
+    await expect.poll(async()=> await orderState(fixture.order),{timeout:180000,intervals:[2000,5000]}).toBe('awaiting_memo_review');
     const before = await operator('inspect',fixture.order);
     expect(before.bootId).toMatch(/^[0-9a-f-]{36}$/);
     expect(before.workerIdentity).toEqual(expect.any(String));
@@ -95,7 +101,7 @@ test('hosted order survives server reboot and releases only to its school', asyn
     await review.getByRole('checkbox').check();
     await review.getByRole('button',{name:'Approve memorandum',exact:true}).click();
     await expect(review).toHaveURL(/\/admin\/papers$/);
-    await expect.poll(async()=> (await operator('inspect',fixture.order)).orderState,{timeout:180000,intervals:[2000,5000]}).toBe('awaiting_release');
+    await expect.poll(async()=> await orderState(fixture.order),{timeout:180000,intervals:[2000,5000]}).toBe('awaiting_release');
     expect((await get(page,path+'/documents/paper')).status()).toBe(404);
     await review.goto(`/admin/papers/${fixture.order}`);
     await expect(review.getByRole('heading',{name:'Inspect all four documents'})).toBeVisible();
