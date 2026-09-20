@@ -13,7 +13,7 @@ test-results
 workspace-test-results
 playwright-report
 blob-report
-supabase
+/supabase
 hosted-jobs.config.ts
 jobs.config.ts
 playwright*.ts
