@@ -1,6 +1,8 @@
 import importlib.util
 from pathlib import Path
 import unittest
+import subprocess
+import sys
 from unittest.mock import patch
 
 
@@ -12,10 +14,16 @@ def load(name):
 
 
 probe = load('remote_probe')
-operator = load('operator')
+operator = load('hosted_operator')
 
 
 class OperatorChecks(unittest.TestCase):
+    def test_driver_starts_as_actual_script(self):
+        result = subprocess.run([sys.executable, str(Path(__file__).parent/'hosted_operator.py'), '--help'],
+                                capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('restart-at-memo', result.stdout)
+
     def test_live_and_incomplete_evidence_cannot_claim_zero_spending(self):
         with self.assertRaises(ValueError):
             probe.replay_evidence({'mode':'live','calls':[]})

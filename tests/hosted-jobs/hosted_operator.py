@@ -1,4 +1,5 @@
 """Operator-only acceptance controller for the isolated hosted synthetic order."""
+import argparse
 import json
 import os
 from pathlib import Path
@@ -40,7 +41,9 @@ def inspect(order):
              "(select count(*) from private.paper_job_events e where e.order_id=o.id "
              "and e.event='submitted') as submission_count from private.paper_orders o "
              "where o.id='" + order + "'::uuid and o.entitlement='internal_test'")
-    raw = subprocess.check_output(['npx','--yes','supabase@2.117.0','db','query','--linked',query,
+    cli = os.environ.get('HOSTED_SUPABASE_CLI')
+    command = [cli] if cli else ['npx','--yes','supabase@2.117.0']
+    raw = subprocess.check_output(command + ['db','query','--linked',query,
                                   '--output-format','json'], cwd=HERE.parents[1], stderr=subprocess.PIPE, timeout=60)
     rows = json.loads(raw)['rows']
     if len(rows) != 1 or host['serverId'] != 166573661:
@@ -81,8 +84,10 @@ def restart_at_memo(order):
 
 
 if __name__ == '__main__':
-    action, order = sys.argv[1:]
-    if action not in ('inspect','report','restart-at-memo'):
-        raise SystemExit('Unknown operator action')
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('action', choices=('inspect','report','restart-at-memo'))
+    parser.add_argument('order')
+    args = parser.parse_args()
+    action, order = args.action, args.order
     result = restart_at_memo(order) if action == 'restart-at-memo' else inspect(order)
     print(json.dumps(result))
