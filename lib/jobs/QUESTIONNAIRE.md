@@ -1,6 +1,6 @@
 # Grouped questionnaire integration
 
-This is the teacher-visible version 2 form contract and reusable input component. It is connected locally to the order screen, submission endpoint and database validation through migration 009. It has not been deployed or connected to a multi-question generation worker.
+This is the teacher-visible version 2 form contract and reusable input component. It is connected locally to the order screen, submission endpoint and database validation through migration 009. Migration 010 adds the private generation plan consumed by the local multi-question worker integration. Neither change has been deployed.
 
 A form has a frozen revision, one section per selected order line, and shared paper settings. Field identifiers are scoped to their order line, so selecting the same specification twice cannot mix its answers. Marks are frozen display values. Choice labels are separate from stable identifiers. Each authored field explicitly permits or refuses automatic choice, free text and omission. The component makes no default selections on behalf of the teacher.
 
@@ -17,3 +17,6 @@ Before activation:
 5. Exercise the real hosted selection, purchase entitlement, answer, generation and four-document review journey.
 
 Current tests exercise repeated field names, closed data boundaries, exact revision and section binding, optional/automatic/written choices, encoded size bounds, independent input controls, frozen mark display and disabled inputs. Database and order-screen tests additionally cover submission retries, exact purchased-form matching, cross-school isolation and labelled receipts. They do not prove payment gating, authored content quality, publication approval or generation support.
+
+
+Migration 010 binds the private generation plan to the form revision, ordered line identifiers, marks, module and release. Once assigned, the plan cannot be changed or cleared; it must be assigned before submission. Worker claims include it, while teacher order listings exclude it. Legacy orders without a plan retain their existing claim shape. Four database tests cover worker-only disclosure, immutability, late assignment and inconsistent marks. These are local database tests, not evidence of a completed purchase or deployment.

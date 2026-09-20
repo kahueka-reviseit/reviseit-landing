@@ -19,7 +19,7 @@ beforeAll(async()=>{
  create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz,raw_user_meta_data jsonb default '{}');
  create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
  grant usage on schema auth,public to authenticated,anon,service_role;grant execute on function auth.uid() to authenticated,anon;`);
- for(const f of ['202609120001_teacher_accounts','202609120002_teacher_workspace','202609190008_teacher_jobs','202609200009_grouped_questionnaires']) await db.exec(readFileSync('supabase/migrations/'+f+'.sql','utf8'));
+ for(const f of ['202609120001_teacher_accounts','202609120002_teacher_workspace','202609190008_teacher_jobs','202609200009_grouped_questionnaires','202609200010_order_generation_plan']) await db.exec(readFileSync('supabase/migrations/'+f+'.sql','utf8'));
  await db.exec("insert into public.curriculum_modules(id,name,current_release,is_demo) values('test-module','Test module','test-1',true)");
  for(const id of [teacher,other,reviewer]) await db.query("insert into auth.users(id,email,email_confirmed_at) values($1,$2,now())",[id,`${id}@synthetic.example`]);
  for(const [id,name] of [[school,'First'],[second,'Second']]){
@@ -115,3 +115,11 @@ test.each([
  ['duplicate choice',(f:any):unknown=>f.items[0].fields[0].choices.push(f.items[0].fields[0].choices[0])],
 ] as const)('database refuses malformed grouped form %s',async(_label,edit)=>{const f=structuredClone(groupedForm);edit(f);await expect(db.query('update private.paper_orders set form=$1 where id=$2',[JSON.stringify(f),order])).rejects.toThrow(/valid_form/);});
 test('grouped own words are accepted only for their authored field',async()=>{await setGrouped();const a:any=structuredClone(groupedAnswers);a.items.second.setting={kind:'text',text:'A teacher preference'};a.paper.notes={kind:'text',text:'Shared paper preference'};await asUser(teacher);await submit(key,a);expect((await listing())[0].answers).toEqual(a);});
+
+function generationPlan(){return {schemaVersion:1,module:'test-module',release:'test-1',formRevision:groupedForm.revision,
+ lines:groupedForm.items.map(i=>({id:i.id,specification:'SYNTHETIC',profileKey:'registered',profileSha256:'a'.repeat(64),marks:i.marks})),
+ paper:{paper_label:'Synthetic',subject:'Physical Sciences',grade:'Grade 11',date:'Synthetic date',exam_period:'Synthetic period',instructions:['Synthetic instruction']}};}
+test('only the worker receives the private generation plan',async()=>{await setGrouped();const plan=generationPlan();await db.query('update private.paper_orders set generation_plan=$1 where id=$2',[JSON.stringify(plan),order]);await asUser(teacher);expect((await listing())[0]).not.toHaveProperty('generationPlan');await submit(key,groupedAnswers);expect((await claim()).generationPlan).toEqual(plan);});
+test('an attached generation plan cannot be changed',async()=>{await setGrouped();await db.query('update private.paper_orders set generation_plan=$1 where id=$2',[JSON.stringify(generationPlan()),order]);await expect(db.query('update private.paper_orders set generation_plan=null where id=$1',[order])).rejects.toThrow(/immutable/);});
+test('generation plans cannot be attached after teacher submission',async()=>{await setGrouped();await asUser(teacher);await submit(key,groupedAnswers);await db.exec('reset role');await expect(db.query('update private.paper_orders set generation_plan=$1 where id=$2',[JSON.stringify(generationPlan()),order])).rejects.toThrow(/precede submission/);});
+test('generation plan must match the exact order line marks',async()=>{await setGrouped();const plan=generationPlan();plan.lines[0].marks+=1;await expect(db.query('update private.paper_orders set generation_plan=$1 where id=$2',[JSON.stringify(plan),order])).rejects.toThrow(/valid_generation_plan/);});
