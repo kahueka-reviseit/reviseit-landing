@@ -15,6 +15,7 @@ playwright-report
 blob-report
 /supabase
 hosted-jobs.config.ts
+hosted-questionnaire.config.ts
 jobs.config.ts
 playwright*.ts
 vitest.config.*
