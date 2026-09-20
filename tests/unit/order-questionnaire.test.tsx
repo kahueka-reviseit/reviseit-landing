@@ -18,3 +18,14 @@ it('shows the labelled receipt after reload without requiring the private form',
  render(<OrderView initial={{...order,state:'held',form:null,answers:{schemaVersion:2,revision:form.revision,items:{line:{setting:{kind:'choice',choiceId:'a'}}},paper:{}},answerSummary:[{title:'Selected question',fields:[{label:'Choose the setting',value:'Setting A'}]}]}}/>);
  expect(screen.getByText('Setting A')).toBeInTheDocument();expect(screen.queryByRole('combobox')).toBeNull();
 });
+
+it('focuses the rejected field, describes the error and preserves the selected answer',async()=>{
+ const user=userEvent.setup();vi.spyOn(globalThis,'fetch').mockResolvedValue(new Response(JSON.stringify({error:'Choose a compatible setting.',fieldError:{itemId:'line',fieldId:'setting'}}),{status:422}));
+ render(<OrderView initial={order}/>);const field=screen.getByRole('combobox');await user.selectOptions(field,'choice:a');await user.click(screen.getByRole('button',{name:'Submit answers'}));
+ await waitFor(()=>expect(field).toHaveFocus());expect(field).toHaveValue('choice:a');expect(field).toHaveAttribute('aria-invalid','true');expect(field).toHaveAccessibleDescription('Choose a compatible setting.');
+ await user.selectOptions(field,'choice:a');expect(field).toHaveAttribute('aria-invalid','false');expect(screen.queryByRole('alert')).toBeNull();
+});
+it('does not target a field outside the issued questionnaire',async()=>{
+ const user=userEvent.setup();vi.spyOn(globalThis,'fetch').mockResolvedValue(new Response(JSON.stringify({error:'Check your answers.',fieldError:{itemId:'other',fieldId:'setting'}}),{status:422}));
+ render(<OrderView initial={order}/>);const field=screen.getByRole('combobox');await user.selectOptions(field,'choice:a');await user.click(screen.getByRole('button',{name:'Submit answers'}));await screen.findByRole('alert');expect(field).toHaveAttribute('aria-invalid','false');expect(field).toHaveValue('choice:a');
+});
