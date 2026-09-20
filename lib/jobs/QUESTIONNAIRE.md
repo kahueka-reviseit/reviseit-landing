@@ -1,6 +1,6 @@
 # Grouped questionnaire integration
 
-This is the teacher-visible version 2 form contract and reusable input component. It is not yet connected to order submission or hosted generation.
+This is the teacher-visible version 2 form contract and reusable input component. It is connected locally to the order screen, submission endpoint and database validation through migration 009. It has not been deployed or connected to a multi-question generation worker.
 
 A form has a frozen revision, one section per selected order line, and shared paper settings. Field identifiers are scoped to their order line, so selecting the same specification twice cannot mix its answers. Marks are frozen display values. Choice labels are separate from stable identifiers. Each authored field explicitly permits or refuses automatic choice, free text and omission. The component makes no default selections on behalf of the teacher.
 
@@ -10,10 +10,10 @@ The validator enforces exact fields, choice membership, explicit answer variants
 
 Before activation:
 
-1. Add database validation and tests for version 2 while preserving existing version 1 orders.
+1. Deploy the database migration together with the application only when the worker capability is ready. Existing version 1 orders remain supported.
 2. Bind a purchased order to its frozen reviewed form and private generation snapshot. Do not expose the form from the pre-purchase catalogue.
-3. Connect the order screen, answer endpoint and byte limit together; preserve submission idempotency and submitted-answer readability.
+3. Verify the purchased order endpoint through the hosted screen. The local endpoint has a bounded body, database validation and readable submitted-answer receipts.
 4. Enable dispatch only for a worker capable of processing every selected item and assembling the complete reviewed paper.
 5. Exercise the real hosted selection, purchase entitlement, answer, generation and four-document review journey.
 
-Current tests exercise repeated field names, closed data boundaries, exact revision and section binding, optional/automatic/written choices, encoded size bounds, independent input controls, frozen mark display and disabled inputs. They do not prove payment gating, authored content quality, publication approval or generation support.
+Current tests exercise repeated field names, closed data boundaries, exact revision and section binding, optional/automatic/written choices, encoded size bounds, independent input controls, frozen mark display and disabled inputs. Database and order-screen tests additionally cover submission retries, exact purchased-form matching, cross-school isolation and labelled receipts. They do not prove payment gating, authored content quality, publication approval or generation support.

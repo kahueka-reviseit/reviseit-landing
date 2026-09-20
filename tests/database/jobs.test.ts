@@ -19,7 +19,7 @@ beforeAll(async()=>{
  create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz,raw_user_meta_data jsonb default '{}');
  create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
  grant usage on schema auth,public to authenticated,anon,service_role;grant execute on function auth.uid() to authenticated,anon;`);
- for(const f of ['202609120001_teacher_accounts','202609120002_teacher_workspace','202609190008_teacher_jobs']) await db.exec(readFileSync('supabase/migrations/'+f+'.sql','utf8'));
+ for(const f of ['202609120001_teacher_accounts','202609120002_teacher_workspace','202609190008_teacher_jobs','202609200009_grouped_questionnaires']) await db.exec(readFileSync('supabase/migrations/'+f+'.sql','utf8'));
  await db.exec("insert into public.curriculum_modules(id,name,current_release,is_demo) values('test-module','Test module','test-1',true)");
  for(const id of [teacher,other,reviewer]) await db.query("insert into auth.users(id,email,email_confirmed_at) values($1,$2,now())",[id,`${id}@synthetic.example`]);
  for(const [id,name] of [[school,'First'],[second,'Second']]){
@@ -79,3 +79,39 @@ test('chunked upload and lost finish acknowledgement are safely repeatable',asyn
 });
 test('incomplete upload cannot create a partial review pack',async()=>{const b=await rendering();await db.query('select public.upload_paper_chunk($1,$2,$3,1,$4)',[order,b.lease,'paper',Buffer.from('PK\x03\x04data').toString('base64')]);await expect(db.query('select public.finish_paper_upload($1,$2,$3)',[order,b.lease,JSON.stringify(Object.fromEntries(['paper','memo','learner-memo','teacher-description'].map(n=>[n,'0'.repeat(64)])))])).rejects.toThrow(/Incomplete document/);});
 test('the same uploaded part cannot silently change bytes',async()=>{const b=await rendering();await db.query("select public.upload_paper_chunk($1,$2,'paper',0,$3)",[order,b.lease,Buffer.from('first').toString('base64')]);await expect(db.query("select public.upload_paper_chunk($1,$2,'paper',0,$3)",[order,b.lease,Buffer.from('changed').toString('base64')])).rejects.toThrow(/Chunk changed/);});
+
+const groupedForm={schemaVersion:2,revision:'a'.repeat(64),items:[
+ {id:'first',title:'First question',marks:8,fields:[{id:'setting',label:'Setting',hint:'',required:true,allowAutomatic:false,type:'choice',allowOther:false,choices:[{id:'a',label:'First'}]}]},
+ {id:'second',title:'Second question',marks:12,fields:[{id:'setting',label:'Setting',hint:'',required:false,allowAutomatic:true,type:'choice',allowOther:true,choices:[{id:'b',label:'Second'}]}]},
+],paperFields:[{id:'notes',label:'Notes',hint:'',required:false,allowAutomatic:false,type:'text',maxLength:100}]};
+const groupedAnswers={schemaVersion:2,revision:'a'.repeat(64),items:{first:{setting:{kind:'choice',choiceId:'a'}},second:{setting:{kind:'automatic'}}},paper:{notes:{kind:'omit'}}};
+async function setGrouped(){await db.query('update private.paper_orders set form=$1 where id=$2',[JSON.stringify(groupedForm),order]);}
+test('grouped answers bind the purchased order form and retry without duplicating dispatch',async()=>{await setGrouped();await asUser(teacher);expect((await listing())[0].form).toEqual(groupedForm);await submit(key,groupedAnswers);await submit(key,groupedAnswers);expect((await listing())[0]).toMatchObject({state:'queued',form:null,answers:groupedAnswers});expect((await listing())[0].answerSummary).toEqual([{title:'First question',fields:[{label:'Setting',value:'First'}]},{title:'Second question',fields:[{label:'Setting',value:'Choose for me'}]},{title:'Settings for the whole paper',fields:[{label:'Notes',value:'No preference'}]}]);await db.exec('reset role');expect((await db.query('select * from private.paper_job_events')).rows).toHaveLength(1);});
+test('a second school cannot retrieve or answer the grouped order',async()=>{await setGrouped();await asUser(other);expect(await listing()).toEqual([]);await expect(submit(key,groupedAnswers)).rejects.toThrow(/access required/);});
+test.each([
+ ['wrong revision',(a:any):unknown=>a.revision='b'.repeat(64)],
+ ['another question choice',(a:any):unknown=>a.items.first.setting.choiceId='b'],
+ ['unpermitted automatic',(a:any):unknown=>a.items.first.setting={kind:'automatic'}],
+ ['unpermitted omission',(a:any):unknown=>a.items.first.setting={kind:'omit'}],
+ ['unpermitted own words',(a:any):unknown=>a.items.first.setting={kind:'text',text:'new'}],
+ ['missing question',(a:any):unknown=>delete a.items.second],
+ ['extra question',(a:any):unknown=>a.items.third={}],
+ ['extra field',(a:any):unknown=>a.paper.secret={kind:'omit'}],
+ ['missing field',(a:any):unknown=>delete a.paper.notes],
+ ['variant smuggling',(a:any):unknown=>a.paper.notes={kind:'omit',text:'hidden'}],
+ ['oversize text',(a:any):unknown=>a.paper.notes={kind:'text',text:'x'.repeat(101)}],
+ ['null revision',(a:any):unknown=>a.revision=null],
+ ['null version',(a:any):unknown=>a.schemaVersion=null],
+] as const)('database rejects grouped answer %s before queuing',async(_label,edit)=>{await setGrouped();const a=structuredClone(groupedAnswers);edit(a);await asUser(teacher);await expect(submit(key,a)).rejects.toThrow(/Invalid answers/);});
+test.each([
+ ['private field',(f:any):unknown=>f.items[0].fields[0].source='private.md'],
+ ['null marks',(f:any):unknown=>f.items[0].marks=null],
+ ['null required',(f:any):unknown=>f.items[0].fields[0].required=null],
+ ['null allowOther',(f:any):unknown=>f.items[0].fields[0].allowOther=null],
+ ['null maxLength',(f:any):unknown=>f.paperFields[0].maxLength=null],
+ ['null version',(f:any):unknown=>f.schemaVersion=null],
+ ['duplicate item',(f:any):unknown=>f.items.push(f.items[0])],
+ ['duplicate field',(f:any):unknown=>f.items[0].fields.push(f.items[0].fields[0])],
+ ['duplicate choice',(f:any):unknown=>f.items[0].fields[0].choices.push(f.items[0].fields[0].choices[0])],
+] as const)('database refuses malformed grouped form %s',async(_label,edit)=>{const f=structuredClone(groupedForm);edit(f);await expect(db.query('update private.paper_orders set form=$1 where id=$2',[JSON.stringify(f),order])).rejects.toThrow(/valid_form/);});
+test('grouped own words are accepted only for their authored field',async()=>{await setGrouped();const a:any=structuredClone(groupedAnswers);a.items.second.setting={kind:'text',text:'A teacher preference'};a.paper.notes={kind:'text',text:'Shared paper preference'};await asUser(teacher);await submit(key,a);expect((await listing())[0].answers).toEqual(a);});
