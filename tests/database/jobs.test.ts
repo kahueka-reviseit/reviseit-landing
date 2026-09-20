@@ -19,7 +19,7 @@ beforeAll(async()=>{
  create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz,raw_user_meta_data jsonb default '{}');
  create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
  grant usage on schema auth,public to authenticated,anon,service_role;grant execute on function auth.uid() to authenticated,anon;`);
- for(const f of ['202609120001_teacher_accounts','202609120002_teacher_workspace','202609190008_teacher_jobs','202609200009_grouped_questionnaires','202609200010_order_generation_plan']) await db.exec(readFileSync('supabase/migrations/'+f+'.sql','utf8'));
+ for(const f of ['202609120001_teacher_accounts','202609120002_teacher_workspace','202609190008_teacher_jobs','202609200009_grouped_questionnaires','202609200010_order_generation_plan','202609200011_answer_compatibility']) await db.exec(readFileSync('supabase/migrations/'+f+'.sql','utf8'));
  await db.exec("insert into public.curriculum_modules(id,name,current_release,is_demo) values('test-module','Test module','test-1',true)");
  for(const id of [teacher,other,reviewer]) await db.query("insert into auth.users(id,email,email_confirmed_at) values($1,$2,now())",[id,`${id}@synthetic.example`]);
  for(const [id,name] of [[school,'First'],[second,'Second']]){
@@ -123,3 +123,36 @@ test('only the worker receives the private generation plan',async()=>{await setG
 test('an attached generation plan cannot be changed',async()=>{await setGrouped();await db.query('update private.paper_orders set generation_plan=$1 where id=$2',[JSON.stringify(generationPlan()),order]);await expect(db.query('update private.paper_orders set generation_plan=null where id=$1',[order])).rejects.toThrow(/immutable/);});
 test('generation plans cannot be attached after teacher submission',async()=>{await setGrouped();await asUser(teacher);await submit(key,groupedAnswers);await db.exec('reset role');await expect(db.query('update private.paper_orders set generation_plan=$1 where id=$2',[JSON.stringify(generationPlan()),order])).rejects.toThrow(/precede submission/);});
 test('generation plan must match the exact order line marks',async()=>{await setGrouped();const plan=generationPlan();plan.lines[0].marks+=1;await expect(db.query('update private.paper_orders set generation_plan=$1 where id=$2',[JSON.stringify(plan),order])).rejects.toThrow(/valid_generation_plan/);});
+
+function policyPlan(policy:unknown){const p=generationPlan();return {...p,schemaVersion:2,lines:p.lines.map(l=>({...l,answerPolicy:policy}))};}
+async function attachPolicy(policy:unknown){await setGrouped();await db.query('update private.paper_orders set generation_plan=$1 where id=$2',[JSON.stringify(policyPlan(policy)),order]);}
+test('unsupported scoped answer refuses queue admission and exposes only its field error',async()=>{
+ await setGrouped();const plan=policyPlan({compatibilityRules:[],instanceChoices:{}});
+ plan.lines[1].answerPolicy={compatibilityRules:[],instanceChoices:{setting:{kind:'choice',choiceId:'b'}}};
+ await db.query('update private.paper_orders set generation_plan=$1 where id=$2',[JSON.stringify(plan),order]);
+ const a=structuredClone(groupedAnswers);a.items.second.setting={kind:'automatic'};
+ await asUser(teacher);await db.exec('savepoint rejected_submission');await expect(submit(key,a)).rejects.toMatchObject({message:'Incompatible answers',detail:expect.stringContaining('"fieldId": "setting"')});
+ await db.exec('rollback to savepoint rejected_submission');const row=(await listing())[0];expect(row.state).toBe('awaiting_answers');expect(row.answers).toBeNull();expect(row).not.toHaveProperty('generationPlan');
+ expect(await claim()).toBeNull();
+});
+test('matching policies preserve submission idempotency and original answers',async()=>{
+ await attachPolicy({compatibilityRules:[],instanceChoices:{}});await asUser(teacher);
+ await submit(key,groupedAnswers);await submit(key,groupedAnswers);expect((await listing())[0].answers).toEqual(groupedAnswers);
+ expect((await claim()).generationPlan.schemaVersion).toBe(2);
+});
+test.each([
+ {compatibilityRules:[],instanceChoices:{unknown:{kind:'automatic'}}},
+ {compatibilityRules:[],instanceChoices:{setting:{kind:'choice',choiceId:'missing'}}},
+ {compatibilityRules:[{id:'r',operator:'requires',when:{field:'setting',choiceId:'a'},then:{field:'unknown',choiceId:'a'},teacherError:'Authored error'}],instanceChoices:{}},
+ {compatibilityRules:null,instanceChoices:{}},
+])('malformed policy cannot be attached %j',async policy=>{await expect(attachPolicy(policy)).rejects.toThrow(/valid_generation_plan/);});
+test('transitive rule conflict through automatic answers is detected without changing answers',async()=>{
+ const rule=(id:string,a:string,b:string)=>({id,operator:'requires',when:{field:a,choiceId:'yes'},then:{field:b,choiceId:'yes'},teacherError:'Authored '+id});
+ const policy={compatibilityRules:[rule('second','b','c'),rule('first','a','b')],instanceChoices:{}};
+ const answers={a:{kind:'choice',choiceId:'yes'},b:{kind:'automatic'},c:{kind:'choice',choiceId:'no'}};
+ const r=await db.query<{problem:any}>('select private.answer_policy_error($1,$2) as problem',[JSON.stringify(policy),JSON.stringify(answers)]);
+ expect(r.rows[0].problem).toEqual({field:'c',message:'Authored second'});expect(answers.b).toEqual({kind:'automatic'});
+});
+test.each([1,null])('version-two policy cannot be smuggled through version %s',async version=>{
+ await setGrouped();const p={...policyPlan({compatibilityRules:[],instanceChoices:{}}),schemaVersion:version};await expect(db.query('update private.paper_orders set generation_plan=$1 where id=$2',[JSON.stringify(p),order])).rejects.toThrow(/valid_generation_plan/);
+});
