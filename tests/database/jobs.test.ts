@@ -19,7 +19,7 @@ beforeAll(async()=>{
  create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz,raw_user_meta_data jsonb default '{}');
  create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
  grant usage on schema auth,public to authenticated,anon,service_role;grant execute on function auth.uid() to authenticated,anon;`);
- for(const f of ['202609120001_teacher_accounts','202609120002_teacher_workspace','202609190008_teacher_jobs','202609200009_grouped_questionnaires','202609200010_order_generation_plan','202609200011_answer_compatibility']) await db.exec(readFileSync('supabase/migrations/'+f+'.sql','utf8'));
+ for(const f of ['202609120001_teacher_accounts','202609120002_teacher_workspace','202609190008_teacher_jobs','202609200009_grouped_questionnaires','202609200010_order_generation_plan','202609200011_answer_compatibility','202609200012_semantic_shadow']) await db.exec(readFileSync('supabase/migrations/'+f+'.sql','utf8'));
  await db.exec("insert into public.curriculum_modules(id,name,current_release,is_demo) values('test-module','Test module','test-1',true)");
  for(const id of [teacher,other,reviewer]) await db.query("insert into auth.users(id,email,email_confirmed_at) values($1,$2,now())",[id,`${id}@synthetic.example`]);
  for(const [id,name] of [[school,'First'],[second,'Second']]){
@@ -155,4 +155,57 @@ test('transitive rule conflict through automatic answers is detected without cha
 });
 test.each([1,null])('version-two policy cannot be smuggled through version %s',async version=>{
  await setGrouped();const p={...policyPlan({compatibilityRules:[],instanceChoices:{}}),schemaVersion:version};await expect(db.query('update private.paper_orders set generation_plan=$1 where id=$2',[JSON.stringify(p),order])).rejects.toThrow(/valid_generation_plan/);
+});
+
+// Shadow observations are operator opt-in. These tests never call a model.
+const checksHash='c'.repeat(64);
+async function shadow(){await worker();return (await db.query<{r:any}>('select public.capture_semantic_observation($1,$2) r',[order,checksHash])).rows[0].r;}
+async function shadowReady(){await attachPolicy({compatibilityRules:[],instanceChoices:{}});await asUser(teacher);await submit(key,groupedAnswers);return shadow();}
+test('shadow capture is absent by default and refuses an unsubmitted order',async()=>{
+ await attachPolicy({compatibilityRules:[],instanceChoices:{}});expect((await db.query('select * from private.semantic_observations')).rows).toEqual([]);
+ await expect(shadow()).rejects.toThrow(/Submitted planned order required/);
+});
+test('shadow capture is idempotent, source bound and invisible to the teacher',async()=>{
+ const a=await shadowReady();expect(await shadow()).toEqual(a);
+ expect(a.input.answers).toEqual(groupedAnswers);expect(a.input.generationPlan).toBeDefined();expect(a.inputSha256).toMatch(/^[a-f0-9]{64}$/);
+ await asUser(teacher);const visible=(await listing())[0];expect(visible.state).toBe('queued');expect(JSON.stringify(visible)).not.toContain('checksSha256');
+ expect((await claim()).answers).toEqual(groupedAnswers);
+});
+test('recording a shadow warning cannot hold generation or modify answers',async()=>{
+ const a=await shadowReady();const evidence={rawResponse:{warning:true},provider:'synthetic'};
+ for(let i=0;i<2;i++)await db.query('select public.record_semantic_observation($1,$2,$3,$4)',[a.id,a.inputSha256,'response_received',JSON.stringify(evidence)]);
+ await asUser(teacher);expect((await listing())[0]).toMatchObject({state:'queued',answers:groupedAnswers,documents:[]});
+ expect((await claim()).answers).toEqual(groupedAnswers);
+ await db.exec('reset role');expect((await db.query('select * from private.semantic_observation_results')).rows).toHaveLength(1);
+});
+test('uncertain shadow results cannot be replaced with a successful retry',async()=>{
+ const a=await shadowReady();await db.query('select public.record_semantic_observation($1,$2,$3,$4)',[a.id,a.inputSha256,'uncertain','{"reason":"connection lost"}']);
+ await expect(db.query('select public.record_semantic_observation($1,$2,$3,$4)',[a.id,a.inputSha256,'response_received','{}'])).rejects.toThrow(/already recorded/);
+});
+test('a result for different inputs is refused',async()=>{
+ const a=await shadowReady();await expect(db.query('select public.record_semantic_observation($1,$2,$3,$4)',[a.id,'d'.repeat(64),'not_sent','{}'])).rejects.toThrow(/identity required/);
+});
+test.each(['anon','authenticated'])('%s cannot capture private shadow inputs',async role=>{
+ await shadowReady();await db.exec('reset role;set role '+role);
+ await expect(db.query('select public.capture_semantic_observation($1,$2)',[order,checksHash])).rejects.toThrow(/permission denied/);
+});
+test('a recorded observation cannot be edited even by the table owner',async()=>{
+ await shadowReady();await db.exec('reset role');await expect(db.query("update private.semantic_observations set input='{}'")).rejects.toThrow(/immutable/);
+});
+
+test('successful submission creates no semantic job without operator opt-in',async()=>{
+ await attachPolicy({compatibilityRules:[],instanceChoices:{}});await asUser(teacher);await submit(key,groupedAnswers);
+ await db.exec('reset role');expect((await db.query('select * from private.semantic_observations')).rows).toEqual([]);
+});
+test('teacher cannot fabricate a semantic result',async()=>{
+ const a=await shadowReady();await asUser(teacher);
+ await expect(db.query('select public.record_semantic_observation($1,$2,$3,$4)',[a.id,a.inputSha256,'response_received','{}'])).rejects.toThrow(/permission denied/);
+});
+test('capture refuses changed order inputs instead of returning stale evidence',async()=>{
+ await shadowReady();await db.exec('reset role');await db.query("update private.paper_orders set answers=jsonb_set(answers,'{paper,notes}','{\"kind\":\"text\",\"text\":\"Changed\"}') where id=$1",[order]);
+ await expect(shadow()).rejects.toThrow(/Shadow input changed/);
+});
+test('stored results cannot be deleted to permit another attempt',async()=>{
+ const a=await shadowReady();await db.query('select public.record_semantic_observation($1,$2,$3,$4)',[a.id,a.inputSha256,'not_sent','{}']);
+ await db.exec('reset role');await expect(db.query('delete from private.semantic_observation_results')).rejects.toThrow(/immutable/);
 });
