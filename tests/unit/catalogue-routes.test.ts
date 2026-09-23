@@ -18,7 +18,7 @@ test.each(['anonymous','pending','suspended'])('%s cannot search or fetch diagra
  expect(mocks.rpc).not.toHaveBeenCalled();expect(mocks.from).not.toHaveBeenCalled();
 });
 test('search projects safe fields and caps responses at fifty',async()=>{
- const row={module_id:'grade-10',module_name:'Grade 10',release:'1',is_demo:false,entry_id:'Q1',title:'Example',topic:'Topic',description:'Description',marks_min:9,marks_max:18,thumbnail_alt:'Circuit',thumbnail_png:'PRIVATE_BYTES',specification:'PRIVATE_SPEC'};
+ const row={module_id:'grade-10',module_name:'Grade 10',release:'1',is_demo:false,entry_id:'Q1',title:'Example',topic:'Topic',description:'Description',marks_min:9,marks_max:18,orderable:false,thumbnail_alt:'Circuit',thumbnail_png:'PRIVATE_BYTES',specification:'PRIVATE_SPEC'};
  mocks.rpc.mockResolvedValue({data:Array(51).fill(row)});const response=await search(req());const result=await response.json();expect(result.matches).toHaveLength(50);expect(result.hasMore).toBe(true);expect(result.matches[0].entry.marks).toEqual({min:9,max:18});expect(JSON.stringify(result)).not.toContain('PRIVATE_');expect(result.matches[0].entry.thumbnail.src).toMatch(/^\/api\/teacher\/catalogue\/thumbnail\?/);
 });
 test.each(['','x'.repeat(121)])('invalid search is rejected before database access',async q=>{expect((await search(req('search?q='+q))).status).toBe(400);expect(mocks.rpc).not.toHaveBeenCalled();});
@@ -34,7 +34,7 @@ test('internal failures do not disclose private details',async()=>{mocks.rpc.moc
 test('search rejects nested private fields and accepts an explicitly safe preview',async()=>{
  const row={module_id:'grade-11',module_name:'Grade 11',release:'1',is_demo:false,entry_id:'Q1',title:'Example',topic:'Topic',description:'Description',marks_min:9,marks_max:18,thumbnail_alt:null};
  const preview={subquestions:{min:1,max:2},outline:[{summary:'Compare observations',bloom:'Analyse'}]};
- mocks.rpc.mockResolvedValue({data:[{...row,preview}]});expect((await (await search(req())).json()).matches[0].entry.preview).toEqual(preview);
+ mocks.rpc.mockResolvedValue({data:[{...row,preview}]});const safe=(await (await search(req())).json()).matches[0].entry;expect(safe.preview).toEqual(preview);expect(safe.orderable).toBe(false);
  mocks.rpc.mockResolvedValue({data:[{...row,preview:{...preview,outline:[{...preview.outline[0],parameter_questions:['PRIVATE_FORM']}]}}]});
  const result=await (await search(req())).json();expect(result.matches[0].entry).not.toHaveProperty('preview');expect(JSON.stringify(result)).not.toContain('PRIVATE_');
 });

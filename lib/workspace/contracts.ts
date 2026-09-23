@@ -1,6 +1,6 @@
 export type Formatting = { font: 'Arial' | 'Times New Roman'; fontSize: 11 | 12; spacing: 'normal' | 'relaxed'; header: string; answerLines: boolean };
 export const defaultFormatting: Formatting = { font:'Arial', fontSize:12, spacing:'normal', header:'', answerLines:false };
-export type CatalogueEntry = { id:string; title:string; topic:string; description:string; marks:{min:number;max:number}; thumbnail?:{src:string; alt:string}; preview?:CataloguePreview };
+export type CatalogueEntry = { id:string; title:string; topic:string; description:string; marks:{min:number;max:number}; orderable:boolean; thumbnail?:{src:string; alt:string}; preview?:CataloguePreview };
 export type Curriculum = { id:string; name:string; release:string; isDemo:boolean };
 export type Workspace = {
   schoolName:string; curricula:Curriculum[]; module:Curriculum | null; entries:CatalogueEntry[];

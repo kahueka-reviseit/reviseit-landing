@@ -17,6 +17,7 @@ function CatalogueCard({entry,selected=false,disabled=false,onSelect}:{entry:Cat
     <div className={styles.cardMetrics}><span className={styles.marks}>{formatMarks(entry.marks)} marks</span>
       {preview ? <span className={styles.subquestionCount}>{formatMarks(preview.subquestions)} {preview.subquestions.max===1?'subquestion':'subquestions'}</span> : <span className={styles.subquestionCount}>Subquestion range not yet available</span>}
     </div>
+    {!entry.orderable && <p className={styles.previewNote}>Not yet available to order.</p>}
     <p className={styles.description}>{entry.description}</p>
     {entry.thumbnail && (failed ? <p className={styles.diagramFallback}>Diagram preview unavailable</p> : <img className={styles.diagram} src={entry.thumbnail.src} alt={entry.thumbnail.alt} loading="lazy" decoding="async" onError={()=>setFailed(true)}/>)}
     {preview?.outline ? <>
@@ -119,7 +120,7 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
           {hiddenSelected>0 && searchQuery && <p className={styles.searchStatus}>{hiddenSelected} selected {hiddenSelected===1?'question is':'questions are'} outside these results. Your selection is unchanged.</p>}
           {stale && <p className={styles.error}>The catalogue has changed since you saved. Review the current entries and save a new selection. Your previous selection stays saved until then.</p>}
           {data.entries.length===0 && <p className={styles.empty}>There are no published questions for this curriculum yet.</p>}
-          <div className={styles.entries}>{visibleEntries.map(entry=><CatalogueCard key={`${data.module!.id}:${data.module!.release}:${entry.id}`} entry={entry} selected={ids.includes(entry.id)} disabled={busy || (!ids.includes(entry.id) && ids.length>=30)} onSelect={checked=>{setNotice('');setIds(checked?[...ids,entry.id]:ids.filter(id=>id!==entry.id));}}/>)}</div>
+          <div className={styles.entries}>{visibleEntries.map(entry=><CatalogueCard key={`${data.module!.id}:${data.module!.release}:${entry.id}`} entry={entry} selected={ids.includes(entry.id)} disabled={busy || (!ids.includes(entry.id) && (!entry.orderable || ids.length>=30))} onSelect={checked=>{setNotice('');setIds(checked?[...ids,entry.id]:ids.filter(id=>id!==entry.id));}}/>)}</div>
           {otherModules.map(module=><section key={module.id} className={styles.otherCurriculum} aria-label={`Results in ${module.name}`}>
             <h3>{module.name}</h3><p>Switch curriculum to select these questions. Each curriculum has its own saved paper.</p>
             <button type="button" className={styles.textButton} disabled={busy} onClick={()=>void switchCurriculum(module.id)}>Browse {module.name}</button>

@@ -19,7 +19,7 @@ beforeAll(async()=>{
  create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz,raw_user_meta_data jsonb default '{}');
  create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
  grant usage on schema auth,public to authenticated,anon,service_role;grant execute on function auth.uid() to authenticated,anon;`);
- for(const f of ['202609120001_teacher_accounts','202609120002_teacher_workspace','202609190008_teacher_jobs','202609200009_grouped_questionnaires','202609200010_order_generation_plan','202609200011_answer_compatibility','202609200012_semantic_shadow']) await db.exec(readFileSync('supabase/migrations/'+f+'.sql','utf8'));
+ for(const f of ['202609120001_teacher_accounts','202609120002_teacher_workspace','202609120003_catalogue_discovery','202609120004_catalogue_mark_ranges','202609130005_catalogue_preview','202609130006_catalogue_publication','202609130007_render_formatting','202609190008_teacher_jobs','202609200009_grouped_questionnaires','202609200010_order_generation_plan','202609200011_answer_compatibility','202609200012_semantic_shadow','202609210014_catalogue_readiness','202609210015_catalogue_form_bindings']) await db.exec(readFileSync('supabase/migrations/'+f+'.sql','utf8'));
  await db.exec("insert into public.curriculum_modules(id,name,current_release,is_demo) values('test-module','Test module','test-1',true)");
  for(const id of [teacher,other,reviewer]) await db.query("insert into auth.users(id,email,email_confirmed_at) values($1,$2,now())",[id,`${id}@synthetic.example`]);
  for(const [id,name] of [[school,'First'],[second,'Second']]){
@@ -87,6 +87,12 @@ const groupedForm={schemaVersion:2,revision:'a'.repeat(64),items:[
 const groupedAnswers={schemaVersion:2,revision:'a'.repeat(64),items:{first:{setting:{kind:'choice',choiceId:'a'}},second:{setting:{kind:'automatic'}}},paper:{notes:{kind:'omit'}}};
 async function setGrouped(){await db.query('update private.paper_orders set form=$1 where id=$2',[JSON.stringify(groupedForm),order]);}
 test('grouped answers bind the purchased order form and retry without duplicating dispatch',async()=>{await setGrouped();await asUser(teacher);expect((await listing())[0].form).toEqual(groupedForm);await submit(key,groupedAnswers);await submit(key,groupedAnswers);expect((await listing())[0]).toMatchObject({state:'queued',form:null,answers:groupedAnswers});expect((await listing())[0].answerSummary).toEqual([{title:'First question',fields:[{label:'Setting',value:'First'}]},{title:'Second question',fields:[{label:'Setting',value:'Choose for me'}]},{title:'Settings for the whole paper',fields:[{label:'Notes',value:'No preference'}]}]);await db.exec('reset role');expect((await db.query('select * from private.paper_job_events')).rows).toHaveLength(1);});
+test('an explicit no-input item submits with an empty answer section',async()=>{
+ const f=structuredClone(groupedForm);f.items[1].fields=[];
+ const a:any=structuredClone(groupedAnswers);a.items.second={};
+ await db.query('update private.paper_orders set form=$1 where id=$2',[JSON.stringify(f),order]);
+ await asUser(teacher);await submit(key,a);expect((await listing())[0].answers).toEqual(a);
+});
 test('a second school cannot retrieve or answer the grouped order',async()=>{await setGrouped();await asUser(other);expect(await listing()).toEqual([]);await expect(submit(key,groupedAnswers)).rejects.toThrow(/access required/);});
 test.each([
  ['wrong revision',(a:any):unknown=>a.revision='b'.repeat(64)],

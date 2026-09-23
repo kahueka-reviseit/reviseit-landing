@@ -1,5 +1,13 @@
 # Catalogue publication delivery
 
+## Current development publication
+
+The isolated teacher test project now has migrations 013–016 and the complete Grade 10 `16.0` and Grade 11 `5.5` catalogues: 131 and 89 entries. Migration 014's restricted `publish_catalogue_release(manifest, expected_previous_release)` supersedes the reviewer-receipt requirement for new releases. It permits blank descriptions and keeps publication separate from ordering readiness. Historical receipt-based records remain intact.
+
+Migration 015 binds private form identities, and migration 016 adds immutable private authored-form registrations and order provisioning. All 220 entries remain visible to assigned approved teachers; none is selectable until its execution path is connected. A current private registration is required before readiness can be enabled. The public payload never contains a questionnaire or private source text.
+
+Publication used the accepted C02 export without rebuilding it, verified all 168 recorded file hashes, took a database backup, read the actual predecessor (null for each real module), and called the restricted publisher. The saved operator and safe evidence are in the business repository's `our product/go-live/` folder. This was a development deployment, not a public teacher launch. The legacy CLI and receipt instructions below describe the older publication path and must not be used as the procedure for these new releases.
+
 This adapter connects a reviewed private catalogue release to the teacher database. It does not approve content. Migration `202609130006_catalogue_publication.sql` adds a restricted importer, gate receipts and immutable import history. It follows migrations 001 through 005 and has not been applied to the hosted project.
 
 The real catalogue is still a migration candidate. Original business content remains authoritative. No real release, school access assignment, automatic publication workflow or source cutover is included here.

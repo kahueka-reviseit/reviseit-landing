@@ -35,7 +35,7 @@ function Field({field,value,onChange,prefix,disabled,error}:{field:QuestionField
 export default function QuestionnaireFields({form,answers,onChange,disabled=false,fieldError}:{form:Questionnaire;answers:QuestionnaireAnswers;onChange:(answers:QuestionnaireAnswers)=>void;disabled?:boolean;fieldError?:QuestionnaireFieldError|null}) {
  return <>
   {form.items.map((item,index)=><fieldset key={item.id} disabled={disabled} style={{marginBottom:24}}><legend>Question {index+1}: {item.title} ({item.marks} marks)</legend>
-   {item.fields.map(field=><Field key={field.id} field={field} prefix={`question-${item.id.length}-${item.id}`} error={fieldError?.itemId===item.id&&fieldError.fieldId===field.id?fieldError.message:undefined} value={answers.items[item.id]?.[field.id]} disabled={disabled} onChange={answer=>onChange({...answers,items:{...answers.items,[item.id]:{...answers.items[item.id],[field.id]:answer}}})}/>)}
+   {item.fields.length===0?<p>No further details are needed for this question.</p>:item.fields.map(field=><Field key={field.id} field={field} prefix={`question-${item.id.length}-${item.id}`} error={fieldError?.itemId===item.id&&fieldError.fieldId===field.id?fieldError.message:undefined} value={answers.items[item.id]?.[field.id]} disabled={disabled} onChange={answer=>onChange({...answers,items:{...answers.items,[item.id]:{...answers.items[item.id],[field.id]:answer}}})}/>)}
   </fieldset>)}
   {form.paperFields.length>0&&<fieldset disabled={disabled}><legend>Settings for the whole paper</legend>{form.paperFields.map(field=><Field key={field.id} field={field} prefix="paper" value={answers.paper[field.id]} disabled={disabled} onChange={answer=>onChange({...answers,paper:{...answers.paper,[field.id]:answer}})}/>)}</fieldset>}
  </>;

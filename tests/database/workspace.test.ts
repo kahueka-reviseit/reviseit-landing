@@ -15,7 +15,9 @@ beforeAll(async()=>{
  create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz,raw_user_meta_data jsonb default '{}');
  create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
  grant usage on schema auth,public to authenticated,anon;grant execute on function auth.uid() to authenticated,anon;`);
- for(const f of ['supabase/migrations/202609120001_teacher_accounts.sql','supabase/migrations/202609120002_teacher_workspace.sql','supabase/migrations/202609120003_catalogue_discovery.sql','supabase/migrations/202609120004_catalogue_mark_ranges.sql','supabase/migrations/202609130005_catalogue_preview.sql','supabase/migrations/202609130007_render_formatting.sql','tests/fixtures/workspace.sql']) await db.exec(readFileSync(f,'utf8'));
+ for(const f of ['supabase/migrations/202609120001_teacher_accounts.sql','supabase/migrations/202609120002_teacher_workspace.sql','supabase/migrations/202609120003_catalogue_discovery.sql','supabase/migrations/202609120004_catalogue_mark_ranges.sql','supabase/migrations/202609130005_catalogue_preview.sql','supabase/migrations/202609130007_render_formatting.sql','tests/fixtures/workspace.sql','supabase/migrations/202609210014_catalogue_readiness.sql','supabase/migrations/202609210015_catalogue_form_bindings.sql']) await db.exec(readFileSync(f,'utf8'));
+ await db.exec('insert into public.catalogue_ordering_readiness(module_id,release,entry_id,orderable) select module_id,release,entry_id,true from public.catalogue_summaries');
+ await db.exec("insert into private.catalogue_form_bindings(module_id,release,entry_id,form_revision,private_bundle_sha256,shared_forms_sha256) select module_id,release,entry_id,repeat('a',64),repeat('b',64),repeat('c',64) from public.catalogue_summaries");
  for(const id of [teacher,other,colleague]) await db.query("insert into auth.users(id,email,email_confirmed_at) values($1,$2,now())",[id,`${id}@synthetic.example`]);
  for(const [id,name] of [[school,'First'],[second,'Second']]){
   await db.query('insert into public.schools(id,slug,name) values($1,$2,$3)',[id,name.toLowerCase(),name]);
@@ -41,6 +43,15 @@ test('stale formatting cannot silently overwrite a colleague’s update',async()
 test('second initial save cannot overwrite an existing profile',async()=>{await asUser(teacher);await format();await expect(format()).rejects.toThrow(/Formatting changed/);});
 test('question identities and marks are qualified by curriculum and release',async()=>{await asUser(teacher);await select();await select(['DEMO_01'],0,'demo-1','demo-grade-11-sciences');const rows=(await db.query<{marks_min:number;marks_max:number}>('select marks_min,marks_max from public.catalogue_summaries where entry_id=\'DEMO_01\' order by module_id')).rows;expect(rows.map(r=>[r.marks_min,r.marks_max])).toEqual([[8,12],[12,18]]);expect((await db.query('select * from public.paper_selections')).rows).toHaveLength(2);});
 test.each([['missing'],['DEMO_01','DEMO_01'],[null],Array(31).fill('DEMO_01')].map(ids=>({ids})))('rejects invalid selection $ids',async ({ids})=>{await asUser(teacher);await expect(select(ids)).rejects.toThrow(/Invalid question selection/);});
+test('an unavailable catalogue entry remains visible but cannot be saved',async()=>{
+ await db.query("update public.catalogue_ordering_readiness set orderable=false where module_id=$1 and release='demo-1' and entry_id='DEMO_01'",[module]);
+ await asUser(teacher);expect((await db.query('select entry_id from public.teacher_catalogue_summaries where entry_id=\'DEMO_01\'')).rows).toHaveLength(2);
+ await expect(select()).rejects.toThrow(/not available to order/);
+});
+test('a readiness row without a frozen private form binding cannot be saved',async()=>{
+ await db.query("delete from private.catalogue_form_bindings where module_id=$1 and release='demo-1' and entry_id='DEMO_01'",[module]);
+ await asUser(teacher);await expect(select()).rejects.toThrow(/not available to order/);
+});
 test('cannot save against an outdated catalogue release',async()=>{await asUser(teacher);await expect(select(['DEMO_01'],0,'old-release')).rejects.toThrow(/Catalogue changed/);});
 test('stale selection cannot overwrite a newer save',async()=>{await asUser(teacher);await select();await select(['DEMO_02'],1);await expect(select(['DEMO_01'],1)).rejects.toThrow(/Selection changed/);});
 test('can clear a saved selection and refresh preserves that empty draft',async()=>{await asUser(teacher);await select();await select([],1);expect((await db.query<{entry_ids:string[];revision:number}>('select entry_ids,revision from public.paper_selections')).rows[0]).toEqual({entry_ids:[],revision:2});});

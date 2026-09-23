@@ -1,5 +1,15 @@
 # Grouped questionnaire integration
 
+## Catalogue integration on 21 September 2026
+
+Migrations 013–016 are now applied to the isolated development project `tgaganmgccvrphpfipgy`. Both real catalogues are published there, and 64 authored item forms are registered privately. The protected teacher application has been deployed and a fenced internal questionnaire exercise passed, including an explicit empty item form, retained answers, duplicate submission and other-school refusal. This supersedes the older local-only deployment statements below for that development target only.
+
+Migration 016 stores immutable authored-form versions, links current bindings to their manifest, and refuses digest-only activation. Its service-role-only `provision_catalogue_internal_order` consumes the saved selection, expected manifest identities, mark allocations and applicable shared forms. It creates an explicitly internal entitlement. Browser roles cannot call it or read the private registrations. Issued catalogue forms, source snapshots and entitlement identities cannot be rewritten by a later form update.
+
+All real catalogue items remain unavailable to order because the corresponding generation executor is not connected. The hosted questionnaire exercise was deliberately provisioned by the operator with a unique worker fence; it was not a saved-selection purchase and generated no documents. Local tests exercise saved-selection provisioning with synthetic execution readiness. Customer payment and mixed generation remain separate unfinished work. See the business return `our product/go-live/returns/codex-integration-01-return.md` for exact versions and evidence.
+
+The earlier notes below describe the historical introduction of each contract.
+
 This is the teacher-visible version 2 form contract and reusable input component. It is connected locally to the order screen, submission endpoint and database validation through migration 009. Migration 010 adds the private generation plan consumed by the local multi-question worker integration. Neither change has been deployed.
 
 A form has a frozen revision, one section per selected order line, and shared paper settings. Field identifiers are scoped to their order line, so selecting the same specification twice cannot mix its answers. Marks are frozen display values. Choice labels are separate from stable identifiers. Each authored field explicitly permits or refuses automatic choice, free text and omission. The component makes no default selections on behalf of the teacher.
@@ -19,9 +29,19 @@ Before activation:
 Current tests exercise repeated field names, closed data boundaries, exact revision and section binding, optional/automatic/written choices, encoded size bounds, independent input controls, frozen mark display and disabled inputs. Database and order-screen tests additionally cover submission retries, exact purchased-form matching, cross-school isolation and labelled receipts. They do not prove payment gating, authored content quality, publication approval or generation support.
 
 
-Migration 010 binds the private generation plan to the form revision, ordered line identifiers, marks, module and release. Once assigned, the plan cannot be changed or cleared; it must be assigned before submission. Worker claims include it, while teacher order listings exclude it. Legacy orders without a plan retain their existing claim shape. Four database tests cover worker-only disclosure, immutability, late assignment and inconsistent marks. These are local database tests, not evidence of a completed purchase or deployment.
+Migration 010 binds the private generation plan to the form revision, ordered line identifiers, marks, module and release. Once assigned, the plan cannot be changed or cleared; it must be assigned before submission. Worker claims include it, while teacher order listings exclude it. Legacy orders without a plan retain their existing claim shape. Four database tests cover worker-only disclosure, immutability, late assignment and inconsistent marks.
+
+Migration 017 adds the accepted workflow manifest and server-derived formatting to
+new authored-catalogue snapshots. Registered execution bindings are private and
+immutable. The worker consumes the retained form/source and instruction bundles,
+then assembles mixed papers through the existing four-document renderer. Existing
+order snapshots are not migrated. Integration 02 deployed this migration and
+proved hosted submission and delivery with synthetic responses; live provider
+execution and customer catalogue ordering remain disabled.
 
 Migration 011 adds authored admission policies to new version-two private generation plans. The content service derives `answerPolicy` from each registered profile, includes it in the frozen form revision and checks it against the original profile again before generation. The policy never enters the teacher form or order read model. Prior version-one internal test plans remain supported; they do not gain a policy retrospectively.
+
+Migration 015 permits an item section with an explicitly empty `fields` array. The teacher sees that no further details are needed and submits an empty object for that item; an absent item section remains invalid. It also makes catalogue selection depend on a private binding for the exact module, release and item. That binding records the authored form revision, private bundle digest and shared-form digest, then records the item's selectable state in the same restricted publisher operation. Browser roles cannot read or write the binding, and a readiness row without one cannot make an item selectable. This is local integration work only: C02 still needs to produce the real private bundle, and no form is exposed before a paid order.
 
 On submission the database checks exact instance scope and authored choice dependencies before changing order state or creating a submission event. Transitive dependencies account for delegated choices without rewriting the submitted answers. A rejection identifies the question and field with an authored clarification, preserving the paid order in `awaiting_answers`. Source-policy validation, queue refusal, retries and response privacy are covered by saved tests. This remains undeployed and does not add purchasing, content approval or Jev blocking authority.
 

@@ -4,9 +4,10 @@ import {test,expect,vi,afterEach} from 'vitest';
 import WorkspaceView from '../../app/(accounts)/teacher/workspace';
 import {workspace} from '../fixtures/workspace';
 afterEach(()=>vi.unstubAllGlobals());
+test('unavailable entries remain visible with disabled selection',()=>{render(<WorkspaceView initial={workspace}/>);expect(screen.getByLabelText('Select Comparing circuit measurements')).toBeDisabled();expect(screen.getAllByText('Not yet available to order.').length).toBeGreaterThan(0);});
 test('selection totals reflect marks and saving sends only catalogue references',async()=>{
  const fetch=vi.fn().mockResolvedValue({ok:true,json:async()=>({revision:1})});vi.stubGlobal('fetch',fetch);
- render(<WorkspaceView initial={workspace}/>);const user=userEvent.setup();await user.click(screen.getByLabelText('Select Reading a motion graph'));await user.click(screen.getByLabelText('Select Comparing circuit measurements'));
+ render(<WorkspaceView initial={{...workspace,entries:workspace.entries.map(e=>({...e,orderable:true}))}}/>);const user=userEvent.setup();await user.click(screen.getByLabelText('Select Reading a motion graph'));await user.click(screen.getByLabelText('Select Comparing circuit measurements'));
  const summary=screen.getByRole('complementary');expect(within(summary).getByText('20–30')).toBeVisible();
  await user.click(screen.getByRole('button',{name:'Save selection'}));await screen.findByRole('status');
  expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({kind:'selection',moduleId:workspace.module!.id,revision:0,release:'demo-1',entryIds:['DEMO_01','DEMO_02']});expect(screen.getByRole('button',{name:'Save selection'})).toBeDisabled();

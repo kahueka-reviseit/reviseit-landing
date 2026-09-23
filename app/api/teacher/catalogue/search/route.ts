@@ -12,9 +12,9 @@ export async function GET(request:NextRequest) {
     if(result.error) return catalogueReply({error:'Search is unavailable. Please try again.'},503);
     const rows=result.data || [];
     // Deliberately project a field allowlist. Never return database rows wholesale.
-    return catalogueReply({hasMore:rows.length>50,matches:rows.slice(0,50).map((r:{module_id:string;module_name:string;release:string;is_demo:boolean;entry_id:string;title:string;topic:string;description:string;marks_min:number;marks_max:number;thumbnail_alt:string|null;preview?:unknown})=>({
+    return catalogueReply({hasMore:rows.length>50,matches:rows.slice(0,50).map((r:{module_id:string;module_name:string;release:string;is_demo:boolean;entry_id:string;title:string;topic:string;description:string;marks_min:number;marks_max:number;thumbnail_alt:string|null;preview?:unknown;orderable:boolean})=>({
       module:{id:r.module_id,name:r.module_name,release:r.release,isDemo:r.is_demo},
-      entry:{id:r.entry_id,title:r.title,topic:r.topic,description:r.description,marks:{min:r.marks_min,max:r.marks_max},preview:cataloguePreview(r.preview),thumbnail:thumbnailFor(r.module_id,r.release,r.entry_id,r.thumbnail_alt)},
+      entry:{id:r.entry_id,title:r.title,topic:r.topic,description:r.description,marks:{min:r.marks_min,max:r.marks_max},orderable:r.orderable===true,preview:cataloguePreview(r.preview),thumbnail:thumbnailFor(r.module_id,r.release,r.entry_id,r.thumbnail_alt)},
     }))});
   } catch { return catalogueReply({error:'Search is unavailable. Please try again.'},503); }
 }

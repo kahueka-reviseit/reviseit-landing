@@ -1,10 +1,10 @@
 export const hostedOrigin = 'https://reviseit-teacher-test.vercel.app';
 export const developmentProject = 'tgaganmgccvrphpfipgy';
 
-export function requireHostedTarget(env: Record<string, string | undefined>) {
+export function requireHostedTarget(env: Record<string, string | undefined>, mode: 'replay' | 'live' = 'replay') {
   if (env.HOSTED_JOB_TEST_ORIGIN !== hostedOrigin ||
       env.HOSTED_JOB_TEST_PROJECT !== developmentProject ||
-      env.HOSTED_JOB_TEST_CONFIRM !== 'synthetic-replay-only') {
+      env.HOSTED_JOB_TEST_CONFIRM !== (mode === 'live' ? 'authorised-internal-live' : 'synthetic-replay-only')) {
     throw new Error('Explicit isolated hosted synthetic target required');
   }
   const secret = env.VERCEL_AUTOMATION_BYPASS_SECRET;
@@ -12,10 +12,10 @@ export function requireHostedTarget(env: Record<string, string | undefined>) {
   return { origin: hostedOrigin, project: developmentProject, secret };
 }
 
-export function requireHostedFixture(value: any) {
+export function requireHostedFixture(value: any, mode: 'replay' | 'live' = 'replay') {
   const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (value?.project !== developmentProject || value?.origin !== hostedOrigin ||
-      value?.mode !== 'replay' || value?.entitlement !== 'internal_test' ||
+      value?.mode !== mode || value?.entitlement !== 'internal_test' ||
       !uuid.test(value?.order ?? '') || !Number.isSafeInteger(value?.serverId) || value.serverId <= 0 ||
       !Array.isArray(value?.form) || !value.form.length) {
     throw new Error('Bound synthetic hosted fixture required');

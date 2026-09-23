@@ -36,6 +36,7 @@ export async function PUT(request:NextRequest) {
     const message=result.error.message;
     if(/changed|Refresh/.test(message)) return reply({error:'This has changed since you opened it. Reload the workspace before saving.'},409);
     if(/access required/.test(message)) return reply({error:'Your curriculum access has changed. Return to your account.'},403);
+    if(/not available to order/.test(message)) return reply({error:'A selected question is not yet available to order. Reload the catalogue and choose an available question.'},422);
     if(/Invalid/.test(message)) return reply({error:'Check your formatting or question selection'},400);
     return reply({error:'We could not save this. Your changes are still on this page; try again.'},503);
   }

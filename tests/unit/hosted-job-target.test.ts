@@ -24,3 +24,13 @@ describe('hosted acceptance admission', () => {
     }
   });
 });
+
+it('live internal proof requires a distinct acknowledgement and retains isolated identities', () => {
+ const liveEnv={...env,HOSTED_JOB_TEST_CONFIRM:'authorised-internal-live'};
+ expect(requireHostedTarget(liveEnv,'live').project).toBe(developmentProject);
+ expect(() => requireHostedTarget(env,'live')).toThrow();
+ expect(() => requireHostedTarget(liveEnv)).toThrow();
+ expect(requireHostedFixture({...fixture(),mode:'live'},'live').entitlement).toBe('internal_test');
+ expect(() => requireHostedFixture({...fixture(),mode:'live',entitlement:'paid'},'live')).toThrow();
+ expect(() => requireHostedFixture(fixture(),'live')).toThrow();
+});

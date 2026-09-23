@@ -7,6 +7,7 @@ let db:PGlite;
 const first='00000000-0000-4000-8000-000000000101',second='00000000-0000-4000-8000-000000000102';
 async function asPublisher(){await db.exec('set role reviseit_catalogue_publisher');}
 async function deliver(payload:unknown=publication(),id=first){return db.query<{result:{status:string}}>('select public.import_catalogue_release($1,$2::jsonb) as result',[id,JSON.stringify(payload)]);}
+async function publish(payload:unknown=publication(),previous:string|null=null){return db.query<{result:{status:string}}>('select public.publish_catalogue_release($1::jsonb,$2) as result',[JSON.stringify(payload),previous]);}
 beforeAll(async()=>{
  db=new PGlite();await db.exec(`create role anon nologin;create role authenticated nologin;create role service_role nologin;create schema auth;
  create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz,raw_user_meta_data jsonb default '{}');
@@ -16,6 +17,10 @@ beforeAll(async()=>{
 },30000);
 beforeEach(async()=>{await db.exec('begin');});afterEach(async()=>{await db.exec('rollback;reset role');});afterAll(async()=>{await db.close();});
 test.each(['anon','authenticated','service_role'])('%s cannot call the publication function',async role=>{await db.exec(`set role ${role}`);await expect(deliver()).rejects.toThrow(/permission denied/);});
+test.each(['anon','authenticated','service_role'])('%s cannot bind a private questionnaire to a catalogue item',async role=>{
+ await db.exec(`set role ${role}`);
+ await expect(db.query("select public.set_catalogue_form_binding('synthetic-publication-sciences','1.0','structured:P1-EXAMPLE-01',$1,$2,$3,true)",['a'.repeat(64),'b'.repeat(64),'c'.repeat(64)])).rejects.toThrow(/permission denied/);
+});
 test('publisher cannot grant its own approval or school access',async()=>{
  await asPublisher();await expect(recordReceipt(db,first,publication())).rejects.toThrow(/permission denied/);
 });
@@ -28,13 +33,30 @@ test.each([
  {...publication(),parameter_questions:['PRIVATE_FORM']},
  {...publication(),entries:[]},
  {...publication(),entries:[publication().entries[0],publication().entries[0]]},
- {...publication(),entries:[{...publication().entries[0],description:''}]},
  {...publication(),entries:[{...publication().entries[0],marks:{min:12,max:8}}]},
  {...publication(),entries:[{...publication().entries[0],preview:{subquestions:{min:1,max:2},outline:[{summary:'Example',bloom:'L4'}]}}]},
  {...publication(),entries:[{...publication().entries[0],thumbnail:{src:'file:///private/spec.svg',alt:'Diagram'}}]},
  {...publication(),entries:[{...publication().entries[0],thumbnail:{png:'iVBORw0KGgo====',alt:'Diagram'}}]},
  {...publication(),entries:[{...publication().entries[0],id:'OTHER_ID'}]},
 ])('rejects invalid, draft or leaking manifests even with a receipt: %j',async payload=>{await recordReceipt(db,first,payload);await asPublisher();await expect(deliver(payload)).rejects.toThrow(/Invalid published catalogue/);});
+test('the new publisher record accepts a redacted description and preserves immutable history',async()=>{
+ const payload=publication();payload.entries[0].description='';
+ await asPublisher();expect((await publish(payload)).rows[0].result.status).toBe('published');
+ expect((await publish(payload)).rows[0].result.status).toBe('already-published');
+ await db.exec('reset role');
+ expect((await db.query('select description from public.catalogue_summaries')).rows).toEqual([{description:''}]);
+ await expect(db.query("update public.catalogue_summaries set title='Changed'")).rejects.toThrow(/immutable/);
+});
+test('publisher binds a private form revision before making an entry orderable',async()=>{
+ await asPublisher();await publish();
+ await db.query('select public.register_catalogue_authored_form($1)',[JSON.stringify({module:'synthetic-publication-sciences',release:'1.0',entryId:'structured:P1-EXAMPLE-01',kind:'specification',canonicalId:'P1-EXAMPLE-01',formRevision:'a'.repeat(64),bundleDigest:'b'.repeat(64),sharedFormsSha256:'c'.repeat(64),manifestSha256:'d'.repeat(64),fields:[],explicitlyNoInput:true,shared:{'paper-logistics':{revision:'e'.repeat(64),fields:[]},'multiple-choice-block':{revision:'f'.repeat(64),fields:[]}},sources:[{role:'specification',path:'sources/synthetic.md',sha256:'b'.repeat(64)}]})]);
+ await db.query("select public.set_catalogue_form_binding('synthetic-publication-sciences','1.0','structured:P1-EXAMPLE-01',$1,$2,$3,true)",['a'.repeat(64),'b'.repeat(64),'c'.repeat(64)]);
+ await db.exec('reset role');
+ expect((await db.query('select orderable from public.catalogue_ordering_readiness')).rows).toEqual([{orderable:true}]);
+ expect((await db.query('select form_revision,private_bundle_sha256,shared_forms_sha256 from private.catalogue_form_bindings')).rows).toEqual([{
+  form_revision:'a'.repeat(64),private_bundle_sha256:'b'.repeat(64),shared_forms_sha256:'c'.repeat(64),
+ }]);
+});
 test('one approved release activates all rows and does not grant school access',async()=>{
  await recordReceipt(db,first,publication());await asPublisher();expect((await deliver()).rows[0].result.status).toBe('imported');
  await db.exec('reset role');expect((await db.query('select current_release from public.curriculum_modules')).rows).toEqual([{current_release:'1.0'}]);

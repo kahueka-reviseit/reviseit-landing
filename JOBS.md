@@ -1,5 +1,31 @@
 # Teacher orders and background worker
 
+## Current authored-catalogue path
+
+Migration 017 freezes the accepted private workflow manifest and the school's
+formatting in each new authored-catalogue order. It leaves existing orders intact.
+The service's `product_workflow` registry adapter executes structured stages 1–5
+and multiple-choice stages 1M–4M, with the skill's bounded correction route and
+the existing spending ledger. It uses one configured model for the skill's own
+checks. No retired variation, human memorandum or release approval is required.
+
+`awaiting_answers → queued → generating → rendering → released`
+
+The four documents are released together by the authenticated worker's existing
+finish operation. New worker-fenced orders are first claims, not resumed jobs;
+expired generating/rendering jobs still require retained worker state.
+
+`tests/hosted-jobs/mixed.spec.ts` and `hosted-mixed.config.ts` exercise protected
+submission, duplicate submission, automatic release and school-isolated downloads
+in two phases around the independently hosted worker. Integration 02 completed
+this path using accepted content bindings and synthetic responses, without model
+calls or a new allowance. Normal catalogue readiness remains disabled pending
+provider and funded execution configuration. These engineering results do not
+claim live-content generation, checkout or customer launch.
+
+The older adapter and historical checkpoint notes below remain for existing
+records and fixtures; their six-stage/review journey does not govern this path.
+
 This branch connects an authenticated, approved teacher's internal order to the private content service. It does not issue paid orders or implement checkout. Only an owner-provisioned `internal_test` entitlement exists; the browser cannot create it or unlock a parameter form itself.
 
 ## Journey and boundaries
