@@ -17,6 +17,7 @@ blob-report
 hosted-jobs.config.ts
 hosted-questionnaire.config.ts
 hosted-catalogue.config.ts
+hosted-mixed.config.ts
 jobs.config.ts
 playwright*.ts
 vitest.config.*
