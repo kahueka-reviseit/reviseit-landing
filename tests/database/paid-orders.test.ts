@@ -261,3 +261,26 @@ test('an expired checkout is terminal for its key; a new key starts one new chec
 test('a paid checkout is never terminal for restart',async()=>{
  const id=await paidOrder();expect(await begin()).toMatchObject({orderId:id,status:'paid',terminal:false});
 });
+
+// Codex's C04A controlled-interleaving probe, kept as diagnostic evidence. It runs inside ONE
+// session, so it bypasses the cross-session payment-intent lock (advisory locks are re-entrant
+// within a session); it cannot and does not prove concurrency. What it checks: if a refund is
+// ever left retained after its payment was associated, the next ordinary confirmation or
+// reconciliation applies it. The two-session proof is tests/concurrency/refund-overlap.test.ts.
+test('C04A review diagnostic: same-session injected overlap is repaired by the next confirmation',async()=>{
+ await funding();await select();const r=await begin();await attach(r.orderId);await owner();
+ await db.exec(`create function private.review_overlap() returns trigger language plpgsql security definer set search_path='' as $$
+ begin
+  perform public.record_stripe_checkout('evt_overlap_paid','checkout.session.completed',false,TG_ARGV[0]::jsonb);
+  return new;
+ end $$;`);
+ const encoded=JSON.stringify(session(r.orderId)).replaceAll("'","''");
+ await db.exec(`create trigger review_overlap before insert on private.stripe_events for each row when (new.event_id='evt_overlap_refund') execute function private.review_overlap('${encoded}')`);
+ await refund('evt_overlap_refund');
+ // Immediately after the forced interleaving, before any repair: stranded exactly as Codex observed.
+ const stranded=await orderRow(r.orderId);expect(stranded).toMatchObject({state:'awaiting_answers',refunded_at:null});
+ expect(await record('reconcile','reconcile',session(r.orderId))).toMatchObject({outcome:'already-paid-refund-applied'});
+ const current=await orderRow(r.orderId);
+ expect(current.refunded_at).not.toBeNull();expect(current.state).toBe('cancelled');
+ await owner();expect((await db.query<any>('select outcome from private.stripe_pending_refunds')).rows).toEqual([{outcome:'refunded'}]);
+});

@@ -20,6 +20,15 @@ create index stripe_pending_refunds_intent on private.stripe_pending_refunds(pay
 alter table private.stripe_pending_refunds enable row level security;
 revoke all on private.stripe_pending_refunds from public,anon,authenticated,service_role,reviseit_catalogue_publisher;
 
+-- Refund association and payment confirmation for one Stripe payment intent are
+-- serialised across sessions by one transaction-scoped lock taken BEFORE either
+-- side looks anything up. Lock order is always: intent lock, then payment row,
+-- then order row. Intent identifiers are distinct across Stripe modes.
+create function private.lock_payment_intent(payment_intent text) returns void
+language sql security definer set search_path='' as $$
+ select pg_advisory_xact_lock(hashtextextended('reviseit:stripe-payment-intent:'||payment_intent,0));
+$$;
+
 -- One refund rule for both delivery orders. The caller holds the payment row lock.
 create function private.apply_full_refund(pay private.paper_payments,event_livemode boolean,amount_refunded integer,refund_currency text) returns text
 language plpgsql security definer set search_path='' as $$
@@ -37,9 +46,10 @@ create or replace function public.record_stripe_refund(event_id text,event_livem
 language plpgsql security definer set search_path='' as $$
 declare prior private.stripe_events; pay private.paper_payments; outcome text;
 begin
+ if event_livemode is null or payment_intent is null or payment_intent !~ '^pi_[A-Za-z0-9]{1,250}$' then raise exception 'Invalid Stripe refund event'; end if;
+ perform private.lock_payment_intent(payment_intent);
  select * into prior from private.stripe_events e where e.event_id=record_stripe_refund.event_id;
  if found then return jsonb_build_object('duplicate',true,'outcome',prior.outcome,'orderId',prior.order_id); end if;
- if event_livemode is null or payment_intent is null or payment_intent !~ '^pi_[A-Za-z0-9]{1,250}$' then raise exception 'Invalid Stripe refund event'; end if;
  select * into pay from private.paper_payments where payment_intent_id=payment_intent for update;
  if found then outcome:=private.apply_full_refund(pay,event_livemode,amount_refunded,refund_currency);
  else outcome:='retained:awaiting-payment-association';
@@ -74,6 +84,7 @@ create or replace function public.record_stripe_checkout(event_id text,event_typ
 language plpgsql security definer set search_path='' as $$
 declare prior private.stripe_events; pay private.paper_payments; o private.paper_orders; target uuid; outcome text;
 begin
+ if session->>'paymentIntent' ~ '^pi_[A-Za-z0-9]{1,250}$' then perform private.lock_payment_intent(session->>'paymentIntent'); end if;
  select * into prior from private.stripe_events e where e.event_id=record_stripe_checkout.event_id;
  if found then return jsonb_build_object('duplicate',true,'outcome',prior.outcome,'orderId',prior.order_id); end if;
  if event_type not in ('checkout.session.completed','checkout.session.async_payment_succeeded','checkout.session.async_payment_failed','checkout.session.expired','reconcile')
@@ -91,7 +102,8 @@ begin
   if pay.checkout_session_id is null then update private.paper_payments set checkout_session_id=session->>'id' where order_id=target; end if;
   if event_type in ('checkout.session.completed','checkout.session.async_payment_succeeded','reconcile') then
    if session->>'paymentStatus'='paid' and session->>'status'='complete' then
-    if pay.status='paid' then outcome:='already-paid';
+    if pay.status='paid' then
+     outcome:=case when private.apply_pending_refunds(target)='refunded' then 'already-paid-refund-applied' else 'already-paid' end;
     else
      update private.paper_payments set status='paid',paid_at=now(),updated_at=now(),
       payment_intent_id=case when session->>'paymentIntent' ~ '^pi_[A-Za-z0-9]{1,250}$' then session->>'paymentIntent' end where order_id=target;
@@ -160,7 +172,7 @@ begin
   'sessionId',null,'checkoutUrl',null,'expiresAt',pay.expires_at,'existing',false,'terminal',false);
 end $$;
 
-revoke all on function private.apply_full_refund(private.paper_payments,boolean,integer,text),private.apply_pending_refunds(uuid) from public,anon,authenticated,service_role,reviseit_catalogue_publisher;
+revoke all on function private.lock_payment_intent(text),private.apply_full_refund(private.paper_payments,boolean,integer,text),private.apply_pending_refunds(uuid) from public,anon,authenticated,service_role,reviseit_catalogue_publisher;
 revoke all on function public.record_stripe_refund(text,boolean,text,integer,text),public.record_stripe_checkout(text,text,boolean,jsonb),public.begin_paper_checkout(uuid,text,integer,jsonb) from public,anon,authenticated,reviseit_catalogue_publisher;
 grant execute on function public.record_stripe_refund(text,boolean,text,integer,text),public.record_stripe_checkout(text,text,boolean,jsonb) to service_role;
 revoke execute on function public.begin_paper_checkout(uuid,text,integer,jsonb) from service_role;
