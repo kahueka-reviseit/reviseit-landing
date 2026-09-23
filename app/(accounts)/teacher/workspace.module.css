@@ -107,3 +107,6 @@
 .bloom { display:inline-block; font:11px/1.2 'Trebuchet MS',sans-serif; padding:4px 7px; }
 .remember { background:#436B56; color:white; }.understand { background:#1A1A2E; color:white; }.apply { background:#D4A574; color:#292323; }.analyse { background:#3B5F8A; color:white; }.evaluate { background:#B85042; color:white; }.create { background:#735B79; color:white; }
 .previewNote { margin:14px 0 0; font-size:12px; line-height:1.45; color:#62625B; }
+.allocations { border:0; padding:0; margin:12px 0; display:grid; gap:10px; font-size:14px; }
+.allocations label { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.allocations input { width:72px; padding:6px; }

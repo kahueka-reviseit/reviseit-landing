@@ -50,6 +50,8 @@ test('the new publisher record accepts a redacted description and preserves immu
 test('publisher binds a private form revision before making an entry orderable',async()=>{
  await asPublisher();await publish();
  await db.query('select public.register_catalogue_authored_form($1)',[JSON.stringify({module:'synthetic-publication-sciences',release:'1.0',entryId:'structured:P1-EXAMPLE-01',kind:'specification',canonicalId:'P1-EXAMPLE-01',formRevision:'a'.repeat(64),bundleDigest:'b'.repeat(64),sharedFormsSha256:'c'.repeat(64),manifestSha256:'d'.repeat(64),fields:[],explicitlyNoInput:true,shared:{'paper-logistics':{revision:'e'.repeat(64),fields:[]},'multiple-choice-block':{revision:'f'.repeat(64),fields:[]}},sources:[{role:'specification',path:'sources/synthetic.md',sha256:'b'.repeat(64)}]})]);
+ // Since C04, enabling also requires the connected execution registration.
+ await db.query("select public.register_catalogue_execution('synthetic-publication-sciences','1.0',$1,$2)",['d'.repeat(64),'8'.repeat(64)]);
  await db.query("select public.set_catalogue_form_binding('synthetic-publication-sciences','1.0','structured:P1-EXAMPLE-01',$1,$2,$3,true)",['a'.repeat(64),'b'.repeat(64),'c'.repeat(64)]);
  await db.exec('reset role');
  expect((await db.query('select orderable from public.catalogue_ordering_readiness')).rows).toEqual([{orderable:true}]);

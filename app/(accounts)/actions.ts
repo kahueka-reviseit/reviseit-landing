@@ -1,6 +1,7 @@
 'use server';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { headers } from 'next/headers';
 import { createClient } from '../../lib/supabase/server';
 import { authConfig } from '../../lib/supabase/config';
 import { requireAccount, requireReviewer } from '../../lib/auth/access';
@@ -8,6 +9,16 @@ import { ACCOUNT_UNAVAILABLE, schoolEmailError, passwordError } from '../../lib/
 export type FormState = { message: string; success?: boolean };
 const text = (form: FormData, name: string) => String(form.get(name) || '').trim();
 const password = (form: FormData) => String(form.get('password') || '');
+// Email links return to the origin the person is using when it is one of our
+// exact configured origins (teacher or administration); otherwise SITE_URL.
+async function linkOrigin(config: NonNullable<ReturnType<typeof authConfig>>) {
+  try {
+    const h = await headers();
+    const host = h.get('x-forwarded-host') || h.get('host'), proto = h.get('x-forwarded-proto') || 'https';
+    const origin = host ? `${proto.split(',')[0].trim()}://${host.split(',')[0].trim()}` : '';
+    return config.trustedOrigins.includes(origin) ? origin : config.siteUrl;
+  } catch { return config.siteUrl; }
+}
 export async function register(_: FormState, form: FormData): Promise<FormState> {
   const email = text(form, 'email').toLowerCase();
   const invalid = schoolEmailError(email) || passwordError(password(form));
@@ -32,7 +43,7 @@ export async function login(_: FormState, form: FormData): Promise<FormState> {
 export async function forgotPassword(_: FormState, form: FormData): Promise<FormState> {
   const supabase = await createClient(), config = authConfig();
   if (!supabase || !config) return { message: ACCOUNT_UNAVAILABLE };
-  const { error } = await supabase.auth.resetPasswordForEmail(text(form, 'email'), { redirectTo: `${config.siteUrl}/auth/confirm` });
+  const { error } = await supabase.auth.resetPasswordForEmail(text(form, 'email'), { redirectTo: `${await linkOrigin(config)}/auth/confirm` });
   if (error && error.status && error.status >= 500) return { message: 'Email delivery is temporarily unavailable. Please try again later.' };
   return { success: true, message: 'If an account exists for that email, you will receive a password reset link. Check your inbox and spam folder.' };
 }
@@ -87,6 +98,6 @@ export async function confirmEmail(_: FormState, form: FormData): Promise<FormSt
 export async function resendConfirmation(_: FormState, form: FormData): Promise<FormState> {
   const supabase = await createClient(), config = authConfig();
   if (!supabase || !config) return { message: ACCOUNT_UNAVAILABLE };
-  await supabase.auth.resend({ type: 'signup', email: text(form, 'email'), options: { emailRedirectTo: `${config.siteUrl}/auth/confirm` } });
+  await supabase.auth.resend({ type: 'signup', email: text(form, 'email'), options: { emailRedirectTo: `${await linkOrigin(config)}/auth/confirm` } });
   return { success: true, message: 'If your account is awaiting confirmation, a new link will be sent to your school email. Please allow a few minutes between requests.' };
 }

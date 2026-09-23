@@ -24,3 +24,8 @@ test('array values cannot masquerade as valid formatting strings',async()=>{cons
 
 test('configured site origin is accepted even when the framework normalises its internal request URL',async()=>{mocks.config.mockReturnValue({siteUrl:'http://127.0.0.1:3101'});const req=new NextRequest('http://localhost:3101/api/teacher/workspace',{method:'PUT',headers:{origin:'http://127.0.0.1:3101'},body:JSON.stringify(body)});expect((await PUT(req)).status).toBe(200);});
 test('a missing site configuration fails closed before any write',async()=>{mocks.config.mockReturnValue(null);expect((await PUT(request())).status).toBe(503);expect(mocks.rpc).not.toHaveBeenCalled();});
+test('the configured administration origin is trusted exactly; lookalikes are not',async()=>{
+ mocks.config.mockReturnValue({siteUrl:'https://teacher.example',trustedOrigins:['https://teacher.example','https://admin.example']});
+ expect((await PUT(request(body,'https://admin.example'))).status).toBe(200);
+ for(const origin of ['https://evil-admin.example','https://admin.example.evil','http://admin.example','null']) expect((await PUT(request(body,origin))).status).toBe(403);
+});

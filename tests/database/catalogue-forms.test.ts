@@ -47,9 +47,11 @@ test('current binding and selection are consumed into the entitled mixed order',
  await expect(provision()).rejects.toThrow(/permission denied/);
 });
 test('execution registration is required for new orders and remains private and immutable',async()=>{
- await register();await register(registration('mcq:MCQ_01'));await enable('structured:SPEC_01');await enable('mcq:MCQ_01');await select();
- await db.exec('savepoint missing');await expect(provision()).rejects.toThrow(/Connected workflow/);await db.exec('rollback to savepoint missing');
- await execution();await db.exec('set role reviseit_catalogue_publisher');
+ // Since C04 the readiness guard refuses enabling before execution is registered;
+ // the order-insert guard below it remains in place for rows enabled earlier.
+ await register();await register(registration('mcq:MCQ_01'));
+ await db.exec('savepoint missing');await expect(enable('structured:SPEC_01')).rejects.toThrow(/Connected execution required/);await db.exec('rollback to savepoint missing');
+ await execution();await enable('structured:SPEC_01');await db.exec('set role reviseit_catalogue_publisher');
  await expect(db.query('select public.register_catalogue_execution($1,$2,$3,$4)',['synthetic-module','1',hash('c'),hash('7')])).rejects.toThrow(/immutable/);
 });
 test('a first claim of a worker-fenced order is not a resumed job',async()=>{
@@ -71,6 +73,6 @@ test('same-school unrelated teacher and pending owner cannot read the entitled f
  expect((await db.query<any>('select public.teacher_orders($1) as orders',[order])).rows[0].orders).toEqual([]);
 });
 test('a form update after selection prevents issuing an order with the old requested manifest',async()=>{
- await register();await register(registration('mcq:MCQ_01'));await enable('structured:SPEC_01');await enable('mcq:MCQ_01');await select();
+ await register();await register(registration('mcq:MCQ_01'));await execution();await enable('structured:SPEC_01');await enable('mcq:MCQ_01');await select();
  await register(registration('structured:SPEC_01',hash('9')));await db.exec('set role service_role');await expect(provision()).rejects.toThrow(/changed or execution unavailable/);
 });

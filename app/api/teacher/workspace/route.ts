@@ -25,7 +25,7 @@ export async function PUT(request:NextRequest) {
   // Cookie-authenticated mutations require a same-origin browser request.
   const config=authConfig();
   if(!config) return reply({error:'Workspace unavailable'},503);
-  if(request.headers.get('origin')!==config.siteUrl) return reply({error:'Request origin rejected'},403);
+  if(!(config.trustedOrigins ?? [config.siteUrl]).includes(request.headers.get('origin') || '')) return reply({error:'Request origin rejected'},403);
   const c=await access(); if(c instanceof NextResponse) return c;
   const raw=await request.text(); if(raw.length>8192) return reply({error:'Request too large'},413);
   let body:unknown; try { body=JSON.parse(raw); } catch { return reply({error:'Invalid request'},400); }

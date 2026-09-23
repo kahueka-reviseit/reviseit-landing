@@ -73,3 +73,21 @@ test('missing metadata stays explicit without invented counts or Bloom categorie
  const missing=screen.getByRole('article',{name:'Explaining a change of state'});
  expect(within(missing).getByText('Subquestion range not yet available')).toBeVisible();expect(within(missing).queryByText('Remember')).not.toBeInTheDocument();
 });
+test('payment stays unavailable until purchasing is open and the selection is saved; checkout sends only the revision and marks',async()=>{
+ const saved={...workspace,selection:{revision:4,release:'demo-1',entryIds:['DEMO_01']}};
+ const {unmount}=render(<WorkspaceView initial={saved}/>);
+ expect(screen.getByRole('button',{name:'Continue to payment · R100'})).toBeDisabled();expect(screen.getByText(/Purchasing is not open/)).toBeVisible();unmount();
+ const assign=vi.fn();vi.stubGlobal('location',{...window.location,assign});
+ const fetch=vi.fn().mockResolvedValue({ok:true,json:async()=>({orderId:'00000000-0000-4000-8000-000000000100',checkoutUrl:'https://checkout.stripe.com/c/pay/cs_test_x'})});vi.stubGlobal('fetch',fetch);
+ render(<WorkspaceView initial={{...saved,purchase:{available:true,amountMinor:10000,currency:'zar'}}}/>);const user=userEvent.setup();
+ const marks=screen.getByLabelText(/Reading a motion graph: marks/);await user.clear(marks);await user.type(marks,'9');
+ await user.click(screen.getByRole('button',{name:'Continue to payment · R100'}));
+ await waitFor(()=>expect(assign).toHaveBeenCalledWith('https://checkout.stripe.com/c/pay/cs_test_x'));
+ const sent=JSON.parse(fetch.mock.calls[0][1].body);expect(Object.keys(sent).sort()).toEqual(['allocations','moduleId','requestKey','selectionRevision']);
+ expect(sent).toMatchObject({moduleId:workspace.module!.id,selectionRevision:4,allocations:{DEMO_01:9}});
+});
+test('an unsaved selection change disables payment',async()=>{
+ render(<WorkspaceView initial={{...workspace,selection:{revision:4,release:'demo-1',entryIds:['DEMO_01']},purchase:{available:true,amountMinor:10000,currency:'zar'}}}/>);
+ expect(screen.getByRole('button',{name:'Continue to payment · R100'})).toBeEnabled();
+ await userEvent.setup().click(screen.getByLabelText('Select Reading a motion graph'));expect(screen.getByRole('button',{name:'Continue to payment · R100'})).toBeDisabled();
+});

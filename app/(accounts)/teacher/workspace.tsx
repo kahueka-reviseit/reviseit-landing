@@ -3,6 +3,7 @@ import { useEffect, useState, useId } from 'react';
 import type { Formatting, Workspace, WorkspaceWrite, CatalogueSearch, CatalogueEntry } from '../../../lib/workspace/contracts';
 import styles from './workspace.module.css';
 import {formatMarks,totalMarks} from '../../../lib/workspace/catalogue';
+import {formatRand} from '../../../lib/payments/contracts';
 const bloomStyles:Record<string,string>={Remember:styles.remember,Understand:styles.understand,Apply:styles.apply,Analyse:styles.analyse,Evaluate:styles.evaluate,Create:styles.create};
 function CatalogueCard({entry,selected=false,disabled=false,onSelect}:{entry:CatalogueEntry;selected?:boolean;disabled?:boolean;onSelect?:(checked:boolean)=>void}) {
   const [failed,setFailed]=useState(false),[expanded,setExpanded]=useState(false);
@@ -43,6 +44,7 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
   const [query,setQuery]=useState('');
   const [search,setSearch]=useState<{query:string;result:CatalogueSearch;error:string}|null>(null);
   const [tab,setTab]=useState<'catalogue'|'formatting'>('catalogue');
+  const [marks,setMarks]=useState<Record<string,number>>({});
   const formattingDirty=JSON.stringify(preferences)!==JSON.stringify(data.formatting.preferences);
   const selectionDirty=!!data.module && (JSON.stringify(ids)!==JSON.stringify(data.selection.entryIds) || data.selection.release!==data.module.release);
   const dirty=formattingDirty || selectionDirty;
@@ -70,6 +72,28 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
     return()=>{clearTimeout(timer);controller.abort();};
   },[searchQuery]);
   const stale=data.selection.revision>0 && data.selection.release!==data.module?.release;
+  // Multiple-choice items are two marks each; structured items take a mark within the published range.
+  const fixedMarks=(e:CatalogueEntry)=>e.id.startsWith('mcq:')?2:null;
+  const allocation=Object.fromEntries(chosen.map(e=>[e.id,fixedMarks(e) ?? marks[e.id] ?? e.marks.max]));
+  const allocatedTotal=Object.values(allocation).reduce((a,b)=>a+b,0);
+  const price=data.purchase ? formatRand(data.purchase.amountMinor) : 'R100';
+  const canPay=!!data.module && !!data.purchase?.available && !selectionDirty && data.selection.revision>0 && chosen.length>0 && chosen.every(e=>e.orderable) &&
+    chosen.every(e=>allocation[e.id]>=e.marks.min && allocation[e.id]<=e.marks.max);
+  async function checkout() {
+    if(!data.module || !canPay) return;
+    setBusy(true);setError('');setNotice('');
+    const payload={moduleId:data.module.id,selectionRevision:data.selection.revision,allocations:allocation};
+    // The same selection and marks reuse one request key, so a double click or retry cannot start a second checkout.
+    const storageKey='checkout:'+JSON.stringify(payload);
+    let requestKey='';
+    try{requestKey=sessionStorage.getItem(storageKey)||'';if(!requestKey){requestKey=crypto.randomUUID();sessionStorage.setItem(storageKey,requestKey);}}catch{requestKey=crypto.randomUUID();}
+    try {
+      const r=await fetch('/api/teacher/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestKey,...payload})});
+      const result=await r.json();
+      if(!r.ok) throw new Error(result.error || 'Checkout could not be started. Nothing has been charged.');
+      window.location.assign(result.checkoutUrl || `/teacher/orders/${result.orderId}`);
+    }catch(e){setError(e instanceof Error?e.message:'Checkout could not be started. Nothing has been charged.');setBusy(false);}
+  }
   useEffect(()=> {
     const guard=(event:BeforeUnloadEvent)=>{if(dirty){event.preventDefault();event.returnValue='';}};
     window.addEventListener('beforeunload',guard);return()=>window.removeEventListener('beforeunload',guard);
@@ -132,7 +156,16 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
           {selectedMarks.min!==selectedMarks.max && <p className={styles.rangeNote}>Final mark allocations are confirmed before payment.</p>}
           <p className={styles.saveState}>{selectionDirty?'Unsaved changes':data.selection.revision?'Selection saved':'No saved selection yet'}</p>
           <button className={styles.primary} disabled={busy || !selectionDirty} onClick={()=>void save('selection')}>{busy?'Please wait…':'Save selection'}</button>
-          <div className={styles.next}><h3>Next: your quote</h3><p>Pricing and checkout are being prepared. Saving does not place an order or charge your school.</p><p>After payment, you will answer the parameter questions for your purchased paper.</p></div>
+          <div className={styles.next}><h3>Next: payment · {price} per paper</h3>
+            {chosen.length>0 && <fieldset className={styles.allocations} disabled={busy}><legend>Marks for each question</legend>
+              {chosen.map(e=>fixedMarks(e)!==null ? <p key={e.id}>{`${e.title}: 2 marks`}</p> :
+                <label key={e.id}>{`${e.title}: marks (${formatMarks(e.marks)})`}<input type="number" min={e.marks.min} max={e.marks.max} step={1} value={allocation[e.id]} onChange={ev=>setMarks({...marks,[e.id]:Number(ev.target.value)})}/></label>)}
+              <p>Paper total: {allocatedTotal} marks</p></fieldset>}
+            {!data.purchase?.available ? <p>Purchasing is not open for your account yet. Your saved selection stays here.</p> :
+              selectionDirty || !data.selection.revision ? <p>Save your selection before continuing to payment.</p> :
+              chosen.some(e=>!e.orderable) ? <p>Remove questions that are not yet available before paying.</p> : null}
+            <button className={styles.primary} disabled={busy || !canPay} onClick={()=>void checkout()}>{busy?'Please wait…':`Continue to payment · ${price}`}</button>
+            <p>You pay {price} for one paper through Stripe's secure checkout. After payment is confirmed, you will answer the parameter questions for the questions you bought.</p></div>
           <details className={styles.package}><summary>Four documents in one delivery</summary><ul><li>Question paper</li><li>First-draft marking memorandum</li><li>Learner memorandum</li><li>Teacher description</li></ul></details>
         </aside>
       </div> : <section className={styles.formatting}><div><h2>Make it your school’s paper</h2><p>These preferences are shared with your school’s teachers for this curriculum. Saving here sets preferences for future papers.</p>

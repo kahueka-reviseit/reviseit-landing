@@ -2,7 +2,7 @@ import 'server-only';
 import { NextResponse } from 'next/server';
 import { accountContext } from '../auth/access';
 import { canEnterWorkspace } from '../auth/policy';
-import { authConfig } from '../supabase/config';
+import { trustedOrigin } from '../supabase/config';
 export const privateHeaders={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'};
 export function reply(value:unknown,status=200){return NextResponse.json(value,{status,headers:privateHeaders});}
 export async function access(reviewer=false){
@@ -12,7 +12,7 @@ export async function access(reviewer=false){
  else if(!canEnterWorkspace(c.account,c.user.email||'',!!c.user.email_confirmed_at))return reply({error:'School verification required'},403);
  return c;
 }
-export function originError(request:Request){const site=authConfig()?.siteUrl;return !site||request.headers.get('origin')!==site?reply({error:'Request origin rejected'},403):null;}
+export function originError(request:Request){return trustedOrigin(request.headers.get('origin'))?null:reply({error:'Request origin rejected'},403);}
 export async function body(request:Request,max=20000):Promise<unknown>{
  if(Number(request.headers.get('content-length')||0)>max)throw new Error('Too large');
  const reader=request.body?.getReader();if(!reader)throw new Error('Missing body');let size=0;const chunks:Uint8Array[]=[];

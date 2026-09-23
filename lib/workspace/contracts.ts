@@ -6,6 +6,7 @@ export type Workspace = {
   schoolName:string; curricula:Curriculum[]; module:Curriculum | null; entries:CatalogueEntry[];
   formatting:{revision:number; preferences:Formatting};
   selection:{revision:number; release:string; entryIds:string[]};
+  purchase?:{available:boolean; amountMinor:number; currency:string};
 };
 export function isFormatting(value: unknown): value is Formatting {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
