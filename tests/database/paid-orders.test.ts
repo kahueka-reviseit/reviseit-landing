@@ -199,3 +199,65 @@ test('only one pilot mode can be enabled and every change is audited',async()=>{
  expect((await db.query<any>('select mode,enabled from private.pilot_funding order by mode')).rows).toEqual([{mode:'live',enabled:true},{mode:'test',enabled:false}]);
  expect((await db.query('select * from private.pilot_funding_changes')).rows).toHaveLength(2);
 });
+
+// C04A R1: Stripe does not guarantee notification order.
+const refund=async(event:string,livemode=false,amount=10000,currency='zar',intent='pi_Synthetic1')=>{await service();return (await db.query<any>('select public.record_stripe_refund($1,$2,$3,$4,$5) as r',[event,livemode,intent,amount,currency])).rows[0].r;};
+test('C04 review: refund received before payment confirmation still prevents fulfilment',async()=>{
+ await funding();await select();const r=await begin();await attach(r.orderId);
+ expect(await refund('evt_early_refund')).toMatchObject({outcome:'retained:awaiting-payment-association',orderId:null});
+ expect(await record('evt_delayed_paid','checkout.session.completed',session(r.orderId))).toMatchObject({outcome:'paid-already-refunded'});
+ const current=await orderRow(r.orderId);
+ expect(current.refunded_at).not.toBeNull();expect(current.state).toBe('cancelled');expect(current.payment_status).toBe('paid');
+ expect((await listing(teacher,r.orderId))[0]).toMatchObject({form:null,payment:{status:'refunded'}});
+ await asUser(teacher);await refuse(()=>db.query('select public.submit_paper_answers($1,$2,$3)',[r.orderId,submission,JSON.stringify(answers())]),/cannot be submitted/);
+ await owner();await db.query("update private.paper_orders set state='queued',answers='{}'::jsonb,submission_key=$2 where id=$1",[r.orderId,submission]);
+ await service();expect((await db.query<any>("select public.claim_paper_job('pilot-synthetic-worker') as j")).rows[0].j).toBeNull();
+});
+test('an early refund replayed before and after association keeps one saved outcome and applies once',async()=>{
+ await funding();await select();const r=await begin();await attach(r.orderId);
+ await refund('evt_early_refund');expect(await refund('evt_early_refund')).toMatchObject({duplicate:true,outcome:'retained:awaiting-payment-association'});
+ await record('evt_paid','checkout.session.completed',session(r.orderId));
+ expect(await refund('evt_early_refund')).toMatchObject({duplicate:true});
+ expect(await record('evt_paid','checkout.session.completed',session(r.orderId))).toMatchObject({duplicate:true,outcome:'paid-already-refunded'});
+ expect(await record('reconcile','reconcile',session(r.orderId))).toMatchObject({outcome:'already-paid'});
+ await owner();expect((await db.query<any>("select event from private.paper_job_events where order_id=$1 and event in ('refunded','paid','paid_after_refund') order by id",[r.orderId])).rows.map(x=>x.event)).toEqual(['refunded','paid_after_refund']);
+ expect((await db.query<any>('select applied_to,outcome from private.stripe_pending_refunds')).rows).toEqual([{applied_to:r.orderId,outcome:'refunded'}]);
+ expect((await orderRow(r.orderId)).state).toBe('cancelled');
+});
+test('payment first and refund second still closes the order; a replayed refund is a duplicate',async()=>{
+ const id=await paidOrder();expect(await refund('evt_late_refund')).toMatchObject({outcome:'refunded',orderId:id});
+ expect(await refund('evt_late_refund')).toMatchObject({duplicate:true,outcome:'refunded'});
+ expect((await orderRow(id)).state).toBe('cancelled');
+ await owner();expect((await db.query('select * from private.stripe_pending_refunds')).rows).toEqual([]);
+});
+test.each([['mode',true,10000,'zar','rejected:mode'],['amount',false,5000,'zar','partial-or-mismatched-refund'],['currency',false,10000,'usd','partial-or-mismatched-refund']])
+('an early refund with mismatched %s is retained but never applied',async(_,livemode,amount,currency,expected)=>{
+ await funding();await select();const r=await begin();await attach(r.orderId);
+ await refund('evt_mismatch',livemode as boolean,amount as number,currency as string);
+ expect(await record('evt_paid','checkout.session.completed',session(r.orderId))).toMatchObject({outcome:'paid'});
+ expect(await orderRow(r.orderId)).toMatchObject({state:'awaiting_answers',refunded_at:null});
+ await owner();expect((await db.query<any>('select outcome,applied_at is not null as applied from private.stripe_pending_refunds')).rows).toEqual([{outcome:expected,applied:true}]);
+});
+test('an early refund for another payment intent does not touch this order',async()=>{
+ await funding();await select();const r=await begin();await attach(r.orderId);
+ await refund('evt_other',false,10000,'zar','pi_SomeoneElse');await record('evt_paid','checkout.session.completed',session(r.orderId));
+ expect(await orderRow(r.orderId)).toMatchObject({state:'awaiting_answers',refunded_at:null});
+});
+
+// C04A R3: an explicit restart after a terminal unpaid checkout.
+test('C04 review: cancelled checkout permits same selection to start again with a new browser request key',async()=>{
+ await funding();await select();const r=await begin();await service();await db.query('select public.cancel_paper_checkout($1,$2)',[r.orderId,teacher]);
+ // The old key still names the old order; it reports that order as terminal and never makes another.
+ expect(await begin()).toMatchObject({orderId:r.orderId,status:'cancelled',terminal:true});
+ const next=await begin(teacher,key2);expect(next.orderId).not.toBe(r.orderId);expect(next).toMatchObject({status:'creating',terminal:false});
+ await owner();expect((await db.query('select * from private.paper_payments')).rows).toHaveLength(2);
+});
+test('an expired checkout is terminal for its key; a new key starts one new checkout; an open one is not terminal',async()=>{
+ await funding();await select();const r=await begin();expect(await begin()).toMatchObject({orderId:r.orderId,terminal:false});
+ await owner();await db.query("update private.paper_payments set expires_at=now()-interval '1 minute' where order_id=$1",[r.orderId]);
+ expect(await begin()).toMatchObject({orderId:r.orderId,terminal:true});
+ const next=await begin(teacher,key2);expect(next.orderId).not.toBe(r.orderId);expect(await begin(teacher,key2)).toMatchObject({orderId:next.orderId,terminal:false});
+});
+test('a paid checkout is never terminal for restart',async()=>{
+ const id=await paidOrder();expect(await begin()).toMatchObject({orderId:id,status:'paid',terminal:false});
+});

@@ -83,15 +83,24 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
     if(!data.module || !canPay) return;
     setBusy(true);setError('');setNotice('');
     const payload={moduleId:data.module.id,selectionRevision:data.selection.revision,allocations:allocation};
-    // The same selection and marks reuse one request key, so a double click or retry cannot start a second checkout.
+    // The same selection and marks reuse one request key, so a double click, timeout or uncertain
+    // retry cannot start a second checkout. The key is replaced only when the server confirms that
+    // its unpaid checkout has ended (cancelled or expired); this click is then a new attempt.
     const storageKey='checkout:'+JSON.stringify(payload);
+    const newKey=()=>{const k=crypto.randomUUID();try{sessionStorage.setItem(storageKey,k);}catch{}return k;};
     let requestKey='';
-    try{requestKey=sessionStorage.getItem(storageKey)||'';if(!requestKey){requestKey=crypto.randomUUID();sessionStorage.setItem(storageKey,requestKey);}}catch{requestKey=crypto.randomUUID();}
+    try{requestKey=sessionStorage.getItem(storageKey)||'';}catch{}
+    if(!requestKey) requestKey=newKey();
     try {
-      const r=await fetch('/api/teacher/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestKey,...payload})});
-      const result=await r.json();
-      if(!r.ok) throw new Error(result.error || 'Checkout could not be started. Nothing has been charged.');
-      window.location.assign(result.checkoutUrl || `/teacher/orders/${result.orderId}`);
+      for(let attempt=0;attempt<2;attempt++){
+        const r=await fetch('/api/teacher/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestKey,...payload})});
+        const result=await r.json();
+        if(!r.ok) throw new Error(result.error || 'Checkout could not be started. Nothing has been charged.');
+        if(result.terminal===true && attempt===0){requestKey=newKey();continue;}
+        window.location.assign(result.checkoutUrl || `/teacher/orders/${result.orderId}`);
+        return;
+      }
+      throw new Error('Checkout could not be started. Nothing has been charged.');
     }catch(e){setError(e instanceof Error?e.message:'Checkout could not be started. Nothing has been charged.');setBusy(false);}
   }
   useEffect(()=> {

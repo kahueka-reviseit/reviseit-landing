@@ -11,6 +11,9 @@ export default function OrderView({initial}:{initial:Order}){
  const [fieldError,setFieldError]=useState<QuestionnaireFieldError|null>(null);
  useEffect(()=>{if(fieldError&&!busy)document.getElementById(questionFieldId(fieldError.itemId,fieldError.fieldId))?.focus();},[fieldError,busy]);
  const [grouped,setGrouped]=useState<QuestionnaireAnswers|null>(()=>isQuestionnaire(initial.form)?emptyQuestionnaireAnswers(initial.form):null);
+ // A paid order's form can first arrive through reconciliation or refresh. Start its answers then;
+ // keep answers already entered for the same form revision.
+ useEffect(()=>{if(isQuestionnaire(order.form)&&grouped?.revision!==order.form.revision)setGrouped(emptyQuestionnaireAnswers(order.form));},[order.form]);
  useEffect(()=>{const storageKey='paper-submit:'+initial.id;let value=sessionStorage.getItem(storageKey);if(!value){value=crypto.randomUUID();sessionStorage.setItem(storageKey,value);}setKey(value);},[initial.id]);
  async function refresh(){try{const r=await fetch(`/api/teacher/orders/${initial.id}`,{cache:'no-store'});if(r.status===401){window.location.assign('/login');return;}if(!r.ok){setError('We could not refresh this request. Check your account access or try again.');return;}setOrder(await r.json());setError('');}catch{setError('Connection lost. Your submitted request remains saved.');}}
  useEffect(()=>{if(['released','held','cancelled','awaiting_answers'].includes(order.state))return;const timer=setInterval(()=>{if(document.visibilityState==='visible')void refresh();},5000);return()=>clearInterval(timer);},[order.state,initial.id]);

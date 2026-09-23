@@ -25,8 +25,11 @@ export async function POST(request:Request){
  if(!isCheckoutRequest(value))return reply({error:'Check the marks for each question.'},422);
  const begun=await c.supabase.rpc('begin_paper_checkout',{request_key:value.requestKey,target_module:value.moduleId,selection_revision:value.selectionRevision,allocations:value.allocations});
  if(begun.error)return refusal(begun.error.message);
- const r=begun.data as {orderId:string;mode:string;status:string;checkoutUrl:string|null;expiresAt:string;existing:boolean};
+ const r=begun.data as {orderId:string;mode:string;status:string;checkoutUrl:string|null;expiresAt:string;existing:boolean;terminal?:boolean};
  if(r.mode!==stripe.mode)return reply({error:'Purchasing is not open yet.'},503);
+ // This request key's unpaid checkout has ended. The browser may start an explicit
+ // new attempt with a new key; the same key never creates another order.
+ if(r.terminal===true)return reply({orderId:r.orderId,checkoutUrl:null,existing:false,terminal:true});
  if(r.status==='open'&&r.checkoutUrl)return reply({orderId:r.orderId,checkoutUrl:r.checkoutUrl,existing:r.existing});
  if(r.status!=='creating')return reply({orderId:r.orderId,checkoutUrl:null,existing:r.existing});
  try{
