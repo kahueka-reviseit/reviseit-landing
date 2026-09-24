@@ -74,15 +74,22 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
   const stale=data.selection.revision>0 && data.selection.release!==data.module?.release;
   // Multiple-choice items are two marks each; structured items take a mark within the published range.
   const fixedMarks=(e:CatalogueEntry)=>e.id.startsWith('mcq:')?2:null;
-  const allocation=Object.fromEntries(chosen.map(e=>[e.id,fixedMarks(e) ?? marks[e.id] ?? e.marks.max]));
-  const allocatedTotal=Object.values(allocation).reduce((a,b)=>a+b,0);
+  // Editable-configuration path: marks are set explicitly against a paper total and are never
+  // filled in for the teacher. The existing path keeps its previous behaviour unchanged.
+  const configured=!!data.purchase?.configurator;
+  const [paperTarget,setPaperTarget]=useState<number|null>(null);
+  const allocation=Object.fromEntries(chosen.map(e=>[e.id,fixedMarks(e) ?? marks[e.id] ?? (configured?NaN:e.marks.max)]));
+  const inRange=(e:CatalogueEntry)=>Number.isInteger(allocation[e.id]) && allocation[e.id]>=e.marks.min && allocation[e.id]<=e.marks.max;
+  const allocatedTotal=Object.values(allocation).reduce((a,b)=>a+(Number.isInteger(b)?b:0),0);
+  const marksSet=chosen.every(inRange);
+  const balanced=!configured || (paperTarget!==null && marksSet && allocatedTotal===paperTarget);
   const price=data.purchase ? formatRand(data.purchase.amountMinor) : 'R100';
   const canPay=!!data.module && !!data.purchase?.available && !selectionDirty && data.selection.revision>0 && chosen.length>0 && chosen.every(e=>e.orderable) &&
-    chosen.every(e=>allocation[e.id]>=e.marks.min && allocation[e.id]<=e.marks.max);
+    marksSet && balanced;
   async function checkout() {
     if(!data.module || !canPay) return;
     setBusy(true);setError('');setNotice('');
-    const payload={moduleId:data.module.id,selectionRevision:data.selection.revision,allocations:allocation};
+    const payload={moduleId:data.module.id,selectionRevision:data.selection.revision,allocations:allocation,...(configured?{targets:{paper:paperTarget!}}:{})};
     // The same selection and marks reuse one request key, so a double click, timeout or uncertain
     // retry cannot start a second checkout. The key is replaced only when the server confirms that
     // its unpaid checkout has ended (cancelled or expired); this click is then a new attempt.
@@ -95,7 +102,7 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
       for(let attempt=0;attempt<2;attempt++){
         const r=await fetch('/api/teacher/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestKey,...payload})});
         const result=await r.json();
-        if(!r.ok) throw new Error(result.error || 'Checkout could not be started. Nothing has been charged.');
+        if(!r.ok) throw new Error([result.error || 'Checkout could not be started. Nothing has been charged.',...(Array.isArray(result.problems)?result.problems:[])].join(' '));
         if(result.terminal===true && attempt===0){requestKey=newKey();continue;}
         window.location.assign(result.checkoutUrl || `/teacher/orders/${result.orderId}`);
         return;
@@ -167,9 +174,13 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
           <button className={styles.primary} disabled={busy || !selectionDirty} onClick={()=>void save('selection')}>{busy?'Please wait…':'Save selection'}</button>
           <div className={styles.next}><h3>Next: payment · {price} per paper</h3>
             {chosen.length>0 && <fieldset className={styles.allocations} disabled={busy}><legend>Marks for each question</legend>
-              {chosen.map(e=>fixedMarks(e)!==null ? <p key={e.id}>{`${e.title}: 2 marks`}</p> :
-                <label key={e.id}>{`${e.title}: marks (${formatMarks(e.marks)})`}<input type="number" min={e.marks.min} max={e.marks.max} step={1} value={allocation[e.id]} onChange={ev=>setMarks({...marks,[e.id]:Number(ev.target.value)})}/></label>)}
-              <p>Paper total: {allocatedTotal} marks</p></fieldset>}
+              {configured && <label>Total marks for this paper<input type="number" min={1} max={3000} step={1} value={paperTarget ?? ''} placeholder="Set a total" onChange={ev=>setPaperTarget(ev.target.value===''?null:Number(ev.target.value))}/></label>}
+              {chosen.map(e=>fixedMarks(e)!==null ? <p key={e.id}>{`${e.title}: 2 marks · fixed for this type`}</p> :
+                <label key={e.id}>{`${e.title}: marks (${formatMarks(e.marks)})`}<input type="number" min={e.marks.min} max={e.marks.max} step={1} value={Number.isNaN(allocation[e.id])?'':allocation[e.id]} placeholder={configured?'Set':undefined} aria-invalid={configured && marks[e.id]!==undefined && !inRange(e)} onChange={ev=>setMarks({...marks,[e.id]:ev.target.value===''?NaN:Number(ev.target.value)})}/></label>)}
+              {configured ? <div role="status"><p><strong>{marksSet && balanced ? 'Ready for payment' : 'Marks needed'}</strong></p>
+                <p>Allocated {allocatedTotal} of {paperTarget ?? '—'} marks{paperTarget!==null && marksSet && allocatedTotal<paperTarget ? ` · ${paperTarget-allocatedTotal} still to allocate` : ''}{paperTarget!==null && allocatedTotal>paperTarget ? ` · ${allocatedTotal-paperTarget} over the total` : ''}</p>
+                <p>After payment you can still move marks between these questions and change every other choice until you submit.</p></div> :
+              <p>Paper total: {allocatedTotal} marks</p>}</fieldset>}
             {!data.purchase?.available ? <p>Purchasing is not open for your account yet. Your saved selection stays here.</p> :
               selectionDirty || !data.selection.revision ? <p>Save your selection before continuing to payment.</p> :
               chosen.some(e=>!e.orderable) ? <p>Remove questions that are not yet available before paying.</p> : null}

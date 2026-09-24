@@ -201,7 +201,8 @@ export function project(defs:Definitions, cfg:Configuration, e:Evaluation, meta:
     status:e.status,statusLabel:readinessLabels[e.status],outstanding:e.outstanding,canSubmit:e.ready&&!meta.submitted&&meta.state==='awaiting_answers',
     totals:{target:e.totals.target,allocated:e.totals.allocated,remaining,excess,complete:e.totals.complete,
       sections:(['multiple_choice','structured'] as SectionKey[]).filter(k=>defs.lines.some(l=>l.identity.kind===k)).map(k=>({key:k,label:sectionLabels[k],allocated:e.totals.sections[k],target:e.totals.sectionTargets[k]??null}))},
-    cognitive,curriculum,lines,paper:{fields:paid?defs.paperFields:[],answers:paid?cfg.answers.paper:{},outstanding:e.paper.outstanding},
+    // Presentation order matches the paper: multiple choice as question 1, then structured.
+    cognitive,curriculum,lines:[...lines].sort((a,b)=>(a.kind===b.kind?0:a.kind==='multiple_choice'?-1:1)),paper:{fields:paid?defs.paperFields:[],answers:paid?cfg.answers.paper:{},outstanding:e.paper.outstanding},
     issues:[...e.totals.problems,...e.issues],configuration:cfg};
 }
 

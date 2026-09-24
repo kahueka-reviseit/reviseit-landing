@@ -1,0 +1,72 @@
+/* Values follow the Paper "Build a paper (proposed)" page: white 12px cards,
+   24px pill chips, sage-dark selection, dashed delegation, slate eyebrows. */
+.layout { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:28px; align-items:start; margin-top:24px; }
+.main,.side { display:grid; gap:20px; min-width:0; }
+.side { position:sticky; top:24px; }
+.panel { background:#fff; border-radius:12px; padding:24px; display:grid; gap:14px; }
+.eyebrow { color:#3B5F8A; font-size:13px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; line-height:16px; margin:0; }
+.heading { font-family:'Playfair Display',Georgia,serif; font-size:26px; line-height:32px; margin:0; }
+.help { color:#4A4A4A; font-size:15px; line-height:20px; margin:0; }
+.status { font-family:'Playfair Display',Georgia,serif; font-size:30px; line-height:36px; margin:0; }
+.saveState { font-size:14px; color:#436B56; margin:0; }
+.stepper { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; }
+.step { flex:1 0 130px; text-align:left; background:#fff; border:1px solid #F0EDE6; border-radius:10px; padding:12px 14px; display:grid; gap:6px; font:inherit; cursor:pointer; }
+.step.current { border:2px solid #436B56; padding:11px 13px; }
+.step:focus-visible,.chip:focus-within,.stepperControl button:focus-visible,.primary:focus-visible,.secondary:focus-visible { outline:3px solid #3B5F8A; outline-offset:2px; }
+.stepLabel,.mcqLabel { font-size:12px; font-weight:600; line-height:16px; color:#3B5F8A; }
+.mcqLabel { color:#8A5F2E; }
+.stepReady { font-size:12px; font-weight:600; color:#436B56; }
+.stepPending { font-size:12px; color:#6b6b6b; }
+.allocation { display:flex; justify-content:space-between; align-items:center; gap:24px; }
+.allocation p { margin:0; font-size:16px; line-height:22px; }
+.marksValue { font-size:24px; }
+.stepperControl { display:flex; align-items:stretch; border:1px solid #898780; border-radius:28px; overflow:hidden; }
+.stepperControl button { width:44px; border:0; background:#fff; font-size:22px; cursor:pointer; }
+.stepperControl button:disabled { color:#b5b3ad; cursor:not-allowed; }
+.stepperControl input { width:64px; border:0; border-inline:1px solid #F0EDE6; text-align:center; font:600 22px/1 'Playfair Display',Georgia,serif; }
+.totalLine { border-top:1px solid #F0EDE6; padding-top:12px; margin:0; font-size:16px; line-height:24px; }
+.field { border:0; border-top:1px solid #F0EDE6; padding:16px 0 0; margin:0; display:grid; gap:10px; min-width:0; }
+.field legend { font-size:17px; font-weight:600; line-height:22px; color:#2D2D2D; padding:0; float:left; width:100%; margin-bottom:10px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; align-items:center; clear:both; }
+.chip { position:relative; border:1px solid #898780; border-radius:24px; padding:10px 18px; font-size:16px; line-height:20px; cursor:pointer; background:#fff; color:#000; }
+.chip input { position:absolute; opacity:0; inset:0; margin:0; cursor:pointer; }
+.chip.dashed { border-style:dashed; }
+.chip.on { background:#436B56; border-color:#436B56; color:#fff; }
+.chip.off { color:#8A8A8A; border-color:#ddd; text-decoration:line-through; cursor:not-allowed; }
+.suggested { font-style:normal; font-size:13px; opacity:.85; }
+.link { border:0; background:none; text-decoration:underline; font:inherit; font-size:15px; cursor:pointer; color:#2D2D2D; }
+.textLabel { font-size:14px; color:#4A4A4A; }
+.text { width:100%; min-height:88px; padding:12px; border:1px solid #898780; font:inherit; }
+.attention { margin:0; padding:10px 14px; border-left:3px solid #B85042; background:#fcf0ee; color:#802f25; font-size:15px; line-height:20px; }
+.required { margin:0; padding:10px 14px; border-left:3px solid #5B8A72; background:#F0EDE6; font-size:15px; }
+.note { background:#F0EDE6; border-left:3px solid #5B8A72; padding:16px; display:grid; gap:8px; font-size:15px; line-height:22px; }
+.parts { list-style:none; margin:0; padding:0; display:grid; gap:0; clear:both; }
+.parts li { display:grid; grid-template-columns:1fr auto auto; gap:6px 12px; align-items:center; padding:12px 0; border-top:1px solid #F0EDE6; }
+.parts li > .help,.parts li > .attention { grid-column:1 / -1; }
+.parts li.left label { color:#8A8A8A; text-decoration:line-through; }
+.parts input { accent-color:#436B56; width:20px; height:20px; vertical-align:middle; }
+.partNo { font-weight:600; margin-inline:6px; }
+.partMarks { font-weight:600; min-width:36px; text-align:right; }
+.band { font-size:13px; color:#4A4A4A; }
+.bloom { display:inline-block; font:600 11px/1.2 'Trebuchet MS',sans-serif; padding:4px 7px; border-radius:3px; }
+.remember { background:#436B56; color:#fff; }.understand { background:#1A1A2E; color:#fff; }.apply { background:#D4A574; color:#292323; }
+.analyse { background:#3B5F8A; color:#fff; }.evaluate { background:#B85042; color:#fff; }.create { background:#735B79; color:#fff; }.unclassified { background:#c9c6be; color:#2D2D2D; }
+.target { display:flex; justify-content:space-between; align-items:center; gap:12px; font-weight:600; }
+.target input { width:88px; padding:8px 10px; border:1px solid #898780; font:inherit; text-align:right; }
+.budgetRow { display:flex; justify-content:space-between; gap:12px; font-size:15px; border-top:1px solid #F0EDE6; padding-top:8px; }
+.mix { list-style:none; margin:0; padding:0; display:grid; gap:8px; }
+.mix li { display:grid; grid-template-columns:120px 1fr 44px; gap:10px; align-items:center; font-size:15px; }
+.mix li span:last-child { text-align:right; }
+.bar { height:8px; background:#F0EDE6; border-radius:999px; overflow:hidden; display:block; }
+.bar i { display:block; height:100%; border-radius:999px; }
+.table { width:100%; border-collapse:collapse; font-size:14px; }
+.table th,.table td { text-align:left; padding:6px 4px; border-top:1px solid #F0EDE6; }
+.primary { width:100%; padding:16px 24px; border:0; border-radius:28px; background:#436B56; color:#fff; font:600 17px/1 inherit; cursor:pointer; }
+.primary:disabled { opacity:.55; cursor:not-allowed; }
+.secondary { padding:10px 18px; border:1px solid #5B8A72; border-radius:24px; background:#fff; font:600 15px/1.2 inherit; cursor:pointer; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns:1fr; }
+  .side { position:static; }
+  .allocation { flex-direction:column; align-items:flex-start; }
+  .mix li { grid-template-columns:110px 1fr 40px; }
+}

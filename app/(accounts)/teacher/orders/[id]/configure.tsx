@@ -1,0 +1,220 @@
+'use client';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { Answer, QuestionField } from '../../../../../lib/jobs/questionnaire';
+import type { Attention, Configuration, ConfigurationView, FacetView, LineView } from '../../../../../lib/configurator/contracts';
+import styles from './configure.module.css';
+
+/**
+ * Configured order: marks, parts and authored details stay editable until
+ * submission. The browser holds only the teacher's own choices and the server's
+ * projection; every rule and total comes back from the server after a save.
+ */
+type SaveState = 'saved'|'pending'|'saving'|'conflict'|'failed';
+const bloomClass:Record<string,string>={remember:styles.remember,understand:styles.understand,apply:styles.apply,analyse:styles.analyse,evaluate:styles.evaluate,create:styles.create,unclassified:styles.unclassified};
+
+function lineStatus(line:LineView,paid:boolean){
+  if(line.marks.value===null || line.attention.some(a=>a.scope==='marks')) return {text:'Marks needed',ready:false};
+  if(!paid) return {text:'Marks set',ready:true};
+  if(line.issues.length) return {text:'Needs attention',ready:false};
+  return line.ready?{text:'Details ready',ready:true}:{text:'Details to complete',ready:false};
+}
+const range=(r:{min:number;max:number})=>r.min===r.max?String(r.min):`${r.min}–${r.max}`;
+
+function Chips({name,field,facet,value,onChange,disabled,attention}:{name:string;field:QuestionField;facet?:FacetView;value?:Answer;onChange:(a:Answer|null)=>void;disabled:boolean;attention?:Attention}) {
+  const id=`${name}-${field.id}`;
+  const selected=value?.kind==='choice'?`choice:${value.choiceId}`:value?.kind??'';
+  const options=field.type==='choice'?field.choices.map(c=>({...c,view:facet?.options.find(o=>o.id===c.id)})):[];
+  const writing=value?.kind==='text';
+  const pick=(mode:string)=>{
+    if(mode.startsWith('choice:')) onChange({kind:'choice',choiceId:mode.slice(7)});
+    else if(mode==='text') onChange({kind:'text',text:''});
+    else if(mode==='automatic'||mode==='omit') onChange({kind:mode});
+  };
+  const radio=(mode:string,label:string,extra:{dashed?:boolean;off?:boolean;reason?:string;preferred?:boolean}={})=>
+    <label key={mode} className={`${styles.chip} ${extra.dashed?styles.dashed:''} ${selected===mode?styles.on:''} ${extra.off?styles.off:''}`} title={extra.reason}>
+      <input type="radio" name={id} value={mode} checked={selected===mode} disabled={disabled||(extra.off&&selected!==mode)} onChange={()=>pick(mode)}/>
+      <span>{selected===mode?'✓ ':''}{label}{extra.preferred?<em className={styles.suggested}> · suggested</em>:null}</span>
+    </label>;
+  const describedBy=[field.hint?`${id}-hint`:'',attention?`${id}-attention`:'',facet?.reason?`${id}-reason`:''].filter(Boolean).join(' ')||undefined;
+  return <fieldset className={styles.field} aria-describedby={describedBy} id={id}>
+    <legend>{field.label}{field.required?'':' (optional)'}</legend>
+    {field.hint&&<p id={`${id}-hint`} className={styles.help}>{field.hint}</p>}
+    <div className={styles.chips}>
+      {options.map(o=>radio(`choice:${o.id}`,o.label,{off:o.view?.disabled,reason:o.view?.reason,preferred:o.view?.preferred}))}
+      {(field.type==='text'||field.allowOther)&&radio('text',field.type==='text'?'Write my answer':'Describe my own')}
+      {field.allowAutomatic&&radio('automatic','Choose for me',{dashed:true})}
+      {!field.required&&radio('omit','No preference',{dashed:true})}
+      {value&&!field.required&&<button type="button" className={styles.link} disabled={disabled} onClick={()=>onChange(null)}>Leave blank</button>}
+    </div>
+    {writing&&<><label className={styles.textLabel} htmlFor={`${id}-text`}>Your answer for {field.label}</label>
+      <textarea id={`${id}-text`} className={styles.text} value={value.kind==='text'?value.text:''} disabled={disabled} maxLength={field.type==='text'?field.maxLength:2000} onChange={e=>onChange({kind:'text',text:e.target.value})}/></>}
+    {facet?.forced&&<p id={`${id}-reason`} className={styles.required}>Required by your other choices: {facet.options.find(o=>o.id===facet.forced)?.label}. {facet.reason}</p>}
+    {options.some(o=>o.view?.disabled)&&<ul className={styles.help}>{options.filter(o=>o.view?.disabled).map(o=><li key={o.id}>{o.label}: {o.view?.reason}</li>)}</ul>}
+    {attention&&<p id={`${id}-attention`} role="alert" className={styles.attention}>{attention.message}</p>}
+  </fieldset>;
+}
+
+export default function ConfigureOrder({orderId,onSubmitted}:{orderId:string;onSubmitted:()=>void}) {
+  const [view,setView]=useState<ConfigurationView|null>(null);
+  const [draft,setDraft]=useState<Configuration|null>(null);
+  const [active,setActive]=useState(0);
+  const [save,setSave]=useState<SaveState>('saved');
+  const [error,setError]=useState('');
+  const [busy,setBusy]=useState(false);
+  const revision=useRef(0), latest=useRef<Configuration|null>(null), timer=useRef<ReturnType<typeof setTimeout>|null>(null), inFlight=useRef(false);
+
+  const load=useCallback(async(keepLocal=false)=>{
+    const r=await fetch(`/api/teacher/orders/${orderId}/configuration`,{cache:'no-store'});
+    if(r.status===401){window.location.assign('/login');return;}
+    const data=await r.json();
+    if(!r.ok){setError(data.error||'This paper could not be loaded. Refresh to try again.');return;}
+    setView(data);revision.current=data.revision;
+    if(!keepLocal){setDraft(data.configuration);latest.current=data.configuration;setSave('saved');}
+  },[orderId]);
+  useEffect(()=>{void load();},[load]);
+
+  const flush=useCallback(async()=>{
+    if(inFlight.current||!latest.current) return;
+    inFlight.current=true;setSave('saving');
+    const sent=latest.current;
+    try{
+      const r=await fetch(`/api/teacher/orders/${orderId}/configuration`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({revision:revision.current,configuration:sent})});
+      const data=await r.json();
+      if(r.status===409){setSave('conflict');setError(data.error);return;}
+      if(!r.ok){setSave('failed');setError(data.error||'We could not save this. Your choices are still on this page.');return;}
+      setView(data);revision.current=data.revision;setError('');
+      // Edits made while saving stay on the page and are saved next.
+      if(latest.current!==sent){setSave('pending');timer.current=setTimeout(()=>void flush(),300);}else setSave('saved');
+    }catch{setSave('failed');setError('Connection lost. Your choices are still on this page; they will save when you try again.');}
+    finally{inFlight.current=false;}
+  },[orderId]);
+
+  function update(change:(c:Configuration)=>Configuration){
+    if(!draft) return;
+    const next=change(structuredClone(draft));setDraft(next);latest.current=next;
+    if(save==='conflict') return;
+    setSave('pending');if(timer.current) clearTimeout(timer.current);timer.current=setTimeout(()=>void flush(),700);
+  }
+  useEffect(()=>()=>{if(timer.current) clearTimeout(timer.current);},[]);
+
+  async function submit(){
+    if(!view) return;
+    setBusy(true);setError('');
+    const storage=`configure-submit:${orderId}:${view.revision}`;
+    let key='';try{key=sessionStorage.getItem(storage)||'';}catch{}
+    if(!key){key=crypto.randomUUID();try{sessionStorage.setItem(storage,key);}catch{}}
+    try{
+      const r=await fetch(`/api/teacher/orders/${orderId}/configuration/submit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestKey:key,revision:view.revision})});
+      const data=await r.json();
+      if(!r.ok){setError(data.error||'Submission could not be confirmed. Retry; this will not create a second request.');if(r.status===409)await load(true);return;}
+      onSubmitted();
+    }catch{setError('Submission could not be confirmed. Retry; this will not create a second request.');}
+    finally{setBusy(false);}
+  }
+
+  if(!view||!draft) return <section className={styles.panel}><p>{error||'Loading your paper…'}</p></section>;
+  const paid=view.paid&&view.state==='awaiting_answers';
+  const editable=!view.submitted&&['awaiting_payment','awaiting_answers'].includes(view.state);
+  const line=view.lines[Math.min(active,view.lines.length-1)];
+  const own=draft.lines[line.id];
+  const setMarks=(id:string,value:number|null)=>update(c=>{c.lines[id].marks=value;return c;});
+  const setAnswer=(scope:'item'|'paper',field:string,answer:Answer|null)=>update(c=>{
+    const section=scope==='paper'?c.answers.paper:(c.answers.items[line.id]??={});
+    if(answer===null) delete section[field]; else section[field]=answer;return c;});
+  const togglePart=(id:string,on:boolean)=>update(c=>{const cur=new Set(c.lines[line.id].parts??[]);if(on)cur.add(id);else cur.delete(id);c.lines[line.id].parts=[...cur];return c;});
+  const attentionFor=(id:string,scope='field')=>line.attention.find(a=>a.scope===scope&&a.id===id);
+  const saveText={saved:'All changes saved',pending:'Unsaved changes',saving:'Saving…',conflict:'Not saved: this paper changed elsewhere',failed:'Not saved'}[save];
+  const t=view.totals;
+  const maxBloom=Math.max(1,...view.cognitive.map(r=>r.max));
+
+  return <div className={styles.layout}>
+    <div className={styles.main}>
+      <nav className={styles.stepper} aria-label="Questions in this paper">
+        {view.lines.map((l,i)=>{const s=lineStatus(l,paid);return <button key={l.id} type="button" aria-current={i===active?'step':undefined} className={`${styles.step} ${i===active?styles.current:''}`} onClick={()=>setActive(i)}>
+          <span className={l.kind==='multiple_choice'?styles.mcqLabel:styles.stepLabel}>Q{l.number} · {l.title}</span>
+          <span className={s.ready?styles.stepReady:styles.stepPending}>{s.text}</span></button>;})}
+      </nav>
+
+      <section className={styles.panel} aria-labelledby="allocation-heading">
+        <p id="allocation-heading" className={styles.eyebrow}>{paid?'Your allocation · still editable':'Marks for this question'}</p>
+        <div className={styles.allocation}>
+          <p>Question {line.number} · {line.title}<br/><span className={styles.help}>{line.marks.fixed?`${line.marks.min} marks · fixed for this type`:`Permitted range ${range(line.marks)} marks`}</span></p>
+          {line.marks.fixed?<strong className={styles.marksValue}>{line.marks.min}</strong>:
+          <div className={styles.stepperControl}>
+            <button type="button" aria-label={`One mark fewer for question ${line.number}`} disabled={!editable||own.marks===null||own.marks<=line.marks.min} onClick={()=>setMarks(line.id,(own.marks??line.marks.min)-1)}>−</button>
+            <input aria-label={`Marks for question ${line.number}`} inputMode="numeric" value={own.marks??''} placeholder="Set" disabled={!editable}
+              onChange={e=>{const v=e.target.value.trim();setMarks(line.id,v===''?null:Number.isInteger(Number(v))?Number(v):own.marks);}}/>
+            <button type="button" aria-label={`One mark more for question ${line.number}`} disabled={!editable||(own.marks??0)>=line.marks.max} onClick={()=>setMarks(line.id,own.marks===null?line.marks.min:own.marks+1)}>+</button>
+          </div>}
+        </div>
+        {attentionFor('marks','marks')&&<p role="alert" className={styles.attention}>{attentionFor('marks','marks')!.message}</p>}
+        {line.attention.filter(a=>a.scope==='marks'&&a.id!=='marks').map((a,i)=><p key={i} role="alert" className={styles.attention}>{a.message}</p>)}
+        <p className={styles.totalLine}>Paper total: {t.allocated} of {t.target??'—'} marks allocated. {t.remaining?`${t.remaining} still to allocate. `:''}{t.excess?`${t.excess} over the total. `:''}Move marks between questions within their ranges; the totals and cognitive mix update when saved.</p>
+      </section>
+
+      {!paid&&!view.submitted&&<section className={styles.panel}><p className={styles.eyebrow}>After payment</p><p>Detailed choices for each question unlock once Stripe confirms your payment. You can still change marks, parts and every other choice until you submit.</p></section>}
+
+      {paid&&<section className={styles.panel} aria-labelledby="details-heading">
+        <p className={styles.eyebrow}>Question {line.number} · {line.title} · {own.marks??'?'} marks</p>
+        <h2 id="details-heading" className={styles.heading}>{line.fields.length?'Set the details':'No further details are needed'}</h2>
+        {line.configurable==='authored'&&<p className={styles.help}>This question uses its authored details. Parts and cognitive levels are not yet classified.</p>}
+        {line.issues.map((m,i)=><p key={i} role="alert" className={styles.attention}>{m}</p>)}
+        {line.parts.length>0&&<fieldset className={styles.field}><legend>What the question covers</legend>
+          <ol className={styles.parts}>{line.parts.map(p=><li key={p.id} className={p.included?'':styles.left}>
+            <label><input type="checkbox" checked={p.included} disabled={!editable||p.locked} onChange={e=>togglePart(p.id,e.target.checked)}/> <span className={styles.partNo}>{line.number}.{p.number}</span> {p.summary}</label>
+            <span className={`${styles.bloom} ${bloomClass[p.bloom??'unclassified']}`}>{p.bloom?p.bloom.charAt(0).toUpperCase()+p.bloom.slice(1):'Not yet classified'}</span>
+            {p.band&&<span className={styles.band}>Curriculum band {p.band}</span>}
+            <span className={styles.partMarks}>{p.marks?range(p.marks):'—'}</span>
+            {p.learnerDrawn&&<span className={styles.help}>Learners draw this themselves</span>}
+            {p.reason&&<span className={styles.help}>{p.reason}</span>}
+            {attentionFor(p.id,'part')&&<span role="alert" className={styles.attention}>{attentionFor(p.id,'part')!.message}</span>}
+          </li>)}</ol></fieldset>}
+        {line.diagram&&<div className={styles.note}><strong>{line.diagram.locked?'Stimulus diagram set by your choices':line.diagram.stimulus==='required'?'This question needs its diagram':line.diagram.stimulus==='not_applicable'?'No stimulus diagram for this question':'Stimulus diagram'}</strong>
+          <span>{line.diagram.learnerDrawn.length?'A drawing learners make themselves is a separate part and is not affected by the stimulus diagram choice.':'The stimulus diagram is what learners are given; it is separate from anything learners draw.'}</span></div>}
+        {line.fields.map(f=><Chips key={f.id} name={`q-${line.id}`} field={f} facet={line.facets.find(x=>x.id===f.id)} value={draft.answers.items[line.id]?.[f.id]} disabled={!editable}
+          attention={attentionFor(f.id)} onChange={a=>setAnswer('item',f.id,a)}/>)}
+      </section>}
+
+      {paid&&view.paper.fields.length>0&&<section className={styles.panel} aria-labelledby="paper-heading">
+        <h2 id="paper-heading" className={styles.heading}>Settings for the whole paper</h2>
+        {view.paper.fields.map(f=><Chips key={f.id} name="paper" field={f} value={draft.answers.paper[f.id]} disabled={!editable} onChange={a=>setAnswer('paper',f.id,a)}/>)}
+      </section>}
+    </div>
+
+    <aside className={styles.side} aria-label="Paper status">
+      <section className={styles.panel}>
+        <p className={styles.eyebrow}>{view.submitted?'Submitted':'Paper status'}</p>
+        <p className={styles.status} aria-live="polite">{view.submitted?'Submitted for generation':view.statusLabel}</p>
+        {!view.submitted&&paid&&view.outstanding>0&&<p>{view.outstanding} required {view.outstanding===1?'choice':'choices'} to make. Optional notes can stay blank.</p>}
+        {view.issues.map((m,i)=><p key={i} className={styles.help}>{m}</p>)}
+        <p className={styles.saveState} role="status">{saveText}</p>
+        {save==='conflict'&&<button type="button" className={styles.secondary} onClick={()=>void load()}>Load the latest saved choices</button>}
+        {save==='failed'&&<button type="button" className={styles.secondary} onClick={()=>void flush()}>Try saving again</button>}
+        {error&&<p role="alert" className={styles.attention}>{error}</p>}
+      </section>
+      <section className={styles.panel} aria-labelledby="budget-heading">
+        <p id="budget-heading" className={styles.eyebrow}>Marks budget</p>
+        <label className={styles.target}>Paper total<input inputMode="numeric" value={draft.targets.paper??''} disabled={!editable} onChange={e=>{const v=e.target.value.trim();update(c=>{c.targets.paper=v===''?null:Number.isInteger(Number(v))?Number(v):c.targets.paper;return c;});}}/></label>
+        {t.sections.map(s=><div key={s.key} className={styles.budgetRow}><span>{s.label}</span><span>{s.allocated}{s.target!==null?` of ${s.target}`:''} marks</span></div>)}
+        <div className={styles.budgetRow}><strong>Allocated</strong><strong>{t.allocated} of {t.target??'—'}</strong></div>
+        {t.remaining>0&&<p className={styles.help}>{t.remaining} marks still to allocate</p>}
+        {t.excess>0&&<p className={styles.attention}>{t.excess} marks over the paper total</p>}
+      </section>
+      <section className={styles.panel} aria-labelledby="bloom-heading">
+        <p id="bloom-heading" className={styles.eyebrow}>Bloom’s cognitive mix · by marks</p>
+        <ul className={styles.mix}>{view.cognitive.map(r=><li key={r.key}><span>{r.label}</span>
+          <span className={styles.bar} aria-hidden="true"><i className={bloomClass[r.key]} style={{width:`${Math.round(r.max/maxBloom*100)}%`}}/></span>
+          <span>{r.min===r.max?r.min:`${r.min}–${r.max}`}</span></li>)}</ul>
+        <p className={styles.help}>A range means the final split between parts is decided within their permitted marks. Marks without a classification are shown as not yet classified, never spread across categories.</p>
+      </section>
+      {view.curriculum.length>0&&<section className={styles.panel} aria-labelledby="curriculum-heading">
+        <p id="curriculum-heading" className={styles.eyebrow}>Curriculum requirements</p>
+        {view.curriculum.map(c=><div key={c.profile}><p className={styles.help}>{c.note}</p>
+          <table className={styles.table}><thead><tr><th scope="col">Curriculum band</th><th scope="col">This paper</th><th scope="col">Target</th></tr></thead>
+            <tbody>{c.rows.map(r=><tr key={r.key}><td>{r.label}</td><td>{r.min===r.max?r.min:`${r.min}–${r.max}`} marks</td><td>{r.target}</td></tr>)}</tbody></table></div>)}
+      </section>}
+      {paid&&!view.submitted&&<button type="button" className={styles.primary} disabled={busy||!view.canSubmit||save!=='saved'} onClick={()=>void submit()}>{busy?'Submitting…':'Submit for generation →'}</button>}
+      {paid&&!view.submitted&&<p className={styles.help}>Once submitted, your choices are fixed for this paper. All four documents are released together.</p>}
+    </aside>
+  </div>;
+}

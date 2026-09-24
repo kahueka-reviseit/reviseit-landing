@@ -98,7 +98,7 @@ describe('authored decisions after payment',()=>{
   const d=definitions({repeat:true});
   const cfg=config([8,4,2,2],16,{answers:{...paidAnswers(),items:{...paidAnswers().items,q4:{}}}});
   const e=evaluate(d,cfg,{paid:true});expect(e.ready).toBe(true);
-  expect(project(d,cfg,e,{orderId:'o',state:'awaiting_answers',paymentStatus:'paid',revision:1,submitted:false}).lines.map(l=>[l.id,l.number])).toEqual([['q1','2'],['q2','3'],['q3','1.1'],['q4','1.2']]);
+  expect(project(d,cfg,e,{orderId:'o',state:'awaiting_answers',paymentStatus:'paid',revision:1,submitted:false}).lines.map(l=>[l.id,l.number])).toEqual([['q3','1.1'],['q4','1.2'],['q1','2'],['q2','3']]);
   const bad={...cfg,answers:{...cfg.answers,items:{...cfg.answers.items,q4:{colour:{kind:'choice' as const,choiceId:'red'}}}}};
   expect(evaluate(d,bad,{paid:true}).lines[3].attention[0]).toMatchObject({id:'colour'});
  });
@@ -133,7 +133,7 @@ describe('classified questions (contract v1, synthetic)',()=>{
   expect(e.lines[0].attention).toEqual([{scope:'field',id:'shade',message:'Synthetic: blue rules out red here.'}]);
   expect(cfg.answers.items.q1.shade).toEqual({kind:'choice',choiceId:'red'});expect(e.ready).toBe(false);
   const view=project(d,cfg,e,{orderId:'o',state:'awaiting_answers',paymentStatus:'paid',revision:3,submitted:false});
-  expect(view.lines[0].facets.find(f=>f.id==='shade')!.options.find(o=>o.id==='red')).toMatchObject({disabled:true,reason:'Synthetic: blue rules out red here.'});
+  expect(view.lines.find(l=>l.id==='q1')!.facets.find(f=>f.id==='shade')!.options.find(o=>o.id==='red')).toMatchObject({disabled:true,reason:'Synthetic: blue rules out red here.'});
  });
  it('compares curriculum bands separately from Bloom, and item-count targets are not compared by marks',()=>{
   const d=definitions({classified:true});const cfg=config([8,6,2],16,{answers:paidAnswers()});
