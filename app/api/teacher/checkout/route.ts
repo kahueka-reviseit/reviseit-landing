@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { access,body,originError,reply } from '../../../../lib/jobs/server';
-import { isCheckoutRequest } from '../../../../lib/payments/contracts';
+import { isCheckoutRequest,isConfiguredCheckoutRequest } from '../../../../lib/payments/contracts';
+import { configuredCheckout } from '../../../../lib/configurator/checkout';
 import { createCheckoutSession,stripeConfig } from '../../../../lib/payments/stripe';
 import { serviceClient } from '../../../../lib/supabase/service';
 import { authConfig } from '../../../../lib/supabase/config';
@@ -22,9 +23,18 @@ export async function POST(request:Request){
  const stripe=stripeConfig(),service=serviceClient(),site=authConfig()?.siteUrl;
  if(!stripe||!service||!site)return reply({error:'Purchasing is not open yet.'},503);
  let value;try{value=await body(request,8000);}catch{return reply({error:'Invalid request'},400);}
- if(!isCheckoutRequest(value))return reply({error:'Check the marks for each question.'},422);
- const begun=await c.supabase.rpc('begin_paper_checkout',{request_key:value.requestKey,target_module:value.moduleId,selection_revision:value.selectionRevision,allocations:value.allocations});
- if(begun.error)return refusal(begun.error.message);
+ let begun;
+ if(isConfiguredCheckoutRequest(value)){
+  // Editable configuration path: the server checks the marks against the
+  // definitions it will pin before any order or payment exists.
+  const checked=await configuredCheckout(service,c.user.id,value);
+  if('error' in checked)return /Configurator unavailable/.test(checked.error)?reply({error:'Purchasing is not open yet.'},503):checked.problems?reply({error:checked.error,problems:checked.problems},422):refusal(checked.error);
+  begun=await c.supabase.rpc('begin_configured_checkout',{request_key:value.requestKey,target_module:value.moduleId,selection_revision:value.selectionRevision,allocations:value.allocations,targets:value.targets,expected_definitions:checked.definitionsSha256});
+ }else{
+  if(!isCheckoutRequest(value))return reply({error:'Check the marks for each question.'},422);
+  begun=await c.supabase.rpc('begin_paper_checkout',{request_key:value.requestKey,target_module:value.moduleId,selection_revision:value.selectionRevision,allocations:value.allocations});
+ }
+ if(begun.error)return /Configurator unavailable/.test(begun.error.message)?reply({error:'Purchasing is not open yet.'},503):refusal(begun.error.message);
  const r=begun.data as {orderId:string;mode:string;status:string;checkoutUrl:string|null;expiresAt:string;existing:boolean;terminal?:boolean};
  if(r.mode!==stripe.mode)return reply({error:'Purchasing is not open yet.'},503);
  // This request key's unpaid checkout has ended. The browser may start an explicit
