@@ -106,7 +106,13 @@ begin
   or kind||item is distinct from target_entry then raise exception 'Classification identity mismatch'; end if;
  if not exists(select 1 from public.catalogue_summaries where module_id=target_module and release=target_release and entry_id=target_entry)
   then raise exception 'Unknown catalogue entry'; end if;
- req_ref:=envelope->>'curriculumRequirementsRef';
+ -- Contract v1 references a profile as {profileId, version}; stored as profileId@version.
+ if jsonb_typeof(envelope->'curriculumRequirementsRef')='object' then
+  if not private.form_keys(envelope->'curriculumRequirementsRef',array['profileId','version']) or jsonb_typeof(envelope->'curriculumRequirementsRef'->'version')<>'number'
+  then raise exception 'Invalid classification'; end if;
+  req_ref:=(envelope->'curriculumRequirementsRef'->>'profileId')||'@'||(envelope->'curriculumRequirementsRef'->>'version');
+ elsif envelope->'curriculumRequirementsRef' is not null and envelope->'curriculumRequirementsRef'<>'null'::jsonb then raise exception 'Invalid classification';
+ end if;
  if req_ref is not null and (target_requirements_sha256 is null or not exists(select 1 from private.curriculum_requirement_profiles r where r.ref=req_ref and r.sha256=target_requirements_sha256))
   then raise exception 'Registered requirements profile required'; end if;
  select payload into prior from private.catalogue_classifications where module_id=target_module and release=target_release and entry_id=target_entry and sha256=target_sha256;

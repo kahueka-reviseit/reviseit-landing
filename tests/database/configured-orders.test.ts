@@ -223,15 +223,17 @@ test('an existing authored order keeps its claim payload for workers with or wit
 });
 
 test('classifications are publisher-only, identity-checked, pinned at checkout and never rewrite an issued order',async()=>{
- const envelope=(tag:string)=>({schemaVersion:1,moduleId:'synthetic-module',kind:'structured',itemId:'SPEC_01',release:'1',curriculumId:'synthetic',curriculumRequirementsRef:null,tag});
- await refuse(()=>publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,null)',['synthetic-module','1','structured:SPEC_02',hash('1'),JSON.stringify(envelope('a'))]),/identity mismatch/);
- await refuse(()=>publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,null)',['synthetic-module','1','structured:SPEC_01',hash('1'),JSON.stringify({...envelope('a'),curriculumRequirementsRef:'missing'})]),/requirements profile required/);
- await service();await refuse(()=>db.query('select public.register_catalogue_classification($1,$2,$3,$4,$5,null)',['synthetic-module','1','structured:SPEC_01',hash('1'),JSON.stringify(envelope('a'))]),/permission denied/);
- await publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,null)',['synthetic-module','1','structured:SPEC_01',hash('1'),JSON.stringify(envelope('a'))]);
- await refuse(()=>publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,null)',['synthetic-module','1','structured:SPEC_01',hash('1'),JSON.stringify(envelope('changed'))]),/immutable/);
+ const envelope=(tag:string)=>({schemaVersion:1,moduleId:'synthetic-module',kind:'structured',itemId:'SPEC_01',release:'1',curriculumId:'synthetic',curriculumRequirementsRef:{profileId:'synthetic-profile',version:1},tag});
+ await refuse(()=>publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,$6)',['synthetic-module','1','structured:SPEC_02',hash('1'),JSON.stringify(envelope('a')),hash('7')]),/identity mismatch/);
+ await refuse(()=>publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,$6)',['synthetic-module','1','structured:SPEC_01',hash('1'),JSON.stringify(envelope('a')),hash('7')]),/requirements profile required/);
+ await publisher('select public.register_curriculum_requirements($1,$2,$3)',['synthetic-profile@1',hash('7'),JSON.stringify({profileId:'synthetic-profile',version:1})]);
+ await service();await refuse(()=>db.query('select public.register_catalogue_classification($1,$2,$3,$4,$5,$6)',['synthetic-module','1','structured:SPEC_01',hash('1'),JSON.stringify(envelope('a')),hash('7')]),/permission denied/);
+ await publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,$6)',['synthetic-module','1','structured:SPEC_01',hash('1'),JSON.stringify(envelope('a')),hash('7')]);
+ await refuse(()=>publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,$6)',['synthetic-module','1','structured:SPEC_01',hash('1'),JSON.stringify(envelope('changed')),hash('7')]),/immutable/);
  // Registration does not change readiness.
  await asUser(teacher);expect((await db.query<any>("select orderable from public.teacher_catalogue_summaries where entry_id='structured:SPEC_01'")).rows[0].orderable).toBe(true);
  const orderId=await paidOrder();
- await publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,null)',['synthetic-module','1','structured:SPEC_01',hash('2'),JSON.stringify(envelope('b'))]);
- const o=await orderRow(orderId);expect(o.snapshot.lines[0].classification).toMatchObject({sha256:hash('1'),payload:{tag:'a'}});expect(o.snapshot.lines[1].classification).toBeNull();
+ await publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,$6)',['synthetic-module','1','structured:SPEC_01',hash('2'),JSON.stringify(envelope('b')),hash('7')]);
+ const o=await orderRow(orderId);expect(o.snapshot.lines[0].classification).toMatchObject({sha256:hash('1'),requirementsRef:'synthetic-profile@1',payload:{tag:'a'}});
+ expect(o.snapshot.requirements['synthetic-profile@1']).toMatchObject({sha256:hash('7')});expect(o.snapshot.lines[1].classification).toBeNull();
 });

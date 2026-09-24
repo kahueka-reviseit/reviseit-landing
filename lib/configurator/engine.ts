@@ -1,7 +1,7 @@
 import { isQuestionnaire, type Answer, type QuestionField, type QuestionnaireAnswers } from '../jobs/questionnaire';
 import { bloomKeys, bloomLabels, readinessLabels, sectionLabels, type Attention, type BloomKey, type CognitiveRow, type Configuration,
   type ConfigurationView, type CurriculumComparison, type LineView, type ReadinessStatus, type SectionKey } from './contracts';
-import { interpretClassification, evaluateClassified, profileComparison, type ClassifiedItem, type ClassifiedResult, type RequirementsProfile } from './classification';
+import { interpretClassification, evaluateClassified, curriculumComparisons, type ClassifiedItem, type ClassifiedResult, type RequirementsProfile } from './classification';
 
 /**
  * Deterministic configuration engine. Runs on the server only: it reads pinned
@@ -40,7 +40,8 @@ export function readDefinitions(snapshot:unknown, form:unknown, sha256:string):D
     if(l.identity?.kind!==kind) throw new Error('Line kind mismatch');
     let classification:ClassifiedItem|null=null, problem:string|null=null;
     if(l.classification) {
-      try { classification=interpretClassification(l.classification.payload, l.classification.requirementsRef?profiles[l.classification.requirementsRef]??null:null, item.fields); }
+      try { classification=interpretClassification(l.classification.payload, l.classification.requirementsRef?profiles[l.classification.requirementsRef]??null:null, item.fields,
+        {range:l.range,fixedMarks:typeof l.fixedMarks==='number'?l.fixedMarks:null,formRevision:l.binding?.formRevision,kind}); }
       catch(e) { problem=e instanceof Error?e.message:'Unsupported classification'; }
     }
     return {id:l.id,entryId:l.entryId,legacyKind,identity:l.identity,title:l.title,range:l.range,fixedMarks:typeof l.fixedMarks==='number'?l.fixedMarks:null,
@@ -116,8 +117,9 @@ export function evaluate(defs:Definitions, cfg:Configuration, opts:{paid:boolean
     if(marksProblem) attention.push({scope:'marks',id:def.id,message:marksProblem});
     if(opts.paid) {
       const fields=authoredFields(def.fields,cfg.answers.items[def.id],blocked);
-      outstanding.push(...fields.outstanding); attention.push(...fields.attention);
-      if(classified) { outstanding.push(...classified.outstanding); attention.push(...classified.attention); }
+      outstanding.push(...new Set([...fields.outstanding,...(classified?.outstanding??[])]));
+      // Classified lines report answer problems through the contract evaluator's authored wording.
+      attention.push(...(classified?classified.attention:fields.attention));
     }
     return {id:def.id,marks:marksProblem?null:marks,marksProblem,classified,outstanding,attention,issues:lineIssues,ready:!marksProblem&&!outstanding.length&&!attention.length&&!lineIssues.length};
   });
@@ -192,7 +194,7 @@ export function project(defs:Definitions, cfg:Configuration, e:Evaluation, meta:
       diagram:c?c.diagramView:null};
   });
   const cognitive:CognitiveRow[]=[...bloomKeys.map(k=>({key:k,label:bloomLabels[k],...e.cognitive[k]})),{key:'unclassified' as const,label:'Not yet classified',...e.cognitive.unclassified}];
-  const curriculum:CurriculumComparison[]=paid?comparisons(defs,e):[];
+  const curriculum:CurriculumComparison[]=paid?comparisons(defs,cfg,e):[];
   const remaining=e.totals.target===null?0:Math.max(0,e.totals.target-e.totals.allocated);
   const excess=e.totals.target===null?0:Math.max(0,e.totals.allocated-e.totals.target);
   return {orderId:meta.orderId,state:meta.state,paid,paymentStatus:meta.paymentStatus,revision:meta.revision,submitted:meta.submitted,
@@ -203,13 +205,8 @@ export function project(defs:Definitions, cfg:Configuration, e:Evaluation, meta:
     issues:[...e.totals.problems,...e.issues],configuration:cfg};
 }
 
-function comparisons(defs:Definitions, e:Evaluation):CurriculumComparison[] {
-  const out:CurriculumComparison[]=[];
-  for(const [ref,profile] of Object.entries(defs.profiles)) {
-    const rows=new Map<string,{min:number;max:number}>();
-    defs.lines.forEach((def,i)=>{ const c=e.lines[i].classified; if(def.requirementsRef===ref && c) for(const [band,v] of Object.entries(c.bands)){const row=rows.get(band)||{min:0,max:0};row.min+=v.min;row.max+=v.max;rows.set(band,row);} });
-    const comparison=profileComparison(ref,profile,rows);
-    if(comparison) out.push(comparison);
-  }
-  return out;
+function comparisons(defs:Definitions, cfg:Configuration, e:Evaluation):CurriculumComparison[] {
+  const profiles=Object.values(defs.profiles);
+  if(!profiles.length) return [];
+  return curriculumComparisons(defs.lines.map((def,i)=>({lineId:def.id,item:def.classification,marks:e.lines[i].marks,parts:cfg.lines[def.id].parts,answers:cfg.answers.items[def.id]||{}})),profiles as never);
 }

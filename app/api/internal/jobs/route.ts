@@ -14,7 +14,10 @@ export async function POST(request:Request){
  if(!v||typeof v!=='object'||Array.isArray(v))return reply({error:'Invalid request'},400);
  const client=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
  let name:string,args:Record<string,unknown>;
- if(v.action==='claim'&&typeof v.worker==='string'&&/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$/.test(v.worker)){name='claim_paper_job';args={worker:v.worker};}
+ if(v.action==='claim'&&typeof v.worker==='string'&&/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$/.test(v.worker)){
+  // Optional declared execution capabilities. Omitted: the previous claim exactly.
+  if(v.capabilities!==undefined&&!(Array.isArray(v.capabilities)&&v.capabilities.length<=10&&v.capabilities.every((x:unknown)=>x==='configured-plan@1')))return reply({error:'Invalid worker operation'},400);
+  name='claim_paper_job';args=v.capabilities===undefined?{worker:v.worker}:{worker:v.worker,capabilities:v.capabilities};}
  else{
   if(!isUuid(v.id)||!isUuid(v.lease))return reply({error:'Invalid job identity'},400);
   args={target:v.id,token:v.lease};
