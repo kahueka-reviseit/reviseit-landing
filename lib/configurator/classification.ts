@@ -33,8 +33,10 @@ export function interpretClassification(payload:unknown, profile:Profile|null, f
   if(marksFacets[0].domain.min!==lo || marksFacets[0].domain.max!==hi) throw new Error('Classification marks facet disagrees with its marks');
   if(pinned) {
     if(pinned.kind!==doc.kind) throw new Error('Classification kind differs from the purchased item');
-    const [plo,phi]=pinned.fixedMarks!==null?[pinned.fixedMarks,pinned.fixedMarks]:[pinned.range.min,pinned.range.max];
-    if(plo!==lo || phi!==hi) throw new Error('Classification marks differ from the purchased range');
+    // A fixed engineering allocation (two-mark multiple choice) must lie inside the
+    // source range; a ranged item must match its purchased range exactly.
+    if(pinned.fixedMarks!==null ? !(lo<=pinned.fixedMarks && pinned.fixedMarks<=hi) : (pinned.range.min!==lo || pinned.range.max!==hi))
+      throw new Error('Classification marks differ from the purchased range');
     if(doc.formBinding.status==='no-form') throw new Error('Classification has no authored form for a supported item');
     if(pinned.formRevision && doc.formBinding.itemForm?.formRevision!==pinned.formRevision) throw new Error('Classification is bound to another form revision');
   }
