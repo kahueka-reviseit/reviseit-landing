@@ -159,7 +159,7 @@ export default function ConfigureOrder({orderId,onSubmitted}:{orderId:string;onS
         <h2 id="details-heading" className={styles.heading}>{line.fields.length?'Set the details':'No further details are needed'}</h2>
         {line.configurable==='authored'&&<p className={styles.help}>This question uses its authored details. Parts and cognitive levels are not yet classified.</p>}
         {line.issues.map((m,i)=><p key={i} role="alert" className={styles.attention}>{m}</p>)}
-        {line.parts.length>0&&<fieldset className={styles.field}><legend>What the question covers</legend>
+        {(line.parts.length>1||line.parts.some(p=>!p.locked))&&<fieldset className={styles.field}><legend>What the question covers</legend>
           <ol className={styles.parts}>{line.parts.map(p=><li key={p.id} className={p.included?'':styles.left}>
             <label><input type="checkbox" checked={p.included} disabled={!editable||p.locked} onChange={e=>togglePart(p.id,e.target.checked)}/> <span className={styles.partNo}>{line.number}.{p.number}</span> {p.summary}</label>
             <span className={`${styles.bloom} ${bloomClass[p.bloom??'unclassified']}`}>{p.bloom?p.bloom.charAt(0).toUpperCase()+p.bloom.slice(1):'Not yet classified'}</span>
