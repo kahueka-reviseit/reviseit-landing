@@ -35,16 +35,42 @@ configurator is switched off, which is the default.
   `TYPESAFE_API_KEY` is present. Hints are authored wording; suggestions need a
   click; nothing blocks payment or submission.
 
+## Exact source binding (CFG01A, migration 021)
+
+- `register_catalogue_classification_bound` replaces the unbound registration (now
+  withdrawn from the publisher). It requires the classification's specification and
+  task sources (module path and SHA-256, top level and dependencies) to equal the
+  registered generation bundle's sources for that entry, with the same form revision,
+  private manifest, bundle digest, registered workflow and published catalogue content
+  digest. Anything else fails with `Classification source version mismatch`.
+- Checkout pins a classification only with that exact binding; a classification bound
+  to another bundle fails checkout loudly rather than silently dropping the item.
+- Plan `reviseit/configured-generation-plan@2` carries each line's `sourceBinding` and
+  the teacher's `order`. The database checks both at submission; claims route version 2
+  plans only to workers declaring `configured-plan@2`. The worker re-checks the binding
+  against the pinned snapshot, its retained bundle and workflow, and the prepared source
+  bytes, and never substitutes its own.
+- Only supported multiple-choice types may repeat in a selection, and only while the
+  configurator is on; the migration-018 checkout refuses repeated selections.
+- Contract version 2 classifications (grouped Bloom candidates) are evaluated with their
+  groups kept as separate buckets; curriculum mappings stay in profile data.
+
+Worker registry for a coherent candidate (private, additive): retain its bundles under
+`bundles/<private manifest SHA-256>` and add its workflow directory to the `workflows`
+map under its manifest hash. Existing entries stay for issued orders.
+
 ## Activation order
 
-1. Deploy a worker whose private registry has a `configured-bundle-v1` adapter of
-   kind `product_workflow` (service branch `codex/configurator-01`). It declares
-   the capability; configured orders are never claimed by older workers.
-2. Apply migration 020 after taking the usual backup. It changes no existing row.
-3. Deploy this application. With the switch off, checkout behaves as before.
-4. Register requirements profiles and classifications through the publisher
-   role (prepared privately; never from this repository).
-5. `select public.configure_configurator(true,'reason')` as the database owner.
+1. Pass the sealed Linux image suites for the service branch (see below).
+2. Deploy a worker whose private registry has a `configured-bundle-v1` adapter of
+   kind `product_workflow`, with the candidate bundles and workflows retained. It
+   declares `configured-plan@1` and `@2`; older workers never claim configured orders.
+3. Back up, then apply migrations 020 and 021. Neither changes an existing row.
+4. Deploy this application. With the switch off, checkout behaves as before.
+5. Publish the candidate catalogue releases and register their forms and workflows
+   through the existing publication path (a separate, coordinated step), then
+   register profiles and bound classifications through the publisher role.
+6. `select public.configure_configurator(true,'reason')` as the database owner.
 
 Rollback: switch off (new checkouts return to the migration-019 path). Already
 configured orders keep their pinned definitions and remain editable/submittable;
@@ -55,5 +81,8 @@ keep the capable worker until they are released.
 `npm test` (engine, contract, journey, Jev, database). Private conformance:
 `CONFIGURATOR_CONTRACT_DIR=<verified contract copy> npx vitest run tests/unit/configurator-conformance.test.ts`.
 Real content: `CONFIGURATOR_CONTENT_REGISTRATIONS=<private file>`. Real PostgreSQL
-races: `REVISEIT_CONCURRENCY_DATABASE_URL=postgres://...@127.0.0.1:PORT/postgres npx vitest run --config concurrency.config.mts`.
+races: `REVISEIT_CONCURRENCY_DATABASE_URL=postgres://...@127.0.0.1:PORT/postgres npx vitest run --config concurrency.config.mts --no-file-parallelism`
+(the two files create the same roles, so run them one after another). Version 2
+conformance: `CONFIGURATOR_CONTRACT_V2_DIR=<verified contract-v2 copy>`. Bound
+registrations: `CONFIGURATOR_BOUND_REGISTRATIONS` and `CONFIGURATOR_OLD_BOUND_REGISTRATIONS`.
 Synthetic screens: `npm run preview:configurator`.
