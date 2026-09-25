@@ -73,8 +73,11 @@ const submitSql='select public.submit_configured_paper($1,$2,$3,$4,$5,$6) as r';
 async function submitArgs(o:{id:string;definitions:string},revision:number,a:number,b:number){
  const form=(await owner.query('select form,snapshot from private.paper_orders where id=$1',[o.id])).rows[0];
  const submitted={schemaVersion:2,revision:form.form.revision,items:answers.items,paper:answers.paper};
- const plan={schema:'reviseit/configured-generation-plan@1',orderId:o.id,module:'synthetic-module',release:'1',formRevision:form.snapshot.formRevision,configurationRevision:revision,definitionsSha256:o.definitions,targets,
-  lines:form.snapshot.lines.map((l:any,i:number)=>({id:l.id,entryId:l.entryId,identity:l.identity,kind:l.kind,marks:[a,b][i],parts:null,facets:{},answers:(answers.items as any)[l.id],classificationSha256:null,requirementsRef:null,diagram:null}))};
+ const w=form.snapshot.execution.workflowManifestSha256;
+ const plan={schema:'reviseit/configured-generation-plan@2',orderId:o.id,module:'synthetic-module',release:'1',formRevision:form.snapshot.formRevision,configurationRevision:revision,definitionsSha256:o.definitions,targets,
+  order:form.snapshot.lines.map((l:any)=>l.id),
+  lines:form.snapshot.lines.map((l:any,i:number)=>({id:l.id,entryId:l.entryId,identity:l.identity,kind:l.kind,marks:[a,b][i],parts:null,facets:{},answers:(answers.items as any)[l.id],classificationSha256:null,requirementsRef:null,diagram:null,
+   sourceBinding:{schema:'reviseit/cfg-source-binding@1',moduleId:l.binding.module,release:l.binding.release,entryId:l.binding.entryId,privateManifestSha256:l.binding.manifestSha256,privateBundleDigest:l.binding.bundleDigest,formRevision:l.binding.formRevision,workflowManifestSha256:w,sources:l.binding.sources}}))};
  return [o.id,teacher,randomUUID(),revision,JSON.stringify(submitted),JSON.stringify(plan)];
 }
 async function state(id:string){
@@ -139,7 +142,7 @@ test('40 simultaneous refund and submit pairs: a refunded order never queues wit
    if(sub.ok) expect(s).toMatchObject({state:'queued',plan_revision:2});else expect([s,sub.v]).toMatchObject([{state:'cancelled',submitted:false,plan_revision:null},expect.stringMatching(/cannot be submitted/)]);
    // Drain the queue: other tests' queued orders may be claimed, this refunded one never is.
    await b.query('reset role');await b.query('set role service_role');
-   for(let job;(job=(await b.query("select public.claim_paper_job('pilot-synthetic-worker','[\"configured-plan@1\"]') as r")).rows[0].r);) expect(job.id).not.toBe(o.id);
+   for(let job;(job=(await b.query("select public.claim_paper_job('pilot-synthetic-worker','[\"configured-plan@1\",\"configured-plan@2\"]') as r")).rows[0].r);) expect(job.id).not.toBe(o.id);
   }finally{await a.end();await b.end();}
  }
  evidence.refundVersusSubmit={pairs:40,observed:[...outcomes]};

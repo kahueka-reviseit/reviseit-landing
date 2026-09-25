@@ -71,3 +71,14 @@
   .allocation { flex-direction:column; align-items:flex-start; }
   .mix li { grid-template-columns:110px 1fr 40px; }
 }
+
+.progress { list-style:none; display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 0; padding:0; }
+.progress li { border:1px solid #898780; border-radius:16px; padding:5px 12px; font-size:13px; color:#4A4A4A; background:#fff; }
+.progress li.done { border-color:transparent; background:#E6EEE8; color:#436B56; }
+.progress li.now { border-color:#436B56; background:#436B56; color:#fff; font-weight:600; }
+.reorder { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+.outline { list-style:none; margin:0; padding:0; }
+.outline li { display:grid; grid-template-columns:1fr auto 48px; gap:12px; align-items:center; padding:8px 0; border-top:1px solid #F0EDE6; font-size:15px; }
+.outline li span:last-child { text-align:right; font-weight:600; }
+.sectionTarget { display:flex; align-items:center; gap:8px; }
+.sectionTarget input { width:64px; padding:4px 6px; border:1px solid #898780; font:inherit; font-size:14px; text-align:right; }

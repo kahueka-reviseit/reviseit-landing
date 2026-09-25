@@ -48,7 +48,10 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
   const formattingDirty=JSON.stringify(preferences)!==JSON.stringify(data.formatting.preferences);
   const selectionDirty=!!data.module && (JSON.stringify(ids)!==JSON.stringify(data.selection.entryIds) || data.selection.release!==data.module.release);
   const dirty=formattingDirty || selectionDirty;
-  const chosen=data.entries.filter(e=>ids.includes(e.id));
+  // Configured path: occurrences in the teacher's order (a multiple-choice type may repeat).
+  // The existing path keeps its one-per-item catalogue-order summary.
+  const occurrences=data.purchase?.configurator?ids.map(id=>data.entries.find(e=>e.id===id)).filter((e):e is CatalogueEntry=>!!e):data.entries.filter(e=>ids.includes(e.id));
+  const chosen=occurrences;
   const selectedMarks=totalMarks(chosen);
   const searchQuery=query.trim();
   const searching=!!searchQuery && search?.query!==searchQuery;
@@ -80,16 +83,20 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
   const [paperTarget,setPaperTarget]=useState<number|null>(null);
   const allocation=Object.fromEntries(chosen.map(e=>[e.id,fixedMarks(e) ?? marks[e.id] ?? (configured?NaN:e.marks.max)]));
   const inRange=(e:CatalogueEntry)=>Number.isInteger(allocation[e.id]) && allocation[e.id]>=e.marks.min && allocation[e.id]<=e.marks.max;
-  const allocatedTotal=Object.values(allocation).reduce((a,b)=>a+(Number.isInteger(b)?b:0),0);
+  const allocatedTotal=chosen.reduce((a,e)=>a+(Number.isInteger(allocation[e.id])?allocation[e.id]:0),0);
+  const [sectionTargets,setSectionTargets]=useState<{multiple_choice?:number;structured?:number}>({});
+  const sectionTotal=(k:'multiple_choice'|'structured')=>chosen.filter(e=>(k==='multiple_choice')===e.id.startsWith('mcq:')).reduce((a,e)=>a+(Number.isInteger(allocation[e.id])?allocation[e.id]:0),0);
+  const sectionsOk=(['multiple_choice','structured'] as const).every(k=>sectionTargets[k]===undefined||sectionTargets[k]===sectionTotal(k));
+  const move=(i:number,by:number)=>{const next=[...ids];const j=i+by;if(j<0||j>=next.length)return;[next[i],next[j]]=[next[j],next[i]];setNotice('');setIds(next);};
   const marksSet=chosen.every(inRange);
-  const balanced=!configured || (paperTarget!==null && marksSet && allocatedTotal===paperTarget);
+  const balanced=!configured || (paperTarget!==null && marksSet && allocatedTotal===paperTarget && sectionsOk);
   const price=data.purchase ? formatRand(data.purchase.amountMinor) : 'R100';
   const canPay=!!data.module && !!data.purchase?.available && !selectionDirty && data.selection.revision>0 && chosen.length>0 && chosen.every(e=>e.orderable) &&
     marksSet && balanced;
   async function checkout() {
     if(!data.module || !canPay) return;
     setBusy(true);setError('');setNotice('');
-    const payload={moduleId:data.module.id,selectionRevision:data.selection.revision,allocations:allocation,...(configured?{targets:{paper:paperTarget!}}:{})};
+    const payload={moduleId:data.module.id,selectionRevision:data.selection.revision,allocations:allocation,...(configured?{targets:{paper:paperTarget!,...(Object.keys(sectionTargets).length?{sections:sectionTargets}:{})}}:{})};
     // The same selection and marks reuse one request key, so a double click, timeout or uncertain
     // retry cannot start a second checkout. The key is replaced only when the server confirms that
     // its unpaid checkout has ended (cancelled or expired); this click is then a new attempt.
@@ -168,17 +175,29 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
           </section>)}
         </section>
         <aside className={styles.summary} aria-labelledby="selection-heading"><span className={styles.eyebrow}>Your paper</span><h2 id="selection-heading">Selection summary</h2><div className={styles.total}><strong>{formatMarks(selectedMarks)}</strong><span>{selectedMarks.min===selectedMarks.max?'total marks':'possible marks'} · {chosen.length} {chosen.length===1?'question':'questions'}</span></div>
-          {chosen.length ? <ul>{chosen.map(e=><li key={e.id}><span>{e.title}</span><span>{formatMarks(e.marks)}</span></li>)}</ul>:<p>Select a question to start planning your paper.</p>}
+          {chosen.length ? (configured ? <ol className={styles.occurrences}>{chosen.map((e,i)=>{const repeat=chosen.slice(0,i).filter(x=>x.id===e.id).length;return <li key={`${e.id}:${i}`}>
+            <span>{e.title}{repeat?` · occurrence ${repeat+1}`:''}</span><span>{formatMarks(e.marks)}</span>
+            <span className={styles.rowActions}>
+              <button type="button" disabled={busy||i===0} aria-label={`Move ${e.title}${repeat?` occurrence ${repeat+1}`:''} earlier`} onClick={()=>move(i,-1)}>↑</button>
+              <button type="button" disabled={busy||i===chosen.length-1} aria-label={`Move ${e.title}${repeat?` occurrence ${repeat+1}`:''} later`} onClick={()=>move(i,1)}>↓</button>
+              {e.id.startsWith('mcq:') && <button type="button" disabled={busy||ids.length>=30} aria-label={`Add another ${e.title}`} onClick={()=>{setNotice('');setIds([...ids.slice(0,i+1),e.id,...ids.slice(i+1)]);}}>+ another</button>}
+              <button type="button" disabled={busy} aria-label={`Remove ${e.title}${repeat?` occurrence ${repeat+1}`:''}`} onClick={()=>{setNotice('');setIds(ids.filter((_,j)=>j!==i));}}>Remove</button>
+            </span></li>;})}</ol>
+            : <ul>{chosen.map(e=><li key={e.id}><span>{e.title}</span><span>{formatMarks(e.marks)}</span></li>)}</ul>):<p>Select a question to start planning your paper.</p>}
+          {configured && chosen.some(e=>e.id.startsWith('mcq:')) && <p className={styles.rangeNote}>A multiple-choice type can be added more than once; each occurrence becomes its own question with its own details.</p>}
           {selectedMarks.min!==selectedMarks.max && <p className={styles.rangeNote}>Final mark allocations are confirmed before payment.</p>}
           <p className={styles.saveState}>{selectionDirty?'Unsaved changes':data.selection.revision?'Selection saved':'No saved selection yet'}</p>
           <button className={styles.primary} disabled={busy || !selectionDirty} onClick={()=>void save('selection')}>{busy?'Please wait…':'Save selection'}</button>
           <div className={styles.next}><h3>Next: payment · {price} per paper</h3>
             {chosen.length>0 && <fieldset className={styles.allocations} disabled={busy}><legend>Marks for each question</legend>
               {configured && <label>Total marks for this paper<input type="number" min={1} max={3000} step={1} value={paperTarget ?? ''} placeholder="Set a total" onChange={ev=>setPaperTarget(ev.target.value===''?null:Number(ev.target.value))}/></label>}
-              {chosen.map(e=>fixedMarks(e)!==null ? <p key={e.id}>{`${e.title}: 2 marks · fixed for this type`}</p> :
+              {configured && <>{(['multiple_choice','structured'] as const).filter(k=>chosen.some(e=>(k==='multiple_choice')===e.id.startsWith('mcq:'))).map(k=><label key={k}>{k==='multiple_choice'?'Multiple-choice section total (optional)':'Structured section total (optional)'}
+                <input type="number" min={0} max={3000} step={1} value={sectionTargets[k]??''} placeholder="Any" aria-invalid={sectionTargets[k]!==undefined&&sectionTargets[k]!==sectionTotal(k)} onChange={ev=>{const v=ev.target.value;setSectionTargets(t=>{const n={...t};if(v==='')delete n[k];else n[k]=Number(v);return n;});}}/></label>)}</>}
+              {chosen.map((e,i)=>fixedMarks(e)!==null ? (chosen.findIndex(x=>x.id===e.id)===i ? <p key={e.id}>{`${e.title}: 2 marks · fixed for this type${chosen.filter(x=>x.id===e.id).length>1?` (×${chosen.filter(x=>x.id===e.id).length})`:''}`}</p> : null) :
                 <label key={e.id}>{`${e.title}: marks (${formatMarks(e.marks)})`}<input type="number" min={e.marks.min} max={e.marks.max} step={1} value={Number.isNaN(allocation[e.id])?'':allocation[e.id]} placeholder={configured?'Set':undefined} aria-invalid={configured && marks[e.id]!==undefined && !inRange(e)} onChange={ev=>setMarks({...marks,[e.id]:ev.target.value===''?NaN:Number(ev.target.value)})}/></label>)}
               {configured ? <div role="status"><p><strong>{marksSet && balanced ? 'Ready for payment' : 'Marks needed'}</strong></p>
                 <p>Allocated {allocatedTotal} of {paperTarget ?? '—'} marks{paperTarget!==null && marksSet && allocatedTotal<paperTarget ? ` · ${paperTarget-allocatedTotal} still to allocate` : ''}{paperTarget!==null && allocatedTotal>paperTarget ? ` · ${allocatedTotal-paperTarget} over the total` : ''}</p>
+                {(['multiple_choice','structured'] as const).filter(k=>sectionTargets[k]!==undefined).map(k=><p key={k}>{k==='multiple_choice'?'Multiple choice':'Structured'}: {sectionTotal(k)} of {sectionTargets[k]} marks</p>)}
                 <p>After payment you can still move marks between these questions and change every other choice until you submit.</p></div> :
               <p>Paper total: {allocatedTotal} marks</p>}</fieldset>}
             {!data.purchase?.available ? <p>Purchasing is not open for your account yet. Your saved selection stays here.</p> :

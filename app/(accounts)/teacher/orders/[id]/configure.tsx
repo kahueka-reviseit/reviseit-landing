@@ -127,7 +127,16 @@ export default function ConfigureOrder({orderId,onSubmitted}:{orderId:string;onS
   const t=view.totals;
   const maxBloom=Math.max(1,...view.cognitive.map(r=>r.max));
 
-  return <div className={styles.layout}>
+  // Reorder the purchased occurrences (identities and answers unchanged); saved as a revision.
+  const moveLine=(id:string,by:number)=>update(c=>{const o=[...(c.order??Object.keys(c.lines))];
+    const kind=view.lines.find(l=>l.id===id)!.kind;const same=o.filter(x=>view.lines.find(l=>l.id===x)!.kind===kind);
+    const at=same.indexOf(id),to=same[at+by];if(to===undefined)return c;const i=o.indexOf(id),j=o.indexOf(to);[o[i],o[j]]=[o[j],o[i]];c.order=o;return c;});
+  const sameKind=view.lines.filter(l=>l.kind===line.kind);const position=sameKind.findIndex(l=>l.id===line.id);
+  const stage=view.submitted?4:paid?(view.status==='ready_to_generate'?3:2):(view.status==='ready_for_payment'?1:0);
+  const steps=['Choose questions','Set marks','Pay','Complete details','Submit'];
+  return <>
+  <ol className={styles.progress} aria-label="Progress">{steps.map((label,i)=><li key={label} aria-current={i===stage?'step':undefined} className={i<stage?styles.done:i===stage?styles.now:''}>{i<stage?'✓ ':''}{label}</li>)}</ol>
+  <div className={styles.layout}>
     <div className={styles.main}>
       <nav className={styles.stepper} aria-label="Questions in this paper">
         {view.lines.map((l,i)=>{const s=lineStatus(l,paid);return <button key={l.id} type="button" aria-current={i===active?'step':undefined} className={`${styles.step} ${i===active?styles.current:''}`} onClick={()=>setActive(i)}>
@@ -150,6 +159,21 @@ export default function ConfigureOrder({orderId,onSubmitted}:{orderId:string;onS
         {attentionFor('marks','marks')&&<p role="alert" className={styles.attention}>{attentionFor('marks','marks')!.message}</p>}
         {line.attention.filter(a=>a.scope==='marks'&&a.id!=='marks').map((a,i)=><p key={i} role="alert" className={styles.attention}>{a.message}</p>)}
         <p className={styles.totalLine}>Paper total: {t.allocated} of {t.target??'—'} marks allocated. {t.remaining?`${t.remaining} still to allocate. `:''}{t.excess?`${t.excess} over the total. `:''}Move marks between questions within their ranges; the totals and cognitive mix update when saved.</p>
+      </section>
+
+      {sameKind.length>1&&editable&&<div className={styles.reorder} role="group" aria-label={`Position of question ${line.number}`}>
+        <span className={styles.help}>{line.kind==='multiple_choice'?'Order within multiple choice':'Order of structured questions'}: {position+1} of {sameKind.length}. Answers stay with the question.</span>
+        <button type="button" className={styles.secondary} disabled={position===0} onClick={()=>moveLine(line.id,-1)}>Move earlier</button>
+        <button type="button" className={styles.secondary} disabled={position===sameKind.length-1} onClick={()=>moveLine(line.id,1)}>Move later</button>
+      </div>}
+
+      <section className={styles.panel} aria-labelledby="outline-heading">
+        <p id="outline-heading" className={styles.eyebrow}>Question outline</p>
+        {paid&&line.parts.length>0?<p className={styles.help}>The parts listed below are this question’s structure. Final wording and values are created when you submit.</p>:
+         line.outline&&line.outline.rows.length?<><p className={styles.help}>One published example structure ({line.outline.subquestions.min===line.outline.subquestions.max?line.outline.subquestions.min:`${line.outline.subquestions.min}–${line.outline.subquestions.max}`} subquestions). Your paper can differ within the published ranges.</p>
+          <ol className={styles.outline}>{line.outline.rows.map((r,i)=><li key={i}><span>{line.number}.{i+1} {r.summary}</span><span className={`${styles.bloom} ${bloomClass[r.bloom.toLowerCase()]??styles.unclassified}`}>{r.bloom}</span><span>{r.marks?(r.marks.min===r.marks.max?r.marks.min:`${r.marks.min}–${r.marks.max}`):''}</span></li>)}</ol></>:
+         line.outline?<p className={styles.help}>{line.outline.subquestions.min===line.outline.subquestions.max?line.outline.subquestions.min:`${line.outline.subquestions.min}–${line.outline.subquestions.max}`} subquestions. A reviewed outline has not been published for this question.</p>:
+         <p className={styles.help}>A reviewed outline has not been published for this question yet.</p>}
       </section>
 
       {!paid&&!view.submitted&&<section className={styles.panel}><p className={styles.eyebrow}>After payment</p><p>Detailed choices for each question unlock once Stripe confirms your payment. You can still change marks, parts and every other choice until you submit.</p></section>}
@@ -196,7 +220,11 @@ export default function ConfigureOrder({orderId,onSubmitted}:{orderId:string;onS
       <section className={styles.panel} aria-labelledby="budget-heading">
         <p id="budget-heading" className={styles.eyebrow}>Marks budget</p>
         <label className={styles.target}>Paper total<input inputMode="numeric" value={draft.targets.paper??''} disabled={!editable} onChange={e=>{const v=e.target.value.trim();update(c=>{c.targets.paper=v===''?null:Number.isInteger(Number(v))?Number(v):c.targets.paper;return c;});}}/></label>
-        {t.sections.map(s=><div key={s.key} className={styles.budgetRow}><span>{s.label}</span><span>{s.allocated}{s.target!==null?` of ${s.target}`:''} marks</span></div>)}
+        {t.sections.map(s=><div key={s.key} className={styles.budgetRow}><label className={styles.sectionTarget}><span>{s.label}</span>
+          <input inputMode="numeric" aria-label={`${s.label} section total (optional)`} placeholder="Any" value={draft.targets.sections?.[s.key]??''} disabled={!editable}
+            onChange={e=>{const v=e.target.value.trim();update(c=>{const sec={...(c.targets.sections??{})};if(v==='')delete sec[s.key];else if(Number.isInteger(Number(v)))sec[s.key]=Number(v);
+              if(Object.keys(sec).length)c.targets.sections=sec;else delete c.targets.sections;return c;});}}/></label>
+          <span>{s.allocated}{s.target!==null?` of ${s.target}`:''} marks</span></div>)}
         <div className={styles.budgetRow}><strong>Allocated</strong><strong>{t.allocated} of {t.target??'—'}</strong></div>
         {t.remaining>0&&<p className={styles.help}>{t.remaining} marks still to allocate</p>}
         {t.excess>0&&<p className={styles.attention}>{t.excess} marks over the paper total</p>}
@@ -217,5 +245,5 @@ export default function ConfigureOrder({orderId,onSubmitted}:{orderId:string;onS
       {paid&&!view.submitted&&<button type="button" className={styles.primary} disabled={busy||!view.canSubmit||save!=='saved'} onClick={()=>void submit()}>{busy?'Submitting…':'Submit for generation →'}</button>}
       {paid&&!view.submitted&&<p className={styles.help}>Once submitted, your choices are fixed for this paper. All four documents are released together.</p>}
     </aside>
-  </div>;
+  </div></>;
 }

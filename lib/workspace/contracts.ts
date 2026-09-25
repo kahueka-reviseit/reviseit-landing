@@ -23,7 +23,9 @@ export function isWorkspaceWrite(value: unknown): value is WorkspaceWrite {
   if (typeof v.moduleId !== 'string' || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(v.moduleId) || v.moduleId.length>120 || !Number.isSafeInteger(v.revision) || Number(v.revision)<0) return false;
   if (v.kind==='formatting') return isFormatting(v.preferences);
   return v.kind==='selection' && typeof v.release==='string' && v.release.length>0 && v.release.length<100 &&
-    Array.isArray(v.entryIds) && v.entryIds.length<=30 && new Set(v.entryIds).size===v.entryIds.length && v.entryIds.every(x=>typeof x==='string' && x.length>0 && x.length<=120);
+    Array.isArray(v.entryIds) && v.entryIds.length<=30 && v.entryIds.every(x=>typeof x==='string' && x.length>0 && x.length<=120) &&
+    // Only multiple-choice types may repeat; the database also requires the configurator to be on.
+    (v.entryIds as string[]).every((x,i,all)=>x.startsWith('mcq:') || all.indexOf(x)===i);
 }
 
 export type CatalogueMatch = { module:Curriculum; entry:CatalogueEntry };

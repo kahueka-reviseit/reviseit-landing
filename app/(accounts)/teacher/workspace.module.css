@@ -110,3 +110,9 @@
 .allocations { border:0; padding:0; margin:12px 0; display:grid; gap:10px; font-size:14px; }
 .allocations label { display:flex; justify-content:space-between; align-items:center; gap:12px; }
 .allocations input { width:72px; padding:6px; }
+
+.occurrences { list-style:decimal; padding-left:22px; }
+.occurrences li { display:grid; grid-template-columns:1fr auto; gap:6px 12px; padding:10px 0; border-top:1px solid #eee; font-size:15px; }
+.rowActions { grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:6px; }
+.rowActions button { border:1px solid #898780; background:#fff; border-radius:16px; padding:4px 10px; font:inherit; font-size:13px; cursor:pointer; }
+.rowActions button:disabled { opacity:.45; cursor:not-allowed; }

@@ -19,7 +19,7 @@ async function as(role:'teacher'|'service'|'owner',sql:string,args:unknown[]=[])
 }
 const rpc=(role:'teacher'|'service')=>async(name:string,args:Record<string,unknown>={})=>{
  const keys=Object.keys(args);
- try{const r=await as(role,`select public.${name}(${keys.map((k,i)=>`${k}=>$${i+1}`).join(',')}) as r`,keys.map(k=>{const v=args[k];return v!==null&&typeof v==='object'?JSON.stringify(v):v;}));return {data:r.rows[0].r,error:null};}
+ try{const r=await as(role,`select public.${name}(${keys.map((k,i)=>`${k}=>$${i+1}`).join(',')}) as r`,keys.map(k=>{const v=args[k];return k.endsWith('_ids')?v:v!==null&&typeof v==='object'?JSON.stringify(v):v;}));return {data:r.rows[0].r,error:null};}
  catch(e){return {data:null,error:{message:(e as Error).message}};}
 };
 vi.mock('../../lib/auth/access',()=>({accountContext:async()=>({kind:'authenticated',user:{id:teacher,email:teacher+'@synthetic.example',email_confirmed_at:'yes'},
@@ -34,6 +34,7 @@ import ConfigureOrder from '../../app/(accounts)/teacher/orders/[id]/configure';
 import {POST as checkoutRoute} from '../../app/api/teacher/checkout/route';
 import {GET as readRoute,PUT as saveRoute} from '../../app/api/teacher/orders/[id]/configuration/route';
 import {POST as submitRoute} from '../../app/api/teacher/orders/[id]/configuration/submit/route';
+import {PUT as workspaceRoute} from '../../app/api/teacher/workspace/route';
 import {defaultFormatting,type Workspace} from '../../lib/workspace/contracts';
 
 const choice=(id:string,required=true)=>({id,label:'Synthetic '+id,hint:'',required,allowAutomatic:true,type:'choice',allowOther:false,choices:[{id:'red',label:'Red'},{id:'blue',label:'Blue'}]});
@@ -77,6 +78,7 @@ beforeEach(()=>{
   const id=url.match(/orders\/([^/]+)\/configuration/)?.[1];
   if(id&&url.endsWith('/submit'))return submitRoute(request,{params:Promise.resolve({id})});
   if(id)return (init.method==='PUT'?saveRoute:readRoute)(request,{params:Promise.resolve({id})});
+  if(url.startsWith('/api/teacher/workspace'))return workspaceRoute(request as any);
   return checkoutRoute(request);
  }));
 });
@@ -144,3 +146,51 @@ test('a stale tab cannot overwrite a newer saved revision and keeps its own edit
  expect((await row(orderId)).configuration.lines.q1.marks).toBe(9);
  expect(screen.queryByText('Set the details')).toBeNull();
 });
+
+test('a repeated multiple-choice type and reordering survive checkout, payment, edits and submission as separate occurrences',async()=>{
+ await (m.db as PGlite).exec('reset role;alter table private.paper_configuration_revisions disable trigger freeze_configuration_revision;alter table private.paper_configuration_plans disable trigger freeze_configuration_plan;delete from private.paper_job_events;delete from private.paper_configuration_plans;delete from private.paper_configuration_revisions;delete from private.paper_configurations;delete from private.paper_payments;delete from private.paper_orders;alter table private.paper_configuration_revisions enable trigger freeze_configuration_revision;alter table private.paper_configuration_plans enable trigger freeze_configuration_plan;');
+ const saved=(await as('owner','select revision from public.paper_selections')).rows[0].revision;
+ const user=userEvent.setup();
+ const initial={...workspace,selection:{...workspace.selection,revision:saved}};
+ const {unmount}=render(<WorkspaceView initial={initial}/>);
+ // Add a second occurrence of the multiple-choice type and move it to the top.
+ await user.click(screen.getByRole('button',{name:'Add another Synthetic MCQ'}));
+ // [one, two, MCQ, MCQ] -> [MCQ, one, two, MCQ] -> [MCQ, one, MCQ, two]
+ await user.click(screen.getByRole('button',{name:'Move Synthetic MCQ earlier'}));
+ await user.click(screen.getByRole('button',{name:'Move Synthetic MCQ earlier'}));
+ await user.click(screen.getByRole('button',{name:'Move Synthetic MCQ occurrence 2 earlier'}));
+ await user.click(screen.getByRole('button',{name:'Save selection'}));
+ await screen.findByText('Your paper selection is saved. You can return to it later.');
+ expect((await as('owner','select entry_ids from public.paper_selections')).rows[0].entry_ids).toEqual(['mcq:MCQ_01','structured:SPEC_01','mcq:MCQ_01','structured:SPEC_02']);
+ await user.type(screen.getByLabelText('Total marks for this paper'),'18');
+ await user.type(screen.getByLabelText('Multiple-choice section total (optional)'),'4');
+ await user.type(screen.getByLabelText('Synthetic one: marks (4–10)'),'8');await user.type(screen.getByLabelText('Synthetic two: marks (4–10)'),'6');
+ expect(screen.getByText('Ready for payment')).toBeInTheDocument();
+ await user.click(screen.getByRole('button',{name:'Continue to payment · R100'}));await waitFor(()=>expect(assign).toHaveBeenCalled());unmount();
+ const orderId=(await as('owner','select id from private.paper_orders')).rows[0].id as string;
+ const snap=(await as('owner','select snapshot from private.paper_orders where id=$1',[orderId])).rows[0].snapshot;
+ expect(snap.lines.map((l:any)=>[l.id,l.entryId])).toEqual([['q1','mcq:MCQ_01'],['q2','structured:SPEC_01'],['q3','mcq:MCQ_01'],['q4','structured:SPEC_02']]);
+ await as('service','select public.attach_paper_checkout($1,$2,$3,false)',[orderId,'cs_test_'+orderId.replace(/-/g,''),'https://checkout.stripe.com/c/pay/cs_test_x']);
+ await as('service',"select public.record_stripe_checkout('evt_paid_repeat','checkout.session.completed',false,$1)",[JSON.stringify({id:'cs_test_'+orderId.replace(/-/g,''),clientReferenceId:orderId,metadataOrderId:orderId,livemode:false,amountTotal:10000,currency:'zar',paymentStatus:'paid',status:'complete',paymentIntent:'pi_Synthetic2'})]);
+ const submitted=vi.fn();render(<ConfigureOrder orderId={orderId} onSubmitted={submitted}/>);
+ // After payment: the two occurrences are 1.1 and 1.2; move the second one earlier.
+ expect(await screen.findByRole('button',{name:/Q1.1 ·/})).toBeInTheDocument();expect(screen.getByRole('button',{name:/Q1.2 ·/})).toBeInTheDocument();
+ await user.click(screen.getByRole('button',{name:/Q1.2 ·/}));
+ await user.click(screen.getByRole('button',{name:'Move earlier'}));
+ await waitFor(async()=>expect((await row(orderId)).configuration.order).toEqual(['q3','q2','q1','q4']),{timeout:4000});
+ // Answer each structured question differently; the multiple-choice occurrences need nothing.
+ await user.click(screen.getByRole('button',{name:/Q2 ·/}));
+ await user.click(within(screen.getByRole('group',{name:'Synthetic setting'})).getByLabelText('Blue'));
+ await user.click(screen.getByRole('button',{name:/Q3 ·/}));
+ await user.click(within(screen.getByRole('group',{name:'Synthetic setting'})).getByLabelText('Red'));
+ for(const name of ['Synthetic logistics','Synthetic block']) await user.click(within(screen.getByRole('group',{name})).getByLabelText('Red'));
+ await waitFor(()=>expect(screen.getByRole('button',{name:'Submit for generation →'})).toBeEnabled(),{timeout:5000});
+ await user.click(screen.getByRole('button',{name:'Submit for generation →'}));await waitFor(()=>expect(submitted).toHaveBeenCalled());
+ const done=await row(orderId);
+ expect(done.state).toBe('queued');
+ expect(done.plan.schema).toBe('reviseit/configured-generation-plan@2');expect(done.plan.order).toEqual(['q3','q2','q1','q4']);
+ expect(done.plan.lines.map((l:any)=>[l.id,l.entryId,l.marks])).toEqual([['q1','mcq:MCQ_01',2],['q2','structured:SPEC_01',8],['q3','mcq:MCQ_01',2],['q4','structured:SPEC_02',6]]);
+ expect(done.answers.items.q2.setting).toEqual({kind:'choice',choiceId:'blue'});expect(done.answers.items.q4.setting).toEqual({kind:'choice',choiceId:'red'});
+ expect(done.plan.lines.every((l:any)=>l.sourceBinding?.privateManifestSha256===hash('c'))).toBe(true);
+ expect(done.plan.targets).toEqual({paper:18,sections:{multiple_choice:4}});
+},40000);
