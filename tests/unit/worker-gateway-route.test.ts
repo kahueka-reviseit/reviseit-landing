@@ -1,5 +1,6 @@
 // @vitest-environment node
 import {beforeEach,describe,it,expect,vi} from 'vitest';
+vi.mock('server-only',()=>({}));
 const rpc=vi.hoisted(()=>vi.fn());
 vi.mock('@supabase/supabase-js',()=>({createClient:()=>({rpc})}));
 import {POST} from '../../app/api/internal/jobs/route';
