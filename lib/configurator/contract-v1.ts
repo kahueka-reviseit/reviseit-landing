@@ -23,8 +23,9 @@ export type Facet = {id:string; type:'integer'|'choice'|'text'|'parts'; stage:'p
   domain:any};
 export type Part = {id:string; label:string; summary:string|null; inclusion:'required'|'optional'|'unspecified';
   marks:{basis:'range'|'typical'|'unknown'; min:number|null; max:number|null};
-  cognitive:{bloom:typeof BLOOM[number]|null; unknownReason:string|null; curriculumBand:string|null; curriculumBandCandidates:string[]; sourceLabels:unknown}; locator:unknown};
-export type Classification = {schemaVersion:1; moduleId:string; kind:'structured'|'multiple_choice'; itemId:string; release:string; title:string;
+  cognitive:{bloom:typeof BLOOM[number]|null; unknownReason:string|null; curriculumBand:string|null; curriculumBandCandidates:string[]; sourceLabels:unknown;
+   bloomBasis?:'source-label'|'profile-single-mapping'|'profile-authorised-fallback'|null; bloomCandidates?:string[]}; locator:unknown};
+export type Classification = {schemaVersion:1|2; moduleId:string; kind:'structured'|'multiple_choice'; itemId:string; release:string; title:string;
   curriculumId:string; curriculumRequirementsRef:{profileId:string; version:number}; marks:{mode:'fixed'; value:number}|{mode:'range'; min:number; max:number};
   parts:Part[]; facets:Facet[]; rules:Rule[];
   diagramPolicy:{stimulus:'required'|'optional'|'not_applicable'|'unspecified'; stimulusFacet:string|null; learnerDrawnParts:string[]; whenLeftOut:string|null; locators:unknown[]};
@@ -41,9 +42,15 @@ export type Effect = {facet:string; option:string; ruleIds:string[]};
 export type LineOutput = {lineId:string; identity:LineInput['identity']; marks:number|null; valid:boolean; complete:boolean; errors:Issue[]; attention:Issue[]; outstanding:string[];
   effectiveParts:{id:string; inclusion:string; marks:Range|null}[]; excludedParts:{part:string; ruleIds:string[]}[];
   excludedOptions:Effect[]; forcedOptions:Effect[]; preferredOptions:Effect[]; feasibility:'feasible'|'infeasible'|'not-determinable'|'not-evaluated';
-  cognitive:{basis:'marks'; determinable:boolean; ranges:Record<Category,Range>|null; reason:string|null}};
+  cognitive:{basis:'marks'; determinable:boolean; ranges:Record<Category,Range>|null; groupedRanges?:Record<string,Range>|null; reason:string|null}};
 export type Internal = {mandatory:[string,number,number][]; flexible:[string,number,number][]; count:[number,number]; marks:number};
 
+/** Version 2: an unresolved grouped label is its own bucket, e.g. apply-or-analyse. */
+export function partCategory(p:Part):string {
+  if(p.cognitive.bloom) return p.cognitive.bloom;
+  const c=p.cognitive.bloomCandidates??[];
+  return c.length?BLOOM.filter(k=>c.includes(k)).join('-or-'):'unclassified';
+}
 const sortedSet=(xs:Iterable<string>)=>[...new Set(xs)].sort(cmp);
 function cmp(a:string,b:string){return a<b?-1:a>b?1:0;}
 function tupleCmp(a:string[],b:string[]){for(let i=0;i<Math.max(a.length,b.length);i++){const c=cmp(a[i]??'',b[i]??'');if(c)return c;}return 0;}
@@ -108,7 +115,8 @@ function answerError(facet:Facet, answer:Answer):string|null {
 }
 const resolved=(a:Answer|undefined)=>!!a && (a.kind!=='text' || !!a.text.trim());
 
-export function evaluateLine(doc:Classification, line:LineInput):{result:LineOutput; internal:Internal|null} {
+export function evaluateLine(doc:Classification, line:LineInput, version:1|2=doc.schemaVersion):{result:LineOutput; internal:Internal|null} {
+  const v2=version===2;
   const lid=line.lineId;const errors:Issue[]=[],attention:Issue[]=[];
   const facets=new Map(doc.facets.map(f=>[f.id,f]));
   const marksFacet=doc.facets.find(f=>f.binding.scope==='line-marks');
@@ -228,8 +236,9 @@ export function evaluateLine(doc:Classification, line:LineInput):{result:LineOut
   let cmin=included.length,cmax=included.length+flexible.length;const countRules=new Set<string>();
   for(const [lo,hi,rid] of counts){cmin=Math.max(cmin,lo);cmax=Math.min(cmax,hi);countRules.add(rid);}
   if(cmin>cmax) errors.push(issue('part-count-infeasible',{ruleIds:countRules,lineId:lid,reasons:reasons(countRules)}));
-  const categoryOf=Object.fromEntries(parts.map(p=>[p.id,p.cognitive.bloom??'unclassified']));
-  let cognitive:LineOutput['cognitive']={basis:'marks',determinable:false,ranges:null,reason:null};
+  const categoryOf=Object.fromEntries(parts.map(p=>[p.id,v2?partCategory(p):p.cognitive.bloom??'unclassified']));
+  const groups=v2?sortedSet(Object.values(categoryOf).filter(c=>c.includes('-or-'))):[];
+  let cognitive:LineOutput['cognitive']=v2?{basis:'marks',determinable:false,ranges:null,groupedRanges:null,reason:null}:{basis:'marks',determinable:false,ranges:null,reason:null};
   let feasibility:LineOutput['feasibility'];let internal:Internal|null=null;
   let mand:[string,number,number][]=[],flex:[string,number,number][]=[];
   if(errors.length){feasibility='not-evaluated';cognitive.reason='invalid-configuration';}
@@ -239,7 +248,7 @@ export function evaluateLine(doc:Classification, line:LineInput):{result:LineOut
   else {
     mand=included.map(([pid])=>[pid,ranges.get(pid)![0]!,ranges.get(pid)![1]!]);
     flex=flexible.map(([pid])=>[pid,ranges.get(pid)![0]!,ranges.get(pid)![1]!]);
-    const bounds=allocationBounds(mand,flex,[cmin,cmax],marks,categoryOf);
+    const bounds=allocationBounds(mand,flex,[cmin,cmax],marks,categoryOf,[...CATEGORIES,...groups]);
     if(bounds===null) {
       feasibility='infeasible';
       const rids=new Set<string>([...countRules]);for(const v of partRanges.values()) v.forEach(c=>rids.add(c[2]));
@@ -248,7 +257,8 @@ export function evaluateLine(doc:Classification, line:LineInput):{result:LineOut
       cognitive.reason='infeasible';
     } else {
       feasibility='feasible';
-      cognitive={basis:'marks',determinable:true,reason:null,ranges:Object.fromEntries(Object.entries(bounds).map(([k,v])=>[k,{min:v[0],max:v[1]}])) as Record<Category,Range>};
+      const ranges=Object.fromEntries(CATEGORIES.map(k=>[k,{min:bounds[k][0],max:bounds[k][1]}])) as Record<Category,Range>;
+      cognitive=v2?{basis:'marks',determinable:true,reason:null,ranges,groupedRanges:Object.fromEntries(groups.map(g=>[g,{min:bounds[g][0],max:bounds[g][1]}]))}:{basis:'marks',determinable:true,reason:null,ranges};
       internal={mandatory:mand,flexible:flex,count:[cmin,cmax],marks};
     }
   }
@@ -266,11 +276,12 @@ export function bandRanges(doc:Classification, internal:Internal):Record<string,
   return allocationBounds(internal.mandatory,internal.flexible,internal.count,internal.marks,bandOf,keys)??{};
 }
 
-export type PaperInput = {schemaVersion:1; targetMarks:number|null; comparison:null|{profile:{profileId:string;version:number}; distributionId:string}; lines:LineInput[]};
+export type PaperInput = {schemaVersion:1|2; targetMarks:number|null; comparison:null|{profile:{profileId:string;version:number}; distributionId:string}; lines:LineInput[]};
 const identityKey=(i:LineInput['identity'])=>[i.moduleId,i.kind,i.itemId,i.release].join('\u0000');
 
 /** The producer's paper-level result: every mark attributed exactly once; comparison is descriptive. */
 export function evaluatePaper(config:PaperInput, classifications:Classification[], profiles:Profile[]=[]) {
+  const v2=config.schemaVersion===2;
   const index=new Map(classifications.map(c=>[identityKey({moduleId:c.moduleId,kind:c.kind,itemId:c.itemId,release:c.release}),c]));
   const paperErrors:Issue[]=[];const ids=config.lines.map(l=>l.lineId);
   for(const dup of sortedSet(ids.filter((x,i)=>ids.indexOf(x)!==i))) paperErrors.push(issue('duplicate-line',{lineId:dup}));
@@ -280,20 +291,25 @@ export function evaluatePaper(config:PaperInput, classifications:Classification[
     if(!doc) {
       lines.push({lineId:line.lineId,identity:{...line.identity},marks:line.marks,valid:false,complete:false,errors:[issue('unknown-identity',{lineId:line.lineId})],attention:[],outstanding:[],
         effectiveParts:[],excludedParts:[],excludedOptions:[],forcedOptions:[],preferredOptions:[],feasibility:'not-evaluated',
-        cognitive:{basis:'marks',determinable:false,ranges:null,reason:'invalid-configuration'}});
+        cognitive:v2?{basis:'marks',determinable:false,ranges:null,groupedRanges:null,reason:'invalid-configuration'}:{basis:'marks',determinable:false,ranges:null,reason:'invalid-configuration'}});
       continue;
     }
-    const r=evaluateLine(doc,line);internal.set(line.lineId,r.internal);docs.set(line.lineId,doc);lines.push(r.result);
+    const r=evaluateLine(doc,line,v2?2:1);internal.set(line.lineId,r.internal);docs.set(line.lineId,doc);lines.push(r.result);
   }
   const allocated=config.lines.reduce((n,l)=>n+(l.marks??0),0);const target=config.targetMarks;
   const difference=target===null?null:allocated-target;const balanced=target===null?null:difference===0;
   const scopes=['paper-logistics',...(config.lines.some(l=>l.identity.kind==='multiple_choice')?['multiple-choice-block']:[])];
   const totals=Object.fromEntries(CATEGORIES.map(k=>[k,[0,0]])) as Record<Category,[number,number]>;const undetermined:string[]=[];
+  const groupedTotals=new Map<string,[number,number]>();
   for(const l of lines) {
-    if(l.cognitive.determinable) for(const k of CATEGORIES){totals[k][0]+=l.cognitive.ranges![k].min;totals[k][1]+=l.cognitive.ranges![k].max;}
+    if(l.cognitive.determinable) {
+      for(const k of CATEGORIES){totals[k][0]+=l.cognitive.ranges![k].min;totals[k][1]+=l.cognitive.ranges![k].max;}
+      for(const [g,r] of Object.entries(l.cognitive.groupedRanges??{})){const a=groupedTotals.get(g)??[0,0];groupedTotals.set(g,[a[0]+r.min,a[1]+r.max]);}
+    }
     else {undetermined.push(l.lineId);totals.unclassified[0]+=l.marks??0;totals.unclassified[1]+=l.marks??0;}
   }
-  const cognitive={basis:'marks',determinable:!undetermined.length,ranges:Object.fromEntries(CATEGORIES.map(k=>[k,{min:totals[k][0],max:totals[k][1]}])),undeterminedLines:sortedSet(undetermined)};
+  const cognitive:Record<string,unknown>={basis:'marks',determinable:!undetermined.length,ranges:Object.fromEntries(CATEGORIES.map(k=>[k,{min:totals[k][0],max:totals[k][1]}])),undeterminedLines:sortedSet(undetermined)};
+  if(v2) cognitive.groupedRanges=Object.fromEntries([...groupedTotals.keys()].sort(cmp).map(g=>[g,{min:groupedTotals.get(g)![0],max:groupedTotals.get(g)![1]}]));
   let comparison:any=null;
   if(config.comparison!==null) {
     const ref=config.comparison;
@@ -305,8 +321,8 @@ export function evaluatePaper(config:PaperInput, classifications:Classification[
       if(dist.basis!=='marks') comparison.status='unsupported-basis';
       else if(dist.taxonomy==='knowledge-area') comparison.status='unsupported-taxonomy';
       else {
-        let agg=new Map<string,[number,number]>();const complete=!undetermined.length;
-        if(dist.taxonomy==='bloom') agg=new Map(Object.entries(totals) as [string,[number,number]][]);
+        let agg=new Map<string,[number,number]>();let complete=!undetermined.length;
+        if(dist.taxonomy==='bloom'){agg=new Map(Object.entries(totals) as [string,[number,number]][]);if(v2)complete=complete&&![...groupedTotals.values()].some(v=>v[1]>0);}
         else {
           for(const l of lines) { if(!docs.has(l.lineId)||!l.cognitive.determinable) continue;
             for(const [key,[lo,hi]] of Object.entries(bandRanges(docs.get(l.lineId)!,internal.get(l.lineId)!))){const a=agg.get(key)??[0,0];agg.set(key,[a[0]+lo,a[1]+hi]);} }
@@ -319,6 +335,6 @@ export function evaluatePaper(config:PaperInput, classifications:Classification[
     }
   }
   const valid=!paperErrors.length && lines.every(l=>l.valid);
-  return {schemaVersion:1,valid,complete:valid && lines.every(l=>l.complete) && balanced!==false,errors:sortIssues(paperErrors),lines,
+  return {schemaVersion:v2?2:1,valid,complete:valid && lines.every(l=>l.complete) && balanced!==false,errors:sortIssues(paperErrors),lines,
     allocatedMarks:allocated,targetMarks:target,marksDifference:difference,marksBalanced:balanced,sharedScopes:scopes,cognitive,comparison};
 }

@@ -12,9 +12,9 @@ export type RequirementsProfile = Profile;
 export type ClassifiedItem = {contract:'configurator-contract-v1'; doc:Classification; profile:Profile|null; fields:QuestionField[]};
 export type ClassifiedResult = {
   feasible:boolean; issues:string[]; outstanding:string[]; attention:Attention[];
-  cognitive:Record<BloomKey|'unclassified',{min:number;max:number}>; bands:Record<string,{min:number;max:number}>;
+  cognitive:Record<BloomKey|'unclassified',{min:number;max:number}>; grouped:Record<string,{min:number;max:number}>; bands:Record<string,{min:number;max:number}>;
   parts:PartView[]; facets:FacetView[]; blockedFieldOptions:Record<string,Set<string>>;
-  plannedParts:{id:string; marks:{min:number;max:number}|null; bloom:BloomKey|null; learnerDrawn:boolean}[];
+  plannedParts:{id:string; marks:{min:number;max:number}|null; bloom:BloomKey|null; bloomOptions:BloomKey[]; learnerDrawn:boolean}[];
   diagram:{stimulus:string; learnerDrawn:string[]}|null;
   diagramView:{stimulus:'required'|'optional'|'not_applicable'|'unknown'; learnerDrawn:string[]; locked?:string}|null;
 };
@@ -24,7 +24,7 @@ const TOP=['schemaVersion','moduleId','kind','itemId','release','title','curricu
 
 /** Defensive structural checks for what the evaluator relies on, plus binding to the pinned order. */
 export function interpretClassification(payload:unknown, profile:Profile|null, fields:QuestionField[], pinned?:{range:{min:number;max:number}; fixedMarks:number|null; formRevision?:string; kind:string}):ClassifiedItem {
-  if(!record(payload) || payload.schemaVersion!==1 || Object.keys(payload).sort().join()!==[...TOP].sort().join()) throw new Error('Unsupported classification schema');
+  if(!record(payload) || (payload.schemaVersion!==1 && payload.schemaVersion!==2) || Object.keys(payload).sort().join()!==[...TOP].sort().join()) throw new Error('Unsupported classification schema');
   const doc=payload as Classification;
   if(!Array.isArray(doc.parts) || !Array.isArray(doc.facets) || !Array.isArray(doc.rules) || !record(doc.hints) || !record(doc.formBinding) || !record(doc.diagramPolicy)) throw new Error('Unsupported classification shape');
   const marksFacets=doc.facets.filter(f=>f?.binding?.scope==='line-marks');
@@ -107,6 +107,7 @@ export function evaluateClassified(item:ClassifiedItem, choice:LineChoice, marks
   const feasible=!result.errors.some(e=>MARK_CODES.has(e.code));
   const unclassified=Object.fromEntries(CATEGORIES.map(k=>[k,{min:0,max:0}])) as ClassifiedResult['cognitive'];
   let cognitive=unclassified;
+  const grouped:ClassifiedResult['grouped']={...(result.cognitive.groupedRanges??{})};
   if(result.cognitive.determinable && result.cognitive.ranges) cognitive=result.cognitive.ranges as ClassifiedResult['cognitive'];
   else cognitive={...unclassified,unclassified:{min:marks,max:marks}};
   const bands:ClassifiedResult['bands']={};
@@ -118,7 +119,8 @@ export function evaluateClassified(item:ClassifiedItem, choice:LineChoice, marks
   const partsFacet=doc.facets.find(f=>f.type==='parts');
   const parts:PartView[]=doc.parts.map((p,i)=>{
     const e=effective.get(p.id), x=excluded.get(p.id);
-    return {id:p.id,number:String(i+1),summary:p.summary??p.label,bloom:p.cognitive.bloom,bloomUnknownReason:p.cognitive.bloom?undefined:'Not yet classified',
+    const options=(BLOOM as readonly string[]).filter(k=>(p.cognitive.bloomCandidates??[]).includes(k)) as BloomKey[];
+    return {id:p.id,number:String(i+1),summary:p.summary??p.label,bloom:p.cognitive.bloom,bloomOptions:options,bloomBasis:p.cognitive.bloomBasis??null,bloomUnknownReason:p.cognitive.bloom||options.length?undefined:'Not yet classified',
       band:p.cognitive.curriculumBand,marks:e?.marks??(p.marks.basis==='range'&&p.marks.min!==null&&p.marks.max!==null?{min:p.marks.min,max:p.marks.max}:null),
       inclusion:p.inclusion==='required'?'required':'optional',included:!!e && e.inclusion!=='flexible',
       locked:p.inclusion==='required' || e?.inclusion==='rule-required' || !!x || !partsFacet || !(partsFacet.domain.parts as string[]).includes(p.id),
@@ -141,8 +143,8 @@ export function evaluateClassified(item:ClassifiedItem, choice:LineChoice, marks
   const stimulusAnswer=doc.diagramPolicy.stimulusFacet?answers[doc.diagramPolicy.stimulusFacet]:undefined;
   const lockedStimulus=doc.diagramPolicy.stimulusFacet?result.forcedOptions.find(o=>o.facet===doc.diagramPolicy.stimulusFacet)?.option:undefined;
   const stimulus=doc.diagramPolicy.stimulus==='unspecified'?'unknown':doc.diagramPolicy.stimulus;
-  return {feasible,issues,outstanding:opts.paid?result.outstanding.filter(x=>x!==marksFacet):[],attention,cognitive,bands,parts,facets,blockedFieldOptions:blocked,
-    plannedParts:result.effectiveParts.map(p=>({id:p.id,marks:p.marks,bloom:doc.parts.find(x=>x.id===p.id)?.cognitive.bloom??null,learnerDrawn:drawn.has(p.id)})),
+  return {feasible,issues,outstanding:opts.paid?result.outstanding.filter(x=>x!==marksFacet):[],attention,cognitive,grouped,bands,parts,facets,blockedFieldOptions:blocked,
+    plannedParts:result.effectiveParts.map(p=>({id:p.id,marks:p.marks,bloom:doc.parts.find(x=>x.id===p.id)?.cognitive.bloom??null,bloomOptions:(BLOOM as readonly string[]).filter(k=>(doc.parts.find(x=>x.id===p.id)?.cognitive.bloomCandidates??[]).includes(k)) as BloomKey[],learnerDrawn:drawn.has(p.id)})),
     diagram:{stimulus:lockedStimulus??(stimulusAnswer?.kind==='choice'?stimulusAnswer.choiceId:doc.diagramPolicy.stimulus),learnerDrawn:[...doc.diagramPolicy.learnerDrawnParts]},
     diagramView:{stimulus,learnerDrawn:[...doc.diagramPolicy.learnerDrawnParts],locked:lockedStimulus}};
 }
@@ -150,7 +152,8 @@ export function evaluateClassified(item:ClassifiedItem, choice:LineChoice, marks
 /** Descriptive comparison against each marks-based distribution, with the producer's semantics. */
 export function curriculumComparisons(lines:{lineId:string; item:ClassifiedItem|null; marks:number|null; parts:string[]|null; answers:Record<string,Answer>}[], profiles:Profile[]):CurriculumComparison[] {
   const docs=lines.flatMap(l=>l.item?[l.item.doc]:[]);
-  const input=(comparison:PaperInput['comparison']):PaperInput=>({schemaVersion:1,targetMarks:null,comparison,
+  const version=docs.some(d=>d.schemaVersion===2)?2:1;
+  const input=(comparison:PaperInput['comparison']):PaperInput=>({schemaVersion:version,targetMarks:null,comparison,
     lines:lines.map(l=>({lineId:l.lineId,identity:l.item?{moduleId:l.item.doc.moduleId,kind:l.item.doc.kind,itemId:l.item.doc.itemId,release:l.item.doc.release}:{moduleId:'unclassified',kind:'structured',itemId:l.lineId,release:'none'},
       marks:l.marks,parts:l.parts,answers:l.answers}))});
   const out:CurriculumComparison[]=[];

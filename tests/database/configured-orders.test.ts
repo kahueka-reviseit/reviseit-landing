@@ -38,10 +38,14 @@ function configured(marks:[number,number,number]=[8,6,2],t:object=targets){retur
  answers:{items:{q1:{setting:chosen},q2:{setting:{kind:'automatic'}},q3:{}},paper:{logistics:chosen,block:chosen}}};}
 function unpaidConfig(marks:[number,number,number],t:object=targets){return {...configured(marks,t),answers:{items:{},paper:{}}};}
 function answersFor(cur:any){return {schemaVersion:2,revision:cur.form.revision,items:{q1:{setting:chosen,note:{kind:'omit'}},q2:{setting:{kind:'automatic'},note:{kind:'omit'}},q3:{}},paper:{logistics:chosen,block:chosen}};}
+// The exact generation inputs of a line, as the database derives them.
+const sourceBinding=(b:any,workflow:string)=>({schema:'reviseit/cfg-source-binding@1',moduleId:b.module,release:b.release,entryId:b.entryId,privateManifestSha256:b.manifestSha256,privateBundleDigest:b.bundleDigest,formRevision:b.formRevision,workflowManifestSha256:workflow,sources:b.sources});
 function planFor(cur:any,order:string){
  const cfg=cur.configuration;
- return {schema:'reviseit/configured-generation-plan@1',orderId:order,module:'synthetic-module',release:'1',formRevision:cur.form.revision,configurationRevision:cur.revision,definitionsSha256:cur.definitionsSha256,targets:cfg.targets,
-  lines:cur.snapshot.lines.map((l:any)=>({id:l.id,entryId:l.entryId,identity:l.identity,kind:l.kind,marks:cfg.lines[l.id].marks,parts:null,facets:cfg.lines[l.id].facets,answers:answersFor(cur).items[l.id as 'q1'],classificationSha256:l.classification?.sha256??null,requirementsRef:null,diagram:null}))};
+ return {schema:'reviseit/configured-generation-plan@2',orderId:order,module:'synthetic-module',release:'1',formRevision:cur.form.revision,configurationRevision:cur.revision,definitionsSha256:cur.definitionsSha256,targets:cfg.targets,
+  order:cfg.order??cur.snapshot.lines.map((l:any)=>l.id),
+  lines:cur.snapshot.lines.map((l:any)=>({id:l.id,entryId:l.entryId,identity:l.identity,kind:l.kind,marks:cfg.lines[l.id].marks,parts:null,facets:cfg.lines[l.id].facets,answers:answersFor(cur).items[l.id as 'q1'],classificationSha256:l.classification?.sha256??null,requirementsRef:null,diagram:null,
+   sourceBinding:sourceBinding(l.binding,cur.snapshot.execution.workflowManifestSha256)}))};
 }
 async function submit(order:string,k=submission,override?:{answers?:object;plan?:object;revision?:number}){const cur=await read(order);await service();
  return one('select public.submit_configured_paper($1,$2,$3,$4,$5,$6) as r',[order,teacher,k,override?.revision??cur.revision,JSON.stringify(override?.answers??answersFor(cur)),JSON.stringify(override?.plan??planFor(cur,order))]);}
@@ -182,7 +186,7 @@ test('a refund before submission cancels the draft; neither edits nor submission
 test('a refund after submission leaves the frozen plan but the worker never claims it',async()=>{
  const orderId=await paidOrder();await save(orderId,configured([8,6,2]),1,true);expect(await submit(orderId)).toBe(orderId);
  await service();await one("select public.record_stripe_refund('evt_refund',false,'pi_Synthetic1',10000,'zar') as r");
- expect(await claim(['configured-plan@1'])).toBeNull();
+ expect(await claim(['configured-plan@2'])).toBeNull();
 });
 
 test('the legacy answer path, other schools and unapproved teachers are refused for configured orders',async()=>{
@@ -200,12 +204,14 @@ test('the legacy answer path, other schools and unapproved teachers are refused 
 test('workers claim configured orders only when they declare the capability, with the frozen plan',async()=>{
  const orderId=await paidOrder();await save(orderId,configured([5,9,2]),1,true);
  expect(await claim()).toBeNull();expect(await claim([])).toBeNull();
- await refuse(()=>claim(['configured-plan@2']),/Invalid worker capabilities/);
+ await refuse(()=>claim(['configured-plan@3']),/Invalid worker capabilities/);
  expect(await submit(orderId)).toBe(orderId);
  expect(await claim()).toBeNull();
- const job=await claim(['configured-plan@1']);
+ // A version-1-only worker never receives a version 2 plan.
+ expect(await claim(['configured-plan@1'])).toBeNull();
+ const job=await claim(['configured-plan@1','configured-plan@2']);
  expect(job).toMatchObject({id:orderId,adapterKey:'configured-bundle-v1',entitlement:'paid',paymentMode:'test'});
- expect(job.configurationPlan).toMatchObject({schema:'reviseit/configured-generation-plan@1',configurationRevision:2,targets:{paper:16}});
+ expect(job.configurationPlan).toMatchObject({schema:'reviseit/configured-generation-plan@2',configurationRevision:2,targets:{paper:16}});
  expect(job.configurationPlan.lines.map((l:any)=>[l.id,l.marks])).toEqual([['q1',5],['q2',9],['q3',2]]);
  expect(job.snapshot.lines[0].checkoutMarks).toBe(8);
  expect(job.answers.items.q2.setting).toEqual({kind:'automatic'});
@@ -217,23 +223,72 @@ test('an existing authored order keeps its claim payload for workers with or wit
  await attach(r.orderId);await paid(r.orderId);
  const form=(await orderRow(r.orderId)).form;
  await asUser(teacher);await db.query('select public.submit_paper_answers($1,$2,$3)',[r.orderId,submission,JSON.stringify({schemaVersion:2,revision:form.revision,items:{q1:{setting:chosen,note:{kind:'omit'}},q2:{}},paper:{logistics:chosen,block:chosen}})]);
- await db.exec('savepoint legacy');const plain=await claim();await db.exec('rollback to savepoint legacy');const declared=await claim(['configured-plan@1']);
+ await db.exec('savepoint legacy');const plain=await claim();await db.exec('rollback to savepoint legacy');const declared=await claim(['configured-plan@1','configured-plan@2']);
  for(const job of [plain,declared]){expect(job).toMatchObject({id:r.orderId,adapterKey:'authored-bundle-v1'});expect(job).not.toHaveProperty('configurationPlan');}
  expect(Object.keys(plain).sort()).toEqual(Object.keys(declared).sort());
 });
 
-test('classifications are publisher-only, identity-checked, pinned at checkout and never rewrite an issued order',async()=>{
- const envelope=(tag:string)=>({schemaVersion:1,moduleId:'synthetic-module',kind:'structured',itemId:'SPEC_01',release:'1',curriculumId:'synthetic',curriculumRequirementsRef:{profileId:'synthetic-profile',version:1},tag});
- await refuse(()=>publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,$6)',['synthetic-module','1','structured:SPEC_02',hash('1'),JSON.stringify(envelope('a')),hash('7')]),/identity mismatch/);
- await refuse(()=>publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,$6)',['synthetic-module','1','structured:SPEC_01',hash('1'),JSON.stringify(envelope('a')),hash('7')]),/requirements profile required/);
- await publisher('select public.register_curriculum_requirements($1,$2,$3)',['synthetic-profile@1',hash('7'),JSON.stringify({profileId:'synthetic-profile',version:1})]);
- await service();await refuse(()=>db.query('select public.register_catalogue_classification($1,$2,$3,$4,$5,$6)',['synthetic-module','1','structured:SPEC_01',hash('1'),JSON.stringify(envelope('a')),hash('7')]),/permission denied/);
- await publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,$6)',['synthetic-module','1','structured:SPEC_01',hash('1'),JSON.stringify(envelope('a')),hash('7')]);
- await refuse(()=>publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,$6)',['synthetic-module','1','structured:SPEC_01',hash('1'),JSON.stringify(envelope('changed')),hash('7')]),/immutable/);
- // Registration does not change readiness.
+const binding=async(entry='structured:SPEC_01')=>{await owner();const f=(await db.query<any>('select payload from private.catalogue_authored_forms where entry_id=$1',[entry])).rows[0].payload;return sourceBinding(f,hash('8'));};
+const bundleSources=(b:any)=>b.sources.map((s:any)=>({...s,originalPath:'our content/synthetic-module/data/'+s.path}));
+const envelope=(tag:string,sources?:any[])=>({schemaVersion:2,moduleId:'synthetic-module',kind:'structured',itemId:'SPEC_01',release:'1',curriculumId:'synthetic',curriculumRequirementsRef:{profileId:'synthetic-profile',version:1},
+ formBinding:{itemForm:{formRevision:hash('a')}},provenance:{sources:sources??[{role:'specification',path:'our content/synthetic-module/data/sources/synthetic.md',sha256:hash('b')}]},tag});
+const registerBound=(env:object,sha:string,b:object,bs:object,digest='synthetic-digest')=>publisher('select public.register_catalogue_classification_bound($1,$2,$3,$4,$5,$6,$7,$8,$9)',['synthetic-module','1','structured:SPEC_01',sha,JSON.stringify(env),hash('7'),JSON.stringify(b),JSON.stringify(bs),digest]);
+async function publishedRelease(){await owner();await db.query("insert into private.catalogue_published_releases(module_id,release,payload) values('synthetic-module','1','{\"contentDigest\":\"synthetic-digest\"}') on conflict do nothing");}
+test('classifications register only with their exact source binding; mismatches fail and issued orders never change',async()=>{
+ await publishedRelease();await publisher('select public.register_curriculum_requirements($1,$2,$3)',['synthetic-profile@1',hash('7'),JSON.stringify({profileId:'synthetic-profile',version:1})]);
+ const b=await binding();
+ // The unbound version-1 registration is withdrawn from the publisher.
+ await refuse(()=>publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,$6)',['synthetic-module','1','structured:SPEC_01',hash('1'),JSON.stringify(envelope('a')),hash('7')]),/permission denied/);
+ await service();await refuse(()=>db.query('select public.register_catalogue_classification_bound($1,$2,$3,$4,$5,$6,$7,$8,$9)',['synthetic-module','1','structured:SPEC_01',hash('1'),'{}',hash('7'),'{}','[]','x']),/permission denied/);
+ // Changed source bytes with an unchanged form revision: refused.
+ await refuse(()=>registerBound(envelope('a',[{role:'specification',path:'our content/synthetic-module/data/sources/synthetic.md',sha256:hash('6')}]),hash('1'),b,bundleSources(b)),/source version mismatch/);
+ // A missing task dependency, an extra one, a cross-module path, another bundle, another workflow, another catalogue release: all refused.
+ await refuse(()=>registerBound(envelope('a',[...envelope('a').provenance.sources,{role:'task-dependency',path:'our content/synthetic-module/data/sources/extra.md',sha256:hash('5')}]),hash('1'),b,bundleSources(b)),/source version mismatch/);
+ await refuse(()=>registerBound(envelope('a'),hash('1'),b,bundleSources(b).map((x:any)=>({...x,originalPath:'our content/other-module/data/'+x.path}))),/source version mismatch/);
+ await refuse(()=>registerBound(envelope('a'),hash('1'),{...b,privateManifestSha256:hash('9')},bundleSources(b)),/source version mismatch/);
+ await refuse(()=>registerBound(envelope('a'),hash('1'),{...b,privateBundleDigest:hash('9')},bundleSources(b)),/source version mismatch/);
+ await refuse(()=>registerBound(envelope('a'),hash('1'),{...b,workflowManifestSha256:hash('9')},bundleSources(b)),/source version mismatch/);
+ await refuse(()=>registerBound(envelope('a'),hash('1'),b,bundleSources(b),'other-digest'),/catalogue release mismatch/);
+ await refuse(()=>registerBound({...envelope('a'),formBinding:{itemForm:{formRevision:hash('9')}}},hash('1'),b,bundleSources(b)),/source version mismatch/);
+ await refuse(()=>registerBound({...envelope('a'),itemId:'SPEC_02'},hash('1'),b,bundleSources(b)),/identity mismatch/);
+ // Aligned: accepted, immutable, and readiness is unchanged.
+ await registerBound(envelope('a'),hash('1'),b,bundleSources(b));
+ await refuse(()=>registerBound(envelope('changed'),hash('1'),b,bundleSources(b)),/immutable/);
  await asUser(teacher);expect((await db.query<any>("select orderable from public.teacher_catalogue_summaries where entry_id='structured:SPEC_01'")).rows[0].orderable).toBe(true);
- const orderId=await paidOrder();
- await publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,$6)',['synthetic-module','1','structured:SPEC_01',hash('2'),JSON.stringify(envelope('b')),hash('7')]);
- const o=await orderRow(orderId);expect(o.snapshot.lines[0].classification).toMatchObject({sha256:hash('1'),requirementsRef:'synthetic-profile@1',payload:{tag:'a'}});
- expect(o.snapshot.requirements['synthetic-profile@1']).toMatchObject({sha256:hash('7')});expect(o.snapshot.lines[1].classification).toBeNull();
+ const orderId=await paidOrder();const o=await orderRow(orderId);
+ expect(o.snapshot.lines[0].classification).toMatchObject({sha256:hash('1'),requirementsRef:'synthetic-profile@1',sourceBinding:b});
+ await registerBound(envelope('b'),hash('2'),b,bundleSources(b));
+ expect((await orderRow(orderId)).snapshot.lines[0].classification.sha256).toBe(hash('1'));
 });
+test('a classification bound to a superseded bundle fails checkout loudly instead of silently dropping the item',async()=>{
+ await publishedRelease();await publisher('select public.register_curriculum_requirements($1,$2,$3)',['synthetic-profile@1',hash('7'),JSON.stringify({profileId:'synthetic-profile',version:1})]);
+ const b=await binding();await registerBound(envelope('a'),hash('1'),b,bundleSources(b));
+ // Simulate a later bundle for this entry: the current form binding moves, the classification still describes the old bytes.
+ await owner();await db.exec("alter table private.catalogue_form_bindings disable trigger all");
+ await db.query("update private.catalogue_form_bindings set manifest_sha256=$1 where entry_id='structured:SPEC_01'",[hash('3')]);
+ await db.query("insert into private.catalogue_authored_forms(module_id,release,entry_id,manifest_sha256,payload) select module_id,release,entry_id,$1,payload||jsonb_build_object('manifestSha256',$1::text) from private.catalogue_authored_forms where entry_id='structured:SPEC_01' and manifest_sha256=$2",[hash('3'),hash('c')]);
+ await enable();await funding();await select();
+ await refuse(()=>candidate(),/source version mismatch|not available/);
+});
+test('repeated multiple-choice occurrences are separate lines; repeats of structured items and repeats on the legacy path are refused',async()=>{
+ await enable();await funding();
+ await select(teacher,['mcq:MCQ_01','structured:SPEC_01','mcq:MCQ_01','structured:SPEC_02']);
+ const r=await begin(teacher,key,allocations,{paper:18});const o=await orderRow(r.orderId);
+ expect(o.snapshot.lines.map((l:any)=>[l.id,l.entryId])).toEqual([['q1','mcq:MCQ_01'],['q2','structured:SPEC_01'],['q3','mcq:MCQ_01'],['q4','structured:SPEC_02']]);
+ await asUser(teacher);await refuse(()=>db.query('select public.save_paper_selection($1,$2,1,$3)',['synthetic-module','1',['structured:SPEC_01','structured:SPEC_01']]),/Invalid question selection/);
+ await enable(false);
+ await asUser(teacher);await refuse(()=>db.query('select public.save_paper_selection($1,$2,1,$3)',['synthetic-module','1',['mcq:MCQ_01','mcq:MCQ_01']]),/Invalid question selection/);
+ // With the earlier checkout closed, the legacy path refuses the saved repeats rather than compiling them.
+ await owner();await db.query("update private.paper_payments set status='cancelled' where order_id=$1",[r.orderId]);
+ await asUser(teacher);await refuse(()=>db.query('select public.begin_paper_checkout($1,$2,1,$3)',[key2,'synthetic-module',JSON.stringify(allocations)]),/Saved selection changed/);
+});
+test('presentation order is a revisioned choice after payment and is frozen into the plan',async()=>{
+ const orderId=await paidOrder();
+ await refuse(()=>save(orderId,{...configured(),order:['q1','q1','q3']},1,true),/Invalid configuration/);
+ expect(await save(orderId,{...configured(),order:['q3','q2','q1']},1,true)).toBe(2);
+ const cur=await read(orderId);
+ await refuse(()=>submit(orderId,submission,{plan:{...planFor(cur,orderId),order:['q1','q2','q3']}}),/Invalid generation plan/);
+ expect(await submit(orderId)).toBe(orderId);
+ expect((await claim(['configured-plan@2'])).configurationPlan.order).toEqual(['q3','q2','q1']);
+});
+

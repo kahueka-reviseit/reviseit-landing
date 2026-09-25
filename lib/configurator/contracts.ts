@@ -15,7 +15,7 @@ export const sectionLabels: Record<SectionKey,string> = {multiple_choice:'Multip
 export type Targets = {paper:number|null; sections?:Partial<Record<SectionKey,number>>};
 export type LineChoice = {marks:number|null; parts:string[]|null; facets:Record<string,Answer>};
 export type Configuration = {
-  schemaVersion:1; targets:Targets; lines:Record<string,LineChoice>;
+  schemaVersion:1; targets:Targets; lines:Record<string,LineChoice>; order?:string[];
   answers:{items:Record<string,Record<string,Answer>>; paper:Record<string,Answer>};
 };
 
@@ -37,7 +37,9 @@ function answers(section:unknown,max:number):section is Record<string,Answer> {
 
 /** Closed shape only. Identities, ranges and rules are checked against pinned definitions on the server. */
 export function isConfiguration(value:unknown):value is Configuration {
-  if(!record(value) || !exact(value,['schemaVersion','targets','lines','answers']) || value.schemaVersion!==1) return false;
+  if(!record(value) || !exact(value,['schemaVersion','targets','lines','answers'],['order']) || value.schemaVersion!==1) return false;
+  if(Object.hasOwn(value,'order') && !(Array.isArray(value.order) && record(value.lines) && value.order.length===Object.keys(value.lines).length
+    && new Set(value.order).size===value.order.length && value.order.every(id=>typeof id==='string' && Object.hasOwn(value.lines as object,id)))) return false;
   const t=value.targets;
   if(!record(t) || !exact(t,['paper'],['sections']) || !(t.paper===null || total(t.paper,1))) return false;
   if(Object.hasOwn(t,'sections') && !(record(t.sections) && Object.entries(t.sections).every(([k,v])=>(k==='multiple_choice'||k==='structured') && total(v,0)))) return false;
@@ -66,7 +68,7 @@ export type ConfiguredCheckoutRequest = {requestKey:string; moduleId:string; sel
 // ---------------------------------------------------------------- projection
 export type OptionView = {id:string; label:string; disabled:boolean; reason?:string; preferred?:boolean};
 export type FacetView = {id:string; label:string; hint:string; type:'choice'; required:boolean; allowAutomatic:boolean; options:OptionView[]; value:Answer|null; forced?:string; reason?:string};
-export type PartView = {id:string; number:string; summary:string; bloom:BloomKey|null; bloomUnknownReason?:string; band:string|null; marks:{min:number;max:number}|null;
+export type PartView = {id:string; number:string; summary:string; bloom:BloomKey|null; bloomOptions:BloomKey[]; bloomBasis:'source-label'|'profile-single-mapping'|'profile-authorised-fallback'|null; bloomUnknownReason?:string; band:string|null; marks:{min:number;max:number}|null;
   inclusion:'required'|'optional'; included:boolean; locked:boolean; reason?:string; learnerDrawn:boolean};
 export type Attention = {scope:'field'|'facet'|'part'|'marks'; id:string; message:string};
 export type LineView = {
@@ -75,8 +77,12 @@ export type LineView = {
   parts:PartView[]; facets:FacetView[]; fields:QuestionField[]; answers:Record<string,Answer>;
   outstanding:string[]; attention:Attention[]; issues:string[]; ready:boolean;
   diagram:{stimulus:'required'|'optional'|'not_applicable'|'unknown'; learnerDrawn:string[]; locked?:string}|null;
+  /** Reviewed public catalogue outline only (one example structure), or null when none was published. */
+  outline:{subquestions:{min:number;max:number}; rows:{summary:string; bloom:string; marks:{min:number;max:number}|null}[]}|null;
 };
-export type CognitiveRow = {key:BloomKey|'unclassified'; label:string; min:number; max:number};
+export type CognitiveRow = {key:string; label:string; min:number; max:number; grouped?:boolean};
+/** 'apply-or-analyse' -> 'Apply or Analyse' */
+export const groupLabel=(key:string)=>key.split('-or-').map(k=>bloomLabels[k as BloomKey]??k).join(' or ');
 export type CurriculumComparison = {profile:string; basis:'marks'|'item-count'; rows:{key:string; label:string; min:number; max:number; target:string}[]; note:string};
 export type ConfigurationView = {
   orderId:string; state:string; paid:boolean; paymentStatus:string; revision:number; submitted:boolean;

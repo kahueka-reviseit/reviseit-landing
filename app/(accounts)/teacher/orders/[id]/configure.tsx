@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Answer, QuestionField } from '../../../../../lib/jobs/questionnaire';
-import type { Attention, Configuration, ConfigurationView, FacetView, LineView } from '../../../../../lib/configurator/contracts';
+import { groupLabel, type Attention, type Configuration, type ConfigurationView, type FacetView, type LineView } from '../../../../../lib/configurator/contracts';
 import styles from './configure.module.css';
 
 /**
@@ -10,7 +10,7 @@ import styles from './configure.module.css';
  * projection; every rule and total comes back from the server after a save.
  */
 type SaveState = 'saved'|'pending'|'saving'|'conflict'|'failed';
-const bloomClass:Record<string,string>={remember:styles.remember,understand:styles.understand,apply:styles.apply,analyse:styles.analyse,evaluate:styles.evaluate,create:styles.create,unclassified:styles.unclassified};
+const bloomClass:Record<string,string>={grouped:styles.grouped,remember:styles.remember,understand:styles.understand,apply:styles.apply,analyse:styles.analyse,evaluate:styles.evaluate,create:styles.create,unclassified:styles.unclassified};
 
 function lineStatus(line:LineView,paid:boolean){
   if(line.marks.value===null || line.attention.some(a=>a.scope==='marks')) return {text:'Marks needed',ready:false};
@@ -162,7 +162,8 @@ export default function ConfigureOrder({orderId,onSubmitted}:{orderId:string;onS
         {(line.parts.length>1||line.parts.some(p=>!p.locked))&&<fieldset className={styles.field}><legend>What the question covers</legend>
           <ol className={styles.parts}>{line.parts.map(p=><li key={p.id} className={p.included?'':styles.left}>
             <label><input type="checkbox" checked={p.included} disabled={!editable||p.locked} onChange={e=>togglePart(p.id,e.target.checked)}/> <span className={styles.partNo}>{line.number}.{p.number}</span> {p.summary}</label>
-            <span className={`${styles.bloom} ${bloomClass[p.bloom??'unclassified']}`}>{p.bloom?p.bloom.charAt(0).toUpperCase()+p.bloom.slice(1):'Not yet classified'}</span>
+            <span className={`${styles.bloom} ${bloomClass[p.bloom??(p.bloomOptions.length?'grouped':'unclassified')]}`} title={p.bloomBasis==='profile-authorised-fallback'?'Taken from the curriculum level under the agreed Grade 10 assumption':p.bloomBasis==='profile-single-mapping'?'Taken from the curriculum level':p.bloomOptions.length?'The curriculum level allows either category; the source does not say which':undefined}>
+              {p.bloom?p.bloom.charAt(0).toUpperCase()+p.bloom.slice(1):p.bloomOptions.length?groupLabel(p.bloomOptions.join('-or-')):'Not yet classified'}</span>
             {p.band&&<span className={styles.band}>Curriculum band {p.band}</span>}
             <span className={styles.partMarks}>{p.marks?range(p.marks):'—'}</span>
             {p.learnerDrawn&&<span className={styles.help}>Learners draw this themselves</span>}
@@ -203,9 +204,9 @@ export default function ConfigureOrder({orderId,onSubmitted}:{orderId:string;onS
       <section className={styles.panel} aria-labelledby="bloom-heading">
         <p id="bloom-heading" className={styles.eyebrow}>Bloom’s cognitive mix · by marks</p>
         <ul className={styles.mix}>{view.cognitive.map(r=><li key={r.key}><span>{r.label}</span>
-          <span className={styles.bar} aria-hidden="true"><i className={bloomClass[r.key]} style={{width:`${Math.round(r.max/maxBloom*100)}%`}}/></span>
+          <span className={styles.bar} aria-hidden="true"><i className={bloomClass[r.grouped?'grouped':r.key]} style={{width:`${Math.round(r.max/maxBloom*100)}%`}}/></span>
           <span>{r.min===r.max?r.min:`${r.min}–${r.max}`}</span></li>)}</ul>
-        <p className={styles.help}>A range means the final split between parts is decided within their permitted marks. Marks without a classification are shown as not yet classified, never spread across categories.</p>
+        <p className={styles.help}>A range means the final split between parts is decided within their permitted marks. Marks whose level allows two categories are shown together, and marks without a classification as not yet classified; neither is spread across categories.</p>
       </section>
       {view.curriculum.length>0&&<section className={styles.panel} aria-labelledby="curriculum-heading">
         <p id="curriculum-heading" className={styles.eyebrow}>Curriculum requirements</p>

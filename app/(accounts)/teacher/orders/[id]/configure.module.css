@@ -51,11 +51,12 @@
 .bloom { display:inline-block; font:600 11px/1.2 'Trebuchet MS',sans-serif; padding:4px 7px; border-radius:3px; }
 .remember { background:#436B56; color:#fff; }.understand { background:#1A1A2E; color:#fff; }.apply { background:#D4A574; color:#292323; }
 .analyse { background:#3B5F8A; color:#fff; }.evaluate { background:#B85042; color:#fff; }.create { background:#735B79; color:#fff; }.unclassified { background:#c9c6be; color:#2D2D2D; }
+.grouped { background:repeating-linear-gradient(135deg,#D4A574 0 6px,#3B5F8A 6px 12px); color:#fff; }
 .target { display:flex; justify-content:space-between; align-items:center; gap:12px; font-weight:600; }
 .target input { width:88px; padding:8px 10px; border:1px solid #898780; font:inherit; text-align:right; }
 .budgetRow { display:flex; justify-content:space-between; gap:12px; font-size:15px; border-top:1px solid #F0EDE6; padding-top:8px; }
 .mix { list-style:none; margin:0; padding:0; display:grid; gap:8px; }
-.mix li { display:grid; grid-template-columns:120px 1fr 44px; gap:10px; align-items:center; font-size:15px; }
+.mix li { display:grid; grid-template-columns:140px 1fr 44px; gap:10px; align-items:center; font-size:15px; }
 .mix li span:last-child { text-align:right; }
 .bar { height:8px; background:#F0EDE6; border-radius:999px; overflow:hidden; display:block; }
 .bar i { display:block; height:100%; border-radius:999px; }

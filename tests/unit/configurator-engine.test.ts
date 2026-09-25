@@ -90,7 +90,7 @@ describe('authored decisions after payment',()=>{
   const d=definitions();const cfg=config([10,4,2],16,{answers:paidAnswers()});const e=evaluate(d,cfg,{paid:true});
   expect(submittedAnswers(d,cfg).items.q1.note).toEqual({kind:'omit'});expect(submittedAnswers(d,cfg).paper.paper_note).toEqual({kind:'omit'});
   const {plan}=generationPlan(d,cfg,e,'00000000-0000-4000-8000-000000000001',7);
-  expect(plan).toMatchObject({schema:'reviseit/configured-generation-plan@1',configurationRevision:7,definitionsSha256:hash('9'),targets:{paper:16}});
+  expect(plan).toMatchObject({schema:'reviseit/configured-generation-plan@2',order:['q1','q2','q3'],configurationRevision:7,definitionsSha256:hash('9'),targets:{paper:16}});
   expect(plan.lines.map(l=>[l.id,l.marks,l.kind])).toEqual([['q1',10,'specification'],['q2',4,'specification'],['q3',2,'multiple-choice']]);
   expect(()=>generationPlan(d,config([8,6,2]),evaluate(d,config([8,6,2]),{paid:true}),'x',1)).toThrow(/not ready/);
  });
@@ -169,5 +169,53 @@ describe('safe projection',()=>{
   expect(isConfiguration({...config([8,6,2]),lines:{q1:{marks:8,parts:null,facets:{},rules:[]}}})).toBe(false);
   expect(isConfiguration({...config([8,6,2]),answers:{items:{other:{}},paper:{}}})).toBe(false);
   expect(isConfiguration({...config([8.5,6,2])})).toBe(false);
+ });
+});
+
+describe('CFG01A: source binding, order and grouped Bloom categories',()=>{
+ const withExecution=(mutate?:(line:any)=>void)=>{
+  const d0=definitions({classified:true});
+  // Rebuild a snapshot whose classification carries a source binding and whose order froze its workflow.
+  const form={schemaVersion:2 as const,revision:hash('d'),items:d0.lines.map(l=>({id:l.id,title:l.title,marks:6,fields:l.fields})),paperFields:d0.paperFields};
+  const bindingFor=(l:any)=>({module:'synthetic-module',release:'1',entryId:l.entryId,manifestSha256:hash('c'),bundleDigest:hash('b'),formRevision:hash('f'),sources:[{role:'specification',path:'sources/x.md',sha256:hash('4')}],fields:l.fields});
+  const lines=d0.lines.map(l=>({id:l.id,entryId:l.entryId,kind:l.legacyKind,identity:l.identity,title:l.title,range:l.range,fixedMarks:l.fixedMarks,checkoutMarks:6,binding:bindingFor(l),
+   classification:l.classification?{sha256:hash('c'),requirementsRef:'synthetic-profile@1',payload:l.classification.doc,
+    sourceBinding:{schema:'reviseit/cfg-source-binding@1',moduleId:'synthetic-module',release:'1',entryId:l.entryId,privateManifestSha256:hash('c'),privateBundleDigest:hash('b'),formRevision:hash('f'),workflowManifestSha256:hash('8'),sources:[{role:'specification',path:'sources/x.md',sha256:hash('4')}]}}:null}));
+  mutate?.(lines[0]);
+  return readDefinitions({schema:'reviseit/configured-authored-inputs@1',module:'synthetic-module',release:'1',formRevision:hash('d'),lines,execution:{workflowManifestSha256:hash('8')},requirements:{'synthetic-profile@1':{sha256:hash('7'),payload:profile}}},form,hash('9'));
+ };
+ it('uses a classification only when it describes the exact bytes the order generates from',()=>{
+  expect(withExecution().lines[0].classificationProblem).toBeNull();
+  const changed=withExecution(l=>{l.classification.sourceBinding.sources=[{role:'specification',path:'sources/x.md',sha256:hash('5')}];});
+  expect(changed.lines[0].classification).toBeNull();expect(changed.lines[0].classificationProblem).toMatch(/other source bytes/);
+  const otherWorkflow=withExecution(l=>{l.classification.sourceBinding.workflowManifestSha256=hash('6');});
+  expect(otherWorkflow.lines[0].classificationProblem).toMatch(/other source bytes/);
+  // The line stays visible with an explicit problem; nothing is silently dropped.
+  expect(changed.lines).toHaveLength(3);expect(evaluate(changed,config([8,6,2]),{paid:false}).lines[0].issues).toHaveLength(1);
+ });
+ it('every plan line carries its exact source binding; the plan carries the teacher order',()=>{
+  const d=withExecution();const cfg={...config([10,4,2],16,{answers:paidAnswers()}),order:['q2','q3','q1']};
+  const e=evaluate(d,cfg,{paid:true});const {plan}=generationPlan(d,cfg,e,'o',3);
+  expect(plan.order).toEqual(['q2','q3','q1']);
+  expect(plan.lines[0].sourceBinding).toMatchObject({privateManifestSha256:hash('c'),workflowManifestSha256:hash('8'),sources:[{sha256:hash('4')}]});
+  expect(project(d,cfg,e,{orderId:'o',state:'awaiting_answers',paymentStatus:'paid',revision:3,submitted:false}).lines.map(l=>[l.id,l.number])).toEqual([['q3','1.1'],['q2','2'],['q1','3']]);
+ });
+ it('grouped categories stay their own bucket, never split or counted twice; missing stays unknown',()=>{
+  const d=definitions({classified:true});
+  const doc=d.lines[0].classification!.doc as any;
+  doc.schemaVersion=2;
+  doc.parts.forEach((p:any)=>{p.cognitive.bloomBasis=p.cognitive.bloom?'source-label':null;p.cognitive.bloomCandidates=[];});
+  doc.parts[2].cognitive={...doc.parts[2].cognitive,bloom:null,unknownReason:'grouped-band-unresolved',bloomCandidates:['apply','analyse']};
+  const e=evaluate(d,config([8,6,2]),{paid:false});
+  expect(e.grouped['apply-or-analyse']).toEqual({min:2,max:4});
+  expect(e.cognitive.apply).toEqual({min:2,max:4});
+  const view=project(d,config([8,6,2]),e,{orderId:'o',state:'awaiting_payment',paymentStatus:'open',revision:1,submitted:false});
+  expect(view.cognitive.map(r=>r.label)).toEqual(['Remember','Understand','Apply','Analyse','Evaluate','Create','Apply or Analyse','Not yet classified']);
+  // Every mark attributed once: the minima never exceed the paper, the maxima cover it.
+  const lo=view.cognitive.reduce((n,r)=>n+r.min,0),hi=view.cognitive.reduce((n,r)=>n+r.max,0);expect(lo).toBeLessThanOrEqual(16);expect(hi).toBeGreaterThanOrEqual(16);
+ });
+ it('no curriculum mapping is hard-coded in application code',async()=>{
+  const {readFileSync,readdirSync}=await import('node:fs');
+  for(const f of readdirSync('lib/configurator')){const t=readFileSync('lib/configurator/'+f,'utf8');expect(t).not.toMatch(/\bL[1-4]\b|founder-authorised|caps-grade-10/);}
  });
 });
