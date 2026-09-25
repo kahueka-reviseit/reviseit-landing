@@ -132,7 +132,8 @@ export default function ConfigureOrder({orderId,onSubmitted}:{orderId:string;onS
     const kind=view.lines.find(l=>l.id===id)!.kind;const same=o.filter(x=>view.lines.find(l=>l.id===x)!.kind===kind);
     const at=same.indexOf(id),to=same[at+by];if(to===undefined)return c;const i=o.indexOf(id),j=o.indexOf(to);[o[i],o[j]]=[o[j],o[i]];c.order=o;return c;});
   const sameKind=view.lines.filter(l=>l.kind===line.kind);const position=sameKind.findIndex(l=>l.id===line.id);
-  const stage=view.submitted?4:paid?(view.status==='ready_to_generate'?3:2):(view.status==='ready_for_payment'?1:0);
+  // Questions are chosen before this page exists; payment is a fact, not a readiness state.
+  const stage=view.submitted?5:paid?(view.status==='ready_to_generate'?4:3):(view.status==='ready_for_payment'?2:1);
   const steps=['Choose questions','Set marks','Pay','Complete details','Submit'];
   return <>
   <ol className={styles.progress} aria-label="Progress">{steps.map((label,i)=><li key={label} aria-current={i===stage?'step':undefined} className={i<stage?styles.done:i===stage?styles.now:''}>{i<stage?'✓ ':''}{label}</li>)}</ol>
@@ -169,7 +170,7 @@ export default function ConfigureOrder({orderId,onSubmitted}:{orderId:string;onS
 
       <section className={styles.panel} aria-labelledby="outline-heading">
         <p id="outline-heading" className={styles.eyebrow}>Question outline</p>
-        {paid&&line.parts.length>0?<p className={styles.help}>The parts listed below are this question’s structure. Final wording and values are created when you submit.</p>:
+        {paid&&(line.parts.length>1||line.parts.some(p=>!p.locked))?<p className={styles.help}>The parts listed below are this question’s structure. Final wording and values are created when you submit.</p>:
          line.outline&&line.outline.rows.length?<><p className={styles.help}>One published example structure ({line.outline.subquestions.min===line.outline.subquestions.max?line.outline.subquestions.min:`${line.outline.subquestions.min}–${line.outline.subquestions.max}`} subquestions). Your paper can differ within the published ranges.</p>
           <ol className={styles.outline}>{line.outline.rows.map((r,i)=><li key={i}><span>{line.number}.{i+1} {r.summary}</span><span className={`${styles.bloom} ${bloomClass[r.bloom.toLowerCase()]??styles.unclassified}`}>{r.bloom}</span><span>{r.marks?(r.marks.min===r.marks.max?r.marks.min:`${r.marks.min}–${r.marks.max}`):''}</span></li>)}</ol></>:
          line.outline?<p className={styles.help}>{line.outline.subquestions.min===line.outline.subquestions.max?line.outline.subquestions.min:`${line.outline.subquestions.min}–${line.outline.subquestions.max}`} subquestions. A reviewed outline has not been published for this question.</p>:

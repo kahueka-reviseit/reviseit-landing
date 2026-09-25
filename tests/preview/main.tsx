@@ -7,7 +7,11 @@ import type { Workspace } from '../../lib/workspace/contracts';
 import '../../app/globals.css';
 // Isolated UI harness: sample data only, no authentication bypass in the actual app.
 const saved:Record<string,Workspace>=JSON.parse(localStorage.getItem('reviseit-workspace-demo') || '{}');
-const get=(id:string)=>({...sampleWorkspace(id),...(saved[id] ? {formatting:saved[id].formatting,selection:saved[id].selection}: {})});
+// ?configurator=1 shows the editable-configuration path with one synthetic multiple-choice type.
+const configurator=new URLSearchParams(location.search).get('configurator')==='1';
+const withConfigurator=(w:Workspace):Workspace=>configurator?{...w,purchase:{available:true,amountMinor:10000,currency:'zar',configurator:true},
+ entries:[...w.entries,{id:'mcq:DEMO_MCQ',title:'Synthetic option type',topic:'Mechanics',description:'A synthetic two-mark option item.',marks:{min:2,max:2},orderable:true}]}:w;
+const get=(id:string)=>withConfigurator({...sampleWorkspace(id),...(saved[id] ? {formatting:saved[id].formatting,selection:saved[id].selection}: {})});
 window.fetch=async(input,options)=>{
  const url=String(input);
  if(url.startsWith('/api/teacher/catalogue/search')) {
