@@ -91,3 +91,19 @@ test('an unsaved selection change disables payment',async()=>{
  expect(screen.getByRole('button',{name:'Continue to payment · R100'})).toBeEnabled();
  await userEvent.setup().click(screen.getByLabelText('Select Reading a motion graph'));expect(screen.getByRole('button',{name:'Continue to payment · R100'})).toBeDisabled();
 });
+
+test.each([10,11])('payment respects the pilot limit with %i repeated questions',async n=>{
+ const entry={...workspace.entries[0],id:'mcq:SYNTHETIC',marks:{min:2,max:2},orderable:true};
+ render(<WorkspaceView initial={{...workspace,entries:[entry],selection:{revision:1,release:'demo-1',entryIds:Array(n).fill(entry.id)},purchase:{available:true,amountMinor:10000,currency:'zar',configurator:true,maxQuestions:10}}}/>);
+ await userEvent.type(screen.getByLabelText('Total marks for this paper'),String(n*2));
+ expect(screen.getByText(/This pilot allows up to 10 questions/)).toBeVisible();
+ const pay=screen.getByRole('button',{name:'Continue to payment · R100'});
+ if(n===10)expect(pay).toBeEnabled();else{expect(pay).toBeDisabled();expect(screen.getByRole('alert')).toHaveTextContent('Remove 1 question');}
+});
+
+test('a selection below the overall cap still respects the multiple-choice allowance',async()=>{
+ const entry={...workspace.entries[0],id:'mcq:SYNTHETIC',marks:{min:2,max:2},orderable:true};
+ render(<WorkspaceView initial={{...workspace,entries:[entry],selection:{revision:1,release:'demo-1',entryIds:Array(11).fill(entry.id)},purchase:{available:true,amountMinor:10000,currency:'zar',configurator:true,maxQuestions:20,maxStructured:10,maxMultipleChoice:10}}}/>);
+ await userEvent.type(screen.getByLabelText('Total marks for this paper'),'22');
+ expect(screen.getByRole('button',{name:'Continue to payment · R100'})).toBeDisabled();expect(screen.getByRole('alert')).toHaveTextContent('Reduce the number');
+});

@@ -292,3 +292,37 @@ test('presentation order is a revisioned choice after payment and is frozen into
  expect((await claim(['configured-plan@2'])).configurationPlan.order).toEqual(['q3','q2','q1']);
 });
 
+
+test.each([10,11])('pilot question limit counts every repeated occurrence: %i lines',async n=>{
+ await enable();await funding();await owner();await db.query("select public.configure_pilot_paper_size('test',10,'Synthetic ten-question pilot')");
+ await select(teacher,Array(n).fill('mcq:MCQ_01'));
+ const run=()=>begin(teacher,key,{'mcq:MCQ_01':2},{paper:n*2});
+ if(n===10){expect(await run()).toMatchObject({status:'creating'});}
+ else{await refuse(run,/allows up to 10 questions/);await owner();expect(await one('select count(*)::int as r from private.paper_orders')).toBe(0);expect(await one('select count(*)::int as r from private.paper_payments')).toBe(0);}
+});
+test('only the owner can change the paper limit; public status exposes the limit and no funding internals',async()=>{
+ await funding();await asUser(teacher);
+ await refuse(()=>db.query("select public.configure_pilot_paper_size('test',30,'Unauthorised increase')"),/permission denied/);
+ await owner();await db.query("select public.configure_pilot_paper_size('test',10,'Synthetic limit')");
+ await asUser(teacher);expect(await one('select public.pilot_checkout_status() as r')).toEqual({available:true,amountMinor:10000,currency:'zar',maxQuestions:10,maxStructured:30,maxMultipleChoice:30});
+ await owner();await refuse(()=>db.query("select public.configure_pilot_paper_size('test',31,'Invalid size')"),/Valid paper size/);
+});
+test('reducing the paper limit preserves an existing checkout and its retry',async()=>{
+ await enable();await funding();await select();const r=await begin();const before=await orderRow(r.orderId);
+ await db.query("select public.configure_pilot_paper_size('test',1,'Future checkouts only')");
+ expect((await begin()).orderId).toBe(r.orderId);expect(await orderRow(r.orderId)).toEqual(before);
+});
+test('a refunded live purchase keeps its pilot seat because generation allowance is not recycled',async()=>{
+ const id=await paidOrder();await owner();await db.query("update private.paper_payments set mode='live',refunded_at=now() where order_id=$1",[id]);
+ expect(await one("select private.pilot_seats_used('live') as r")).toBe(1);
+});
+
+test.each([[1,10,false],[2,1,true]])('pilot per-kind bounds structured=%i and multiple choice=%i',async(structured,mcq,accepted)=>{
+ await enable();await funding();await owner();await db.query("select public.configure_pilot_paper_size('test',20,'Synthetic kind limits',$1,$2)",[structured,mcq]);await select();
+ if(accepted)expect(await begin()).toMatchObject({status:'creating'});
+ else{await refuse(()=>begin(),/structured and 10 multiple-choice/);await owner();expect(await one('select count(*)::int as r from private.paper_payments')).toBe(0);}
+});
+test('eleven multiple-choice occurrences are refused even below the overall twenty-question cap',async()=>{
+ await enable();await funding();await owner();await db.query("select public.configure_pilot_paper_size('test',20,'Synthetic funded mix',10,10)");await select(teacher,Array(11).fill('mcq:MCQ_01'));
+ await refuse(()=>begin(teacher,key,{'mcq:MCQ_01':2},{paper:22}),/10 structured and 10 multiple-choice/);
+});

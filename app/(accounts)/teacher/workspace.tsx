@@ -91,8 +91,12 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
   const marksSet=chosen.every(inRange);
   const balanced=!configured || (paperTarget!==null && marksSet && allocatedTotal===paperTarget && sectionsOk);
   const price=data.purchase ? formatRand(data.purchase.amountMinor) : 'R100';
+  const maxQuestions=data.purchase?.maxQuestions ?? 30;
+  const maxStructured=data.purchase?.maxStructured ?? 30, maxMultipleChoice=data.purchase?.maxMultipleChoice ?? 30;
+  const mcqCount=chosen.filter(e=>e.id.startsWith('mcq:')).length;
+  const withinPilotSize=chosen.length<=maxQuestions && mcqCount<=maxMultipleChoice && chosen.length-mcqCount<=maxStructured;
   const canPay=!!data.module && !!data.purchase?.available && !selectionDirty && data.selection.revision>0 && chosen.length>0 && chosen.every(e=>e.orderable) &&
-    marksSet && balanced;
+    marksSet && balanced && withinPilotSize;
   async function checkout() {
     if(!data.module || !canPay) return;
     setBusy(true);setError('');setNotice('');
@@ -189,6 +193,10 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
           <p className={styles.saveState}>{selectionDirty?'Unsaved changes':data.selection.revision?'Selection saved':'No saved selection yet'}</p>
           <button className={styles.primary} disabled={busy || !selectionDirty} onClick={()=>void save('selection')}>{busy?'Please wait…':'Save selection'}</button>
           <div className={styles.next}><h3>Next: payment · {price} per paper</h3>
+            <p>This pilot allows up to {maxQuestions} questions per paper. Each repeated multiple-choice question counts separately.</p>
+            {(maxStructured<maxQuestions || maxMultipleChoice<maxQuestions) && <p>Up to {maxStructured} structured questions and {maxMultipleChoice} multiple-choice questions.</p>}
+            {!withinPilotSize && chosen.length<=maxQuestions && <p role="alert">Reduce the number of structured or multiple-choice questions to fit the pilot limits before paying.</p>}
+            {chosen.length>maxQuestions && <p role="alert">Remove {chosen.length-maxQuestions} {chosen.length-maxQuestions===1?'question':'questions'} before continuing to payment.</p>}
             {chosen.length>0 && <fieldset className={styles.allocations} disabled={busy}><legend>Marks for each question</legend>
               {configured && <label>Total marks for this paper<input type="number" min={1} max={3000} step={1} value={paperTarget ?? ''} placeholder="Set a total" onChange={ev=>setPaperTarget(ev.target.value===''?null:Number(ev.target.value))}/></label>}
               {configured && <>{(['multiple_choice','structured'] as const).filter(k=>chosen.some(e=>(k==='multiple_choice')===e.id.startsWith('mcq:'))).map(k=><label key={k}>{k==='multiple_choice'?'Multiple-choice section total (optional)':'Structured section total (optional)'}

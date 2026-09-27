@@ -27,6 +27,6 @@ export async function readWorkspace(client: SupabaseClient, schoolId:string, mod
     entries:(catalogue.data || []).map(c=>({id:c.entry_id,title:c.title,topic:c.topic,description:c.description,marks:{min:c.marks_min,max:c.marks_max},orderable:c.orderable===true,preview:cataloguePreview(c.preview),thumbnail:thumbnailFor(module.id,module.release,c.entry_id,c.thumbnail_alt)})),
     formatting:formatting.data || empty.formatting,
     selection:selection.data ? {revision:selection.data.revision,release:selection.data.release,entryIds:selection.data.entry_ids} : empty.selection,
-    purchase:{available:!purchase.error && purchase.data?.available===true,amountMinor:10000,currency:'zar',configurator:!configurator.error && configurator.data?.enabled===true},
+    purchase:{available:!purchase.error && purchase.data?.available===true,amountMinor:10000,currency:'zar',maxQuestions:Number.isInteger(purchase.data?.maxQuestions)?purchase.data.maxQuestions:30,maxStructured:Number.isInteger(purchase.data?.maxStructured)?purchase.data.maxStructured:30,maxMultipleChoice:Number.isInteger(purchase.data?.maxMultipleChoice)?purchase.data.maxMultipleChoice:30,configurator:!configurator.error && configurator.data?.enabled===true},
   };
 }

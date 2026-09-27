@@ -64,7 +64,7 @@ test('readiness follows connected bindings: excluded, unconnected and unauthored
 });
 test('checkout is refused until an operator enables the pilot allowance',async()=>{
  await select();await refuse(()=>begin(),/Pilot purchasing unavailable/);
- await asUser(teacher);expect((await db.query<any>('select public.pilot_checkout_status() as s')).rows[0].s).toEqual({available:false,amountMinor:10000,currency:'zar'});
+ await asUser(teacher);expect((await db.query<any>('select public.pilot_checkout_status() as s')).rows[0].s).toEqual({available:false,amountMinor:10000,currency:'zar',maxQuestions:30,maxStructured:30,maxMultipleChoice:30});
 });
 test('checkout freezes the saved mixed selection at the server price without unlocking the form',async()=>{
  await funding();await select();const r=await begin();
@@ -283,4 +283,10 @@ test('C04A review diagnostic: same-session injected overlap is repaired by the n
  const current=await orderRow(r.orderId);
  expect(current.refunded_at).not.toBeNull();expect(current.state).toBe('cancelled');
  await owner();expect((await db.query<any>('select outcome from private.stripe_pending_refunds')).rows).toEqual([{outcome:'refunded'}]);
+});
+
+test('the legacy checkout also refuses an oversized paper before creating payment records',async()=>{
+ await funding();await owner();await db.query("select public.configure_pilot_paper_size('test',1,'Synthetic small pilot')");await select();
+ await refuse(()=>begin(),/allows up to 1 questions/);
+ await owner();expect((await db.query('select * from private.paper_payments')).rows).toEqual([]);expect((await db.query('select * from private.paper_orders')).rows).toEqual([]);
 });

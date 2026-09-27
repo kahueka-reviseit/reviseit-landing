@@ -7,6 +7,10 @@ import { serviceClient } from '../../../../lib/supabase/service';
 import { authConfig } from '../../../../lib/supabase/config';
 export const dynamic='force-dynamic';
 function refusal(message:string){
+ const mix=/^This pilot allows up to (\d{1,2}) structured and (\d{1,2}) multiple-choice questions per paper\./.exec(message);
+ if(mix)return reply({error:`This pilot allows up to ${mix[1]} structured and ${mix[2]} multiple-choice questions per paper.`},422);
+ const size=/^This pilot allows up to (\d{1,2}) questions per paper\./.exec(message);
+ if(size)return reply({error:`This pilot allows up to ${size[1]} questions per paper. Reduce your selection before payment.`},422);
  if(/Pilot capacity unavailable/.test(message))return reply({error:'Pilot places are fully booked at the moment. Please contact kahueka@reviseit.io.'},409);
  if(/Pilot purchasing unavailable/.test(message))return reply({error:'Purchasing is not open yet.'},503);
  if(/Saved selection changed/.test(message))return reply({error:'Your saved selection has changed. Save it again before paying.'},409);
