@@ -30,6 +30,10 @@ function FilterMenu({def,options,paper,query,open,onOpen,onClose}:{def:typeof fi
     document.addEventListener('pointerdown',outside);return()=>document.removeEventListener('pointerdown',outside);
   },[open]);
   const set=(value:string,on:boolean)=>setFilters({...filters,[def.key]:on?[...selected,value]:selected.filter(v=>v!==value)});
+  // Long option lists (fine-grained topic labels) get a find box; ticked options always stay listed.
+  const [find,setFind]=useState('');
+  const findable=options.length>12, f=find.trim().toLocaleLowerCase();
+  const listed=findable&&f?options.filter(o=>selected.includes(o.value)||o.label.toLocaleLowerCase().includes(f)):options;
   const keys=(e:KeyboardEvent)=>{if(e.key==='Escape'){e.stopPropagation();onClose(true);pill.current?.focus();}};
   return <div className={styles.filterWrap} onKeyDown={keys}>
     <button ref={pill} type="button" className={`${styles.pill} ${selected.length?styles.pillActive:''}`} aria-expanded={open} aria-controls={menuId} onClick={()=>open?onClose():onOpen()}>
@@ -37,8 +41,10 @@ function FilterMenu({def,options,paper,query,open,onOpen,onClose}:{def:typeof fi
     </button>
     {open && <div ref={menu} id={menuId} className={styles.menu} role="group" aria-label={`${def.label} filter`}>
       <div className={styles.menuHead}><span>{def.heading}</span>{selected.length>0&&<button type="button" onClick={()=>setFilters({...filters,[def.key]:[]})}>Clear</button>}</div>
+      {findable && <label className={styles.menuFind}><span className={styles.srOnly}>Find a {def.label.toLocaleLowerCase()}</span><input type="search" value={find} placeholder={`Find a ${def.label.toLocaleLowerCase()} (${options.length})`} onChange={e=>setFind(e.target.value)}/></label>}
+      {findable && f && listed.length===0 && <p className={styles.menuEmpty}>No {def.label.toLocaleLowerCase()} matches “{find.trim()}”.</p>}
       {options.length===0 && <p className={styles.menuEmpty}>{def.key==='bloom'?'No published outlines name a Bloom’s level in this curriculum yet.':'No options in this curriculum.'}</p>}
-      {options.map(o=>{const n=optionCount(data.entries,filters,def.key,o.value,query),on=selected.includes(o.value);
+      {listed.map(o=>{const n=optionCount(data.entries,filters,def.key,o.value,query),on=selected.includes(o.value);
         return <label key={o.value} className={`${styles.option} ${!n&&!on?styles.optionEmpty:''}`}>
           <input type="checkbox" checked={on} disabled={!n&&!on} onChange={e=>set(o.value,e.target.checked)}/><span className={styles.box} aria-hidden="true">{on&&Icon.check(12)}</span>
           <span className={styles.optionLabel}>{o.label}</span><span className={styles.optionCount}>{n}</span></label>;})}
@@ -87,12 +93,20 @@ function Typeahead({paper,query,setQuery}:{paper:PaperModel;query:string;setQuer
   </div>;
 }
 
+/** C05A: real curricula publish many fine-grained topic labels (Grade 11: 81 labels, 73 used
+ * once). The overview shows the largest few as tiles and discloses the full list on request,
+ * keeping every published label unchanged. */
+export const TILE_LIMIT=8, GROUP_LIMIT=8;
 function Overview({paper,compact,setCompact}:{paper:PaperModel;compact:boolean;setCompact:(v:boolean)=>void}) {
   const {data,filters,setFilters}=paper;
+  const [all,setAll]=useState(false);
+  const listId=useId();
   const groups=topicGroups(data.entries);
   const structured=data.entries.filter(e=>kindOf(e)==='structured').length, mcq=data.entries.length-structured, ready=data.entries.filter(e=>e.orderable).length;
   if(compact) return <p className={styles.compactBreadth}><span>{data.entries.length} questions in this catalogue</span><span>·</span><span>{structured} structured</span><span>·</span><span>{mcq} multiple choice</span><span>·</span><span>{ready} ready to order</span>
     <button type="button" className={styles.textLink} onClick={()=>setCompact(false)}>Show topic overview</button></p>;
+  const toggle=(topic:string)=>{const on=filters.topics.includes(topic);setFilters({...filters,topics:on?filters.topics.filter(t=>t!==topic):[...filters.topics,topic]});};
+  const more=groups.length>TILE_LIMIT;
   return <section className={styles.overview} aria-label="Catalogue overview">
     <div className={styles.totals}>
       <p className={styles.eyebrowGold}>In this catalogue</p>
@@ -101,14 +115,18 @@ function Overview({paper,compact,setCompact}:{paper:PaperModel;compact:boolean;s
       <p className={styles.totalsNote}>Each question is rebuilt with new scenarios and values for your school when you configure it.</p>
     </div>
     <div className={styles.topics}>
-      <div className={styles.topicsHead}><p className={styles.groupEyebrow}>Topics · {groups.length}</p><button type="button" className={styles.textLink} onClick={()=>setCompact(true)}>Hide overview</button></div>
-      <ul className={styles.tiles}>{groups.map(g=>{const on=filters.topics.includes(g.topic);
-        return <li key={g.topic}><button type="button" aria-pressed={on} className={`${styles.tile} ${on?styles.tileOn:''}`} onClick={()=>setFilters({...filters,topics:on?filters.topics.filter(t=>t!==g.topic):[...filters.topics,g.topic]})}>
-          <span className={styles.tileName}>{g.topic}</span>
+      <div className={styles.topicsHead}><p className={styles.groupEyebrow}>Topics · {groups.length}{more?' · largest first':''}</p><button type="button" className={styles.textLink} onClick={()=>setCompact(true)}>Hide overview</button></div>
+      {!all && <ul className={styles.tiles}>{groups.slice(0,TILE_LIMIT).map((g,i)=>{const on=filters.topics.includes(g.topic);
+        return <li key={g.topic} className={i>=4?styles.tileMore:''}><button type="button" aria-pressed={on} className={`${styles.tile} ${on?styles.tileOn:''}`} onClick={()=>toggle(g.topic)}>
+          <span className={styles.tileName} title={g.topic}>{g.topic}</span>
           <span className={styles.tileCount}><strong>{g.total}</strong><small>{g.structured} S · {g.multipleChoice} MC</small></span>
           <span className={styles.tileBar} aria-hidden="true"><i className={styles.slate} style={{flexGrow:g.structured}}/><i className={styles.gold} style={{flexGrow:g.multipleChoice}}/></span>
           <span className={styles.srOnly}>{g.structured} structured, {g.multipleChoice} multiple choice. {on?'Filtering by this topic.':'Show only this topic.'}</span>
-        </button></li>;})}</ul>
+        </button></li>;})}</ul>}
+      {all && <ul id={listId} className={styles.topicList}>{groups.map(g=>{const on=filters.topics.includes(g.topic);
+        return <li key={g.topic}><button type="button" aria-pressed={on} className={on?styles.topicOn:''} onClick={()=>toggle(g.topic)}><span>{g.topic}</span><small>{g.total}</small></button></li>;})}</ul>}
+      {more && <button type="button" className={styles.showTopics} aria-expanded={all} aria-controls={all?listId:undefined} onClick={()=>setAll(!all)}>
+        {all?'Show the largest topics only':`Show all ${groups.length} topics`}</button>}
     </div>
   </section>;
 }
@@ -133,7 +151,12 @@ export default function CatalogueView({paper,status,query,setQuery,search,switch
   const onlyKind=filters.kinds.length===1?filters.kinds[0]:null;
   const heading=q?`Results for “${q}”`:onlyKind==='multiple_choice'?'Multiple choice types':onlyKind==='structured'?'Structured questions':'All questions';
   const order=(a:CatalogueEntry,b:CatalogueEntry)=>(kindOf(a)===kindOf(b)?0:kindOf(a)==='structured'?-1:1) || a.id.localeCompare(b.id);
-  const groups=q?[{topic:'',items:[...visible].sort(order)}]:topicGroups(visible).map(g=>({topic:g.topic,items:visible.filter(e=>e.topic===g.topic).sort(order)}));
+  // C05A: group by topic only when the labels form a few real groups; otherwise one compact
+  // grid sorted by topic, with each card's topic chip naming its label.
+  const visibleTopics=topicGroups(visible);
+  const grouped=!q && visibleTopics.length<=GROUP_LIMIT;
+  const byTopic=(a:CatalogueEntry,b:CatalogueEntry)=>a.topic.localeCompare(b.topic)||order(a,b);
+  const groups=grouped?visibleTopics.map(g=>({topic:g.topic,items:visible.filter(e=>e.topic===g.topic).sort(order)})):[{topic:'',items:[...visible].sort(q?order:byTopic)}];
   const others=search?.query===q?data.curricula.filter(m=>m.id!==data.module!.id&&search.result.matches.some(r=>r.module.id===m.id)):[];
   const full=paper.data.selection && ids.length>=30;
   const card=(e:CatalogueEntry)=><CatalogueCard key={`${data.module!.id}:${data.module!.release}:${e.id}`} entry={e} count={counts(e.id)} disabled={busy || (!counts(e.id) && full)}
@@ -154,7 +177,7 @@ export default function CatalogueView({paper,status,query,setQuery,search,switch
     {data.entries.length===0 ? <p className={styles.emptyState}>There are no published questions for this curriculum yet.</p> : <>
       <Overview paper={paper} compact={compact||active>0||!!q} setCompact={setCompact}/>
       <div className={styles.filterBar}>
-        <div><h2 id="results-heading">{heading}</h2><p aria-live="polite">{active||q?`${visible.length} of ${data.entries.length} questions match`:`${data.entries.length} questions · structured first in each topic`}</p></div>
+        <div><h2 id="results-heading">{heading}</h2><p aria-live="polite">{active||q?`${visible.length} of ${data.entries.length} questions match`:grouped?`${data.entries.length} questions · structured first in each topic`:`${data.entries.length} questions · sorted by topic`}</p></div>
         <div className={styles.pills} role="group" aria-label="Filters">{filterDefs.map(def=><FilterMenu key={def.key} def={def} options={options[def.key]} paper={paper} query={q} open={menu===def.key} onOpen={()=>setMenu(def.key)} onClose={()=>setMenu(null)}/>)}</div>
       </div>
       {active>0 && <div className={styles.activeFilters}><span>Filtered by</span>

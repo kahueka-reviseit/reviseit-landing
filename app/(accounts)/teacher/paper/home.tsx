@@ -81,7 +81,10 @@ export function ShapeView({paper,status}:{paper:PaperModel;status:ReactNode}) {
     questions>limits.multipleChoice?`This pilot allows up to ${limits.multipleChoice} multiple-choice questions (${limits.multipleChoice*2} marks).`:null].filter(Boolean) as string[];
   const canApply=validTotal&&validMc&&m%2===0;
   const sliderMax=validTotal?Math.min(t-(t%2),limits.multipleChoice*2):0;
-  const apply=()=>{paper.setPaperTarget(t);paper.setSectionTarget('multiple_choice',m||undefined);paper.setSectionTarget('structured',m?t-m:undefined);paper.go(paper.occurrences.length?'builder':'catalogue');};
+  // C05A: an entered 0 is a real target (a structured-only paper) and keeps its structured
+  // total; only a blank field leaves the split unset. The selection itself is never changed.
+  const splitSet=mc.trim()!=='';
+  const apply=()=>{paper.setPaperTarget(t);paper.setSectionTarget('multiple_choice',splitSet?m:undefined);paper.setSectionTarget('structured',splitSet?t-m:undefined);paper.go(paper.occurrences.length?'builder':'catalogue');};
   return <>
     <nav className={styles.breadcrumb} aria-label="Breadcrumb"><button type="button" onClick={()=>paper.go('home')}>{data.module!.name}</button><span aria-hidden="true">/</span><span aria-current="page">Paper shape</span></nav>
     <div className={styles.shapeTop}><Stages stages={journey(paper,0)}/></div>
@@ -93,7 +96,7 @@ export function ShapeView({paper,status}:{paper:PaperModel;status:ReactNode}) {
         <p className={styles.panelLead}>Set the totals first. The catalogue and the paper builder then show how each question fits. You can change them at any time before you submit.</p>
         <label className={styles.field}>Total marks<span className={styles.unitInput}><input type="number" inputMode="numeric" min={1} max={3000} value={total} onChange={e=>setTotal(e.target.value)} placeholder="For example 150"/><span>marks</span></span></label>
         <fieldset className={styles.field}><legend>Split between question types</legend>
-          <p className={styles.fieldHint}>Multiple-choice questions are worth 2 marks each. Leave multiple choice at 0 for a structured-only paper.</p>
+          <p className={styles.fieldHint}>Multiple-choice questions are worth 2 marks each. Enter 0 for a structured-only paper, or leave the field blank to set only the paper total.</p>
           {validTotal&&<input className={styles.split} type="range" min={0} max={sliderMax} step={2} value={Math.min(m,sliderMax)} aria-label="Multiple-choice marks slider" style={{'--pct':`${sliderMax?Math.min(100,m/sliderMax*100):0}%`} as CSSProperties} onChange={e=>setMc(e.target.value)}/>}
           <div className={styles.splitLabelsRow}><span className={styles.eyebrowGoldText}>Multiple choice</span><span className={styles.eyebrowSlate}>Structured</span></div>
           <div className={styles.threeFields}>

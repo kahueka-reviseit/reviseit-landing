@@ -29,7 +29,7 @@ export function CatalogueCard({entry,count,disabled,onToggle,onOpen,onTopic}:{en
     <div className={styles.typeRow}><span className={kind==='structured'?styles.kindStructured:styles.kindMcq}>{kindLabels[kind]}</span><span className={styles.code}>{codeOf(entry.id)}</span></div>
     <h3 id={titleId} className={styles.cardTitle}><button type="button" id={cardId(entry.id)} onClick={onOpen}>{entry.title}</button></h3>
     <p className={styles.cardMarks}><strong>{formatMarks(entry.marks)}</strong> <span>marks</span></p>
-    {!compact && <div className={styles.diagramBox}>{entry.thumbnail && !failed ? <img src={entry.thumbnail.src} alt={entry.thumbnail.alt} loading="lazy" decoding="async" onError={()=>setFailed(true)}/> :
+    {!compact && <div className={`${styles.diagramBox} ${entry.thumbnail?'':styles.diagramEmpty}`}>{entry.thumbnail && !failed ? <img src={entry.thumbnail.src} alt={entry.thumbnail.alt} loading="lazy" decoding="async" onError={()=>setFailed(true)}/> :
       <span>{entry.thumbnail?'Diagram preview unavailable':'No diagram preview'}</span>}</div>}
     <div className={styles.metaRow}>
       <span>{Icon.parts()}{preview ? `${formatMarks(preview.subquestions)} ${preview.subquestions.max===1?(kind==='multiple_choice'?'item':'part'):'parts'}` : 'Parts not yet published'}</span>

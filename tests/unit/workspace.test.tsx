@@ -140,7 +140,8 @@ test('the catalogue shows breadth first: computed totals, topic tiles and a card
  expect(within(overview).getByText('Structured').nextSibling).toHaveTextContent(String(structured));
  expect(within(overview).getByText('Ready to order').nextSibling).toHaveTextContent(String(ready));
  expect(screen.getAllByRole('article')).toHaveLength(dense.entries.length);
- expect(screen.getByText('Select up to'.length?`${dense.entries.length} questions · structured first in each topic`:'')).toBeVisible();
+ // C05A: 11 topic labels exceed the grouping limit, so cards flow in one grid sorted by topic.
+ expect(screen.getByText(`${dense.entries.length} questions · sorted by topic`)).toBeVisible();
  expect(screen.queryByText(/Select up to 30/)).toBeNull();
 });
 test('filters combine within (or) and across (and) groups, show counts first, and reset without losing the selection',async()=>{

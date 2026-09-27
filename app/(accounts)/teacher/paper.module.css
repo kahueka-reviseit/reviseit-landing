@@ -99,6 +99,18 @@
 .tileCount small { font-size:12px; color:var(--med-gray); }
 .tileBar,.splitBar { display:flex; height:4px; border-radius:999px; overflow:hidden; background:var(--light-gray); }
 .slate { background:var(--slate); } .gold { background:var(--gold); }
+.showTopics { align-self:flex-start; background:#fff; border:1px solid var(--line); border-radius:999px; padding:8px 16px; font-size:14px; line-height:18px; font-weight:600; color:var(--sage-dark); }
+.showTopics:hover { border-color:var(--sage-dark); }
+/* C05A: every published topic label, compact and multi-column, for fine-grained curricula. */
+.topicList { list-style:none; margin:0; padding:12px; background:#fff; border-radius:12px; box-shadow:var(--shadow); columns:3 260px; column-gap:24px; max-height:420px; overflow-y:auto; }
+.topicList li { break-inside:avoid; }
+.topicList button { width:100%; display:flex; justify-content:space-between; align-items:baseline; gap:12px; text-align:left; background:none; border:0; border-radius:6px; padding:7px 10px; font-size:14px; line-height:19px; color:var(--dark-text); }
+.topicList button:hover { background:var(--off-white); }
+.topicList small { font-size:13px; color:var(--med-gray); flex-shrink:0; }
+.topicList .topicOn { background:var(--navy); color:#fff; } .topicList .topicOn small { color:var(--sage-light); }
+.menuFind { display:block; padding:12px 16px 8px; position:sticky; top:-8px; background:#fff; z-index:1; }
+.menuFind input { width:100%; border:1px solid var(--line); border-radius:999px; padding:9px 14px; font-size:15px; background:#fff; }
+.tileName { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 .compactBreadth { display:flex; flex-wrap:wrap; align-items:center; gap:10px; font-size:15px; color:var(--mid-text); margin:18px 0 0; }
 .compactBreadth button { margin-left:10px; }
 
@@ -507,6 +519,11 @@ button.topicChip:hover { background:#E6E2D8; }
   .totals { width:auto; padding:22px; }
   .bigCount strong { font-size:56px; line-height:56px; }
   .tiles { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .tileMore { display:none; }
+  .topicList { columns:1; max-height:360px; }
+  .totals { gap:6px; }
+  .totals dl { grid-template-columns:1fr 1fr; column-gap:20px; }
+  .totalsNote { display:none; }
   .filterBar { padding:32px 0 16px; }
   .filterBar h2 { font-size:26px; line-height:32px; }
   .pills { flex-wrap:nowrap; overflow-x:auto; padding:2px 2px 10px; margin:0 -2px; scrollbar-width:thin; }
@@ -514,13 +531,14 @@ button.topicChip:hover { background:#E6E2D8; }
   .menu,.pills .filterWrap:nth-last-child(-n+3) .menu { position:fixed; left:16px; right:16px; top:auto; bottom:16px; width:auto; max-height:70vh; overflow:auto; }
   .grid { grid-template-columns:minmax(0,1fr); gap:20px; }
   .groupLabel { margin-bottom:20px; }
-  .paperBar { bottom:8px; display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; padding:14px 16px; margin-top:28px; }
-  .barTitle { grid-column:1 / -1; display:flex; justify-content:space-between; align-items:baseline; gap:12px; }
-  .barTitle strong { font-size:16px; line-height:20px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .meter div { flex-direction:column; gap:2px; }
+  /* C05A: a slimmer phone bar; the curriculum name is already in the page header. */
+  .paperBar { bottom:8px; display:grid; grid-template-columns:1fr 1fr; gap:8px 14px; padding:10px 14px; margin-top:28px; }
+  .barTitle { display:none; }
+  .diagramEmpty { display:none; }
+  .meter div { flex-direction:column; gap:0; font-size:12px; line-height:15px; }
   .meter strong { text-align:left; }
   .barActions { grid-column:1 / -1; flex-direction:row; justify-content:space-between; align-items:center; }
-  .barButton { padding:10px 16px; font-size:14px; }
+  .barButton { padding:8px 14px; font-size:14px; }
   .pageTitle h1,.shapeCard h1 { font-size:32px; line-height:38px; }
   .pageHeader { padding:16px 0 20px; }
   .tableHead { display:none; }

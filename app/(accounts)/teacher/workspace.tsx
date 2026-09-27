@@ -15,15 +15,10 @@ import PaperBar from './paper/paper-bar';
 
 const views:View[]=['home','shape','catalogue','question','builder','builder-question','builder-mcq','review','formatting'];
 type Draft = {paperTarget:number|null; sectionTargets:Partial<Record<SectionKey,number>>; marks:Record<string,number>};
-// Targets and marks are a per-browser convenience until checkout sends them; the server
-// re-checks everything and nothing private is stored.
-const draftKey=(w:Workspace)=>w.module?`reviseit-paper:${w.module.id}:${w.module.release}`:'';
-function readDraft(w:Workspace):Draft {
-  const empty={paperTarget:null,sectionTargets:{},marks:{}};
-  try{const raw=draftKey(w)&&localStorage.getItem(draftKey(w));if(!raw)return empty;const d=JSON.parse(raw);
-    return {paperTarget:Number.isSafeInteger(d.paperTarget)?d.paperTarget:null,sectionTargets:d.sectionTargets&&typeof d.sectionTargets==='object'?d.sectionTargets:{},marks:d.marks&&typeof d.marks==='object'?d.marks:{}};}
-  catch{return empty;}
-}
+// C05A: targets and marks live only in this page's memory until checkout sends them, as
+// before C05. Nothing is written to browser storage, so another account on the same
+// browser can never inherit them. The chosen questions are saved to the account as before.
+const emptyDraft=():Draft=>({paperTarget:null,sectionTargets:{},marks:{}});
 
 export default function WorkspaceView({initial}:{initial:Workspace}) {
   const [data,setData]=useState(initial);
@@ -35,14 +30,11 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
   const [view,setView]=useState<View>('catalogue');
   const [question,setQuestion]=useState<string|null>(null);
   const [filters,setFilters]=useState<Filters>(emptyFilters);
-  const [draft,setDraft]=useState<Draft>(()=>({paperTarget:null,sectionTargets:{},marks:{}}));
+  const [draft,setDraft]=useState<Draft>(emptyDraft);
   const returnFocus=useRef<string|null>(null);
 
-  // Restore this browser's draft targets and marks for the open curriculum.
-  // Nothing is written until the draft for this curriculum has been read back.
-  const [draftFor,setDraftFor]=useState('');
-  useEffect(()=>{setDraft(readDraft(data));setDraftFor(draftKey(data));},[data.module?.id,data.module?.release]);
-  useEffect(()=>{try{if(draftFor&&draftFor===draftKey(data))localStorage.setItem(draftFor,JSON.stringify(draft));}catch{}},[draft,draftFor]);
+  // Each curriculum starts with its own empty targets and marks.
+  useEffect(()=>setDraft(emptyDraft()),[data.module?.id,data.module?.release]);
 
   // Screens are addressable (?view=…&question=…) so Back and reload keep the teacher's place.
   const fromUrl=useCallback(()=>{

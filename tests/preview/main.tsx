@@ -5,18 +5,20 @@ import AccountNav from '../../app/(accounts)/account-nav';
 import shell from '../../app/(accounts)/accounts.module.css';
 import {workspace,sampleWorkspace} from '../fixtures/workspace';
 import {paperCurriculum,paperWorkspace} from '../fixtures/paper-catalogue';
+import {denseWorkspace} from '../fixtures/dense-catalogue';
 import {searchTerms} from '../../lib/workspace/catalogue';
 import type { Workspace } from '../../lib/workspace/contracts';
 import '../../app/globals.css';
 // Isolated UI harness: synthetic data only, no authentication bypass in the actual app.
 // Default: the realistic synthetic paper catalogue (configurator on, purchasing open).
-// ?data=demo keeps the original three-entry demonstration catalogue.
+// ?data=demo keeps the original three-entry demonstration catalogue; ?data=dense uses the
+// pilot's real catalogue shape (89 entries, 81 topic labels, 73 used once).
 const params=new URLSearchParams(location.search);
-const legacy=params.get('data')==='demo';
-const store='reviseit-workspace-demo'+(legacy?'':'-paper');
+const legacy=params.get('data')==='demo', dense=params.get('data')==='dense';
+const store='reviseit-workspace-demo'+(legacy?'':dense?'-dense':'-paper');
 const saved:Record<string,Workspace>=JSON.parse(localStorage.getItem(store) || '{}');
-const base=(id:string)=>legacy?sampleWorkspace(id):paperCurriculum(id);
-const curricula=legacy?workspace.curricula:paperWorkspace.curricula;
+const base=(id:string)=>legacy?sampleWorkspace(id):dense?denseWorkspace:paperCurriculum(id);
+const curricula=legacy?workspace.curricula:dense?denseWorkspace.curricula:paperWorkspace.curricula;
 // ?configurator=1 on the legacy data adds one synthetic multiple-choice type and the editable path.
 const configurator=legacy && params.get('configurator')==='1';
 const withConfigurator=(w:Workspace):Workspace=>configurator?{...w,purchase:{available:true,amountMinor:10000,currency:'zar',configurator:true},

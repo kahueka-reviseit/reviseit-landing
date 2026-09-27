@@ -96,3 +96,20 @@ test('payment confirmation unlocks details; a stale tab keeps its unsaved edit',
  await noSideScroll(page);
  await page.screenshot({path:`workspace-test-results/configure-${info.project.name}.png`,fullPage:true});
 });
+
+// C05A R3: the pilot's real catalogue shape (89 entries, 81 topic labels, 73 used once).
+test('a dense catalogue keeps the overview bounded and cards flowing compactly',async({page},info)=>{
+ await page.goto('/?data=dense');await page.evaluate(()=>localStorage.clear());await page.reload();await page.getByRole('article').first().waitFor();
+ const m=await page.evaluate(()=>{const cards=[...document.querySelectorAll('article')];const rows=new Set(cards.map(c=>Math.round(c.getBoundingClientRect().top+scrollY)));
+  return {tiles:[...document.querySelectorAll('section[aria-label="Catalogue overview"] li')].filter(li=>getComputedStyle(li).display!=='none').length,
+   cards:cards.length,firstCardY:cards[0].getBoundingClientRect().top+scrollY,perRow:cards.length/rows.size};});
+ expect(m.cards).toBe(89);
+ const phone=info.project.name==='mobile';
+ expect(m.tiles).toBe(phone?4:8);
+ expect(m.firstCardY).toBeLessThan(phone?1400:1000);
+ if(!phone) expect(m.perRow).toBeGreaterThan(3);
+ await page.getByRole('button',{name:'Show all 81 topics'}).click();
+ await expect(page.getByRole('button',{name:'Show the largest topics only'})).toHaveAttribute('aria-expanded','true');
+ await noSideScroll(page);
+ await page.screenshot({path:`workspace-test-results/dense-${info.project.name}.png`});
+});
