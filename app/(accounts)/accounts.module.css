@@ -26,3 +26,9 @@
 .details summary { cursor: pointer; font-weight: 600; }
 .wide { max-width: 850px; }
 .review { border-top: 1px solid #ccc; margin-top: 32px; padding-top: 24px; overflow-wrap: anywhere; }
+.teacherNav { max-width:1296px; }
+.navLinks { display:flex; align-items:center; gap:32px; flex-wrap:wrap; }
+.navLinks a { font-size:15px; line-height:18px; color:var(--mid-text); padding-bottom:6px; border-bottom:2px solid transparent; }
+.navLinks a[aria-current=page] { color:var(--dark-text); font-weight:600; border-bottom-color:var(--sage); padding-bottom:4px; }
+.nav .navLinks a:last-child { text-decoration:none; }
+@media (max-width:560px) { .teacherNav { flex-wrap:wrap; gap:12px; padding:16px; } .navLinks { gap:20px; } }

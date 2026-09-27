@@ -34,6 +34,7 @@ vi.mock('../../lib/payments/stripe',async original=>({...(await original<typeof 
  createCheckoutSession:async(_c:unknown,input:{orderId:string})=>{m.sessions++;return sessionFor(input.orderId);},
  retrieveCheckoutSession:async(_c:unknown,id:string)=>sessionFor(id.replace('cs_test_','').replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/,'$1-$2-$3-$4-$5')),
  expireCheckoutSession:async(_c:unknown,id:string)=>sessionFor(id.replace('cs_test_','').replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/,'$1-$2-$3-$4-$5'),{status:'expired'})}));
+import {toPayment} from './paper-journey';
 import WorkspaceView from '../../app/(accounts)/teacher/workspace';
 import {POST as checkoutRoute} from '../../app/api/teacher/checkout/route';
 import {POST as paymentRoute} from '../../app/api/teacher/orders/[id]/payment/route';
@@ -83,7 +84,8 @@ beforeEach(async()=>{
 });
 afterEach(()=>vi.unstubAllGlobals());
 const orders=async()=>(await (m.db as PGlite).query<any>('select o.id,o.state,p.status from private.paper_orders o join private.paper_payments p on p.order_id=o.id order by o.created_at')).rows;
-async function pay(user:ReturnType<typeof userEvent.setup>){await user.click(screen.getByRole('button',{name:'Continue to payment · R100'}));await waitFor(()=>expect(assign).toHaveBeenCalled());return assign.mock.calls.at(-1)![0] as string;}
+// The pay button now lives on the review screen (Paper C4); the checkout request is unchanged.
+async function pay(user:ReturnType<typeof userEvent.setup>){await user.click(await toPayment(user));await waitFor(()=>expect(assign).toHaveBeenCalled());return assign.mock.calls.at(-1)![0] as string;}
 async function cancelViaOrderPage(orderId:string){
  const r=await fetch(`/api/teacher/orders/${orderId}/payment`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'cancel'})} as RequestInit);
  expect(r.status).toBe(200);
@@ -105,14 +107,14 @@ test('after expiry, the same selection starts a new checkout',async()=>{
 });
 test('a lost response keeps the key: the retry returns the same single order and session',async()=>{
  const user=userEvent.setup();render(<WorkspaceView initial={workspace}/>);
- lose=1;await user.click(screen.getByRole('button',{name:'Continue to payment · R100'}));
+ lose=1;await user.click(await toPayment(user));
  expect(await screen.findByRole('alert')).toHaveTextContent(/Nothing has been charged|Network/);expect(assign).not.toHaveBeenCalled();
  expect(await orders()).toHaveLength(1);
  const url=await pay(user);const rows=await orders();expect(rows).toHaveLength(1);expect(url).toContain(rows[0].id.replace(/-/g,''));expect(m.sessions).toBe(1);
 });
 test('a double click produces one order and one hosted session',async()=>{
  const user=userEvent.setup();const {unmount}=render(<WorkspaceView initial={workspace}/>);
- const button=screen.getByRole('button',{name:'Continue to payment · R100'});await user.dblClick(button);
+ const button=await toPayment(user);await user.dblClick(button);
  await waitFor(()=>expect(assign).toHaveBeenCalled());expect(await orders()).toHaveLength(1);expect(m.sessions).toBe(1);
  // Returning (for example with the browser's back button) and clicking again resumes the same open checkout.
  unmount();assign.mockReset();render(<WorkspaceView initial={workspace}/>);await pay(user);expect(await orders()).toHaveLength(1);expect(m.sessions).toBe(1);

@@ -30,6 +30,7 @@ vi.mock('../../lib/payments/stripe',async original=>({...(await original<typeof 
  createCheckoutSession:async(_c:unknown,input:{orderId:string})=>({id:'cs_test_'+input.orderId.replace(/-/g,''),url:'https://checkout.stripe.com/c/pay/cs_test_x',livemode:false,status:'open',paymentStatus:'unpaid',
   amountTotal:10000,currency:'zar',clientReferenceId:input.orderId,metadataOrderId:input.orderId,paymentIntent:null})}));
 import WorkspaceView from '../../app/(accounts)/teacher/workspace';
+import {openBuilder,openReview,payButton} from './paper-journey';
 import ConfigureOrder from '../../app/(accounts)/teacher/orders/[id]/configure';
 import {POST as checkoutRoute} from '../../app/api/teacher/checkout/route';
 import {GET as readRoute,PUT as saveRoute} from '../../app/api/teacher/orders/[id]/configuration/route';
@@ -86,16 +87,17 @@ afterEach(()=>vi.unstubAllGlobals());
 const row=async(id:string)=>(await as('owner','select o.state,o.answers,c.revision,c.configuration,p.plan from private.paper_orders o join private.paper_configurations c on c.order_id=o.id left join private.paper_configuration_plans p on p.order_id=o.id where o.id=$1',[id])).rows[0];
 
 test('marks are explicit before payment, every choice stays editable after payment, and submission freezes the final edit',async()=>{
+ // C05: marks are set in the paper builder (Paper C1); payment happens on the review screen (C4).
  const user=userEvent.setup();const {unmount}=render(<WorkspaceView initial={workspace}/>);
- const pay=screen.getByRole('button',{name:'Continue to payment · R100'});
- expect(pay).toBeDisabled();expect(screen.getByText('Marks needed')).toBeInTheDocument();
+ await openReview(user);expect(payButton()).toBeDisabled();expect(screen.getAllByText('Marks needed').length).toBeGreaterThan(0);
+ await user.click(screen.getAllByRole('button',{name:/Back to paper builder/})[0]);
  await user.type(screen.getByLabelText('Total marks for this paper'),'16');
  await user.type(screen.getByLabelText('Synthetic one: marks (4–10)'),'8');
  await user.type(screen.getByLabelText('Synthetic two: marks (4–10)'),'5');
- expect(pay).toBeDisabled();expect(screen.getByText(/1 still to allocate/)).toBeInTheDocument();
+ expect(screen.getByText('Marks needed')).toBeInTheDocument();expect(screen.getByText(/1 still to allocate/)).toBeInTheDocument();
  await user.clear(screen.getByLabelText('Synthetic two: marks (4–10)'));await user.type(screen.getByLabelText('Synthetic two: marks (4–10)'),'6');
  expect(screen.getByText('Ready for payment')).toBeInTheDocument();
- await user.click(pay);await waitFor(()=>expect(assign).toHaveBeenCalled());unmount();
+ await openReview(user);await user.click(payButton());await waitFor(()=>expect(assign).toHaveBeenCalled());unmount();
  const orderId=(await as('owner','select id from private.paper_orders')).rows[0].id as string;
  expect((await row(orderId)).configuration.lines).toMatchObject({q1:{marks:8},q2:{marks:6},q3:{marks:2}});
  // Stripe confirms payment by its server path; the draft is untouched.
@@ -130,8 +132,9 @@ test('marks are explicit before payment, every choice stays editable after payme
 test('a stale tab cannot overwrite a newer saved revision and keeps its own edits on the page',async()=>{
  await (m.db as PGlite).exec('reset role;alter table private.paper_configuration_revisions disable trigger freeze_configuration_revision;alter table private.paper_configuration_plans disable trigger freeze_configuration_plan;delete from private.paper_job_events;delete from private.paper_configuration_plans;delete from private.paper_configuration_revisions;delete from private.paper_configurations;delete from private.paper_payments;delete from private.paper_orders;alter table private.paper_configuration_revisions enable trigger freeze_configuration_revision;alter table private.paper_configuration_plans enable trigger freeze_configuration_plan;');
  const user=userEvent.setup();const {unmount}=render(<WorkspaceView initial={workspace}/>);
+ await openBuilder(user);
  await user.type(screen.getByLabelText('Total marks for this paper'),'16');await user.type(screen.getByLabelText('Synthetic one: marks (4–10)'),'8');await user.type(screen.getByLabelText('Synthetic two: marks (4–10)'),'6');
- await user.click(screen.getByRole('button',{name:'Continue to payment · R100'}));await waitFor(()=>expect(assign).toHaveBeenCalled());unmount();
+ await openReview(user);await user.click(payButton());await waitFor(()=>expect(assign).toHaveBeenCalled());unmount();
  const orderId=(await as('owner','select id from private.paper_orders')).rows[0].id as string;
  render(<ConfigureOrder orderId={orderId} onSubmitted={()=>{}}/>);
  await screen.findByText('Ready for payment');
@@ -153,23 +156,24 @@ test('a repeated multiple-choice type and reordering survive checkout, payment, 
  const user=userEvent.setup();
  const initial={...workspace,selection:{...workspace.selection,revision:saved}};
  const {unmount}=render(<WorkspaceView initial={initial}/>);
- // Add a second occurrence of the multiple-choice type and move it to the top.
+ // C05: add a second occurrence of the multiple-choice type (Paper C3), and reorder the
+ // structured questions within their section, which is how the paper numbers them.
+ await openBuilder(user);await user.click(screen.getByRole('button',{name:'Arrange'}));
  await user.click(screen.getByRole('button',{name:'Add another Synthetic MCQ'}));
- // [one, two, MCQ, MCQ] -> [MCQ, one, two, MCQ] -> [MCQ, one, MCQ, two]
- await user.click(screen.getByRole('button',{name:'Move Synthetic MCQ earlier'}));
- await user.click(screen.getByRole('button',{name:'Move Synthetic MCQ earlier'}));
- await user.click(screen.getByRole('button',{name:'Move Synthetic MCQ occurrence 2 earlier'}));
+ await user.click(screen.getByRole('button',{name:'Back to paper builder'}));
+ // [one, two, MCQ, MCQ] -> [two, one, MCQ, MCQ]
+ await user.click(screen.getByRole('button',{name:'Move Synthetic two earlier'}));
  await user.click(screen.getByRole('button',{name:'Save selection'}));
  await screen.findByText('Your paper selection is saved. You can return to it later.');
- expect((await as('owner','select entry_ids from public.paper_selections')).rows[0].entry_ids).toEqual(['mcq:MCQ_01','structured:SPEC_01','mcq:MCQ_01','structured:SPEC_02']);
+ expect((await as('owner','select entry_ids from public.paper_selections')).rows[0].entry_ids).toEqual(['structured:SPEC_02','structured:SPEC_01','mcq:MCQ_01','mcq:MCQ_01']);
  await user.type(screen.getByLabelText('Total marks for this paper'),'18');
  await user.type(screen.getByLabelText('Multiple-choice section total (optional)'),'4');
  await user.type(screen.getByLabelText('Synthetic one: marks (4–10)'),'8');await user.type(screen.getByLabelText('Synthetic two: marks (4–10)'),'6');
  expect(screen.getByText('Ready for payment')).toBeInTheDocument();
- await user.click(screen.getByRole('button',{name:'Continue to payment · R100'}));await waitFor(()=>expect(assign).toHaveBeenCalled());unmount();
+ await openReview(user);await user.click(payButton());await waitFor(()=>expect(assign).toHaveBeenCalled());unmount();
  const orderId=(await as('owner','select id from private.paper_orders')).rows[0].id as string;
  const snap=(await as('owner','select snapshot from private.paper_orders where id=$1',[orderId])).rows[0].snapshot;
- expect(snap.lines.map((l:any)=>[l.id,l.entryId])).toEqual([['q1','mcq:MCQ_01'],['q2','structured:SPEC_01'],['q3','mcq:MCQ_01'],['q4','structured:SPEC_02']]);
+ expect(snap.lines.map((l:any)=>[l.id,l.entryId])).toEqual([['q1','structured:SPEC_02'],['q2','structured:SPEC_01'],['q3','mcq:MCQ_01'],['q4','mcq:MCQ_01']]);
  await as('service','select public.attach_paper_checkout($1,$2,$3,false)',[orderId,'cs_test_'+orderId.replace(/-/g,''),'https://checkout.stripe.com/c/pay/cs_test_x']);
  await as('service',"select public.record_stripe_checkout('evt_paid_repeat','checkout.session.completed',false,$1)",[JSON.stringify({id:'cs_test_'+orderId.replace(/-/g,''),clientReferenceId:orderId,metadataOrderId:orderId,livemode:false,amountTotal:10000,currency:'zar',paymentStatus:'paid',status:'complete',paymentIntent:'pi_Synthetic2'})]);
  const submitted=vi.fn();render(<ConfigureOrder orderId={orderId} onSubmitted={submitted}/>);
@@ -177,7 +181,7 @@ test('a repeated multiple-choice type and reordering survive checkout, payment, 
  expect(await screen.findByRole('button',{name:/Q1.1 ·/})).toBeInTheDocument();expect(screen.getByRole('button',{name:/Q1.2 ·/})).toBeInTheDocument();
  await user.click(screen.getByRole('button',{name:/Q1.2 ·/}));
  await user.click(screen.getByRole('button',{name:'Move earlier'}));
- await waitFor(async()=>expect((await row(orderId)).configuration.order).toEqual(['q3','q2','q1','q4']),{timeout:4000});
+ await waitFor(async()=>expect((await row(orderId)).configuration.order).toEqual(['q1','q2','q4','q3']),{timeout:4000});
  // Answer each structured question differently; the multiple-choice occurrences need nothing.
  await user.click(screen.getByRole('button',{name:/Q2 ·/}));
  await user.click(within(screen.getByRole('group',{name:'Synthetic setting'})).getByLabelText('Blue'));
@@ -188,9 +192,9 @@ test('a repeated multiple-choice type and reordering survive checkout, payment, 
  await user.click(screen.getByRole('button',{name:'Submit for generation →'}));await waitFor(()=>expect(submitted).toHaveBeenCalled());
  const done=await row(orderId);
  expect(done.state).toBe('queued');
- expect(done.plan.schema).toBe('reviseit/configured-generation-plan@2');expect(done.plan.order).toEqual(['q3','q2','q1','q4']);
- expect(done.plan.lines.map((l:any)=>[l.id,l.entryId,l.marks])).toEqual([['q1','mcq:MCQ_01',2],['q2','structured:SPEC_01',8],['q3','mcq:MCQ_01',2],['q4','structured:SPEC_02',6]]);
- expect(done.answers.items.q2.setting).toEqual({kind:'choice',choiceId:'blue'});expect(done.answers.items.q4.setting).toEqual({kind:'choice',choiceId:'red'});
+ expect(done.plan.schema).toBe('reviseit/configured-generation-plan@2');expect(done.plan.order).toEqual(['q1','q2','q4','q3']);
+ expect(done.plan.lines.map((l:any)=>[l.id,l.entryId,l.marks])).toEqual([['q1','structured:SPEC_02',6],['q2','structured:SPEC_01',8],['q3','mcq:MCQ_01',2],['q4','mcq:MCQ_01',2]]);
+ expect(done.answers.items.q1.setting).toEqual({kind:'choice',choiceId:'blue'});expect(done.answers.items.q2.setting).toEqual({kind:'choice',choiceId:'red'});
  expect(done.plan.lines.every((l:any)=>l.sourceBinding?.privateManifestSha256===hash('c'))).toBe(true);
  expect(done.plan.targets).toEqual({paper:18,sections:{multiple_choice:4}});
 },40000);
