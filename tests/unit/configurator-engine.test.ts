@@ -76,7 +76,7 @@ describe('authored decisions after payment',()=>{
   const d=definitions();
   const partial=evaluate(d,config([8,6,2],16,{answers:{items:{q1:{colour:{kind:'choice',choiceId:'red'}}},paper:{}}}),{paid:true});
   expect(partial.status).toBe('details_to_complete');expect(partial.lines[0].outstanding).toEqual(['shade']);expect(partial.lines[1].outstanding).toEqual(['setting']);
-  expect(partial.paper.outstanding).toEqual(['logistics']);
+  expect(partial.paper.outstanding).toEqual([]);
   const done=evaluate(d,config([8,6,2],16,{answers:paidAnswers()}),{paid:true});
   expect(done.status).toBe('ready_to_generate');expect(done.ready).toBe(true);
  });
@@ -88,9 +88,9 @@ describe('authored decisions after payment',()=>{
  });
  it('submits exact answers with explicit omissions and a plan carrying the final marks',()=>{
   const d=definitions();const cfg=config([10,4,2],16,{answers:paidAnswers()});const e=evaluate(d,cfg,{paid:true});
-  expect(submittedAnswers(d,cfg).items.q1.note).toEqual({kind:'omit'});expect(submittedAnswers(d,cfg).paper.paper_note).toEqual({kind:'omit'});
+  expect(submittedAnswers(d,cfg).items.q1.note).toEqual({kind:'omit'});expect(submittedAnswers(d,cfg).paper).toEqual({});
   const {plan}=generationPlan(d,cfg,e,'00000000-0000-4000-8000-000000000001',7);
-  expect(plan).toMatchObject({schema:'reviseit/configured-generation-plan@2',order:['q1','q2','q3'],configurationRevision:7,definitionsSha256:hash('9'),targets:{paper:16}});
+  expect(plan).toMatchObject({schema:'reviseit/configured-generation-plan@3',order:['q1','q2','q3'],configurationRevision:7,definitionsSha256:hash('9'),targets:{paper:16}});
   expect(plan.lines.map(l=>[l.id,l.marks,l.kind])).toEqual([['q1',10,'specification'],['q2',4,'specification'],['q3',2,'multiple-choice']]);
   expect(()=>generationPlan(d,config([8,6,2]),evaluate(d,config([8,6,2]),{paid:true}),'x',1)).toThrow(/not ready/);
  });
@@ -161,7 +161,7 @@ describe('safe projection',()=>{
  });
  it('the stored verdict is compact and bound to the definitions',()=>{
   const d=definitions();const e=evaluate(d,config([8,6,2]),{paid:false});
-  expect(storedEvaluation(e)).toEqual({engine:'cfg01-engine@1',definitionsSha256:hash('9'),ready:false,status:'ready_for_payment',outstanding:0,totals:{allocated:16,target:16},lines:[{id:'q1',marks:8,ready:true},{id:'q2',marks:6,ready:true},{id:'q3',marks:2,ready:true}]});
+  expect(storedEvaluation(e)).toEqual({engine:'cfg01-engine@2',definitionsSha256:hash('9'),ready:false,status:'ready_for_payment',outstanding:0,totals:{allocated:16,target:16},lines:[{id:'q1',marks:8,ready:true},{id:'q2',marks:6,ready:true},{id:'q3',marks:2,ready:true}]});
  });
  it('accepts only the closed configuration shape from a browser',()=>{
   expect(isConfiguration(config([8,6,2]))).toBe(true);
@@ -218,4 +218,17 @@ describe('CFG01A: source binding, order and grouped Bloom categories',()=>{
   const {readFileSync,readdirSync}=await import('node:fs');
   for(const f of readdirSync('lib/configurator')){const t=readFileSync('lib/configurator/'+f,'utf8');expect(t).not.toMatch(/\bL[1-4]\b|founder-authorised|caps-grade-10/);}
  });
+});
+
+
+it('requires only individual answers and preserves historical shared answers without forwarding them',()=>{
+ const d=definitions(),answers=paidAnswers();
+ const cfg=config([8,6,2],16,{answers:{...answers,paper:{logistics:{kind:'text',text:''}}}});
+ const before=JSON.stringify(cfg);
+ const e=evaluate(d,cfg,{paid:true});expect(e.ready).toBe(true);expect(e.outstanding).toBe(0);
+ const v=project(d,cfg,e,{orderId:'o',state:'awaiting_answers',paymentStatus:'paid',revision:1,submitted:false});
+ expect(v.paper).toEqual({fields:[],answers:{},outstanding:[]});
+ expect(generationPlan(d,cfg,e,'o',1).answers.paper).toEqual({});
+ expect(JSON.stringify(cfg)).toBe(before);
+ delete cfg.answers.items.q2.setting;expect(evaluate(d,cfg,{paid:true}).ready).toBe(false);
 });

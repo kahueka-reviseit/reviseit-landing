@@ -16,7 +16,7 @@ describe('worker claim capabilities (CFG01A)',()=>{
   expect((await call({action:'claim',worker:'w1'})).status).toBe(200);expect(rpc).toHaveBeenCalledWith('claim_paper_job',{worker:'w1'});
  });
  it('unknown capabilities and bad tokens are refused before the database',async()=>{
-  expect((await call({action:'claim',worker:'w1',capabilities:['configured-plan@3']})).status).toBe(400);
+  expect((await call({action:'claim',worker:'w1',capabilities:['configured-plan@99']})).status).toBe(400);
   expect((await call({action:'claim',worker:'w1'},'Bearer wrong')).status).toBe(401);expect(rpc).not.toHaveBeenCalled();
  });
 });

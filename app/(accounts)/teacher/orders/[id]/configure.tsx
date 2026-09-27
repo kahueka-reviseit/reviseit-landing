@@ -149,7 +149,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
   const stage=view.submitted?5:paid?(view.status==='ready_to_generate'?4:3):(view.status==='ready_for_payment'?2:1);
   const steps=['Choose questions','Set marks','Pay','Complete details','Submit'];
   const allReady=paid&&!view.submitted&&view.canSubmit;
-  const itemAnswers=Object.values(draft.answers.items).flatMap(s=>Object.values(s)).concat(Object.values(draft.answers.paper));
+  const itemAnswers=Object.values(draft.answers.items).flatMap(s=>Object.values(s));
   const yours=itemAnswers.filter(a=>a.kind==='choice'||a.kind==='text').length, delegated=itemAnswers.filter(a=>a.kind==='automatic').length;
   const nextLine=view.lines[index+1];
   const heading=view.submitted?'Submitted for generation':allReady?'Your paper is fully configured':paid?'Finish your paper':'Your paper is waiting for payment';
@@ -238,11 +238,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
           attention={attentionFor(f.id)} onChange={a=>setAnswer('item',f.id,a)}/>)}
       </section>}
 
-      {paid&&view.paper.fields.length>0&&<section className={styles.panel} aria-labelledby="paper-heading">
-        <p className={styles.eyebrowSlate}>Whole paper</p>
-        <h2 id="paper-heading" className={styles.heading}>Settings for the whole paper</h2>
-        {view.paper.fields.map(f=><Chips key={f.id} name="paper" field={f} value={draft.answers.paper[f.id]} disabled={!editable} onChange={a=>setAnswer('paper',f.id,a)}/>)}
-      </section>}
+
     </div>
 
     <aside className={styles.side} aria-label="Paper status">

@@ -204,7 +204,7 @@ test('the legacy answer path, other schools and unapproved teachers are refused 
 test('workers claim configured orders only when they declare the capability, with the frozen plan',async()=>{
  const orderId=await paidOrder();await save(orderId,configured([5,9,2]),1,true);
  expect(await claim()).toBeNull();expect(await claim([])).toBeNull();
- await refuse(()=>claim(['configured-plan@3']),/Invalid worker capabilities/);
+ await refuse(()=>claim(['configured-plan@99']),/Invalid worker capabilities/);
  expect(await submit(orderId)).toBe(orderId);
  expect(await claim()).toBeNull();
  // A version-1-only worker never receives a version 2 plan.
@@ -325,4 +325,26 @@ test.each([[1,10,false],[2,1,true]])('pilot per-kind bounds structured=%i and mu
 test('eleven multiple-choice occurrences are refused even below the overall twenty-question cap',async()=>{
  await enable();await funding();await owner();await db.query("select public.configure_pilot_paper_size('test',20,'Synthetic funded mix',10,10)");await select(teacher,Array(11).fill('mcq:MCQ_01'));
  await refuse(()=>begin(teacher,key,{'mcq:MCQ_01':2},{paper:22}),/10 structured and 10 multiple-choice/);
+});
+
+
+test('individual-only submission ignores shared requirements and preserves saved history; only new workers claim it',async()=>{
+ const orderId=await paidOrder(); const cfg=configured();
+ cfg.answers.paper={logistics:{kind:'text',text:''}} as any;
+ await save(orderId,cfg,1,false); const cur=await read(orderId);
+ const answers={...answersFor(cur),paper:{}};
+ const plan={...planFor(cur,orderId),schema:'reviseit/configured-generation-plan@3'};
+ const fresh={...evaluation(cur,true),engine:'cfg01-engine@2'};
+ const call=(a:any=answers,p:any=plan,e:any=fresh,rev=cur.revision)=>one('select public.submit_configured_paper_v3($1,$2,$3,$4,$5,$6,$7) as r',[orderId,teacher,submission,rev,JSON.stringify(a),JSON.stringify(p),JSON.stringify(e)]);
+ await service();
+ await refuse(()=>call(answers,plan,{...fresh,ready:false}),/not ready/);
+ await refuse(()=>call(answers,plan,{...fresh,engine:'cfg01-engine@1'}),/not ready/);
+ await refuse(()=>call({...answers,paper:{logistics:chosen}}),/Invalid answers/);
+ await refuse(()=>call({...answers,items:{...answers.items,q1:{note:{kind:'omit'}}}}),/Invalid answers/);
+ await refuse(()=>call(answers,plan,fresh,cur.revision-1),/Configuration changed/);
+ expect(await call()).toBe(orderId);expect(await call()).toBe(orderId);
+ expect((await read(orderId)).configuration.answers).toEqual(cur.configuration.answers);
+ expect(await claim(['configured-plan@1','configured-plan@2'])).toBeNull();
+ const job=await claim(['configured-plan@3']);expect(job.answers.paper).toEqual({});expect(job.answers.items).toEqual(answers.items);
+ expect(job.snapshot).toEqual(cur.snapshot);
 });

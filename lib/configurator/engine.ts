@@ -10,7 +10,7 @@ import { interpretClassification, evaluateClassified, curriculumComparisons, typ
  * Code owns ranges, arithmetic, required decisions and declared dependencies.
  * Nothing here chooses an unresolved answer for the teacher.
  */
-export const ENGINE_VERSION = 'cfg01-engine@1';
+export const ENGINE_VERSION = 'cfg01-engine@2';
 
 export type LineDefinition = {
   id:string; entryId:string; legacyKind:'specification'|'multiple-choice';
@@ -140,7 +140,8 @@ export function evaluate(defs:Definitions, cfg:Configuration, opts:{paid:boolean
     }
     return {id:def.id,marks:marksProblem?null:marks,marksProblem,classified,outstanding,attention,issues:lineIssues,ready:!marksProblem&&!outstanding.length&&!attention.length&&!lineIssues.length};
   });
-  const paper=opts.paid?authoredFields(defs.paperFields,cfg.answers.paper):{outstanding:[],attention:[]};
+  // Product policy: only per-item answers are requested. Retained shared answers are historical data.
+  const paper:FieldState={outstanding:[],attention:[]};
   const target=cfg.targets.paper;
   const problems:string[]=[];
   if(target===null) problems.push('Set the total marks for the paper.');
@@ -169,14 +170,14 @@ export function storedEvaluation(e:Evaluation) {
 /** Exact answers for the issued form: optional fields left blank are explicit omissions. */
 export function submittedAnswers(defs:Definitions, cfg:Configuration):QuestionnaireAnswers {
   const fill=(fields:QuestionField[],given:Record<string,Answer>|undefined)=>Object.fromEntries(fields.map(f=>[f.id,given?.[f.id] ?? {kind:'omit' as const}]));
-  return {schemaVersion:2,revision:defs.formRevision,items:Object.fromEntries(defs.lines.map(l=>[l.id,fill(l.fields,cfg.answers.items[l.id])])),paper:fill(defs.paperFields,cfg.answers.paper)};
+  return {schemaVersion:2,revision:defs.formRevision,items:Object.fromEntries(defs.lines.map(l=>[l.id,fill(l.fields,cfg.answers.items[l.id])])),paper:{}};
 }
 
 export type PlanLine = {id:string; entryId:string; identity:LineDefinition['identity']; kind:LineDefinition['legacyKind']; marks:number;
   parts:{id:string; marks:{min:number;max:number}|null; bloom:BloomKey|null; learnerDrawn:boolean}[]|null;
   facets:Record<string,Answer>; answers:Record<string,Answer>; classificationSha256:string|null; requirementsRef:string|null;
   diagram:{stimulus:string; learnerDrawn:string[]}|null; sourceBinding:SourceBinding};
-export type GenerationPlan = {schema:'reviseit/configured-generation-plan@2'; order:string[]; orderId:string; module:string; release:string; formRevision:string;
+export type GenerationPlan = {schema:'reviseit/configured-generation-plan@3'; order:string[]; orderId:string; module:string; release:string; formRevision:string;
   configurationRevision:number; definitionsSha256:string; targets:Configuration['targets']; lines:PlanLine[]};
 
 /** Freeze the resolved configuration the worker and skill must consume. Refuses anything not ready. */
@@ -189,7 +190,7 @@ export function generationPlan(defs:Definitions, cfg:Configuration, e:Evaluation
       parts:r.classified?r.classified.plannedParts:null,facets:cfg.lines[def.id].facets,answers:answers.items[def.id],
       classificationSha256:def.classificationSha256,requirementsRef:def.requirementsRef,diagram:r.classified?.diagram??null,sourceBinding:def.sourceBinding};
   });
-  return {plan:{schema:'reviseit/configured-generation-plan@2',order:lineOrder(defs,cfg),orderId,module:defs.module,release:defs.release,formRevision:defs.formRevision,
+  return {plan:{schema:'reviseit/configured-generation-plan@3',order:lineOrder(defs,cfg),orderId,module:defs.module,release:defs.release,formRevision:defs.formRevision,
     configurationRevision:revision,definitionsSha256:defs.sha256,targets:cfg.targets,lines},answers};
 }
 
@@ -231,7 +232,7 @@ export function project(defs:Definitions, cfg:Configuration, e:Evaluation, meta:
     totals:{target:e.totals.target,allocated:e.totals.allocated,remaining,excess,complete:e.totals.complete,
       sections:(['multiple_choice','structured'] as SectionKey[]).filter(k=>defs.lines.some(l=>l.identity.kind===k)).map(k=>({key:k,label:sectionLabels[k],allocated:e.totals.sections[k],target:e.totals.sectionTargets[k]??null}))},
     // Presentation order matches the paper: multiple choice as question 1, then structured.
-    cognitive,curriculum,lines:shown.map(x=>lines.find(l=>l.id===x.id)!),paper:{fields:paid?defs.paperFields:[],answers:paid?cfg.answers.paper:{},outstanding:e.paper.outstanding},
+    cognitive,curriculum,lines:shown.map(x=>lines.find(l=>l.id===x.id)!),paper:{fields:[],answers:{},outstanding:[]},
     issues:[...e.totals.problems,...e.issues],configuration:cfg};
 }
 
