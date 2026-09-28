@@ -83,7 +83,7 @@ test('payment confirmation unlocks details; a stale tab keeps its unsaved edit',
  await page.goto('/configurator.html?paid=0');
  await expect(page.getByRole('heading',{name:'Your paper',exact:true})).toBeVisible();
  await expect(page.getByRole('group',{name:'Synthetic setting'})).toHaveCount(0);
- await page.getByText('Payment and request details',{exact:true}).click();
+ // The payment notice sits under the paper header (Paper M2 B), not inside the request details.
  await page.getByRole('button',{name:'I have paid: check again'}).click();
  await expect(page.getByRole('heading',{name:'Your paper',exact:true})).toBeVisible();
  await page.getByRole('button',{name:'Edit question 2',exact:true}).click();

@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import type { Answer, QuestionField } from '../../../../../lib/jobs/questionnaire';
 import { groupLabel, type Attention, type Configuration, type ConfigurationView, type FacetView, type LineView } from '../../../../../lib/configurator/contracts';
@@ -69,7 +70,7 @@ function Chips({name,field,facet,value,onChange,disabled,attention}:{name:string
   </fieldset>;
 }
 
-export default function ConfigureOrder({orderId,onSubmitted,title,children,catalogue={}}:{catalogue?:Record<string,Catalogue>;orderId:string;onSubmitted:()=>void;title?:string;children?:ReactNode}) {
+export default function ConfigureOrder({orderId,onSubmitted,title,children,notice,catalogue={}}:{catalogue?:Record<string,Catalogue>;orderId:string;onSubmitted:()=>void;title?:string;children?:ReactNode;notice?:ReactNode}) {
   const [view,setView]=useState<ConfigurationView|null>(null);
   const [draft,setDraft]=useState<Configuration|null>(null);
   const [active,setActive]=useState<string|null>(null);
@@ -134,7 +135,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,catal
     finally{setBusy(false);}
   }
 
-  if(!view||!draft) return <section className={styles['card']}><p>{error||'Loading your paper…'}</p>{children}</section>;
+  if(!view||!draft) return <section className={styles['card']}>{notice}<p>{error||'Loading your paper…'}</p>{children}</section>;
   const paid=view.paid&&view.state==='awaiting_answers';
   const editable=!busy&&!view.submitted&&['awaiting_payment','awaiting_answers'].includes(view.state);
   const index=Math.max(0,view.lines.findIndex(l=>l.id===active));
@@ -190,13 +191,14 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,catal
     {error&&<p role="alert" className={styles['notice--error']}>{error}</p>}</>;
   return <>
   <header className={styles['paper-header']}>
-    <div><p className={styles['paper-header__breadcrumb']}>{title||'Your selected questions'} / Your paper · {paid?'Paid':view.submitted?'Submitted':'Awaiting payment'}</p>
+    <div><p className={styles['paper-header__breadcrumb']}><Link href="/teacher/orders">My papers</Link> / {title||'Your selected questions'} · {paid?'Paid':view.submitted?'Submitted':'Awaiting payment'}</p>
       <h1 className={styles['paper-header__title']}>Your paper</h1></div>
     <div className={styles['paper-header__actions']}>
       <button type="button" className={styles['button--secondary']} onClick={()=>setPanel('review')}>Marks and cognitive mix</button>
       <button type="button" className={styles['button--primary']} onClick={()=>setPanel('review')}>Review paper →</button>
     </div>
   </header>
+  {notice}
   <div className={styles['paper-totals']}>
     <label>Paper total <input aria-label="Paper total" inputMode="numeric" value={draft.targets.paper??''} disabled={!editable}
       onChange={e=>{const v=e.target.value.trim();update(c=>{c.targets.paper=v===''?null:Number.isInteger(Number(v))?Number(v):c.targets.paper;return c;});}}/> marks</label>

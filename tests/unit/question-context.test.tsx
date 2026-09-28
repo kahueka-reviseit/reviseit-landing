@@ -6,7 +6,7 @@ import {test,expect,vi,afterEach} from 'vitest';
 import {isValidElement} from 'react';
 vi.mock('server-only',()=>({}));
 const auth=vi.hoisted(()=>({supabase:null as any}));
-vi.mock('../../lib/auth/access',()=>({requireTeacher:async()=>({supabase:auth.supabase})}));
+vi.mock('../../lib/auth/access',()=>({requireTeacher:async()=>({supabase:auth.supabase,account:{full_name:'Synthetic Teacher'}})}));
 import ConfigureOrder from '../../app/(accounts)/teacher/orders/[id]/configure';
 import OrderPage from '../../app/(accounts)/teacher/orders/[id]/page';
 import {briefPrompts} from '../../app/(accounts)/teacher/orders/[id]/question-context';
@@ -114,17 +114,24 @@ test('the order page reads safe context from the order release only',async()=>{
  const order={id:orderId,configurable:true,moduleId:'synthetic-module',release:'2026-09-a'};
  const chain:{method:string;args:unknown[]}[]=[];
  const query:any={select:(...a:unknown[])=>(chain.push({method:'select',args:a}),query),eq:(...a:unknown[])=>(chain.push({method:'eq',args:a}),query),
+  maybeSingle:async()=>({data:{name:'Synthetic curriculum'},error:null}),
   then:(resolve:(v:unknown)=>void)=>resolve({data:[{entry_id:'structured:SYN-02',topic:' Topic ',description:'',thumbnail_alt:'A diagram',thumbnail_png:'secret',preview:{private:true}}]})};
  auth.supabase={rpc:async()=>({data:[order],error:null}),from:(table:string)=>(chain.push({method:'from',args:[table]}),query)};
+ // The page renders the teacher header and the order view; find the view by its catalogue prop.
+ const view=(el:any):any=>el?.props?.catalogue!==undefined?el:[].concat(el?.props?.children??[]).map(view).find(Boolean);
+ const catalogueReads=()=>{const i=chain.findIndex(c=>c.method==='from'&&c.args[0]==='teacher_catalogue_summaries');return i<0?[]:chain.slice(i,i+4);};
  const element=await OrderPage({params:Promise.resolve({id:orderId})});
  expect(isValidElement(element)).toBe(true);
- expect(chain).toEqual([{method:'from',args:['teacher_catalogue_summaries']},{method:'select',args:['entry_id,topic,description,thumbnail_alt']},
+ expect(catalogueReads()).toEqual([{method:'from',args:['teacher_catalogue_summaries']},{method:'select',args:['entry_id,topic,description,thumbnail_alt']},
   {method:'eq',args:['module_id','synthetic-module']},{method:'eq',args:['release','2026-09-a']}]);
- expect((element as any).props.catalogue).toEqual({'structured:SYN-02':{topic:'Topic',description:'',
+ // The only other read is the curriculum's display name.
+ expect(chain.filter(c=>c.method==='from').map(c=>c.args[0]).sort()).toEqual(['curriculum_modules','teacher_catalogue_summaries']);
+ expect(view(element).props.catalogue).toEqual({'structured:SYN-02':{topic:'Topic',description:'',
   thumbnail:{src:'/api/teacher/catalogue/thumbnail?curriculum=synthetic-module&release=2026-09-a&entry=structured%3ASYN-02',alt:'A diagram'}}});
+ expect(view(element).props.curriculum).toBe('Synthetic curriculum');
  // Legacy orders make no catalogue read at all.
  chain.length=0;auth.supabase.rpc=async()=>({data:[{...order,configurable:false}],error:null});
- expect((await OrderPage({params:Promise.resolve({id:orderId})}) as any).props.catalogue).toEqual({});expect(chain).toEqual([]);
+ expect(view(await OrderPage({params:Promise.resolve({id:orderId})})).props.catalogue).toEqual({});expect(catalogueReads()).toEqual([]);
 });
 
 test('context projection keeps only public fields and skips malformed rows',()=>{
