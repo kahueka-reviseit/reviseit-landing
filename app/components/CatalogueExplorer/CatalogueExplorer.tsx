@@ -91,35 +91,35 @@ export default function CatalogueExplorer() {
   }
 
   return (
-    <div ref={sectionRef} className={styles.wrapper}>
+    <div ref={sectionRef} className={styles['catalogue-explorer']}>
 
       {/* Top row: intro copy left, selector right */}
-      <div className={styles.topRow}>
-        <div className={styles.topLeft}>
-          <p className={`eyebrow eyebrow-sage ${styles.eyebrow}`}>The Catalogue</p>
-          <h2 className={styles.headline}>Every Assessment<br />Starts Here.</h2>
-          <p className={styles.intro}>
+      <div className={styles['section__header']}>
+        <div className={styles['section__content']}>
+          <p className={`eyebrow eyebrow-sage ${styles['section__eyebrow']}`}>The Catalogue</p>
+          <h2 className={styles['section__title']}>Every Assessment<br />Starts Here.</h2>
+          <p className={styles['section__body']}>
             Every teacher knows the move. When a test is due, you open last year&apos;s
             paper. Then the year before. Then a provincial June. You&apos;re scanning for
             a question type you can adapt — the right structure, the right cognitive level,
             something you can make your own.
           </p>
-          <p className={styles.intro}>
+          <p className={styles['section__body']}>
             That&apos;s what we do for every curriculum we add. The scanning, the
             pattern-finding, the mapping — done. Select a curriculum below to see
             how much institutional knowledge we&apos;ve captured.
           </p>
         </div>
 
-        <div className={styles.topRight}>
-          <div className={styles.selectorCard}>
-            <p className={styles.selectorCardEyebrow}>Browse by curriculum</p>
-            <label htmlFor="catalogue-select" className={styles.selectLabel}>
+        <div className={styles['section__aside']}>
+          <div className={styles['card']}>
+            <p className={styles['card__eyebrow']}>Browse by curriculum</p>
+            <label htmlFor="catalogue-select" className={styles['card__title']}>
               Select a curriculum
             </label>
             <select
               id="catalogue-select"
-              className={styles.select}
+              className={styles['select']}
               value={selectedId}
               onFocus={handleDropdownFocus}
               onChange={handleSelect}
@@ -137,7 +137,7 @@ export default function CatalogueExplorer() {
               ))}
             </select>
             {!selectedId && (
-              <p className={styles.selectorHint}>
+              <p className={styles['card__meta']}>
                 Grade 11 Physical Sciences is available now. Grade 12 coming soon.
               </p>
             )}
@@ -147,50 +147,50 @@ export default function CatalogueExplorer() {
 
       {/* Preview card — fades in on selection */}
       {selected && (
-        <div className={`${styles.previewCard} ${previewVisible ? styles.previewVisible : ''}`}>
+        <div className={`${styles['card--preview']} ${previewVisible ? styles['card--visible'] : ''}`}>
 
           {stats && (
-            <div className={styles.statsStrip}>
-              <div className={styles.statItem}>
-                <span className={styles.statNumber}>{papersCount}</span>
-                <span className={styles.statLabel}>papers analysed</span>
+            <div className={styles['stats']}>
+              <div className={styles['stat']}>
+                <span className={styles['stat__value']}>{papersCount}</span>
+                <span className={styles['stat__label']}>papers analysed</span>
               </div>
-              <div className={styles.statDivider} />
-              <div className={styles.statItem}>
-                <span className={styles.statNumber}>{structuredCount}</span>
-                <span className={styles.statLabel}>structured question types</span>
+              <div className={styles['stat__divider']} />
+              <div className={styles['stat']}>
+                <span className={styles['stat__value']}>{structuredCount}</span>
+                <span className={styles['stat__label']}>structured question types</span>
               </div>
-              <div className={styles.statDivider} />
-              <div className={styles.statItem}>
-                <span className={styles.statNumber}>{mcqCount}</span>
-                <span className={styles.statLabel}>MCQ types</span>
+              <div className={styles['stat__divider']} />
+              <div className={styles['stat']}>
+                <span className={styles['stat__value']}>{mcqCount}</span>
+                <span className={styles['stat__label']}>MCQ types</span>
               </div>
-              <div className={styles.statDivider} />
-              <div className={styles.statItem}>
-                <span className={styles.statNumber}>{totalCount}</span>
-                <span className={styles.statLabel}>total structures mapped</span>
+              <div className={styles['stat__divider']} />
+              <div className={styles['stat']}>
+                <span className={styles['stat__value']}>{totalCount}</span>
+                <span className={styles['stat__label']}>total structures mapped</span>
               </div>
             </div>
           )}
 
-          <div className={styles.previewImageWrap}>
+          <div className={styles['card__image-container']}>
             <img
               src={selected.previewImage}
               alt={`Preview of the ${selected.displayLabel} catalogue`}
-              className={styles.previewImage}
+              className={styles['card__image']}
             />
           </div>
-          <div className={styles.previewMeta}>
-            <p className={styles.previewCaption}>{selected.displayLabel}</p>
-            <h3 className={styles.previewHeadline}>
+          <div className={styles['card__meta-row']}>
+            <p className={styles['card__caption']}>{selected.displayLabel}</p>
+            <h3 className={styles['card__heading']}>
               Every question type that exists in this curriculum. All of them.
             </h3>
-            <p className={styles.previewNote}>
+            <p className={styles['card__note']}>
               Each structure was extracted from actual provincial papers. You
               bring the scenario — the context, the numbers, the difficulty.
               We build a question that has never existed before.
             </p>
-            <div className={styles.tallyEmbed} onClick={handleGetCatalogue}>
+            <div className={styles['form__embed']} onClick={handleGetCatalogue}>
               <iframe
                 data-tally-src={`https://tally.so/embed/${selected.tallyFormId}?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1`}
                 loading="lazy"
@@ -202,7 +202,7 @@ export default function CatalogueExplorer() {
                 title={`Get the ${selected.displayLabel} Catalogue`}
               />
             </div>
-            <p className={styles.emailNote}>
+            <p className={styles['form__email-note']}>
               Sent to your <strong>school email only</strong> — no personal addresses.
             </p>
           </div>

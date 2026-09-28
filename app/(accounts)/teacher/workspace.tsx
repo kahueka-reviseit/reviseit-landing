@@ -175,15 +175,15 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
   // Return keyboard focus to the card that opened a detail view.
   useEffect(()=>{if((view==='catalogue'||view==='builder')&&returnFocus.current){const el=document.getElementById(returnFocus.current);returnFocus.current=null;el?.focus();}},[view]);
 
-  if(!data.module) return <div className={styles.page}><section className={styles.emptyState}><h2>Your curricula will appear here</h2><p>Your school account is verified. Contact our team to arrange curriculum access for your department.</p><a href="mailto:kahueka@reviseit.io">Contact Revise It</a></section></div>;
+  if(!data.module) return <div className={styles['paper-journey']}><section className={styles['empty-state']}><h2>Your curricula will appear here</h2><p>Your school account is verified. Contact our team to arrange curriculum access for your department.</p><a href="mailto:kahueka@reviseit.io">Contact Revise It</a></section></div>;
   const detail=question?byId.get(question):undefined;
   const status=<>
-    <div aria-live="polite">{notice && <p role="status" className={styles.success}>{notice}</p>}</div>
-    {error && <p role="alert" className={styles.error}>{error} <a href="/teacher">Reload workspace</a></p>}
+    <div aria-live="polite">{notice && <p role="status" className={styles['notice--success']}>{notice}</p>}</div>
+    {error && <p role="alert" className={styles['notice--error']}>{error} <a href="/teacher">Reload workspace</a></p>}
   </>;
   const withBar=['catalogue','question'].includes(view);
-  return <div className={`${styles.page} ${withBar?styles.withBar:''}`}>
-    {data.module.isDemo && <p className={styles.demo}>Explore with sample entries. These are demonstration selections; purchasing and paper generation are not available yet.</p>}
+  return <div className={`${styles['paper-journey']} ${withBar?styles['paper-journey--with-bottom-bar']:''}`}>
+    {data.module.isDemo && <p className={styles['demo-notice']}>Explore with sample entries. These are demonstration selections; purchasing and paper generation are not available yet.</p>}
     {view==='home' ? <HomeView paper={paper} status={status} switchCurriculum={switchCurriculum}/> :
      view==='shape' ? <ShapeView paper={paper} status={status}/> :
      view==='formatting' ? <FormattingView paper={paper} status={status} preferences={preferences} setPreferences={setPreferences} dirty={formattingDirty} save={()=>void save('formatting')}/> :

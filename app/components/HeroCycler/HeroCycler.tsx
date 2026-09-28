@@ -68,39 +68,39 @@ export default function HeroCycler() {
   const current = ITEMS[active];
 
   return (
-    <div className={styles.root}>
+    <div className={styles['carousel']}>
 
       {/* Stacked iframes — all loaded, one visible at a time */}
-      <div className={styles.frames}>
+      <div className={styles['carousel__slides']}>
         {ITEMS.map((item, i) => (
           <iframe
             key={item.src}
             src={item.src}
             title={item.document}
             scrolling="no"
-            className={`${styles.frame} ${i === active ? styles.frameVisible : ''}`}
+            className={`${styles['carousel__slide']} ${i === active ? styles['carousel__slide--visible'] : ''}`}
           />
         ))}
       </div>
 
       {/* Value copy — fades with each cycle */}
-      <div className={`${styles.copy} ${copyVisible ? styles.copyVisible : ''}`}>
-        <p className={styles.copyLabel} style={{ color: current.color }}>
+      <div className={`${styles['carousel__caption']} ${copyVisible ? styles['carousel__caption--visible'] : ''}`}>
+        <p className={styles['carousel__eyebrow']} style={{ color: current.color }}>
           {current.phase}&ensp;&middot;&ensp;{current.document}
         </p>
-        <p className={styles.copyHeadline}>{current.headline}</p>
-        <p className={styles.copySub}>{current.sub}</p>
+        <p className={styles['carousel__title']}>{current.headline}</p>
+        <p className={styles['carousel__body']}>{current.sub}</p>
       </div>
 
       {/* Dot navigation */}
-      <div className={styles.dots} role="tablist">
+      <div className={styles['carousel__dots']} role="tablist">
         {ITEMS.map((item, i) => (
           <button
             key={i}
             role="tab"
             aria-selected={i === active}
             aria-label={`View ${item.document}`}
-            className={`${styles.dot} ${i === active ? styles.dotActive : ''}`}
+            className={`${styles['carousel__dot']} ${i === active ? styles['carousel__dot--active'] : ''}`}
             style={i === active ? { background: current.color } : undefined}
             onClick={() => goTo(i)}
           />

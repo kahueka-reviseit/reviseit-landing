@@ -1,10 +1,10 @@
-.footer {
+.site-footer {
   padding: 24px 0 16px;
-  background: #1A1A2E;
+  background: var(--color-navy);
   background: var(--navy);
 }
 
-.footerInner {
+.site-footer__row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -12,51 +12,51 @@
   gap: 16px;
 }
 
-.footerLogo {
-  font-family: 'Source Sans 3', sans-serif;
+.site-footer__brand {
+  font-family: var(--font-body), sans-serif;
   font-weight: 600;
   font-size: 0.95rem;
   letter-spacing: 0.08em;
 }
 
-.logoRevise {
-  color: #fff;
+.site-footer__wordmark {
+  color: var(--color-white);
 }
 
-.logoIt {
-  color: #A7BEAE;
+.site-footer__wordmark--accent {
+  color: var(--color-sage-light);
   color: var(--sage-light);
 }
 
-.footerCopy {
+.site-footer__text {
   font-size: 0.8rem;
-  color: #8A8A8A;
+  color: var(--color-med-gray);
   color: var(--med-gray);
 }
 
-.footerLinks {
+.site-footer__links {
   display: flex;
   gap: 20px;
   align-items: center;
   flex-wrap: wrap;
 }
 
-.footerLink {
-  font-family: 'Source Sans 3', sans-serif;
+.site-footer__link {
+  font-family: var(--font-body), sans-serif;
   font-size: 0.85rem;
   font-weight: 500;
-  color: #A7BEAE;
+  color: var(--color-sage-light);
   color: var(--sage-light);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
-.footerLink:hover {
-  color: #fff;
+.site-footer__link:hover {
+  color: var(--color-white);
 }
 
 /* ─── Legal row ──────────────────────────────────────────────── */
-.footerLegal {
+.site-footer__legal {
   display: flex;
   gap: 16px;
   margin-top: 12px;
@@ -65,16 +65,16 @@
   flex-wrap: wrap;
 }
 
-.footerLegalLink {
-  font-family: 'Source Sans 3', sans-serif;
+.site-footer__legal-link {
+  font-family: var(--font-body), sans-serif;
   font-size: 0.75rem;
   font-weight: 400;
-  color: #8A8A8A;
+  color: var(--color-med-gray);
   color: var(--med-gray);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
-.footerLegalLink:hover {
-  color: #fff;
+.site-footer__legal-link:hover {
+  color: var(--color-white);
 }

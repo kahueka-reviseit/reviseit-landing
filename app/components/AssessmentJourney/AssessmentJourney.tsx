@@ -116,10 +116,10 @@ export default function AssessmentJourney() {
   );
 
   return (
-    <div className={styles.root}>
+    <div className={styles['assessment-journey']}>
 
       {/* ── Button strip ──────────────────────────────────────── */}
-      <div className={styles.tabStrip} role="tablist">
+      <div className={styles['tabs']} role="tablist">
         {PHASES.map((phase) => {
           const isActive = phase.key === activeKey;
           return (
@@ -127,7 +127,7 @@ export default function AssessmentJourney() {
               key={phase.key}
               role="tab"
               aria-selected={isActive}
-              className={`${styles.tab} ${isActive ? styles.tabActive : ''}`}
+              className={`${styles['tabs__tab']} ${isActive ? styles['tabs__tab--current'] : ''}`}
               style={{
                 '--phase-color': phase.color,
                 '--phase-bg': phase.bgInactive,
@@ -137,39 +137,39 @@ export default function AssessmentJourney() {
               onClick={() => handleTabClick(phase.key)}
             >
               {phase.stepNum !== undefined && (
-                <span className={styles.tabStep}>{phase.stepNum}</span>
+                <span className={styles['tabs__number']}>{phase.stepNum}</span>
               )}
-              <span className={styles.tabLabel}>{phase.label}</span>
+              <span className={styles['tabs__label']}>{phase.label}</span>
             </button>
           );
         })}
       </div>
 
       {/* ── Content: copy left + iframe right ─────────────────── */}
-      <div className={styles.content}>
+      <div className={styles['tabs__panel']}>
 
         {/* Copy panel */}
         <div
-          className={`${styles.copyPanel} ${isCopyFading ? styles.copyFading : ''}`}
+          className={`${styles['tabs__copy']} ${isCopyFading ? styles['tabs__copy--fading'] : ''}`}
           aria-live="polite"
         >
           {activePhase.key === 'start' ? (
             <>
-              <h3 className={styles.copyHeadline}>{activePhase.headline}</h3>
-              <p className={styles.copyBody}>{activePhase.body}</p>
+              <h3 className={styles['section__title']}>{activePhase.headline}</h3>
+              <p className={styles['section__body']}>{activePhase.body}</p>
             </>
           ) : (
             <>
               <p
-                className={styles.copyEyebrow}
+                className={styles['section__eyebrow']}
                 style={{ color: activePhase.color }}
               >
                 {activePhase.label}&ensp;&middot;&ensp;{activePhase.document}
               </p>
-              <h3 className={styles.copyTagline}>{activePhase.tagline}</h3>
-              <p className={styles.copyBody}>{activePhase.body}</p>
+              <h3 className={styles['section__tagline']}>{activePhase.tagline}</h3>
+              <p className={styles['section__body']}>{activePhase.body}</p>
               {activePhase.transformation && (
-                <p className={styles.copyTransformation}>
+                <p className={styles['section__transformation']}>
                   {activePhase.transformation}
                 </p>
               )}
@@ -178,12 +178,12 @@ export default function AssessmentJourney() {
         </div>
 
         {/* Iframe */}
-        <div className={styles.iframeOuter}>
-          <div className={styles.iframeInner}>
+        <div className={styles['widget']}>
+          <div className={styles['widget__container']}>
             <iframe
               key={iframeKey}
               src={activePhase.src}
-              className={styles.iframe}
+              className={styles['widget__frame']}
               title={`${activePhase.label} phase`}
               scrolling="no"
             />

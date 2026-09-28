@@ -5,13 +5,13 @@ import type { FormState } from './actions';
 import styles from './accounts.module.css';
 export function Submit({ label }: { label: string }) {
   const { pending } = useFormStatus();
-  return <button className={styles.button} disabled={pending} type="submit">{pending ? 'Please wait…' : label}</button>;
+  return <button className={styles['button--primary']} disabled={pending} type="submit">{pending ? 'Please wait…' : label}</button>;
 }
 export function AccountForm({ action, label, children }: { action: (state: FormState, data: FormData) => Promise<FormState>; label: string; children: ReactNode }) {
   const [state, formAction] = useFormState(action, { message: '' });
-  return <form action={formAction} className={styles.form}>
+  return <form action={formAction} className={styles['form']}>
     {children}
-    {state.message && <p className={state.success ? styles.success : styles.error} role={state.success ? 'status' : 'alert'}>{state.message}</p>}
+    {state.message && <p className={state.success ? styles['notice--success'] : styles['notice--error']} role={state.success ? 'status' : 'alert'}>{state.message}</p>}
     <Submit label={label} />
   </form>;
 }

@@ -19,37 +19,37 @@ export const Icon = {
 };
 
 export const bloomClass:Record<string,string> = {
-  Remember:styles.bRemember, Understand:styles.bUnderstand, Apply:styles.bApply, Analyse:styles.bAnalyse, Evaluate:styles.bEvaluate, Create:styles.bCreate,
+  Remember:styles['tag--remember'], Understand:styles['tag--understand'], Apply:styles['tag--apply'], Analyse:styles['tag--analyse'], Evaluate:styles['tag--evaluate'], Create:styles['tag--create'],
 };
 export function BloomTag({bloom}:{bloom:BloomCategory|string}) {
-  return <span className={`${styles.bloomTag} ${bloomClass[bloom] ?? styles.bUnclassified}`}>{bloom}</span>;
+  return <span className={`${styles['tag']} ${bloomClass[bloom] ?? styles['tag--unclassified']}`}>{bloom}</span>;
 }
 /** Proportional Bloom's bar; widths come from marks, never from invented weights. */
 export function BloomBar({rows}:{rows:{bloom:string;weight:number}[]}) {
-  return <span className={styles.bloomBar} aria-hidden="true">{rows.map(r=><i key={r.bloom} className={bloomClass[r.bloom]} style={{flexGrow:r.weight}}/>)}</span>;
+  return <span className={styles['bloom-mix__bar']} aria-hidden="true">{rows.map(r=><i key={r.bloom} className={bloomClass[r.bloom]} style={{flexGrow:r.weight}}/>)}</span>;
 }
 
 export type Stage = {label:string; state:'done'|'now'|'next'};
 /** The journey pills shared by the builder, review and paid configuration screens. */
 export function Stages({stages,label='Progress'}:{stages:Stage[];label?:string}) {
-  return <ol className={styles.stages} aria-label={label}>{stages.map((s,i)=><li key={s.label} className={styles[s.state]} aria-current={s.state==='now'?'step':undefined}>
-    {s.state==='done'?<><span aria-hidden="true">✓ </span><span className={styles.srOnly}>Done: </span></>:<span>{i+1} </span>}{s.label}</li>)}</ol>;
+  return <ol className={styles['progress-steps']} aria-label={label}>{stages.map((s,i)=><li key={s.label} className={styles[({done:'progress-steps__step--done',now:'progress-steps__step--current',next:'progress-steps__step--upcoming'} as const)[s.state]]} aria-current={s.state==='now'?'step':undefined}>
+    {s.state==='done'?<><span aria-hidden="true">✓ </span><span className={styles['visually-hidden']}>Done: </span></>:<span>{i+1} </span>}{s.label}</li>)}</ol>;
 }
 
 export function PageHeader({eyebrow,title,subtitle,back,aside}:{eyebrow?:ReactNode;title:ReactNode;subtitle?:ReactNode;back?:{label:string;onClick:()=>void};aside?:ReactNode}) {
-  return <header className={styles.pageHeader}>
-    <div className={styles.pageTitle}>
-      {back ? <button type="button" className={styles.backEyebrow} onClick={back.onClick}>{Icon.back(12)} {back.label}</button> : eyebrow ? <p className={styles.eyebrowSlate}>{eyebrow}</p> : null}
+  return <header className={styles['page-header']}>
+    <div className={styles['page-header__titles']}>
+      {back ? <button type="button" className={styles['page-header__back']} onClick={back.onClick}>{Icon.back(12)} {back.label}</button> : eyebrow ? <p className={styles['eyebrow--structured']}>{eyebrow}</p> : null}
       <h1>{title}</h1>
-      {subtitle && <p className={styles.pageSubtitle}>{subtitle}</p>}
+      {subtitle && <p className={styles['page-header__subtitle']}>{subtitle}</p>}
     </div>
     {aside}
   </header>;
 }
 
 export function Meter({label,value,fill,tone}:{label:string;value:string;fill:number;tone:'structured'|'mc'}) {
-  return <div className={styles.meter}>
+  return <div className={styles['meter']}>
     <div><span>{label}</span><strong>{value}</strong></div>
-    <span className={styles.track} aria-hidden="true"><i className={tone==='mc'?styles.fillMc:styles.fillStructured} style={{width:`${Math.max(0,Math.min(100,Math.round(fill*100)))}%`}}/></span>
+    <span className={styles['meter__track']} aria-hidden="true"><i className={tone==='mc'?styles['meter__fill--multiple-choice']:styles['meter__fill--structured']} style={{width:`${Math.max(0,Math.min(100,Math.round(fill*100)))}%`}}/></span>
   </div>;
 }

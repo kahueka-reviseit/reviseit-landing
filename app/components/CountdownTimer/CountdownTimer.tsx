@@ -27,16 +27,16 @@ export default function CountdownTimer() {
     return () => clearInterval(id);
   }, []);
 
-  if (!timeLeft) return <div className={styles.timer} />;
+  if (!timeLeft) return <div className={styles['countdown']} />;
 
   return (
-    <div className={styles.timer}>
+    <div className={styles['countdown']}>
       {UNITS.map((unit) => (
-        <div key={unit} className={styles.unit}>
-          <span className={styles.value}>
+        <div key={unit} className={styles['countdown__unit']}>
+          <span className={styles['countdown__value']}>
             {String(timeLeft[unit]).padStart(2, '0')}
           </span>
-          <span className={styles.label}>{unit}</span>
+          <span className={styles['countdown__label']}>{unit}</span>
         </div>
       ))}
     </div>

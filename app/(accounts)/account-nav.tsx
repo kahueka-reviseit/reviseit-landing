@@ -11,14 +11,14 @@ export default function AccountNav({path:forced}:{path?:string}={}) {
   // `path` lets the isolated synthetic preview render the teacher navigation outside Next.
   const current=usePathname();const path=forced ?? current ?? '';
   const teacher=path==='/teacher'||path.startsWith('/teacher/');
-  if(!teacher) return <nav className={styles.nav} aria-label="Account navigation"><Link className={styles.brand} href="/">Revise It</Link><Link href="/account">My account</Link></nav>;
+  if(!teacher) return <nav className={styles['site-nav']} aria-label="Account navigation"><Link className={styles['site-nav__brand']} href="/">Revise It</Link><Link className={styles['site-nav__link']} href="/account">My account</Link></nav>;
   const papers=path.startsWith('/teacher/orders');
-  return <nav className={`${styles.nav} ${styles.teacherNav}`} aria-label="Account navigation">
-    <Link className={styles.brand} href="/">Revise It</Link>
-    <span className={styles.navLinks}>
-      {/* A full load: the workspace reads its screen from the address on arrival. */}<a href="/teacher?view=home" aria-current={!papers?'page':undefined}>My curricula</a>
-      <Link href="/teacher/orders" aria-current={papers?'page':undefined}>My papers</Link>
-      <Link href="/account">My account</Link>
+  return <nav className={`${styles['site-nav']} ${styles['site-nav--teacher']}`} aria-label="Account navigation">
+    <Link className={styles['site-nav__brand']} href="/">Revise It</Link>
+    <span className={styles['site-nav__links']}>
+      {/* A full load: the workspace reads its screen from the address on arrival. */}<a className={`${styles['site-nav__link']} ${!papers?styles['site-nav__link--current']:''}`} href="/teacher?view=home" aria-current={!papers?'page':undefined}>My curricula</a>
+      <Link className={`${styles['site-nav__link']} ${papers?styles['site-nav__link--current']:''}`} href="/teacher/orders" aria-current={papers?'page':undefined}>My papers</Link>
+      <Link className={styles['site-nav__link']} href="/account">My account</Link>
     </span>
   </nav>;
 }

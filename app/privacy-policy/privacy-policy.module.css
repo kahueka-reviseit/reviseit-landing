@@ -1,4 +1,4 @@
-.page {
+.privacy-policy {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -6,112 +6,112 @@
 }
 
 /* ─── Nav ────────────────────────────────────────────────────── */
-.nav {
+.site-nav {
   padding: 16px 24px;
-  background: #1A1A2E;
+  background: var(--color-navy);
   display: flex;
   align-items: center;
 }
 
-.navLogo {
+.site-nav__brand {
   text-decoration: none;
-  font-family: 'Source Sans 3', sans-serif;
+  font-family: var(--font-body), sans-serif;
   font-weight: 600;
   font-size: 1rem;
   letter-spacing: 0.08em;
 }
 
-.logoRevise {
-  color: #ffffff;
+.site-nav__wordmark {
+  color: var(--color-white);
 }
 
-.logoIt {
-  color: #A7BEAE;
+.site-nav__wordmark--accent {
+  color: var(--color-sage-light);
 }
 
 /* ─── Main ───────────────────────────────────────────────────── */
-.main {
+.page-body {
   flex: 1;
   padding: 64px 24px;
 }
 
-.container {
+.page-body__container {
   max-width: 720px;
   margin: 0 auto;
 }
 
 /* ─── Prose ──────────────────────────────────────────────────── */
-.content h1 {
-  font-family: 'Playfair Display', serif;
+.section h1 {
+  font-family: var(--font-display), serif;
   font-size: 2rem;
   color: var(--dark-text);
   margin-bottom: 8px;
 }
 
-.content h2 {
-  font-family: 'Playfair Display', serif;
+.section h2 {
+  font-family: var(--font-display), serif;
   font-size: 1.25rem;
   color: var(--dark-text);
   margin-top: 40px;
   margin-bottom: 12px;
 }
 
-.content p {
+.section p {
   color: var(--mid-text);
   line-height: 1.7;
   margin-bottom: 16px;
 }
 
-.content ul {
+.section ul {
   padding-left: 20px;
   margin-bottom: 16px;
 }
 
-.content li {
+.section li {
   color: var(--mid-text);
   line-height: 1.7;
   margin-bottom: 6px;
 }
 
-.content strong {
+.section strong {
   color: var(--dark-text);
   font-weight: 600;
 }
 
-.content a {
+.section a {
   color: var(--sage);
   text-decoration: underline;
 }
 
-.content a:hover {
+.section a:hover {
   color: var(--dark-text);
 }
 
-.content hr {
+.section hr {
   border: none;
   border-top: 1px solid var(--light-gray);
   margin: 32px 0;
 }
 
 /* ─── Footer ─────────────────────────────────────────────────── */
-.footer {
+.site-footer {
   padding: 24px 0;
-  background: #1A1A2E;
+  background: var(--color-navy);
 }
 
-.footerCopy {
+.site-footer__text {
   font-size: 0.8rem;
-  color: #8A8A8A;
+  color: var(--color-med-gray);
   text-align: center;
 }
 
-.footerLink {
-  color: #A7BEAE;
+.site-footer__link {
+  color: var(--color-sage-light);
   text-decoration: none;
   font-size: 0.8rem;
   transition: color 0.15s ease;
 }
 
-.footerLink:hover {
-  color: #fff;
+.site-footer__link:hover {
+  color: var(--color-white);
 }

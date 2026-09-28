@@ -63,16 +63,16 @@ export default function RealityShowcase() {
   );
 
   return (
-    <div className={styles.root}>
+    <div className={styles['showcase']}>
 
       {/* ── Statement selector ─────────────────────────────────── */}
-      <div className={styles.selector}>
+      <div className={styles['showcase__selector']}>
         {ITEMS.map((item) => {
           const isActive = item.key === activeKey;
           return (
             <button
               key={item.key}
-              className={`${styles.card} ${isActive ? styles.cardActive : ''}`}
+              className={`${styles['quote']} ${isActive ? styles['quote--active'] : ''}`}
               style={{
                 '--item-color': item.color,
                 '--item-bg': item.bgActive,
@@ -80,11 +80,11 @@ export default function RealityShowcase() {
               onClick={() => handleSelect(item.key)}
               aria-pressed={isActive}
             >
-              <span className={styles.cardLabel}>{item.label}</span>
-              <span className={styles.cardQuote}>
-                <span className={styles.cardQuoteMark}>&ldquo;</span>
+              <span className={styles['quote__title']}>{item.label}</span>
+              <span className={styles['quote__text']}>
+                <span className={styles['quote__mark']}>&ldquo;</span>
                 {item.quote}
-                <span className={styles.cardQuoteMark}>&rdquo;</span>
+                <span className={styles['quote__mark']}>&rdquo;</span>
               </span>
             </button>
           );
@@ -92,12 +92,12 @@ export default function RealityShowcase() {
       </div>
 
       {/* ── Preview iframe ─────────────────────────────────────── */}
-      <div className={`${styles.preview} ${isPreviewFading ? styles.previewFading : ''}`}>
-        <div className={styles.iframeShell}>
+      <div className={`${styles['showcase__preview']} ${isPreviewFading ? styles['showcase__preview--fading'] : ''}`}>
+        <div className={styles['widget']}>
           <iframe
             key={iframeKey}
             src={activeItem.src}
-            className={styles.iframe}
+            className={styles['widget__frame']}
             title={activeItem.label}
             scrolling="no"
           />

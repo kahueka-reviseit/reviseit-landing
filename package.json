@@ -20,7 +20,8 @@
     "test:jobs:integration": "playwright test --config jobs.config.ts",
     "test:workspace:e2e": "playwright test --config playwright.workspace.config.ts",
     "test:jobs:hosted": "playwright test --config hosted-jobs.config.ts",
-    "test:questionnaire:hosted": "playwright test --config hosted-questionnaire.config.ts"
+    "test:questionnaire:hosted": "playwright test --config hosted-questionnaire.config.ts",
+    "check:paper": "node scripts/check-paper-alignment.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

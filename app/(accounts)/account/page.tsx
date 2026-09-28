@@ -16,9 +16,9 @@ export default async function Account() {
   const approved = canEnterWorkspace(account, user.email || '', confirmed);
   const [heading, description] = !confirmed ? ['Confirm your school email', 'Check your school inbox and follow the confirmation link. Our team will then verify your account.'] : copy[approved ? 'approved' : account.status === 'approved' ? 'pending' : account.status];
   const { data: reviewer } = await supabase.rpc('is_account_reviewer');
-  return <section className={styles.card}><span className={styles.eyebrow}>My account</span><h1>{heading}</h1><p>{description}</p><p><strong>{account.full_name}</strong><br />{user.email}<br />{account.requested_school}<br />{account.requested_department}</p>
+  return <section className={styles['card']}><span className={styles['card__eyebrow']}>My account</span><h1>{heading}</h1><p>{description}</p><p><strong>{account.full_name}</strong><br />{user.email}<br />{account.requested_school}<br />{account.requested_department}</p>
     {approved && <p><Link href="/teacher">Open teacher workspace</Link></p>}
     {reviewer === true && <p><Link href="/admin/accounts">Review school accounts</Link></p>}
-    {['pending','approved'].includes(account.status) && <details className={styles.details}><summary>Update my school details</summary><p>Submitting a change puts your account back into verification. Workspace access pauses until our team approves the new details.</p><AccountForm action={saveDetails} label="Submit for verification"><SchoolFields account={account} /></AccountForm></details>}
-    <form action={logout}><button className={styles.button}>Log out</button></form></section>;
+    {['pending','approved'].includes(account.status) && <details className={styles['disclosure']}><summary>Update my school details</summary><p>Submitting a change puts your account back into verification. Workspace access pauses until our team approves the new details.</p><AccountForm action={saveDetails} label="Submit for verification"><SchoolFields account={account} /></AccountForm></details>}
+    <form action={logout}><button className={styles['button--primary']}>Log out</button></form></section>;
 }

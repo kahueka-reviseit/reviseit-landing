@@ -10,7 +10,7 @@ import styles from './configure.module.css';
  * the server's projection; every rule and total comes back from the server after a save.
  */
 type SaveState = 'saved'|'pending'|'saving'|'conflict'|'failed';
-const bloomClass:Record<string,string>={grouped:styles.grouped,remember:styles.remember,understand:styles.understand,apply:styles.apply,analyse:styles.analyse,evaluate:styles.evaluate,create:styles.create,unclassified:styles.unclassified};
+const bloomClass:Record<string,string>={grouped:styles['tag--grouped'],remember:styles['tag--remember'],understand:styles['tag--understand'],apply:styles['tag--apply'],analyse:styles['tag--analyse'],evaluate:styles['tag--evaluate'],create:styles['tag--create'],unclassified:styles['tag--unclassified']};
 
 function lineStatus(line:LineView,paid:boolean){
   if(line.marks.value===null || line.attention.some(a=>a.scope==='marks')) return {text:'Marks needed',ready:false};
@@ -39,27 +39,28 @@ function Chips({name,field,facet,value,onChange,disabled,attention}:{name:string
     else if(mode==='automatic'||mode==='omit') onChange({kind:mode});
   };
   const radio=(mode:string,label:string,extra:{dashed?:boolean;off?:boolean;reason?:string;preferred?:boolean}={})=>
-    <label key={mode} className={`${styles.chip} ${extra.dashed?styles.dashed:''} ${selected===mode?styles.on:''} ${extra.off?styles.off:''}`} title={extra.reason}>
+    <label key={mode} className={`${styles['chip']} ${extra.dashed?styles['chip--delegate']:''} ${selected===mode?styles['chip--selected']:''} ${extra.off?styles['chip--unavailable']:''}`} title={extra.reason}>
       <input type="radio" name={id} value={mode} checked={selected===mode} disabled={disabled||(extra.off&&selected!==mode)} onChange={()=>pick(mode)}/>
-      <span>{selected===mode?'✓ ':''}{label}{extra.preferred?<em className={styles.suggested}> · suggested</em>:null}</span>
+      <span>{selected===mode?'✓ ':''}{label}{extra.preferred?<em className={styles['chip__suggestion']}> · suggested</em>:null}</span>
     </label>;
   const describedBy=[field.hint?`${id}-hint`:'',attention?`${id}-attention`:'',facet?.reason?`${id}-reason`:''].filter(Boolean).join(' ')||undefined;
-  return <fieldset className={styles.field} aria-describedby={describedBy} id={id}>
-    <legend>{field.label}{field.required?'':' (optional)'}</legend>
-    {(!field.required||value)&&<span className={styles.fieldNote} aria-hidden="true">{field.required?'✓ Your current choice':'Optional · can stay blank'}</span>}
-    {field.hint&&<p id={`${id}-hint`} className={styles.help}>{field.hint}</p>}
-    <div className={styles.chips}>
+  return <fieldset className={styles['choice-field']} aria-describedby={describedBy} id={id}>
+    <legend className={styles['choice-field__header']}><span className={styles['choice-field__label']}>{field.label}{field.required?'':' (optional)'}</span>
+      {(!field.required||value)&&<span className={styles['choice-field__message']} aria-hidden="true">{field.required?'✓ Your current choice':'Optional · can stay blank'}</span>}
+    </legend>
+    {field.hint&&<p id={`${id}-hint`} className={styles['paragraph']}>{field.hint}</p>}
+    <div className={styles['chip-group']}>
       {options.map(o=>radio(`choice:${o.id}`,o.label,{off:o.view?.disabled,reason:o.view?.reason,preferred:o.view?.preferred}))}
       {(field.type==='text'||field.allowOther)&&radio('text',field.type==='text'?'Write my answer':'Describe my own')}
       {field.allowAutomatic&&radio('automatic','Choose for me',{dashed:true})}
       {!field.required&&radio('omit','No preference',{dashed:true})}
-      {value&&!field.required&&<button type="button" className={styles.link} disabled={disabled} onClick={()=>onChange(null)}>Leave blank</button>}
+      {value&&!field.required&&<button type="button" className={styles['link']} disabled={disabled} onClick={()=>onChange(null)}>Leave blank</button>}
     </div>
-    {writing&&<><label className={styles.textLabel} htmlFor={`${id}-text`}>Your answer for {field.label}</label>
-      <textarea id={`${id}-text`} className={styles.text} value={value.kind==='text'?value.text:''} disabled={disabled} maxLength={field.type==='text'?field.maxLength:2000} onChange={e=>onChange({kind:'text',text:e.target.value})}/></>}
-    {facet?.forced&&<p id={`${id}-reason`} className={styles.required}>Required by your other choices: {facet.options.find(o=>o.id===facet.forced)?.label}. {facet.reason}</p>}
-    {options.some(o=>o.view?.disabled)&&<ul className={styles.help}>{options.filter(o=>o.view?.disabled).map(o=><li key={o.id}>{o.label}: {o.view?.reason}</li>)}</ul>}
-    {attention&&<p id={`${id}-attention`} role="alert" className={styles.attention}>{attention.message}</p>}
+    {writing&&<><label className={styles['text-field__label']} htmlFor={`${id}-text`}>Your answer for {field.label}</label>
+      <textarea id={`${id}-text`} className={styles['text-input']} value={value.kind==='text'?value.text:''} disabled={disabled} maxLength={field.type==='text'?field.maxLength:2000} onChange={e=>onChange({kind:'text',text:e.target.value})}/></>}
+    {facet?.forced&&<p id={`${id}-reason`} className={styles['notice--required']}>Required by your other choices: {facet.options.find(o=>o.id===facet.forced)?.label}. {facet.reason}</p>}
+    {options.some(o=>o.view?.disabled)&&<ul className={styles['paragraph']}>{options.filter(o=>o.view?.disabled).map(o=><li key={o.id}>{o.label}: {o.view?.reason}</li>)}</ul>}
+    {attention&&<p id={`${id}-attention`} role="alert" className={styles['notice--error']}>{attention.message}</p>}
   </fieldset>;
 }
 
@@ -122,7 +123,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
     finally{setBusy(false);}
   }
 
-  if(!view||!draft) return <section className={styles.panel}><p>{error||'Loading your paper…'}</p>{children}</section>;
+  if(!view||!draft) return <section className={styles['card']}><p>{error||'Loading your paper…'}</p>{children}</section>;
   const paid=view.paid&&view.state==='awaiting_answers';
   const editable=!view.submitted&&['awaiting_payment','awaiting_answers'].includes(view.state);
   const index=Math.min(active,view.lines.length-1);
@@ -154,85 +155,85 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
   const nextLine=view.lines[index+1];
   const heading=view.submitted?'Submitted for generation':allReady?'Your paper is fully configured':paid?'Finish your paper':'Your paper is waiting for payment';
   return <>
-  <header className={styles.header}>
-    <div className={styles.titleBlock}>
-      <p className={styles.eyebrow}>{[title,paid?'Paid':view.submitted?'Submitted':'Awaiting payment',paid&&!view.submitted?(allReady?'Ready to submit':'Complete configuration'):null].filter(Boolean).join(' · ')}</p>
-      <h1 className={styles.title}>{heading}</h1>
-      <p className={styles.lead}>{paid?'Answer the details for each question, or let us choose. Your answers are saved as you go.':view.submitted?'Your choices are fixed for this paper. Follow its progress on Your paper requests.':'Your questions and marks are saved with this checkout. You can still adjust marks; the detailed questions open when Stripe confirms your payment.'}</p>
+  <header className={styles['page-header']}>
+    <div className={styles['page-header__titles']}>
+      <p className={styles['card__eyebrow']}>{[title,paid?'Paid':view.submitted?'Submitted':'Awaiting payment',paid&&!view.submitted?(allReady?'Ready to submit':'Complete configuration'):null].filter(Boolean).join(' · ')}</p>
+      <h1 className={styles['page-header__title']}>{heading}</h1>
+      <p className={styles['page-header__subtitle']}>{paid?'Answer the details for each question, or let us choose. Your answers are saved as you go.':view.submitted?'Your choices are fixed for this paper. Follow its progress on Your paper requests.':'Your questions and marks are saved with this checkout. You can still adjust marks; the detailed questions open when Stripe confirms your payment.'}</p>
     </div>
-    <ol className={styles.progress} aria-label="Progress">{steps.map((label,i)=><li key={label} aria-current={i===stage?'step':undefined} className={i<stage?styles.done:i===stage?styles.now:''}>{i<stage?'✓ ':`${i+1} `}{label}</li>)}</ol>
+    <ol className={styles['progress-steps']} aria-label="Progress">{steps.map((label,i)=><li key={label} aria-current={i===stage?'step':undefined} className={i<stage?styles['progress-steps__step--done']:i===stage?styles['progress-steps__step--current']:''}>{i<stage?'✓ ':`${i+1} `}{label}</li>)}</ol>
   </header>
   {children}
   {allReady&&<>
-    <section className={styles.readyBanner} aria-labelledby="ready-heading">
+    <section className={styles['notice--complete']} aria-labelledby="ready-heading">
       <div><p>Paper configured</p><h2 id="ready-heading">Ready</h2></div>
       <div><p><span>Marks balance</span><span>Required choices complete</span></p>
         <span>Every question has its marks and required details set. {yours} {yours===1?'answer was':'answers were'} yours; {delegated} {delegated===1?'was':'were'} chosen for you.</span></div>
     </section>
-    <section className={styles.panel} aria-labelledby="final-review">
-      <div className={styles.panelHead}><p id="final-review" className={styles.eyebrowMid}>Final review</p><span className={styles.help}>Edit any question until you submit</span></div>
-      <ol className={styles.finalList}>{view.lines.map((l,i)=>{const summary=l.fields.map(f=>describe(f,draft.answers.items[l.id]?.[f.id])).filter(Boolean).join(' · ');
-        return <li key={l.id}><span className={l.kind==='multiple_choice'?styles.numGold:styles.numSlate}>{l.number}</span><span><strong>{l.title}</strong><small>{summary||'No further details needed'}</small></span><strong>{l.marks.value}</strong>
-          <button type="button" className={styles.linkButton} aria-label={`Edit question ${l.number}`} onClick={()=>go(i)}>Edit</button></li>;})}</ol>
+    <section className={styles['card']} aria-labelledby="final-review">
+      <div className={styles['card__header']}><p id="final-review" className={styles['card__eyebrow--neutral']}>Final review</p><span className={styles['paragraph']}>Edit any question until you submit</span></div>
+      <ol className={styles['question-list']}>{view.lines.map((l,i)=>{const summary=l.fields.map(f=>describe(f,draft.answers.items[l.id]?.[f.id])).filter(Boolean).join(' · ');
+        return <li key={l.id}><span className={l.kind==='multiple_choice'?styles['question-list__number--multiple-choice']:styles['question-list__number--structured']}>{l.number}</span><span><strong>{l.title}</strong><small>{summary||'No further details needed'}</small></span><strong>{l.marks.value}</strong>
+          <button type="button" className={styles['button--text']} aria-label={`Edit question ${l.number}`} onClick={()=>go(i)}>Edit</button></li>;})}</ol>
     </section>
   </>}
-  <nav className={styles.stepper} aria-label="Questions in this paper">
-    {view.lines.map((l,i)=>{const s=lineStatus(l,paid);return <button key={l.id} type="button" aria-current={i===index?'step':undefined} className={`${styles.step} ${i===index?styles.current:''}`} onClick={()=>setActive(i)}>
-      <span className={l.kind==='multiple_choice'?styles.mcqLabel:styles.stepLabel}>Q{l.number} · {l.title}</span>
-      <span className={s.ready?styles.stepReady:styles.stepPending}>{s.text}</span></button>;})}
+  <nav className={styles['question-tabs']} aria-label="Questions in this paper">
+    {view.lines.map((l,i)=>{const s=lineStatus(l,paid);return <button key={l.id} type="button" aria-current={i===index?'step':undefined} className={`${styles['question-tabs__tab']} ${i===index?styles['question-tabs__tab--current']:''}`} onClick={()=>setActive(i)}>
+      <span className={l.kind==='multiple_choice'?styles['question-tabs__label--multiple-choice']:styles['question-tabs__label']}>Q{l.number} · {l.title}</span>
+      <span className={s.ready?styles['question-tabs__status--ready']:styles['question-tabs__status--to-complete']}>{s.text}</span></button>;})}
   </nav>
-  <div className={styles.layout} ref={detailsRef}>
-    <div className={styles.main}>
-      <section className={styles.panel} aria-labelledby="allocation-heading">
-        <p id="allocation-heading" className={styles.eyebrowSage}>{paid?'Your allocation · still editable':'Marks for this question'}</p>
-        <div className={styles.allocation}>
-          <p>Question {line.number} · {line.title}<br/><span className={styles.help}>{line.marks.fixed?`${line.marks.min} marks · fixed for this type`:`Permitted range ${range(line.marks)} marks`}</span></p>
-          {line.marks.fixed?<strong className={styles.marksValue}>{line.marks.min}</strong>:
-          <div className={styles.stepperControl}>
+  <div className={styles['page-body']} ref={detailsRef}>
+    <div className={styles['page-body__main']}>
+      <section className={styles['card']} aria-labelledby="allocation-heading">
+        <p id="allocation-heading" className={styles['card__eyebrow--positive']}>{paid?'Your allocation · still editable':'Marks for this question'}</p>
+        <div className={styles['marks-control']}>
+          <p>Question {line.number} · {line.title}<br/><span className={styles['paragraph']}>{line.marks.fixed?`${line.marks.min} marks · fixed for this type`:`Permitted range ${range(line.marks)} marks`}</span></p>
+          {line.marks.fixed?<strong className={styles['marks-fixed__value']}>{line.marks.min}</strong>:
+          <div className={styles['stepper']}>
             <button type="button" aria-label={`One mark fewer for question ${line.number}`} disabled={!editable||own.marks===null||own.marks<=line.marks.min} onClick={()=>setMarks(line.id,(own.marks??line.marks.min)-1)}>−</button>
             <input aria-label={`Marks for question ${line.number}`} inputMode="numeric" value={own.marks??''} placeholder="Set" disabled={!editable}
               onChange={e=>{const v=e.target.value.trim();setMarks(line.id,v===''?null:Number.isInteger(Number(v))?Number(v):own.marks);}}/>
             <button type="button" aria-label={`One mark more for question ${line.number}`} disabled={!editable||(own.marks??0)>=line.marks.max} onClick={()=>setMarks(line.id,own.marks===null?line.marks.min:own.marks+1)}>+</button>
           </div>}
         </div>
-        {attentionFor('marks','marks')&&<p role="alert" className={styles.attention}>{attentionFor('marks','marks')!.message}</p>}
-        {line.attention.filter(a=>a.scope==='marks'&&a.id!=='marks').map((a,i)=><p key={i} role="alert" className={styles.attention}>{a.message}</p>)}
-        <p className={styles.totalLine}>Paper total: {t.allocated} of {t.target??'—'} marks allocated. {t.remaining?`${t.remaining} still to allocate. `:''}{t.excess?`${t.excess} over the total. `:''}Move marks between questions within their ranges; the totals and cognitive mix update when saved.</p>
-        {sameKind.length>1&&editable&&<div className={styles.reorder} role="group" aria-label={`Position of question ${line.number}`}>
-          <span className={styles.help}>{line.kind==='multiple_choice'?'Order within multiple choice':'Order of structured questions'}: {position+1} of {sameKind.length}. Answers stay with the question.</span>
-          <button type="button" className={styles.secondary} disabled={position===0} onClick={()=>moveLine(line.id,-1)}>Move earlier</button>
-          <button type="button" className={styles.secondary} disabled={position===sameKind.length-1} onClick={()=>moveLine(line.id,1)}>Move later</button>
+        {attentionFor('marks','marks')&&<p role="alert" className={styles['notice--error']}>{attentionFor('marks','marks')!.message}</p>}
+        {line.attention.filter(a=>a.scope==='marks'&&a.id!=='marks').map((a,i)=><p key={i} role="alert" className={styles['notice--error']}>{a.message}</p>)}
+        <p className={styles['card__footer']}>Paper total: {t.allocated} of {t.target??'—'} marks allocated. {t.remaining?`${t.remaining} still to allocate. `:''}{t.excess?`${t.excess} over the total. `:''}Move marks between questions within their ranges; the totals and cognitive mix update when saved.</p>
+        {sameKind.length>1&&editable&&<div className={styles['question-order-controls']} role="group" aria-label={`Position of question ${line.number}`}>
+          <span className={styles['paragraph']}>{line.kind==='multiple_choice'?'Order within multiple choice':'Order of structured questions'}: {position+1} of {sameKind.length}. Answers stay with the question.</span>
+          <button type="button" className={styles['button--secondary']} disabled={position===0} onClick={()=>moveLine(line.id,-1)}>Move earlier</button>
+          <button type="button" className={styles['button--secondary']} disabled={position===sameKind.length-1} onClick={()=>moveLine(line.id,1)}>Move later</button>
         </div>}
       </section>
 
-      {!paid&&<section className={styles.panel} aria-labelledby="outline-heading">
-        <p id="outline-heading" className={styles.eyebrowSlate}>Question outline</p>
-        {line.outline&&line.outline.rows.length?<><p className={styles.help}>One published example structure ({range(line.outline.subquestions)} subquestions). Your paper can differ within the published ranges.</p>
-          <ol className={styles.outline}>{line.outline.rows.map((r,i)=><li key={i}><span>{line.number}.{i+1} {r.summary}</span><span className={`${styles.bloom} ${bloomClass[r.bloom.toLowerCase()]??styles.unclassified}`}>{r.bloom}</span><span>{r.marks?range(r.marks):''}</span></li>)}</ol></>:
-         line.outline?<p className={styles.help}>{range(line.outline.subquestions)} subquestions. A reviewed outline has not been published for this question.</p>:
-         <p className={styles.help}>A reviewed outline has not been published for this question yet.</p>}
+      {!paid&&<section className={styles['card']} aria-labelledby="outline-heading">
+        <p id="outline-heading" className={styles['card__eyebrow--structured']}>Question outline</p>
+        {line.outline&&line.outline.rows.length?<><p className={styles['paragraph']}>One published example structure ({range(line.outline.subquestions)} subquestions). Your paper can differ within the published ranges.</p>
+          <ol className={styles['paper-preview']}>{line.outline.rows.map((r,i)=><li key={i}><span>{line.number}.{i+1} {r.summary}</span><span className={`${styles['tag']} ${bloomClass[r.bloom.toLowerCase()]??styles['tag--unclassified']}`}>{r.bloom}</span><span>{r.marks?range(r.marks):''}</span></li>)}</ol></>:
+         line.outline?<p className={styles['paragraph']}>{range(line.outline.subquestions)} subquestions. A reviewed outline has not been published for this question.</p>:
+         <p className={styles['paragraph']}>A reviewed outline has not been published for this question yet.</p>}
       </section>}
 
-      {!paid&&!view.submitted&&<section className={styles.panel}><p className={styles.eyebrowSlate}>After payment</p><p className={styles.help}>Detailed choices for each question unlock once Stripe confirms your payment. You can still change marks, parts and every other choice until you submit.</p></section>}
+      {!paid&&!view.submitted&&<section className={styles['card']}><p className={styles['card__eyebrow--structured']}>After payment</p><p className={styles['paragraph']}>Detailed choices for each question unlock once Stripe confirms your payment. You can still change marks, parts and every other choice until you submit.</p></section>}
 
-      {paid&&<section className={styles.panel} aria-labelledby="details-heading">
-        <div className={styles.panelHead}><div><p className={styles.eyebrowSlate}>Question {line.number} · {line.title} · {own.marks??'?'} marks</p>
-          <h2 id="details-heading" className={styles.heading}>{line.fields.length?'Set the details':'No further details are needed'}</h2></div>
-          {editable&&line.fields.some(f=>f.allowAutomatic&&!draft.answers.items[line.id]?.[f.id])&&<button type="button" className={styles.linkButton} onClick={chooseAll}>Choose for me on all</button>}</div>
-        {line.configurable==='authored'&&<p className={styles.help}>This question uses its authored details. Parts and cognitive levels are not yet classified.</p>}
-        {line.issues.map((m,i)=><p key={i} role="alert" className={styles.attention}>{m}</p>)}
-        {(line.parts.length>1||line.parts.some(p=>!p.locked))&&<fieldset className={styles.field}><legend>What the question covers</legend><span className={styles.fieldNote} aria-hidden="true">Include or leave out each part</span>
-          <ol className={styles.parts}>{line.parts.map(p=><li key={p.id} className={p.included?'':styles.left}>
-            <label className={styles.toggle}><input type="checkbox" checked={p.included} disabled={!editable||p.locked} onChange={e=>togglePart(p.id,e.target.checked)}/><span aria-hidden="true" className={styles.switch}/> <span className={styles.partNo}>{line.number}.{p.number}</span> <span className={styles.partText}>{p.summary}</span></label>
-            <span className={`${styles.bloom} ${bloomClass[p.bloom??(p.bloomOptions.length?'grouped':'unclassified')]}`} title={p.bloomBasis==='profile-authorised-fallback'?'Taken from the curriculum level under the agreed Grade 10 assumption':p.bloomBasis==='profile-single-mapping'?'Taken from the curriculum level':p.bloomOptions.length?'The curriculum level allows either category; the source does not say which':undefined}>
+      {paid&&<section className={styles['card']} aria-labelledby="details-heading">
+        <div className={styles['card__header']}><div><p className={styles['card__eyebrow--structured']}>Question {line.number} · {line.title} · {own.marks??'?'} marks</p>
+          <h2 id="details-heading" className={styles['card__title']}>{line.fields.length?'Set the details':'No further details are needed'}</h2></div>
+          {editable&&line.fields.some(f=>f.allowAutomatic&&!draft.answers.items[line.id]?.[f.id])&&<button type="button" className={styles['button--text']} onClick={chooseAll}>Choose for me on all</button>}</div>
+        {line.configurable==='authored'&&<p className={styles['paragraph']}>This question uses its authored details. Parts and cognitive levels are not yet classified.</p>}
+        {line.issues.map((m,i)=><p key={i} role="alert" className={styles['notice--error']}>{m}</p>)}
+        {(line.parts.length>1||line.parts.some(p=>!p.locked))&&<fieldset className={styles['choice-field']}><legend>What the question covers</legend><span className={styles['choice-field__message']} aria-hidden="true">Include or leave out each part</span>
+          <ol className={styles['subquestion-list']}>{line.parts.map(p=><li key={p.id} className={p.included?'':styles['subquestion-toggle--excluded']}>
+            <label className={styles['subquestion-toggle__control']}><input type="checkbox" checked={p.included} disabled={!editable||p.locked} onChange={e=>togglePart(p.id,e.target.checked)}/><span aria-hidden="true" className={styles['switch']}/> <span className={styles['subquestion-toggle__number']}>{line.number}.{p.number}</span> <span className={styles['subquestion-toggle__text']}>{p.summary}</span></label>
+            <span className={`${styles['tag']} ${bloomClass[p.bloom??(p.bloomOptions.length?'grouped':'unclassified')]}`} title={p.bloomBasis==='profile-authorised-fallback'?'Taken from the curriculum level under the agreed Grade 10 assumption':p.bloomBasis==='profile-single-mapping'?'Taken from the curriculum level':p.bloomOptions.length?'The curriculum level allows either category; the source does not say which':undefined}>
               {p.bloom?p.bloom.charAt(0).toUpperCase()+p.bloom.slice(1):p.bloomOptions.length?groupLabel(p.bloomOptions.join('-or-')):'Not yet classified'}</span>
-            {p.band?<span className={styles.band}>Curriculum band {p.band}</span>:<span/>}
-            <span className={styles.partMarks}>{p.included?(p.marks?range(p.marks):'—'):<em>Left out</em>}</span>
-            {p.learnerDrawn&&<span className={styles.help}>Learners draw this themselves</span>}
-            {p.reason&&<span className={styles.help}>{p.reason}</span>}
-            {attentionFor(p.id,'part')&&<span role="alert" className={styles.attention}>{attentionFor(p.id,'part')!.message}</span>}
+            {p.band?<span className={styles['subquestion-toggle__level']}>Curriculum band {p.band}</span>:<span/>}
+            <span className={styles['subquestion-toggle__marks']}>{p.included?(p.marks?range(p.marks):'—'):<em>Left out</em>}</span>
+            {p.learnerDrawn&&<span className={styles['paragraph']}>Learners draw this themselves</span>}
+            {p.reason&&<span className={styles['paragraph']}>{p.reason}</span>}
+            {attentionFor(p.id,'part')&&<span role="alert" className={styles['notice--error']}>{attentionFor(p.id,'part')!.message}</span>}
           </li>)}</ol></fieldset>}
-        {line.diagram&&<div className={styles.note}><strong>{line.diagram.locked?'Stimulus diagram set by your choices':line.diagram.stimulus==='required'?'This question needs its diagram':line.diagram.stimulus==='not_applicable'?'No stimulus diagram for this question':'Stimulus diagram'}</strong>
+        {line.diagram&&<div className={styles['notice--info']}><strong>{line.diagram.locked?'Stimulus diagram set by your choices':line.diagram.stimulus==='required'?'This question needs its diagram':line.diagram.stimulus==='not_applicable'?'No stimulus diagram for this question':'Stimulus diagram'}</strong>
           <span>{line.diagram.learnerDrawn.length?'A drawing learners make themselves is a separate part and is not affected by the stimulus diagram choice.':'The stimulus diagram is what learners are given; it is separate from anything learners draw.'}</span></div>}
         {line.fields.map(f=><Chips key={f.id} name={`q-${line.id}`} field={f} facet={line.facets.find(x=>x.id===f.id)} value={draft.answers.items[line.id]?.[f.id]} disabled={!editable}
           attention={attentionFor(f.id)} onChange={a=>setAnswer('item',f.id,a)}/>)}
@@ -241,54 +242,54 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
 
     </div>
 
-    <aside className={styles.side} aria-label="Paper status">
-      {paid&&<section className={styles.panel} aria-labelledby="line-summary">
-        <p id="line-summary" className={styles.eyebrowMid}>Question {line.number} {line.ready?'configured':'details'}</p>
-        <div className={styles.summaryBig}><span>{own.marks??'?'} marks</span><strong>{lineStatus(line,paid).ready?'Ready':'In progress'}</strong></div>
-        <ul className={styles.checks}>
-          <li className={styles.ok}>Marks{line.parts.some(p=>!p.locked)?', parts':''} and details remain editable</li>
-          {line.fields.map(f=>{const d=describe(f,draft.answers.items[line.id]?.[f.id]);return <li key={f.id} className={d?styles.ok:''}>{f.label}: {d ?? (f.required?'to choose':'can stay blank')}</li>;})}
+    <aside className={styles['page-body__aside']} aria-label="Paper status">
+      {paid&&<section className={styles['card']} aria-labelledby="line-summary">
+        <p id="line-summary" className={styles['card__eyebrow--neutral']}>Question {line.number} {line.ready?'configured':'details'}</p>
+        <div className={styles['card__summary']}><span>{own.marks??'?'} marks</span><strong>{lineStatus(line,paid).ready?'Ready':'In progress'}</strong></div>
+        <ul className={styles['list']}>
+          <li className={styles['list__item--done']}>Marks{line.parts.some(p=>!p.locked)?', parts':''} and details remain editable</li>
+          {line.fields.map(f=>{const d=describe(f,draft.answers.items[line.id]?.[f.id]);return <li key={f.id} className={d?styles['list__item--done']:''}>{f.label}: {d ?? (f.required?'to choose':'can stay blank')}</li>;})}
         </ul>
       </section>}
-      <section className={styles.panel}>
-        <p className={styles.eyebrowMid}>{view.submitted?'Submitted':'Paper status'}</p>
-        <p className={styles.status} aria-live="polite">{view.submitted?'Submitted for generation':view.statusLabel}</p>
-        {!view.submitted&&paid&&view.outstanding>0&&<p className={styles.help}>{view.outstanding} required {view.outstanding===1?'choice':'choices'} to make. Optional notes can stay blank.</p>}
-        {view.issues.map((m,i)=><p key={i} className={styles.help}>{m}</p>)}
-        <p className={styles.saveState} role="status">{saveText}</p>
-        {save==='conflict'&&<button type="button" className={styles.secondary} onClick={()=>void load()}>Load the latest saved choices</button>}
-        {save==='failed'&&<button type="button" className={styles.secondary} onClick={()=>void flush()}>Try saving again</button>}
-        {error&&<p role="alert" className={styles.attention}>{error}</p>}
+      <section className={styles['card']}>
+        <p className={styles['card__eyebrow--neutral']}>{view.submitted?'Submitted':'Paper status'}</p>
+        <p className={styles['card__meta']} aria-live="polite">{view.submitted?'Submitted for generation':view.statusLabel}</p>
+        {!view.submitted&&paid&&view.outstanding>0&&<p className={styles['paragraph']}>{view.outstanding} required {view.outstanding===1?'choice':'choices'} to make. Optional notes can stay blank.</p>}
+        {view.issues.map((m,i)=><p key={i} className={styles['paragraph']}>{m}</p>)}
+        <p className={styles['save-status']} role="status">{saveText}</p>
+        {save==='conflict'&&<button type="button" className={styles['button--secondary']} onClick={()=>void load()}>Load the latest saved choices</button>}
+        {save==='failed'&&<button type="button" className={styles['button--secondary']} onClick={()=>void flush()}>Try saving again</button>}
+        {error&&<p role="alert" className={styles['notice--error']}>{error}</p>}
       </section>
-      <section className={styles.panel} aria-labelledby="budget-heading">
-        <p id="budget-heading" className={styles.eyebrowMid}>Marks budget</p>
-        <label className={styles.target}>Paper total<input inputMode="numeric" value={draft.targets.paper??''} disabled={!editable} onChange={e=>{const v=e.target.value.trim();update(c=>{c.targets.paper=v===''?null:Number.isInteger(Number(v))?Number(v):c.targets.paper;return c;});}}/></label>
-        {t.sections.map(s=><div key={s.key} className={styles.budgetRow}><label className={styles.sectionTarget}><span>{s.label}</span>
+      <section className={styles['card']} aria-labelledby="budget-heading">
+        <p id="budget-heading" className={styles['card__eyebrow--neutral']}>Marks budget</p>
+        <label className={styles['totals__paper-target']}>Paper total<input inputMode="numeric" value={draft.targets.paper??''} disabled={!editable} onChange={e=>{const v=e.target.value.trim();update(c=>{c.targets.paper=v===''?null:Number.isInteger(Number(v))?Number(v):c.targets.paper;return c;});}}/></label>
+        {t.sections.map(s=><div key={s.key} className={styles['budget-line']}><label className={styles['totals__section-target']}><span>{s.label}</span>
           <input inputMode="numeric" aria-label={`${s.label} section total (optional)`} placeholder="Any" value={draft.targets.sections?.[s.key]??''} disabled={!editable}
             onChange={e=>{const v=e.target.value.trim();update(c=>{const sec={...(c.targets.sections??{})};if(v==='')delete sec[s.key];else if(Number.isInteger(Number(v)))sec[s.key]=Number(v);
               if(Object.keys(sec).length)c.targets.sections=sec;else delete c.targets.sections;return c;});}}/></label>
           <span>{s.allocated}{s.target!==null?` of ${s.target}`:''} marks{s.target!==null&&s.allocated===s.target?' ✓':''}</span>
-          <span className={styles.bar} aria-hidden="true"><i className={s.key==='multiple_choice'?styles.goldFill:styles.slateFill} style={{width:`${s.target?Math.min(100,Math.round(s.allocated/s.target*100)):100}%`}}/></span></div>)}
-        <div className={styles.budgetTotal}><strong>Allocated</strong><strong>{t.allocated} of {t.target??'—'}</strong></div>
-        {t.remaining>0&&<p className={styles.help}>{t.remaining} marks still to allocate</p>}
-        {t.excess>0&&<p className={styles.attention}>{t.excess} marks over the paper total</p>}
+          <span className={styles['meter__track']} aria-hidden="true"><i className={s.key==='multiple_choice'?styles['meter__fill--multiple-choice']:styles['meter__fill--structured']} style={{width:`${s.target?Math.min(100,Math.round(s.allocated/s.target*100)):100}%`}}/></span></div>)}
+        <div className={styles['totals']}><strong>Allocated</strong><strong>{t.allocated} of {t.target??'—'}</strong></div>
+        {t.remaining>0&&<p className={styles['paragraph']}>{t.remaining} marks still to allocate</p>}
+        {t.excess>0&&<p className={styles['notice--error']}>{t.excess} marks over the paper total</p>}
       </section>
-      <section className={styles.panel} aria-labelledby="bloom-heading">
-        <p id="bloom-heading" className={styles.eyebrowMid}>Bloom’s cognitive mix · by marks</p>
-        <ul className={styles.mix}>{view.cognitive.map(r=><li key={r.key}><span>{r.label}</span>
-          <span className={styles.bar} aria-hidden="true"><i className={bloomClass[r.grouped?'grouped':r.key]} style={{width:`${Math.round(r.max/maxBloom*100)}%`}}/></span>
+      <section className={styles['card']} aria-labelledby="bloom-heading">
+        <p id="bloom-heading" className={styles['card__eyebrow--neutral']}>Bloom’s cognitive mix · by marks</p>
+        <ul className={styles['bloom-mix']}>{view.cognitive.map(r=><li key={r.key}><span>{r.label}</span>
+          <span className={styles['meter__track']} aria-hidden="true"><i className={bloomClass[r.grouped?'grouped':r.key]} style={{width:`${Math.round(r.max/maxBloom*100)}%`}}/></span>
           <span>{r.min===r.max?r.min:`${r.min}–${r.max}`}</span></li>)}</ul>
-        <p className={styles.fine}>A range means the final split between parts is decided within their permitted marks. Marks whose level allows two categories are shown together, and marks without a classification as not yet classified; neither is spread across categories.</p>
+        <p className={styles['card__note']}>A range means the final split between parts is decided within their permitted marks. Marks whose level allows two categories are shown together, and marks without a classification as not yet classified; neither is spread across categories.</p>
       </section>
-      {view.curriculum.length>0&&<section className={styles.panel} aria-labelledby="curriculum-heading">
-        <p id="curriculum-heading" className={styles.eyebrowMid}>Curriculum requirements</p>
-        {view.curriculum.map(c=><div key={c.profile}><p className={styles.help}>{c.note}</p>
-          <table className={styles.table}><thead><tr><th scope="col">Curriculum band</th><th scope="col">This paper</th><th scope="col">Target</th></tr></thead>
+      {view.curriculum.length>0&&<section className={styles['card']} aria-labelledby="curriculum-heading">
+        <p id="curriculum-heading" className={styles['card__eyebrow--neutral']}>Curriculum requirements</p>
+        {view.curriculum.map(c=><div key={c.profile}><p className={styles['paragraph']}>{c.note}</p>
+          <table className={styles['data-table']}><thead><tr><th scope="col">Curriculum band</th><th scope="col">This paper</th><th scope="col">Target</th></tr></thead>
             <tbody>{c.rows.map(r=><tr key={r.key}><td>{r.label}</td><td>{r.min===r.max?r.min:`${r.min}–${r.max}`} marks</td><td>{r.target}</td></tr>)}</tbody></table></div>)}
       </section>}
-      {paid&&!view.submitted&&<button type="button" className={styles.primary} disabled={busy||!view.canSubmit||save!=='saved'} onClick={()=>void submit()}>{busy?'Submitting…':'Submit for generation →'}</button>}
-      {!view.submitted&&nextLine&&<button type="button" className={paid?styles.secondaryWide:styles.primary} onClick={()=>go(index+1)}>Next: Question {nextLine.number} →</button>}
-      {paid&&!view.submitted&&<p className={styles.fine}>Once submitted, your choices are fixed for this paper. All four documents are released together.</p>}
+      {paid&&!view.submitted&&<button type="button" className={styles['button--primary']} disabled={busy||!view.canSubmit||save!=='saved'} onClick={()=>void submit()}>{busy?'Submitting…':'Submit for generation →'}</button>}
+      {!view.submitted&&nextLine&&<button type="button" className={paid?styles['button--secondary-wide']:styles['button--primary']} onClick={()=>go(index+1)}>Next: Question {nextLine.number} →</button>}
+      {paid&&!view.submitted&&<p className={styles['card__note']}>Once submitted, your choices are fixed for this paper. All four documents are released together.</p>}
     </aside>
   </div></>;
 }

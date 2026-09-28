@@ -1,0 +1,3859 @@
+{
+  "meta": {
+    "last_updated": "2026-09-28"
+  },
+  "fileId": "01M36MRM9HCJ4T87N081XDT4MX",
+  "modules": {
+    "app/(accounts)/accounts.module.css": {
+      "shell": {
+        "class": "site-shell",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "nav": {
+        "class": "site-nav",
+        "paperNode": "3JI-0",
+        "source": "Paper layer"
+      },
+      "brand": {
+        "class": "site-nav__brand",
+        "paperNode": "3JJ-0",
+        "source": "Paper layer"
+      },
+      "main": {
+        "class": "page-body",
+        "paperNode": "3MR-0",
+        "source": "Paper layer"
+      },
+      "card": {
+        "class": "card",
+        "paperNode": "195-0",
+        "source": "Paper layer"
+      },
+      "eyebrow": {
+        "class": "card__eyebrow",
+        "paperNode": "603-0",
+        "source": "Paper layer"
+      },
+      "notice": {
+        "class": "notice--info",
+        "paperNode": "71Z-0",
+        "source": "Paper layer"
+      },
+      "form": {
+        "class": "form",
+        "paperNode": "3ZU-0",
+        "source": "Paper layer"
+      },
+      "button": {
+        "class": "button--primary",
+        "paperNode": "5GA-0",
+        "source": "Paper layer"
+      },
+      "error": {
+        "class": "notice--error",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "success": {
+        "class": "notice--success",
+        "paperNode": "63A-0",
+        "source": "Paper layer"
+      },
+      "links": {
+        "class": "card__actions",
+        "paperNode": "71T-0",
+        "source": "Paper layer"
+      },
+      "footer": {
+        "class": "site-footer",
+        "paperNode": "19S-0",
+        "source": "Paper layer"
+      },
+      "details": {
+        "class": "disclosure",
+        "paperNode": "AP-0",
+        "source": "Paper layer"
+      },
+      "wide": {
+        "class": "card--wide",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "review": {
+        "class": "account-review",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "teacherNav": {
+        "class": "site-nav--teacher",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "navLinks": {
+        "class": "site-nav__links",
+        "paperNode": "3JK-0",
+        "source": "Paper layer"
+      }
+    },
+    "app/(accounts)/teacher/paper.module.css": {
+      "page": {
+        "class": "paper-journey",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "withBar": {
+        "class": "paper-journey--with-bottom-bar",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "srOnly": {
+        "class": "visually-hidden",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "demo": {
+        "class": "demo-notice",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "success": {
+        "class": "notice--success",
+        "paperNode": "63A-0",
+        "source": "Paper layer"
+      },
+      "error": {
+        "class": "notice--error",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "emptyState": {
+        "class": "empty-state",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "quietNote": {
+        "class": "paragraph--subtle",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "textLink": {
+        "class": "link",
+        "paperNode": "6N4-0",
+        "source": "Paper layer"
+      },
+      "actionLink": {
+        "class": "button--text",
+        "paperNode": "430-0",
+        "source": "Paper layer"
+      },
+      "eyebrowSlate": {
+        "class": "eyebrow--structured",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "eyebrowSage": {
+        "class": "eyebrow--positive",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "eyebrowMid": {
+        "class": "eyebrow--neutral",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "eyebrowGold": {
+        "class": "eyebrow--inverse",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "eyebrowGoldText": {
+        "class": "eyebrow--multiple-choice",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "groupEyebrow": {
+        "class": "section__eyebrow",
+        "paperNode": "6L1-0",
+        "source": "Paper layer"
+      },
+      "breadcrumb": {
+        "class": "breadcrumb",
+        "paperNode": "3JT-0",
+        "source": "Paper layer"
+      },
+      "backLink": {
+        "class": "breadcrumb__back",
+        "paperNode": "6IA-0",
+        "source": "Paper layer"
+      },
+      "catalogueHeader": {
+        "class": "page-header--catalogue",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pageHeader": {
+        "class": "page-header",
+        "paperNode": "3JS-0",
+        "source": "Paper layer"
+      },
+      "pageTitle": {
+        "class": "page-header__titles",
+        "paperNode": "3K0-0",
+        "source": "Paper layer"
+      },
+      "pageSubtitle": {
+        "class": "page-header__subtitle",
+        "paperNode": "3K2-0",
+        "source": "Paper layer"
+      },
+      "backEyebrow": {
+        "class": "page-header__back",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "stages": {
+        "class": "progress-steps",
+        "paperNode": "3ZD-0",
+        "source": "Paper layer"
+      },
+      "done": {
+        "class": "progress-steps__step--done",
+        "paperNode": "53C-0",
+        "source": "Paper layer"
+      },
+      "now": {
+        "class": "progress-steps__step--current",
+        "paperNode": "3ZE-0",
+        "source": "Paper layer"
+      },
+      "searchWrap": {
+        "class": "search-field__container",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "searchPill": {
+        "class": "search-field",
+        "paperNode": "5NL-0",
+        "source": "Paper layer"
+      },
+      "searchOpen": {
+        "class": "search-field--active",
+        "paperNode": "66M-0",
+        "source": "Paper layer"
+      },
+      "clearSearch": {
+        "class": "search-field__clear",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "typeahead": {
+        "class": "typeahead",
+        "paperNode": "6G1-0",
+        "source": "Paper layer"
+      },
+      "taLabel": {
+        "class": "typeahead__section-title",
+        "paperNode": "6G3-0",
+        "source": "Paper layer"
+      },
+      "taRow": {
+        "class": "typeahead__option",
+        "paperNode": "6GO-0",
+        "source": "Paper layer"
+      },
+      "taActive": {
+        "class": "typeahead__option--focused",
+        "paperNode": "6GH-0",
+        "source": "Paper layer"
+      },
+      "taIcon": {
+        "class": "typeahead__option-icon",
+        "paperNode": "6G5-0",
+        "source": "Paper layer"
+      },
+      "taMain": {
+        "class": "typeahead__option-body",
+        "paperNode": "6G8-0",
+        "source": "Paper layer"
+      },
+      "taCount": {
+        "class": "typeahead__option-count",
+        "paperNode": "6GE-0",
+        "source": "Paper layer"
+      },
+      "taCode": {
+        "class": "typeahead__option-code",
+        "paperNode": "6GI-0",
+        "source": "Paper layer"
+      },
+      "taMarks": {
+        "class": "typeahead__option-marks",
+        "paperNode": "6GN-0",
+        "source": "Paper layer"
+      },
+      "taNone": {
+        "class": "typeahead__empty",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "taFoot": {
+        "class": "typeahead__footer",
+        "paperNode": "6H0-0",
+        "source": "Paper layer"
+      },
+      "overview": {
+        "class": "breadth-strip",
+        "paperNode": "3KI-0",
+        "source": "Paper layer"
+      },
+      "totals": {
+        "class": "breadth-strip__totals",
+        "paperNode": "3KJ-0",
+        "source": "Paper layer"
+      },
+      "bigCount": {
+        "class": "stat",
+        "paperNode": "3KL-0",
+        "source": "Paper layer"
+      },
+      "totalsNote": {
+        "class": "breadth-strip__note",
+        "paperNode": "3KY-0",
+        "source": "Paper layer"
+      },
+      "topics": {
+        "class": "topic-groups",
+        "paperNode": "3L0-0",
+        "source": "Paper layer"
+      },
+      "topicsHead": {
+        "class": "topic-group__header",
+        "paperNode": "3O1-0",
+        "source": "Paper layer"
+      },
+      "tiles": {
+        "class": "topic-group__tiles",
+        "paperNode": "3O5-0",
+        "source": "Paper layer"
+      },
+      "tile": {
+        "class": "topic-tile",
+        "paperNode": "3O6-0",
+        "source": "Paper layer"
+      },
+      "tileOn": {
+        "class": "topic-tile--selected",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "tileName": {
+        "class": "topic-tile__title",
+        "paperNode": "3O7-0",
+        "source": "Paper layer"
+      },
+      "tileCount": {
+        "class": "topic-tile__stats",
+        "paperNode": "3O8-0",
+        "source": "Paper layer"
+      },
+      "tileBar": {
+        "class": "type-split__bar",
+        "paperNode": "3OB-0",
+        "source": "Paper layer"
+      },
+      "splitBar": {
+        "class": "type-split",
+        "paperNode": "3HO-0",
+        "source": "Paper layer"
+      },
+      "slate": {
+        "class": "type-split__segment--structured",
+        "paperNode": "3OC-0",
+        "source": "Paper layer"
+      },
+      "gold": {
+        "class": "type-split__segment--multiple-choice",
+        "paperNode": "3OD-0",
+        "source": "Paper layer"
+      },
+      "showTopics": {
+        "class": "topic-groups__disclosure",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "topicList": {
+        "class": "topic-list",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "topicOn": {
+        "class": "topic-list__item--selected",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "menuFind": {
+        "class": "filter-menu__search",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "compactBreadth": {
+        "class": "breadth-strip--compact",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "filterBar": {
+        "class": "filter-bar",
+        "paperNode": "401-0",
+        "source": "Paper layer"
+      },
+      "pills": {
+        "class": "filter-bar__filters",
+        "paperNode": "405-0",
+        "source": "Paper layer"
+      },
+      "filterWrap": {
+        "class": "filter__container",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pill": {
+        "class": "filter",
+        "paperNode": "406-0",
+        "source": "Paper layer"
+      },
+      "pillActive": {
+        "class": "filter--active",
+        "paperNode": "40Q-0",
+        "source": "Paper layer"
+      },
+      "badge": {
+        "class": "filter__badge",
+        "paperNode": "40S-0",
+        "source": "Paper layer"
+      },
+      "menu": {
+        "class": "filter-menu",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "menuHead": {
+        "class": "filter-menu__header",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "menuEmpty": {
+        "class": "filter-menu__empty",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "option": {
+        "class": "filter-menu__option",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "box": {
+        "class": "checkbox",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "optionLabel": {
+        "class": "filter-menu__option-label",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "optionCount": {
+        "class": "filter-menu__option-count",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "optionEmpty": {
+        "class": "filter-menu__option--empty",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "menuFoot": {
+        "class": "filter-menu__footer",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "primaryPill": {
+        "class": "button--primary-compact",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "secondaryPill": {
+        "class": "button--secondary-compact",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "activeFilters": {
+        "class": "active-filters",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "chip": {
+        "class": "active-filters__chip",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "clearAll": {
+        "class": "button--clear",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "group": {
+        "class": "catalogue-group",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "groupLabel": {
+        "class": "catalogue-group__title",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "grid": {
+        "class": "catalogue-grid",
+        "paperNode": "41S-0",
+        "source": "Paper layer"
+      },
+      "card": {
+        "class": "catalogue-card",
+        "paperNode": "434-0",
+        "source": "Paper layer"
+      },
+      "cardAdded": {
+        "class": "catalogue-card--added",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "cardUnavailable": {
+        "class": "catalogue-card--unavailable",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "cardMarks": {
+        "class": "catalogue-card__marks",
+        "paperNode": "43T-0",
+        "source": "Paper layer"
+      },
+      "cardTitle": {
+        "class": "catalogue-card__title",
+        "paperNode": "43W-0",
+        "source": "Paper layer"
+      },
+      "typeRow": {
+        "class": "catalogue-card__header",
+        "paperNode": "43X-0",
+        "source": "Paper layer"
+      },
+      "kindStructured": {
+        "class": "catalogue-card__type--structured",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "kindMcq": {
+        "class": "catalogue-card__type--multiple-choice",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "code": {
+        "class": "catalogue-card__code",
+        "paperNode": "43Y-0",
+        "source": "Paper layer"
+      },
+      "diagramBox": {
+        "class": "catalogue-card__diagram",
+        "paperNode": "43K-0",
+        "source": "Paper layer"
+      },
+      "cardCompact": {
+        "class": "catalogue-card--compact",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "metaRow": {
+        "class": "catalogue-card__meta",
+        "paperNode": "43B-0",
+        "source": "Paper layer"
+      },
+      "unavailableNote": {
+        "class": "catalogue-card__unavailable-note",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "cardFooter": {
+        "class": "catalogue-card__footer",
+        "paperNode": "435-0",
+        "source": "Paper layer"
+      },
+      "topicChip": {
+        "class": "catalogue-card__topic",
+        "paperNode": "439-0",
+        "source": "Paper layer"
+      },
+      "add": {
+        "class": "catalogue-card__add",
+        "paperNode": "436-0",
+        "source": "Paper layer"
+      },
+      "added": {
+        "class": "catalogue-card__add--added",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "addSmall": {
+        "class": "catalogue-card__add--compact",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "addOff": {
+        "class": "catalogue-card__add--unavailable",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "paperBar": {
+        "class": "bottom-bar",
+        "paperNode": "5FU-0",
+        "source": "Paper layer"
+      },
+      "barTitle": {
+        "class": "bottom-bar__paper",
+        "paperNode": "5FV-0",
+        "source": "Paper layer"
+      },
+      "meter": {
+        "class": "meter",
+        "paperNode": "3N8-0",
+        "source": "Paper layer"
+      },
+      "track": {
+        "class": "meter__track",
+        "paperNode": "5G2-0",
+        "source": "Paper layer"
+      },
+      "fillStructured": {
+        "class": "meter__fill--structured",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "fillMc": {
+        "class": "meter__fill--multiple-choice",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "barActions": {
+        "class": "bottom-bar__actions",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "barState": {
+        "class": "bottom-bar__status",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "barButton": {
+        "class": "bottom-bar__button",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "otherCurriculum": {
+        "class": "curriculum-suggestions",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "detailHero": {
+        "class": "question-hero",
+        "paperNode": "6II-0",
+        "source": "Paper layer"
+      },
+      "gallery": {
+        "class": "gallery",
+        "paperNode": "6IJ-0",
+        "source": "Paper layer"
+      },
+      "galleryFrame": {
+        "class": "gallery__main",
+        "paperNode": "6IK-0",
+        "source": "Paper layer"
+      },
+      "galleryLabel": {
+        "class": "gallery__caption",
+        "paperNode": "6IY-0",
+        "source": "Paper layer"
+      },
+      "galleryEmpty": {
+        "class": "gallery__empty",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "scenarioLine": {
+        "class": "gallery__scenario-header",
+        "paperNode": "6ST-0",
+        "source": "Paper layer"
+      },
+      "buyPanel": {
+        "class": "buy-panel",
+        "paperNode": "6J0-0",
+        "source": "Paper layer"
+      },
+      "detailSub": {
+        "class": "buy-panel__subtitle",
+        "paperNode": "6K6-0",
+        "source": "Paper layer"
+      },
+      "detailMarks": {
+        "class": "buy-panel__marks",
+        "paperNode": "6K7-0",
+        "source": "Paper layer"
+      },
+      "chips": {
+        "class": "buy-panel__facts",
+        "paperNode": "6KA-0",
+        "source": "Paper layer"
+      },
+      "effect": {
+        "class": "budget-impact",
+        "paperNode": "6KL-0",
+        "source": "Paper layer"
+      },
+      "effectLabel": {
+        "class": "budget-impact__eyebrow",
+        "paperNode": "6KM-0",
+        "source": "Paper layer"
+      },
+      "effectBar": {
+        "class": "budget-impact__track",
+        "paperNode": "6KN-0",
+        "source": "Paper layer"
+      },
+      "effectUsed": {
+        "class": "budget-impact__fill",
+        "paperNode": "6KO-0",
+        "source": "Paper layer"
+      },
+      "effectThis": {
+        "class": "budget-impact__fill--range",
+        "paperNode": "6KP-0",
+        "source": "Paper layer"
+      },
+      "effectText": {
+        "class": "budget-impact__text",
+        "paperNode": "6KQ-0",
+        "source": "Paper layer"
+      },
+      "detailAdd": {
+        "class": "buy-panel__actions",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "primaryWide": {
+        "class": "button--primary-wide",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "payButton": {
+        "class": "button--pay",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "secondaryWide": {
+        "class": "button--secondary-wide",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "unavailableBox": {
+        "class": "notice--unavailable",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "detailNote": {
+        "class": "buy-panel__note",
+        "paperNode": "6KX-0",
+        "source": "Paper layer"
+      },
+      "structure": {
+        "class": "question-structure",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "structureIntro": {
+        "class": "question-structure__intro",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "mix": {
+        "class": "bloom-mix",
+        "paperNode": "6L4-0",
+        "source": "Paper layer"
+      },
+      "mixLabels": {
+        "class": "bloom-mix__legend",
+        "paperNode": "6LA-0",
+        "source": "Paper layer"
+      },
+      "partsTable": {
+        "class": "parts-table",
+        "paperNode": "6LE-0",
+        "source": "Paper layer"
+      },
+      "partsEmpty": {
+        "class": "parts-table__empty",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "related": {
+        "class": "related-questions",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "relatedHead": {
+        "class": "related-questions__header",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "mcqRow": {
+        "class": "multiple-choice-grid",
+        "paperNode": "6N5-0",
+        "source": "Paper layer"
+      },
+      "mcqMini": {
+        "class": "multiple-choice-card--compact",
+        "paperNode": "6N6-0",
+        "source": "Paper layer"
+      },
+      "miniTop": {
+        "class": "multiple-choice-card__header",
+        "paperNode": "6N7-0",
+        "source": "Paper layer"
+      },
+      "miniTitle": {
+        "class": "multiple-choice-card__title",
+        "paperNode": "6NA-0",
+        "source": "Paper layer"
+      },
+      "miniFoot": {
+        "class": "multiple-choice-card__footer",
+        "paperNode": "6NB-0",
+        "source": "Paper layer"
+      },
+      "bloomTag": {
+        "class": "tag",
+        "paperNode": "6KB-0",
+        "source": "Paper layer"
+      },
+      "bRemember": {
+        "class": "tag--remember",
+        "paperNode": "6LQ-0",
+        "source": "Paper layer"
+      },
+      "bUnderstand": {
+        "class": "tag--understand",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "bApply": {
+        "class": "tag--apply",
+        "paperNode": "6LY-0",
+        "source": "Paper layer"
+      },
+      "bAnalyse": {
+        "class": "tag--analyse",
+        "paperNode": "6MU-0",
+        "source": "Paper layer"
+      },
+      "bEvaluate": {
+        "class": "tag--evaluate",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "bCreate": {
+        "class": "tag--create",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "bUnclassified": {
+        "class": "tag--unclassified",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "bloomBar": {
+        "class": "bloom-mix__bar",
+        "paperNode": "6L6-0",
+        "source": "Paper layer"
+      },
+      "twoCol": {
+        "class": "page-body",
+        "paperNode": "3MR-0",
+        "source": "Paper layer"
+      },
+      "mainCol": {
+        "class": "page-body__main",
+        "paperNode": "600-0",
+        "source": "Paper layer"
+      },
+      "rail": {
+        "class": "page-body__aside",
+        "paperNode": "611-0",
+        "source": "Paper layer"
+      },
+      "railCard": {
+        "class": "card",
+        "paperNode": "195-0",
+        "source": "Paper layer"
+      },
+      "panelCard": {
+        "class": "card--panel",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "sectionCard": {
+        "class": "section",
+        "paperNode": "6KZ-0",
+        "source": "Paper layer"
+      },
+      "flush": {
+        "class": "section--flush",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "sectionHead": {
+        "class": "section__header",
+        "paperNode": "6L0-0",
+        "source": "Paper layer"
+      },
+      "sectionText": {
+        "class": "section__body",
+        "paperNode": "6L3-0",
+        "source": "Paper layer"
+      },
+      "topGold": {
+        "class": "section--multiple-choice",
+        "paperNode": "3GF-0",
+        "source": "Paper layer"
+      },
+      "topSlate": {
+        "class": "section--structured",
+        "paperNode": "36W-0",
+        "source": "Paper layer"
+      },
+      "topSage": {
+        "class": "section--order",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "topNavy": {
+        "class": "section--summary",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "sectionMeta": {
+        "class": "section__meta",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "sectionFoot": {
+        "class": "section__footer",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "mcChips": {
+        "class": "multiple-choice-chips",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "chipBad": {
+        "class": "multiple-choice-chips__item--invalid",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "table": {
+        "class": "question-table",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "tableHead": {
+        "class": "question-table__head",
+        "paperNode": "373-0",
+        "source": "Paper layer"
+      },
+      "tableRow": {
+        "class": "question-table__row",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "mcGrid": {
+        "class": "question-table--multiple-choice",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "qNumber": {
+        "class": "question-table__cell--number",
+        "paperNode": "37L-0",
+        "source": "Paper layer"
+      },
+      "qNumberGold": {
+        "class": "question-table__number--multiple-choice",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "qTitle": {
+        "class": "question-table__cell--question",
+        "paperNode": "37M-0",
+        "source": "Paper layer"
+      },
+      "titleButton": {
+        "class": "question-table__title",
+        "paperNode": "37N-0",
+        "source": "Paper layer"
+      },
+      "marksCell": {
+        "class": "question-table__cell--marks",
+        "paperNode": "37P-0",
+        "source": "Paper layer"
+      },
+      "stepper": {
+        "class": "stepper",
+        "paperNode": "71P-0",
+        "source": "Paper layer"
+      },
+      "invalid": {
+        "class": "marks-control--invalid",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "mixCell": {
+        "class": "question-table__cell--bloom",
+        "paperNode": "37S-0",
+        "source": "Paper layer"
+      },
+      "rowStatus": {
+        "class": "question-table__cell--status",
+        "paperNode": "37Y-0",
+        "source": "Paper layer"
+      },
+      "ok": {
+        "class": "status--ready",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "todo": {
+        "class": "status--to-complete",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "bad": {
+        "class": "status--invalid",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "rowEnd": {
+        "class": "question-table__cell--actions",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "rowActions": {
+        "class": "question-table__actions",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "iconButton": {
+        "class": "button--icon",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "removeButton": {
+        "class": "button--remove",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "topicCell": {
+        "class": "question-table__cell--topic",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "swapOpen": {
+        "class": "question-table__row--selected",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "swapPanel": {
+        "class": "swap-panel",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "statusBig": {
+        "class": "card__summary",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "railText": {
+        "class": "card__body",
+        "paperNode": "71S-0",
+        "source": "Paper layer"
+      },
+      "railFine": {
+        "class": "card__note",
+        "paperNode": "6FW-0",
+        "source": "Paper layer"
+      },
+      "railFigures": {
+        "class": "card__figures",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "budgetInput": {
+        "class": "totals__paper-target",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "sectionInput": {
+        "class": "totals__section-target",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "budgetRow": {
+        "class": "budget-line",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "budgetBar": {
+        "class": "budget-line__bar",
+        "paperNode": "3IZ-0",
+        "source": "Paper layer"
+      },
+      "budgetGap": {
+        "class": "budget-line__gap",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "budgetTotal": {
+        "class": "totals",
+        "paperNode": "60Y-0",
+        "source": "Paper layer"
+      },
+      "warnText": {
+        "class": "notice__warning",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "okText": {
+        "class": "notice__success",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "railActions": {
+        "class": "page-body__actions",
+        "paperNode": "53T-0",
+        "source": "Paper layer"
+      },
+      "saveLine": {
+        "class": "save-status",
+        "paperNode": "3M9-0",
+        "source": "Paper layer"
+      },
+      "panelHead": {
+        "class": "card__header",
+        "paperNode": "602-0",
+        "source": "Paper layer"
+      },
+      "panelLead": {
+        "class": "card__lead",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "rangeTrack": {
+        "class": "range-ruler",
+        "paperNode": "4E5-0",
+        "source": "Paper layer"
+      },
+      "on": {
+        "class": "range-ruler__segment--current",
+        "paperNode": "4EA-0",
+        "source": "Paper layer"
+      },
+      "infoBox": {
+        "class": "notice--info",
+        "paperNode": "71Z-0",
+        "source": "Paper layer"
+      },
+      "partsList": {
+        "class": "subquestion-list",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "partNo": {
+        "class": "subquestion-toggle__number",
+        "paperNode": "4FM-0",
+        "source": "Paper layer"
+      },
+      "allocationBig": {
+        "class": "marks-fixed__value",
+        "paperNode": "37Q-0",
+        "source": "Paper layer"
+      },
+      "checks": {
+        "class": "list",
+        "paperNode": "54V-0",
+        "source": "Paper layer"
+      },
+      "railHead": {
+        "class": "card__heading",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "softTag": {
+        "class": "status-tag",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "paperPreview": {
+        "class": "paper-preview",
+        "paperNode": "546-0",
+        "source": "Paper layer"
+      },
+      "previewItalic": {
+        "class": "paper-preview__intro",
+        "paperNode": "54M-0",
+        "source": "Paper layer"
+      },
+      "balance": {
+        "class": "topic-balance",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "blocks": {
+        "class": "card__blocks",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "reviewList": {
+        "class": "question-list",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "reviewState": {
+        "class": "question-list__status",
+        "paperNode": "607-0",
+        "source": "Paper layer"
+      },
+      "reviewTotal": {
+        "class": "question-list__total",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "docs": {
+        "class": "download-list",
+        "paperNode": "625-0",
+        "source": "Paper layer"
+      },
+      "docSage": {
+        "class": "download-list__item--question-paper",
+        "paperNode": "626-0",
+        "source": "Paper layer"
+      },
+      "docTerracotta": {
+        "class": "download-list__item--marking-memo",
+        "paperNode": "629-0",
+        "source": "Paper layer"
+      },
+      "docGold": {
+        "class": "download-list__item--learner-memo",
+        "paperNode": "62C-0",
+        "source": "Paper layer"
+      },
+      "docNavy": {
+        "class": "download-list__item--teacher-description",
+        "paperNode": "62F-0",
+        "source": "Paper layer"
+      },
+      "nextSteps": {
+        "class": "steps",
+        "paperNode": "62K-0",
+        "source": "Paper layer"
+      },
+      "orderLine": {
+        "class": "order-summary__line",
+        "paperNode": "634-0",
+        "source": "Paper layer"
+      },
+      "orderTotal": {
+        "class": "order-summary__total",
+        "paperNode": "637-0",
+        "source": "Paper layer"
+      },
+      "readiness": {
+        "class": "notice--ready",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "readinessTodo": {
+        "class": "notice--not-ready",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "payNote": {
+        "class": "order-summary__note",
+        "paperNode": "63J-0",
+        "source": "Paper layer"
+      },
+      "homeHero": {
+        "class": "page-header--curriculum",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "homeTitle": {
+        "class": "page-header__title",
+        "paperNode": "3K1-0",
+        "source": "Paper layer"
+      },
+      "homeLead": {
+        "class": "page-header__lead",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "startPanel": {
+        "class": "cta",
+        "paperNode": "3MH-0",
+        "source": "Paper layer"
+      },
+      "homeRow": {
+        "class": "curriculum-home__columns",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "homeH2": {
+        "class": "section__title",
+        "paperNode": "6L2-0",
+        "source": "Paper layer"
+      },
+      "draftCard": {
+        "class": "draft-card",
+        "paperNode": "3MU-0",
+        "source": "Paper layer"
+      },
+      "draftHead": {
+        "class": "draft-card__header",
+        "paperNode": "3MV-0",
+        "source": "Paper layer"
+      },
+      "tagWarm": {
+        "class": "status-tag--unpaid",
+        "paperNode": "3MZ-0",
+        "source": "Paper layer"
+      },
+      "draftSub": {
+        "class": "draft-card__meta",
+        "paperNode": "3MY-0",
+        "source": "Paper layer"
+      },
+      "draftStats": {
+        "class": "draft-card__stats",
+        "paperNode": "3N1-0",
+        "source": "Paper layer"
+      },
+      "draftState": {
+        "class": "draft-card__status",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "linkList": {
+        "class": "past-paper-list",
+        "paperNode": "3NI-0",
+        "source": "Paper layer"
+      },
+      "curricula": {
+        "class": "curriculum-grid",
+        "paperNode": "3HC-0",
+        "source": "Paper layer"
+      },
+      "curriculumCurrent": {
+        "class": "curriculum-card--current",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "curriculumCount": {
+        "class": "curriculum-card__count",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "splitLabels": {
+        "class": "type-split__legend",
+        "paperNode": "3HS-0",
+        "source": "Paper layer"
+      },
+      "shapeTop": {
+        "class": "paper-shape__header",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "shapeCard": {
+        "class": "paper-shape",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "field": {
+        "class": "form-field",
+        "paperNode": "40X-0",
+        "source": "Paper layer"
+      },
+      "fieldHint": {
+        "class": "form-field__hint",
+        "paperNode": "422-0",
+        "source": "Paper layer"
+      },
+      "unitInput": {
+        "class": "number-input",
+        "paperNode": "41X-0",
+        "source": "Paper layer"
+      },
+      "split": {
+        "class": "split-slider",
+        "paperNode": "423-0",
+        "source": "Paper layer"
+      },
+      "splitLabelsRow": {
+        "class": "split-slider__legend",
+        "paperNode": "428-0",
+        "source": "Paper layer"
+      },
+      "threeFields": {
+        "class": "form__row",
+        "paperNode": "42B-0",
+        "source": "Paper layer"
+      },
+      "readonly": {
+        "class": "number-input--readonly",
+        "paperNode": "42I-0",
+        "source": "Paper layer"
+      },
+      "goldEdge": {
+        "class": "number-input--multiple-choice",
+        "paperNode": "42E-0",
+        "source": "Paper layer"
+      },
+      "slateEdge": {
+        "class": "number-input--structured",
+        "paperNode": "42M-0",
+        "source": "Paper layer"
+      },
+      "noteWarm": {
+        "class": "notice--caution",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "formActions": {
+        "class": "form__actions",
+        "paperNode": "42Z-0",
+        "source": "Paper layer"
+      },
+      "shapeHeadline": {
+        "class": "paper-shape__headline",
+        "paperNode": "4F6-0",
+        "source": "Paper layer"
+      },
+      "shapeBlocks": {
+        "class": "paper-shape__bar",
+        "paperNode": "4F7-0",
+        "source": "Paper layer"
+      },
+      "legend": {
+        "class": "legend",
+        "paperNode": "3LT-0",
+        "source": "Paper layer"
+      },
+      "fits": {
+        "class": "paper-shape__feasibility",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "whyNote": {
+        "class": "paper-shape__note",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "formatTitle": {
+        "class": "page-header--formatting",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "form": {
+        "class": "form",
+        "paperNode": "3ZU-0",
+        "source": "Paper layer"
+      },
+      "fieldPair": {
+        "class": "form__pair",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "check": {
+        "class": "form__checkbox",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "previewWrap": {
+        "class": "paper-preview__container",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "preview": {
+        "class": "paper-preview__page",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "answerLines": {
+        "class": "paper-preview__answer-lines",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "tileMore": {
+        "class": "topic-groups__more",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "diagramEmpty": {
+        "class": "catalogue-card__diagram--empty",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      }
+    },
+    "app/(accounts)/teacher/orders/[id]/configure.module.css": {
+      "header": {
+        "class": "page-header",
+        "paperNode": "3JS-0",
+        "source": "Paper layer"
+      },
+      "titleBlock": {
+        "class": "page-header__titles",
+        "paperNode": "3K0-0",
+        "source": "Paper layer"
+      },
+      "eyebrow": {
+        "class": "card__eyebrow",
+        "paperNode": "603-0",
+        "source": "Paper layer"
+      },
+      "eyebrowMid": {
+        "class": "card__eyebrow--neutral",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "eyebrowSage": {
+        "class": "card__eyebrow--positive",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "eyebrowSlate": {
+        "class": "card__eyebrow--structured",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "title": {
+        "class": "page-header__title",
+        "paperNode": "3K1-0",
+        "source": "Paper layer"
+      },
+      "lead": {
+        "class": "page-header__subtitle",
+        "paperNode": "3K2-0",
+        "source": "Paper layer"
+      },
+      "progress": {
+        "class": "progress-steps",
+        "paperNode": "3ZD-0",
+        "source": "Paper layer"
+      },
+      "done": {
+        "class": "progress-steps__step--done",
+        "paperNode": "53C-0",
+        "source": "Paper layer"
+      },
+      "now": {
+        "class": "progress-steps__step--current",
+        "paperNode": "3ZE-0",
+        "source": "Paper layer"
+      },
+      "stepper": {
+        "class": "question-tabs",
+        "paperNode": "649-0",
+        "source": "Paper layer"
+      },
+      "step": {
+        "class": "question-tabs__tab",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "current": {
+        "class": "question-tabs__tab--current",
+        "paperNode": "64E-0",
+        "source": "Paper layer"
+      },
+      "chip": {
+        "class": "chip",
+        "paperNode": "410-0",
+        "source": "Paper layer"
+      },
+      "stepperControl": {
+        "class": "stepper",
+        "paperNode": "71P-0",
+        "source": "Paper layer"
+      },
+      "primary": {
+        "class": "button--primary",
+        "paperNode": "5GA-0",
+        "source": "Paper layer"
+      },
+      "secondary": {
+        "class": "button--secondary",
+        "paperNode": "3I5-0",
+        "source": "Paper layer"
+      },
+      "secondaryWide": {
+        "class": "button--secondary-wide",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "linkButton": {
+        "class": "button--text",
+        "paperNode": "430-0",
+        "source": "Paper layer"
+      },
+      "toggle": {
+        "class": "subquestion-toggle__control",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "stepLabel": {
+        "class": "question-tabs__label",
+        "paperNode": "64B-0",
+        "source": "Paper layer"
+      },
+      "mcqLabel": {
+        "class": "question-tabs__label--multiple-choice",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "stepReady": {
+        "class": "question-tabs__status--ready",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "stepPending": {
+        "class": "question-tabs__status--to-complete",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "layout": {
+        "class": "page-body",
+        "paperNode": "3MR-0",
+        "source": "Paper layer"
+      },
+      "main": {
+        "class": "page-body__main",
+        "paperNode": "600-0",
+        "source": "Paper layer"
+      },
+      "side": {
+        "class": "page-body__aside",
+        "paperNode": "611-0",
+        "source": "Paper layer"
+      },
+      "panel": {
+        "class": "card",
+        "paperNode": "195-0",
+        "source": "Paper layer"
+      },
+      "panelHead": {
+        "class": "card__header",
+        "paperNode": "602-0",
+        "source": "Paper layer"
+      },
+      "heading": {
+        "class": "card__title",
+        "paperNode": "65E-0",
+        "source": "Paper layer"
+      },
+      "help": {
+        "class": "paragraph",
+        "paperNode": "3KZ-0",
+        "source": "Paper layer"
+      },
+      "fine": {
+        "class": "card__note",
+        "paperNode": "6FW-0",
+        "source": "Paper layer"
+      },
+      "status": {
+        "class": "card__meta",
+        "paperNode": "556-0",
+        "source": "Paper layer"
+      },
+      "saveState": {
+        "class": "save-status",
+        "paperNode": "3M9-0",
+        "source": "Paper layer"
+      },
+      "allocation": {
+        "class": "marks-control",
+        "paperNode": "71N-0",
+        "source": "Paper layer"
+      },
+      "marksValue": {
+        "class": "marks-fixed__value",
+        "paperNode": "37Q-0",
+        "source": "Paper layer"
+      },
+      "totalLine": {
+        "class": "card__footer",
+        "paperNode": "71R-0",
+        "source": "Paper layer"
+      },
+      "reorder": {
+        "class": "question-order-controls",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "field": {
+        "class": "choice-field",
+        "paperNode": "41H-0",
+        "source": "Paper layer"
+      },
+      "fieldNote": {
+        "class": "choice-field__message",
+        "paperNode": "65J-0",
+        "source": "Paper layer"
+      },
+      "chips": {
+        "class": "chip-group",
+        "paperNode": "40Z-0",
+        "source": "Paper layer"
+      },
+      "dashed": {
+        "class": "chip--delegate",
+        "paperNode": "65R-0",
+        "source": "Paper layer"
+      },
+      "on": {
+        "class": "chip--selected",
+        "paperNode": "65N-0",
+        "source": "Paper layer"
+      },
+      "off": {
+        "class": "chip--unavailable",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "suggested": {
+        "class": "chip__suggestion",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "link": {
+        "class": "link",
+        "paperNode": "6N4-0",
+        "source": "Paper layer"
+      },
+      "textLabel": {
+        "class": "text-field__label",
+        "paperNode": "6CC-0",
+        "source": "Paper layer"
+      },
+      "text": {
+        "class": "text-input",
+        "paperNode": "41C-0",
+        "source": "Paper layer"
+      },
+      "attention": {
+        "class": "notice--error",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "required": {
+        "class": "notice--required",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "note": {
+        "class": "notice--info",
+        "paperNode": "71Z-0",
+        "source": "Paper layer"
+      },
+      "parts": {
+        "class": "subquestion-list",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "left": {
+        "class": "subquestion-toggle--excluded",
+        "paperNode": "4J5-0",
+        "source": "Paper layer"
+      },
+      "partText": {
+        "class": "subquestion-toggle__text",
+        "paperNode": "4FN-0",
+        "source": "Paper layer"
+      },
+      "partMarks": {
+        "class": "subquestion-toggle__marks",
+        "paperNode": "4FS-0",
+        "source": "Paper layer"
+      },
+      "switch": {
+        "class": "switch",
+        "paperNode": "4JD-0",
+        "source": "Paper layer"
+      },
+      "partNo": {
+        "class": "subquestion-toggle__number",
+        "paperNode": "4FM-0",
+        "source": "Paper layer"
+      },
+      "band": {
+        "class": "subquestion-toggle__level",
+        "paperNode": "4FR-0",
+        "source": "Paper layer"
+      },
+      "bloom": {
+        "class": "tag",
+        "paperNode": "6KB-0",
+        "source": "Paper layer"
+      },
+      "remember": {
+        "class": "tag--remember",
+        "paperNode": "6LQ-0",
+        "source": "Paper layer"
+      },
+      "understand": {
+        "class": "tag--understand",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "apply": {
+        "class": "tag--apply",
+        "paperNode": "6LY-0",
+        "source": "Paper layer"
+      },
+      "analyse": {
+        "class": "tag--analyse",
+        "paperNode": "6MU-0",
+        "source": "Paper layer"
+      },
+      "evaluate": {
+        "class": "tag--evaluate",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "create": {
+        "class": "tag--create",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "unclassified": {
+        "class": "tag--unclassified",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "grouped": {
+        "class": "tag--grouped",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "outline": {
+        "class": "paper-preview",
+        "paperNode": "546-0",
+        "source": "Paper layer"
+      },
+      "summaryBig": {
+        "class": "card__summary",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "checks": {
+        "class": "list",
+        "paperNode": "54V-0",
+        "source": "Paper layer"
+      },
+      "ok": {
+        "class": "list__item--done",
+        "paperNode": "550-0",
+        "source": "Paper layer"
+      },
+      "target": {
+        "class": "totals__paper-target",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "sectionTarget": {
+        "class": "totals__section-target",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "budgetRow": {
+        "class": "budget-line",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "bar": {
+        "class": "meter__track",
+        "paperNode": "5G2-0",
+        "source": "Paper layer"
+      },
+      "budgetTotal": {
+        "class": "totals",
+        "paperNode": "60Y-0",
+        "source": "Paper layer"
+      },
+      "mix": {
+        "class": "bloom-mix",
+        "paperNode": "6L4-0",
+        "source": "Paper layer"
+      },
+      "goldFill": {
+        "class": "meter__fill--multiple-choice",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "slateFill": {
+        "class": "meter__fill--structured",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "table": {
+        "class": "data-table",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "readyBanner": {
+        "class": "notice--complete",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "finalList": {
+        "class": "question-list",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "numGold": {
+        "class": "question-list__number--multiple-choice",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "numSlate": {
+        "class": "question-list__number--structured",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "orderPage": {
+        "class": "order-page",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "orderBack": {
+        "class": "breadcrumb__back",
+        "paperNode": "6IA-0",
+        "source": "Paper layer"
+      },
+      "orderNotices": {
+        "class": "order-page__notices",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "orderMeta": {
+        "class": "order-page__meta",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "orderCard": {
+        "class": "card--order",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "orderEyebrow": {
+        "class": "order-page__eyebrow",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "orderRefresh": {
+        "class": "button--refresh",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      }
+    },
+    "app/page.module.css": {
+      "page": {
+        "class": "home-page",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "logo": {
+        "class": "site-nav__brand",
+        "paperNode": "3JJ-0",
+        "source": "Paper layer"
+      },
+      "logoRevise": {
+        "class": "site-nav__wordmark",
+        "paperNode": "8S-0",
+        "source": "Paper layer"
+      },
+      "logoIt": {
+        "class": "site-nav__wordmark--accent",
+        "paperNode": "8T-0",
+        "source": "Paper layer"
+      },
+      "nav": {
+        "class": "site-nav",
+        "paperNode": "3JI-0",
+        "source": "Paper layer"
+      },
+      "navInner": {
+        "class": "site-nav__inner",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "navCenter": {
+        "class": "site-nav__links",
+        "paperNode": "3JK-0",
+        "source": "Paper layer"
+      },
+      "navCenterLink": {
+        "class": "site-nav__link",
+        "paperNode": "3JN-0",
+        "source": "Paper layer"
+      },
+      "navDivider": {
+        "class": "site-nav__separator",
+        "paperNode": "8W-0",
+        "source": "Paper layer"
+      },
+      "navRight": {
+        "class": "site-nav__actions",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "navLogin": {
+        "class": "site-nav__action",
+        "paperNode": "90-0",
+        "source": "Paper layer"
+      },
+      "hero": {
+        "class": "hero",
+        "paperNode": "A4-0",
+        "source": "Paper layer"
+      },
+      "heroInner": {
+        "class": "hero__content",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "heroEyebrow": {
+        "class": "hero__eyebrow",
+        "paperNode": "A5-0",
+        "source": "Paper layer"
+      },
+      "heroHeadline": {
+        "class": "hero__title",
+        "paperNode": "A7-0",
+        "source": "Paper layer"
+      },
+      "heroSub": {
+        "class": "hero__lead",
+        "paperNode": "A9-0",
+        "source": "Paper layer"
+      },
+      "heroCyclerWrap": {
+        "class": "hero__media",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "heroCtas": {
+        "class": "hero__actions",
+        "paperNode": "B4-0",
+        "source": "Paper layer"
+      },
+      "btnPrimary": {
+        "class": "button--primary",
+        "paperNode": "5GA-0",
+        "source": "Paper layer"
+      },
+      "btnSecondary": {
+        "class": "button--secondary",
+        "paperNode": "3I5-0",
+        "source": "Paper layer"
+      },
+      "sectionEyebrow": {
+        "class": "section__eyebrow",
+        "paperNode": "6L1-0",
+        "source": "Paper layer"
+      },
+      "sectionHeadline": {
+        "class": "section__title",
+        "paperNode": "6L2-0",
+        "source": "Paper layer"
+      },
+      "sectionIntro": {
+        "class": "section__body",
+        "paperNode": "6L3-0",
+        "source": "Paper layer"
+      },
+      "perfectWorldGrid": {
+        "class": "feature-grid",
+        "paperNode": "PC-0",
+        "source": "Paper layer"
+      },
+      "perfectWorldCard": {
+        "class": "feature",
+        "paperNode": "PD-0",
+        "source": "Paper layer"
+      },
+      "perfectWorldLabel": {
+        "class": "feature__title",
+        "paperNode": "PE-0",
+        "source": "Paper layer"
+      },
+      "perfectWorldCardGold": {
+        "class": "feature--question-design",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "perfectWorldCardTerracotta": {
+        "class": "feature--assessment",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "perfectWorldCardSage": {
+        "class": "feature--marking",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "perfectWorldCardNavy": {
+        "class": "feature--remediation",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "realityBridge": {
+        "class": "section--perfect-world",
+        "paperNode": "P9-0",
+        "source": "Paper layer"
+      },
+      "realityBridgeText": {
+        "class": "section__subtitle",
+        "paperNode": "PP-0",
+        "source": "Paper layer"
+      },
+      "realityBridgeHint": {
+        "class": "section__hint",
+        "paperNode": "PR-0",
+        "source": "Paper layer"
+      },
+      "problems": {
+        "class": "home-page__problems",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "problemGrid": {
+        "class": "home-page__problem-grid",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "problemCard": {
+        "class": "home-page__problem-card",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "problemCardBorder": {
+        "class": "home-page__problem-card-border",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "problemTitle": {
+        "class": "home-page__problem-title",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "problemBody": {
+        "class": "home-page__problem-body",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "reveal": {
+        "class": "home-page__reveal",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "revealBelow": {
+        "class": "home-page__reveal-below",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "revealBelowHeadline": {
+        "class": "home-page__reveal-below-headline",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "revealBelowBody": {
+        "class": "home-page__reveal-below-body",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "revealClosing": {
+        "class": "home-page__reveal-closing",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "workTogether": {
+        "class": "section--workflow",
+        "paperNode": "Z0-0",
+        "source": "Paper layer"
+      },
+      "workflowList": {
+        "class": "steps",
+        "paperNode": "62K-0",
+        "source": "Paper layer"
+      },
+      "workflowStep": {
+        "class": "step",
+        "paperNode": "62L-0",
+        "source": "Paper layer"
+      },
+      "workflowLeft": {
+        "class": "step__main",
+        "paperNode": "111-0",
+        "source": "Paper layer"
+      },
+      "workflowRight": {
+        "class": "step__example",
+        "paperNode": "118-0",
+        "source": "Paper layer"
+      },
+      "workflowRightSage": {
+        "class": "home-page__workflow-right-sage",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "workflowRightTerracotta": {
+        "class": "home-page__workflow-right-terracotta",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "workflowRightGold": {
+        "class": "home-page__workflow-right-gold",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "workflowRightNavy": {
+        "class": "home-page__workflow-right-navy",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "workflowIcon": {
+        "class": "step__icon",
+        "paperNode": "112-0",
+        "source": "Paper layer"
+      },
+      "workflowIconSage": {
+        "class": "home-page__workflow-icon-sage",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "workflowIconTerracotta": {
+        "class": "home-page__workflow-icon-terracotta",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "workflowIconGold": {
+        "class": "home-page__workflow-icon-gold",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "workflowIconNavy": {
+        "class": "home-page__workflow-icon-navy",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "workflowStepTitle": {
+        "class": "step__title",
+        "paperNode": "62N-0",
+        "source": "Paper layer"
+      },
+      "workflowStepBody": {
+        "class": "step__body",
+        "paperNode": "62O-0",
+        "source": "Paper layer"
+      },
+      "workflowQuote": {
+        "class": "quote",
+        "paperNode": "Q2-0",
+        "source": "Paper layer"
+      },
+      "workflowArrow": {
+        "class": "steps__connector",
+        "paperNode": "11A-0",
+        "source": "Paper layer"
+      },
+      "workflowFooterBar": {
+        "class": "steps__summary",
+        "paperNode": "158-0",
+        "source": "Paper layer"
+      },
+      "workflowFooterGold": {
+        "class": "steps__summary-line--accent",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successMeasure": {
+        "class": "home-page__success-measure",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successGrid": {
+        "class": "home-page__success-grid",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successCard": {
+        "class": "home-page__success-card",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successCardTerracotta": {
+        "class": "home-page__success-card-terracotta",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successCardSage": {
+        "class": "home-page__success-card-sage",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successCardGold": {
+        "class": "home-page__success-card-gold",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successIconWrap": {
+        "class": "home-page__success-icon-wrap",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successIconTerracotta": {
+        "class": "home-page__success-icon-terracotta",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successIconSage": {
+        "class": "home-page__success-icon-sage",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successIconGold": {
+        "class": "home-page__success-icon-gold",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successCardTitle": {
+        "class": "home-page__success-card-title",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successCardBody": {
+        "class": "home-page__success-card-body",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successFeedbackBtn": {
+        "class": "home-page__success-feedback-btn",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successClosing": {
+        "class": "home-page__success-closing",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "levels": {
+        "class": "home-page__levels",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "levelsStack": {
+        "class": "home-page__levels-stack",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "levelRow": {
+        "class": "home-page__level-row",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "levelNum": {
+        "class": "home-page__level-num",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "levelContent": {
+        "class": "home-page__level-content",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "levelPhase": {
+        "class": "home-page__level-phase",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "levelLabel": {
+        "class": "home-page__level-label",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "levelDesc": {
+        "class": "home-page__level-desc",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "workflow": {
+        "class": "home-page__workflow",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "workflowGrid": {
+        "class": "home-page__workflow-grid",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "workflowCard": {
+        "class": "home-page__workflow-card",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "workflowStepNum": {
+        "class": "home-page__workflow-step-num",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "workflowCardTitle": {
+        "class": "home-page__workflow-card-title",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "workflowCardBody": {
+        "class": "home-page__workflow-card-body",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "workflowClosing": {
+        "class": "home-page__workflow-closing",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "animationBlock": {
+        "class": "home-page__animation-block",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "animationIntro": {
+        "class": "home-page__animation-intro",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "animationFrame": {
+        "class": "home-page__animation-frame",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "animationIframe": {
+        "class": "home-page__animation-iframe",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "animationCaption": {
+        "class": "home-page__animation-caption",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "vision": {
+        "class": "home-page__vision",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "visionEyebrow": {
+        "class": "home-page__vision-eyebrow",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "testimonialQuote": {
+        "class": "home-page__testimonial-quote",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "testimonialAttribution": {
+        "class": "home-page__testimonial-attribution",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "objection": {
+        "class": "home-page__objection",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "objectionHeadline": {
+        "class": "home-page__objection-headline",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "objectionBody": {
+        "class": "home-page__objection-body",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "objectionArchitect": {
+        "class": "home-page__objection-architect",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "cta": {
+        "class": "section--invitation",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "ctaInner": {
+        "class": "section__invitation-content",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "ctaHeadline": {
+        "class": "section__invitation-title",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "ctaBr": {
+        "class": "home-page__cta-br",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "ctaSub": {
+        "class": "section__invitation-body",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotLists": {
+        "class": "home-page__pilot-lists",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotListTitle": {
+        "class": "home-page__pilot-list-title",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotListSage": {
+        "class": "home-page__pilot-list-sage",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotListTerracotta": {
+        "class": "home-page__pilot-list-terracotta",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotBody": {
+        "class": "home-page__pilot-body",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotSummaryBlock": {
+        "class": "home-page__pilot-summary-block",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotSummaryEyebrow": {
+        "class": "home-page__pilot-summary-eyebrow",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotSummaryGrid": {
+        "class": "home-page__pilot-summary-grid",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotSummaryItem": {
+        "class": "home-page__pilot-summary-item",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotSummaryItemSage": {
+        "class": "home-page__pilot-summary-item-sage",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotSummaryItemGold": {
+        "class": "home-page__pilot-summary-item-gold",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotSummaryItemTerracotta": {
+        "class": "home-page__pilot-summary-item-terracotta",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotSummaryLabel": {
+        "class": "home-page__pilot-summary-label",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotSummaryText": {
+        "class": "home-page__pilot-summary-text",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotCta": {
+        "class": "home-page__pilot-cta",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotCtaQuestion": {
+        "class": "home-page__pilot-cta-question",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "btnCtaPrimary": {
+        "class": "home-page__btn-cta-primary",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotSmall": {
+        "class": "home-page__pilot-small",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "ecosystemHint": {
+        "class": "home-page__ecosystem-hint",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "ecosystemText": {
+        "class": "home-page__ecosystem-text",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "catalogueSection": {
+        "class": "section--catalogue",
+        "paperNode": "18W-0",
+        "source": "Paper layer"
+      },
+      "pilotTeaser": {
+        "class": "cta",
+        "paperNode": "3MH-0",
+        "source": "Paper layer"
+      },
+      "pilotTeaserInner": {
+        "class": "cta__layout",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "pilotTeaserLeft": {
+        "class": "cta__content",
+        "paperNode": "3MI-0",
+        "source": "Paper layer"
+      },
+      "pilotTeaserText": {
+        "class": "cta__body",
+        "paperNode": "3ML-0",
+        "source": "Paper layer"
+      },
+      "pilotTeaserRight": {
+        "class": "cta__actions",
+        "paperNode": "19O-0",
+        "source": "Paper layer"
+      },
+      "pilotTeaserDeadline": {
+        "class": "cta__deadline",
+        "paperNode": "19P-0",
+        "source": "Paper layer"
+      },
+      "btnPilotTeaser": {
+        "class": "button--pilot",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "footer": {
+        "class": "site-footer",
+        "paperNode": "19S-0",
+        "source": "Paper layer"
+      },
+      "footerInner": {
+        "class": "site-footer__row",
+        "paperNode": "19T-0",
+        "source": "Paper layer"
+      },
+      "footerLogo": {
+        "class": "site-footer__brand",
+        "paperNode": "19U-0",
+        "source": "Paper layer"
+      },
+      "footerCopy": {
+        "class": "site-footer__text",
+        "paperNode": "19X-0",
+        "source": "Paper layer"
+      },
+      "footerLinks": {
+        "class": "site-footer__links",
+        "paperNode": "19Y-0",
+        "source": "Paper layer"
+      },
+      "footerLink": {
+        "class": "site-footer__link",
+        "paperNode": "19Z-0",
+        "source": "Paper layer"
+      },
+      "transformationCols": {
+        "class": "home-page__transformation-cols",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "transformationColBefore": {
+        "class": "home-page__transformation-col-before",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "transformationCol": {
+        "class": "home-page__transformation-col",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      }
+    },
+    "app/privacy-policy/privacy-policy.module.css": {
+      "page": {
+        "class": "privacy-policy",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "nav": {
+        "class": "site-nav",
+        "paperNode": "3JI-0",
+        "source": "Paper layer"
+      },
+      "navLogo": {
+        "class": "site-nav__brand",
+        "paperNode": "3JJ-0",
+        "source": "Paper layer"
+      },
+      "logoRevise": {
+        "class": "site-nav__wordmark",
+        "paperNode": "8S-0",
+        "source": "Paper layer"
+      },
+      "logoIt": {
+        "class": "site-nav__wordmark--accent",
+        "paperNode": "8T-0",
+        "source": "Paper layer"
+      },
+      "main": {
+        "class": "page-body",
+        "paperNode": "3MR-0",
+        "source": "Paper layer"
+      },
+      "container": {
+        "class": "page-body__container",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "content": {
+        "class": "section",
+        "paperNode": "6KZ-0",
+        "source": "Paper layer"
+      },
+      "footer": {
+        "class": "site-footer",
+        "paperNode": "19S-0",
+        "source": "Paper layer"
+      },
+      "footerCopy": {
+        "class": "site-footer__text",
+        "paperNode": "19X-0",
+        "source": "Paper layer"
+      },
+      "footerLink": {
+        "class": "site-footer__link",
+        "paperNode": "19Z-0",
+        "source": "Paper layer"
+      }
+    },
+    "app/components/Footer/Footer.module.css": {
+      "footer": {
+        "class": "site-footer",
+        "paperNode": "19S-0",
+        "source": "Paper layer"
+      },
+      "footerInner": {
+        "class": "site-footer__row",
+        "paperNode": "19T-0",
+        "source": "Paper layer"
+      },
+      "footerLogo": {
+        "class": "site-footer__brand",
+        "paperNode": "19U-0",
+        "source": "Paper layer"
+      },
+      "logoRevise": {
+        "class": "site-footer__wordmark",
+        "paperNode": "19V-0",
+        "source": "Paper layer"
+      },
+      "logoIt": {
+        "class": "site-footer__wordmark--accent",
+        "paperNode": "19W-0",
+        "source": "Paper layer"
+      },
+      "footerCopy": {
+        "class": "site-footer__text",
+        "paperNode": "19X-0",
+        "source": "Paper layer"
+      },
+      "footerLinks": {
+        "class": "site-footer__links",
+        "paperNode": "19Y-0",
+        "source": "Paper layer"
+      },
+      "footerLink": {
+        "class": "site-footer__link",
+        "paperNode": "19Z-0",
+        "source": "Paper layer"
+      },
+      "footerLegal": {
+        "class": "site-footer__legal",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "footerLegalLink": {
+        "class": "site-footer__legal-link",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      }
+    },
+    "app/components/TimeStarvation/TimeStarvation.module.css": {
+      "section": {
+        "class": "teacher-week",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "headline": {
+        "class": "teacher-week__title",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "intro": {
+        "class": "teacher-week__lead",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "calendarWrap": {
+        "class": "calendar",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "calendarHeader": {
+        "class": "calendar__header",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "timeGutter": {
+        "class": "calendar__gutter",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "dayHeader": {
+        "class": "calendar__day-heading",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "dayHeaderSun": {
+        "class": "calendar__day-heading--sunday",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "scrollWrap": {
+        "class": "calendar__scroll",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "gridContent": {
+        "class": "calendar__grid",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "timeCol": {
+        "class": "calendar__times",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "timeLabel": {
+        "class": "calendar__time",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "dayColumns": {
+        "class": "calendar__days",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "dayCol": {
+        "class": "calendar__day",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "dayColSun": {
+        "class": "calendar__day--sunday",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "hLine": {
+        "class": "calendar__hour-rule",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "halfLine": {
+        "class": "calendar__half-hour-rule",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "block": {
+        "class": "calendar__event",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "blockSm": {
+        "class": "calendar__event--compact",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "blockLabel": {
+        "class": "calendar__event-label",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "blockSub": {
+        "class": "calendar__event-detail",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "blockSmLabel": {
+        "class": "calendar__event-label--compact",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "satBlock": {
+        "class": "teacher-week__sat-block",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "satVisible": {
+        "class": "teacher-week__sat-visible",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "examGroup": {
+        "class": "teacher-week__exam-group",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "cursorWrap": {
+        "class": "teacher-week__cursor-wrap",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "examFloat": {
+        "class": "teacher-week__exam-float",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "examText": {
+        "class": "teacher-week__exam-text",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "examLanded": {
+        "class": "teacher-week__exam-landed",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "fadeTop": {
+        "class": "teacher-week__fade-top",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "fadeBottom": {
+        "class": "teacher-week__fade-bottom",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "caption": {
+        "class": "teacher-week__caption",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "captionVisible": {
+        "class": "teacher-week__caption-visible",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "captionHead": {
+        "class": "teacher-week__caption-head",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "captionBody": {
+        "class": "teacher-week__caption-body",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "replayBtn": {
+        "class": "button--replay",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "mobileList": {
+        "class": "teacher-week__list",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "mobileRow": {
+        "class": "teacher-week__mobile-row",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "mobileRowSun": {
+        "class": "teacher-week__mobile-row-sun",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "mobileDay": {
+        "class": "teacher-week__mobile-day",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "mobileDaySun": {
+        "class": "teacher-week__mobile-day-sun",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "mobileDetail": {
+        "class": "teacher-week__mobile-detail",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "mobileSchool": {
+        "class": "teacher-week__mobile-school",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "mobileGhost": {
+        "class": "teacher-week__mobile-ghost",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "mobileCommit": {
+        "class": "teacher-week__mobile-commit",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "mobileVisible": {
+        "class": "teacher-week__mobile-visible",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "mobileExam": {
+        "class": "teacher-week__mobile-exam",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      }
+    },
+    "app/components/AssessmentJourney/AssessmentJourney.module.css": {
+      "root": {
+        "class": "assessment-journey",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "tabStrip": {
+        "class": "tabs",
+        "paperNode": "YF-0",
+        "source": "Paper layer"
+      },
+      "tab": {
+        "class": "tabs__tab",
+        "paperNode": "YI-0",
+        "source": "Paper layer"
+      },
+      "tabActive": {
+        "class": "tabs__tab--current",
+        "paperNode": "YG-0",
+        "source": "Paper layer"
+      },
+      "tabStep": {
+        "class": "tabs__number",
+        "paperNode": "YJ-0",
+        "source": "Paper layer"
+      },
+      "tabLabel": {
+        "class": "tabs__label",
+        "paperNode": "YH-0",
+        "source": "Paper layer"
+      },
+      "content": {
+        "class": "tabs__panel",
+        "paperNode": "YU-0",
+        "source": "Paper layer"
+      },
+      "copyPanel": {
+        "class": "tabs__copy",
+        "paperNode": "YV-0",
+        "source": "Paper layer"
+      },
+      "copyFading": {
+        "class": "tabs__copy--fading",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "copyEyebrow": {
+        "class": "section__eyebrow",
+        "paperNode": "6L1-0",
+        "source": "Paper layer"
+      },
+      "copyHeadline": {
+        "class": "section__title",
+        "paperNode": "6L2-0",
+        "source": "Paper layer"
+      },
+      "copyTagline": {
+        "class": "section__tagline",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "copyBody": {
+        "class": "section__body",
+        "paperNode": "6L3-0",
+        "source": "Paper layer"
+      },
+      "copyTransformation": {
+        "class": "section__transformation",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "iframeOuter": {
+        "class": "widget",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "iframeInner": {
+        "class": "widget__container",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "iframe": {
+        "class": "widget__frame",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      }
+    },
+    "app/components/HeroCycler/HeroCycler.module.css": {
+      "root": {
+        "class": "carousel",
+        "paperNode": "AT-0",
+        "source": "Paper layer"
+      },
+      "frames": {
+        "class": "carousel__slides",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "frame": {
+        "class": "carousel__slide",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "frameVisible": {
+        "class": "carousel__slide--visible",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "copy": {
+        "class": "carousel__caption",
+        "paperNode": "AV-0",
+        "source": "Paper layer"
+      },
+      "copyVisible": {
+        "class": "carousel__caption--visible",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "copyLabel": {
+        "class": "carousel__eyebrow",
+        "paperNode": "AW-0",
+        "source": "Paper layer"
+      },
+      "copyHeadline": {
+        "class": "carousel__title",
+        "paperNode": "AX-0",
+        "source": "Paper layer"
+      },
+      "copySub": {
+        "class": "carousel__body",
+        "paperNode": "AY-0",
+        "source": "Paper layer"
+      },
+      "dots": {
+        "class": "carousel__dots",
+        "paperNode": "AZ-0",
+        "source": "Paper layer"
+      },
+      "dot": {
+        "class": "carousel__dot",
+        "paperNode": "B0-0",
+        "source": "Paper layer"
+      },
+      "dotActive": {
+        "class": "carousel__dot--active",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      }
+    },
+    "app/components/CatalogueExplorer/CatalogueExplorer.module.css": {
+      "wrapper": {
+        "class": "catalogue-explorer",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "topRow": {
+        "class": "section__header",
+        "paperNode": "6L0-0",
+        "source": "Paper layer"
+      },
+      "topLeft": {
+        "class": "section__content",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "topRight": {
+        "class": "section__aside",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "eyebrow": {
+        "class": "section__eyebrow",
+        "paperNode": "6L1-0",
+        "source": "Paper layer"
+      },
+      "headline": {
+        "class": "section__title",
+        "paperNode": "6L2-0",
+        "source": "Paper layer"
+      },
+      "intro": {
+        "class": "section__body",
+        "paperNode": "6L3-0",
+        "source": "Paper layer"
+      },
+      "selectorCard": {
+        "class": "card",
+        "paperNode": "195-0",
+        "source": "Paper layer"
+      },
+      "selectorCardEyebrow": {
+        "class": "card__eyebrow",
+        "paperNode": "603-0",
+        "source": "Paper layer"
+      },
+      "selectLabel": {
+        "class": "card__title",
+        "paperNode": "65E-0",
+        "source": "Paper layer"
+      },
+      "select": {
+        "class": "select",
+        "paperNode": "673-0",
+        "source": "Paper layer"
+      },
+      "selectorHint": {
+        "class": "card__meta",
+        "paperNode": "556-0",
+        "source": "Paper layer"
+      },
+      "statsStrip": {
+        "class": "stats",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "statItem": {
+        "class": "stat",
+        "paperNode": "3KL-0",
+        "source": "Paper layer"
+      },
+      "statNumber": {
+        "class": "stat__value",
+        "paperNode": "3KM-0",
+        "source": "Paper layer"
+      },
+      "statLabel": {
+        "class": "stat__label",
+        "paperNode": "3KN-0",
+        "source": "Paper layer"
+      },
+      "statDivider": {
+        "class": "stat__divider",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "previewCard": {
+        "class": "card--preview",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "previewVisible": {
+        "class": "card--visible",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "previewImageWrap": {
+        "class": "card__image-container",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "previewImage": {
+        "class": "card__image",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "previewMeta": {
+        "class": "card__meta-row",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "previewCaption": {
+        "class": "card__caption",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "previewHeadline": {
+        "class": "card__heading",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "previewNote": {
+        "class": "card__note",
+        "paperNode": "6FW-0",
+        "source": "Paper layer"
+      },
+      "tallyEmbed": {
+        "class": "form__embed",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "emailNote": {
+        "class": "form__email-note",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "forwardNote": {
+        "class": "form__forward-note",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "btnGetCatalogue": {
+        "class": "button--primary",
+        "paperNode": "5GA-0",
+        "source": "Paper layer"
+      }
+    },
+    "app/components/CountdownTimer/CountdownTimer.module.css": {
+      "timer": {
+        "class": "countdown",
+        "paperNode": "1MW-0",
+        "source": "Paper layer"
+      },
+      "unit": {
+        "class": "countdown__unit",
+        "paperNode": "1MX-0",
+        "source": "Paper layer"
+      },
+      "value": {
+        "class": "countdown__value",
+        "paperNode": "1MY-0",
+        "source": "Paper layer"
+      },
+      "label": {
+        "class": "countdown__label",
+        "paperNode": "1MZ-0",
+        "source": "Paper layer"
+      }
+    },
+    "app/components/RealityShowcase/RealityShowcase.module.css": {
+      "root": {
+        "class": "showcase",
+        "paperNode": "PX-0",
+        "source": "Paper layer"
+      },
+      "selector": {
+        "class": "showcase__selector",
+        "paperNode": "PY-0",
+        "source": "Paper layer"
+      },
+      "card": {
+        "class": "quote",
+        "paperNode": "Q2-0",
+        "source": "Paper layer"
+      },
+      "cardActive": {
+        "class": "quote--active",
+        "paperNode": "PZ-0",
+        "source": "Paper layer"
+      },
+      "cardLabel": {
+        "class": "quote__title",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "cardQuote": {
+        "class": "quote__text",
+        "paperNode": "Q1-0",
+        "source": "Paper layer"
+      },
+      "cardQuoteMark": {
+        "class": "quote__mark",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "preview": {
+        "class": "showcase__preview",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "previewFading": {
+        "class": "showcase__preview--fading",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "iframeShell": {
+        "class": "widget",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "iframe": {
+        "class": "widget__frame",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      }
+    },
+    "app/pilot/pilot.module.css": {
+      "page": {
+        "class": "pilot",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "nav": {
+        "class": "site-nav",
+        "paperNode": "3JI-0",
+        "source": "Paper layer"
+      },
+      "navLogo": {
+        "class": "site-nav__brand",
+        "paperNode": "3JJ-0",
+        "source": "Paper layer"
+      },
+      "logoRevise": {
+        "class": "site-nav__wordmark",
+        "paperNode": "8S-0",
+        "source": "Paper layer"
+      },
+      "logoIt": {
+        "class": "site-nav__wordmark--accent",
+        "paperNode": "8T-0",
+        "source": "Paper layer"
+      },
+      "navHome": {
+        "class": "site-nav__back",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "hero": {
+        "class": "hero",
+        "paperNode": "A4-0",
+        "source": "Paper layer"
+      },
+      "heroEyebrow": {
+        "class": "hero__eyebrow",
+        "paperNode": "A5-0",
+        "source": "Paper layer"
+      },
+      "heroHeadline": {
+        "class": "hero__title",
+        "paperNode": "A7-0",
+        "source": "Paper layer"
+      },
+      "heroSub": {
+        "class": "hero__lead",
+        "paperNode": "A9-0",
+        "source": "Paper layer"
+      },
+      "deadline": {
+        "class": "cta__deadline",
+        "paperNode": "19P-0",
+        "source": "Paper layer"
+      },
+      "btnApply": {
+        "class": "button--primary",
+        "paperNode": "5GA-0",
+        "source": "Paper layer"
+      },
+      "sectionEyebrow": {
+        "class": "section__eyebrow",
+        "paperNode": "6L1-0",
+        "source": "Paper layer"
+      },
+      "sectionHeadline": {
+        "class": "section__title",
+        "paperNode": "6L2-0",
+        "source": "Paper layer"
+      },
+      "offer": {
+        "class": "section--offer",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "offerGrid": {
+        "class": "feature-grid",
+        "paperNode": "PC-0",
+        "source": "Paper layer"
+      },
+      "offerCard": {
+        "class": "feature",
+        "paperNode": "PD-0",
+        "source": "Paper layer"
+      },
+      "offerCardTerracotta": {
+        "class": "feature--assessment",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "offerCardSage": {
+        "class": "feature--design",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "offerCardGold": {
+        "class": "feature--marking",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "offerCardNavy": {
+        "class": "feature--remediation",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "offerCardNumber": {
+        "class": "feature__number",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "offerCardTitle": {
+        "class": "feature__title",
+        "paperNode": "PE-0",
+        "source": "Paper layer"
+      },
+      "offerCardBody": {
+        "class": "feature__body",
+        "paperNode": "PF-0",
+        "source": "Paper layer"
+      },
+      "journey": {
+        "class": "section--journey",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "journeyIntro": {
+        "class": "section__lead",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "journeyList": {
+        "class": "timeline",
+        "paperNode": "1OD-0",
+        "source": "Paper layer"
+      },
+      "journeyItem": {
+        "class": "timeline__item",
+        "paperNode": "1OE-0",
+        "source": "Paper layer"
+      },
+      "journeyAccent": {
+        "class": "pilot__journey-accent",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "journeyAccentTerracotta": {
+        "class": "pilot__journey-accent-terracotta",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "journeyAccentSage": {
+        "class": "pilot__journey-accent-sage",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "journeyAccentGold": {
+        "class": "pilot__journey-accent-gold",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "journeyContent": {
+        "class": "timeline__content",
+        "paperNode": "1OG-0",
+        "source": "Paper layer"
+      },
+      "journeyBadge": {
+        "class": "pilot__journey-badge",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "journeyBadgeReady": {
+        "class": "pilot__journey-badge-ready",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "journeyBadgeDeploying": {
+        "class": "pilot__journey-badge-deploying",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "journeyBadgeBuilding": {
+        "class": "pilot__journey-badge-building",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "journeyTitle": {
+        "class": "timeline__title",
+        "paperNode": "1OJ-0",
+        "source": "Paper layer"
+      },
+      "journeyBody": {
+        "class": "timeline__body",
+        "paperNode": "1OK-0",
+        "source": "Paper layer"
+      },
+      "compare": {
+        "class": "pilot__compare",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "compareTabs": {
+        "class": "pilot__compare-tabs",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "compareTab": {
+        "class": "pilot__compare-tab",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "compareTabTodayActive": {
+        "class": "pilot__compare-tab-today-active",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "compareTabReviseActive": {
+        "class": "pilot__compare-tab-revise-active",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "compareTabInactive": {
+        "class": "pilot__compare-tab-inactive",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "compareRows": {
+        "class": "pilot__compare-rows",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "compareRow": {
+        "class": "pilot__compare-row",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "compareRowLeft": {
+        "class": "pilot__compare-row-left",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "compareRowIconWrap": {
+        "class": "pilot__compare-row-icon-wrap",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "compareRowIconWrapToday": {
+        "class": "pilot__compare-row-icon-wrap-today",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "compareRowIconWrapRevise": {
+        "class": "pilot__compare-row-icon-wrap-revise",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "compareRowDimension": {
+        "class": "pilot__compare-row-dimension",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "compareRowBody": {
+        "class": "pilot__compare-row-body",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "exchange": {
+        "class": "pilot__exchange",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "exchangeSub": {
+        "class": "pilot__exchange-sub",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "exchangeList": {
+        "class": "pilot__exchange-list",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "exchangeItem": {
+        "class": "pilot__exchange-item",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "exchangeDot": {
+        "class": "pilot__exchange-dot",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "exchangeItemText": {
+        "class": "pilot__exchange-item-text",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "exchangeBody": {
+        "class": "pilot__exchange-body",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "success": {
+        "class": "pilot__success",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successGrid": {
+        "class": "pilot__success-grid",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successCard": {
+        "class": "pilot__success-card",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successIconWrap": {
+        "class": "pilot__success-icon-wrap",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successIconTerracotta": {
+        "class": "pilot__success-icon-terracotta",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successIconSage": {
+        "class": "pilot__success-icon-sage",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successIconGold": {
+        "class": "pilot__success-icon-gold",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successCardTitle": {
+        "class": "pilot__success-card-title",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "successCardBody": {
+        "class": "pilot__success-card-body",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "spots": {
+        "class": "pilot__spots",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "spotsHeadline": {
+        "class": "pilot__spots-headline",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "spotsSub": {
+        "class": "pilot__spots-sub",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "spotsCount": {
+        "class": "pilot__spots-count",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "spotPill": {
+        "class": "pilot__spot-pill",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "spotPillTaken": {
+        "class": "pilot__spot-pill-taken",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "formSection": {
+        "class": "form",
+        "paperNode": "3ZU-0",
+        "source": "Paper layer"
+      },
+      "formHeadline": {
+        "class": "form__title",
+        "paperNode": "3ZX-0",
+        "source": "Paper layer"
+      },
+      "formSub": {
+        "class": "form__lead",
+        "paperNode": "3ZY-0",
+        "source": "Paper layer"
+      },
+      "formWrap": {
+        "class": "form__container",
+        "paperNode": null,
+        "source": "application extension using Paper naming convention"
+      },
+      "footer": {
+        "class": "site-footer",
+        "paperNode": "19S-0",
+        "source": "Paper layer"
+      },
+      "footerCopy": {
+        "class": "site-footer__text",
+        "paperNode": "19X-0",
+        "source": "Paper layer"
+      },
+      "footerLink": {
+        "class": "site-footer__link",
+        "paperNode": "19Z-0",
+        "source": "Paper layer"
+      }
+    }
+  }
+}

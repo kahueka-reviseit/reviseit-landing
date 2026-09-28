@@ -1,17 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap');
 
+@import './paper-tokens.css';
+
 :root {
-  --terracotta: #B85042;
+  --terracotta: var(--color-terracotta);
   --terracotta-light: #D4887E;
-  --sage: #5B8A72;
-  --sage-light: #A7BEAE;
-  --gold: #D4A574;
-  --navy: #1A1A2E;
-  --off-white: #F8F6F0;
-  --light-gray: #F0EDE6;
-  --dark-text: #2D2D2D;
-  --mid-text: #4A4A4A;
-  --med-gray: #8A8A8A;
+  --sage: var(--color-sage);
+  --sage-light: var(--color-sage-light);
+  --gold: var(--color-gold);
+  --navy: var(--color-navy);
+  --off-white: var(--color-off-white);
+  --light-gray: var(--color-light-gray);
+  --dark-text: var(--color-dark-text);
+  --mid-text: var(--color-mid-text);
+  --med-gray: var(--color-med-gray);
 }
 
 * {
@@ -25,26 +27,26 @@ html {
 }
 
 body {
-  background: #F8F6F0;
+  background: var(--color-off-white);
   background: var(--off-white);
-  color: #2D2D2D;
+  color: var(--color-dark-text);
   color: var(--dark-text);
-  font-family: 'Source Sans 3', sans-serif;
+  font-family: var(--font-body), sans-serif;
   font-weight: 400;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4 {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-display), serif;
   font-weight: 700;
   line-height: 1.2;
-  color: #2D2D2D;
+  color: var(--color-dark-text);
   color: var(--dark-text);
 }
 
 p {
-  color: #4A4A4A;
+  color: var(--color-mid-text);
   color: var(--mid-text);
 }
 
@@ -55,7 +57,7 @@ a {
 
 .sage-bar {
   height: 6px;
-  background: #5B8A72;
+  background: var(--color-sage);
   background: var(--sage);
   width: 100%;
 }
@@ -73,7 +75,7 @@ a {
 }
 
 .eyebrow {
-  font-family: 'Source Sans 3', sans-serif;
+  font-family: var(--font-body), sans-serif;
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -81,11 +83,11 @@ a {
 }
 
 .eyebrow-terracotta {
-  color: #B85042;
+  color: var(--color-terracotta);
   color: var(--terracotta);
 }
 
 .eyebrow-sage {
-  color: #5B8A72;
+  color: var(--color-sage);
   color: var(--sage);
 }

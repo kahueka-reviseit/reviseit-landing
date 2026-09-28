@@ -17,48 +17,48 @@ export function HomeView({paper,status,switchCurriculum}:{paper:PaperModel;statu
   const c=counts(paper), n=occurrences.length;
   const start=()=>paper.go(configured&&paperTarget===null?'shape':n?'builder':'catalogue');
   return <>
-    <nav className={styles.breadcrumb} aria-label="Breadcrumb"><span>My curricula</span><span aria-hidden="true">/</span><span aria-current="page">{data.module!.name}</span></nav>
+    <nav className={styles['breadcrumb']} aria-label="Breadcrumb"><span>My curricula</span><span aria-hidden="true">/</span><span aria-current="page">{data.module!.name}</span></nav>
     {status}
-    <div className={styles.homeHero}>
+    <div className={styles['page-header--curriculum']}>
       <div>
-        <p className={styles.eyebrowSlate}>{data.schoolName}</p>
-        <h1 className={styles.homeTitle}>{data.module!.name}</h1>
-        <p className={styles.homeLead}>Curriculum · {c.total} catalogue questions: {c.structured} structured and {c.mcq} multiple choice, across {c.topics} topics. {c.ready} are ready to order now.</p>
-        <button type="button" className={styles.textLink} onClick={()=>paper.go('catalogue')}>Just browse the catalogue</button>
+        <p className={styles['eyebrow--structured']}>{data.schoolName}</p>
+        <h1 className={styles['page-header__title']}>{data.module!.name}</h1>
+        <p className={styles['page-header__lead']}>Curriculum · {c.total} catalogue questions: {c.structured} structured and {c.mcq} multiple choice, across {c.topics} topics. {c.ready} are ready to order now.</p>
+        <button type="button" className={styles['link']} onClick={()=>paper.go('catalogue')}>Just browse the catalogue</button>
       </div>
-      <section className={styles.startPanel} aria-labelledby="start-heading">
+      <section className={styles['cta']} aria-labelledby="start-heading">
         <p>Start here</p><h2 id="start-heading">Build a paper</h2>
         <span>Set the shape of the paper, choose questions from the catalogue and set their marks. You pay only when it is ready.</span>
         <button type="button" onClick={start}><span>{n?'Continue your paper':'Start a new paper'}</span><i>{Icon.arrow()}</i></button>
       </section>
     </div>
-    <div className={styles.homeRow}>
-      <section aria-labelledby="draft-heading"><h2 id="draft-heading" className={styles.homeH2}>Paper in progress</h2>
-        {n ? <div className={styles.draftCard}>
-          <div className={styles.draftHead}><strong>{data.module!.name}</strong><span className={styles.tagWarm}>Not paid yet</span></div>
-          <p className={styles.draftSub}>{paperTarget!==null?`${paperTarget} marks planned`:'Total not set yet'}</p>
-          <div className={styles.draftStats}><p><strong>{allocatedTotal}{paperTarget!==null?` of ${paperTarget}`:''}</strong><span>marks allocated</span></p><p><strong>{n}</strong><span>{n===1?'question':'questions'} added</span></p></div>
-          <p className={styles.draftState}><span>{paper.selectionDirty?'Unsaved changes':'Saved to your account'}</span><span>{paper.marksSet&&paper.balanced?'Ready for payment':'Marks needed'}</span></p>
-          <button type="button" className={styles.textLink} onClick={()=>paper.go('builder')}>Continue building</button>
-        </div> : <div className={styles.draftCard}><p className={styles.draftSub}>No paper in progress. Start a new paper or browse the catalogue.</p></div>}
+    <div className={styles['curriculum-home__columns']}>
+      <section aria-labelledby="draft-heading"><h2 id="draft-heading" className={styles['section__title']}>Paper in progress</h2>
+        {n ? <div className={styles['draft-card']}>
+          <div className={styles['draft-card__header']}><strong>{data.module!.name}</strong><span className={styles['status-tag--unpaid']}>Not paid yet</span></div>
+          <p className={styles['draft-card__meta']}>{paperTarget!==null?`${paperTarget} marks planned`:'Total not set yet'}</p>
+          <div className={styles['draft-card__stats']}><p><strong>{allocatedTotal}{paperTarget!==null?` of ${paperTarget}`:''}</strong><span>marks allocated</span></p><p><strong>{n}</strong><span>{n===1?'question':'questions'} added</span></p></div>
+          <p className={styles['draft-card__status']}><span>{paper.selectionDirty?'Unsaved changes':'Saved to your account'}</span><span>{paper.marksSet&&paper.balanced?'Ready for payment':'Marks needed'}</span></p>
+          <button type="button" className={styles['link']} onClick={()=>paper.go('builder')}>Continue building</button>
+        </div> : <div className={styles['draft-card']}><p className={styles['draft-card__meta']}>No paper in progress. Start a new paper or browse the catalogue.</p></div>}
       </section>
-      <section aria-labelledby="past-heading"><h2 id="past-heading" className={styles.homeH2}>Papers and formatting</h2>
-        <ul className={styles.linkList}>
+      <section aria-labelledby="past-heading"><h2 id="past-heading" className={styles['section__title']}>Papers and formatting</h2>
+        <ul className={styles['past-paper-list']}>
           <li><a href="/teacher/orders"><strong>Your paper requests</strong><span>Follow paid papers and download released documents.</span></a></li>
           <li><button type="button" onClick={()=>paper.go('formatting')}><strong>School formatting</strong><span>Font, spacing and heading used for this curriculum’s papers.</span></button></li>
         </ul>
       </section>
     </div>
-    {data.curricula.length>1 && <section className={styles.curricula} aria-labelledby="curricula-heading"><h2 id="curricula-heading" className={styles.homeH2}>Your curricula</h2>
+    {data.curricula.length>1 && <section className={styles['curriculum-grid']} aria-labelledby="curricula-heading"><h2 id="curricula-heading" className={styles['section__title']}>Your curricula</h2>
       <ul>{data.curricula.map(m=>{const current=m.id===data.module!.id;
-        return <li key={m.id} className={current?styles.curriculumCurrent:''}>
-          <p className={styles.eyebrowSage}>Curriculum · {m.isDemo?'demonstration':'access active'}</p>
+        return <li key={m.id} className={current?styles['curriculum-card--current']:''}>
+          <p className={styles['eyebrow--positive']}>Curriculum · {m.isDemo?'demonstration':'access active'}</p>
           <h3>{m.name}</h3>
-          {current ? <><p className={styles.curriculumCount}><strong>{c.total}</strong><span>catalogue questions</span></p>
-            <span className={styles.splitBar} aria-hidden="true"><i className={styles.slate} style={{flexGrow:c.structured}}/><i className={styles.gold} style={{flexGrow:c.mcq}}/></span>
-            <p className={styles.splitLabels}><span>{c.structured} structured</span><span>{c.mcq} multiple choice</span></p>
-            <button type="button" className={styles.primaryWide} onClick={()=>paper.go('catalogue')}>Open catalogue {Icon.arrow()}</button></> :
-            <button type="button" className={styles.secondaryWide} disabled={paper.busy} onClick={()=>switchCurriculum(m.id)}>Open curriculum {Icon.arrow()}</button>}
+          {current ? <><p className={styles['curriculum-card__count']}><strong>{c.total}</strong><span>catalogue questions</span></p>
+            <span className={styles['type-split']} aria-hidden="true"><i className={styles['type-split__segment--structured']} style={{flexGrow:c.structured}}/><i className={styles['type-split__segment--multiple-choice']} style={{flexGrow:c.mcq}}/></span>
+            <p className={styles['type-split__legend']}><span>{c.structured} structured</span><span>{c.mcq} multiple choice</span></p>
+            <button type="button" className={styles['button--primary-wide']} onClick={()=>paper.go('catalogue')}>Open catalogue {Icon.arrow()}</button></> :
+            <button type="button" className={styles['button--secondary-wide']} disabled={paper.busy} onClick={()=>switchCurriculum(m.id)}>Open curriculum {Icon.arrow()}</button>}
         </li>;})}</ul></section>}
   </>;
 }
@@ -86,41 +86,41 @@ export function ShapeView({paper,status}:{paper:PaperModel;status:ReactNode}) {
   const splitSet=mc.trim()!=='';
   const apply=()=>{paper.setPaperTarget(t);paper.setSectionTarget('multiple_choice',splitSet?m:undefined);paper.setSectionTarget('structured',splitSet?t-m:undefined);paper.go(paper.occurrences.length?'builder':'catalogue');};
   return <>
-    <nav className={styles.breadcrumb} aria-label="Breadcrumb"><button type="button" onClick={()=>paper.go('home')}>{data.module!.name}</button><span aria-hidden="true">/</span><span aria-current="page">Paper shape</span></nav>
-    <div className={styles.shapeTop}><Stages stages={journey(paper,0)}/></div>
+    <nav className={styles['breadcrumb']} aria-label="Breadcrumb"><button type="button" onClick={()=>paper.go('home')}>{data.module!.name}</button><span aria-hidden="true">/</span><span aria-current="page">Paper shape</span></nav>
+    <div className={styles['paper-shape__header']}><Stages stages={journey(paper,0)}/></div>
     {status}
-    <div className={styles.twoCol}>
-      <form className={styles.shapeCard} onSubmit={e=>{e.preventDefault();if(canApply)apply();}}>
-        <p className={styles.eyebrowSage}>Step 1 of 5</p>
+    <div className={styles['page-body']}>
+      <form className={styles['paper-shape']} onSubmit={e=>{e.preventDefault();if(canApply)apply();}}>
+        <p className={styles['eyebrow--positive']}>Step 1 of 5</p>
         <h1>What shape is this paper?</h1>
-        <p className={styles.panelLead}>Set the totals first. The catalogue and the paper builder then show how each question fits. You can change them at any time before you submit.</p>
-        <label className={styles.field}>Total marks<span className={styles.unitInput}><input type="number" inputMode="numeric" min={1} max={3000} value={total} onChange={e=>setTotal(e.target.value)} placeholder="For example 150"/><span>marks</span></span></label>
-        <fieldset className={styles.field}><legend>Split between question types</legend>
-          <p className={styles.fieldHint}>Multiple-choice questions are worth 2 marks each. Enter 0 for a structured-only paper, or leave the field blank to set only the paper total.</p>
-          {validTotal&&<input className={styles.split} type="range" min={0} max={sliderMax} step={2} value={Math.min(m,sliderMax)} aria-label="Multiple-choice marks slider" style={{'--pct':`${sliderMax?Math.min(100,m/sliderMax*100):0}%`} as CSSProperties} onChange={e=>setMc(e.target.value)}/>}
-          <div className={styles.splitLabelsRow}><span className={styles.eyebrowGoldText}>Multiple choice</span><span className={styles.eyebrowSlate}>Structured</span></div>
-          <div className={styles.threeFields}>
-            <label className={styles.goldEdge}>Multiple-choice marks<input type="number" inputMode="numeric" min={0} step={2} value={mc} onChange={e=>setMc(e.target.value)} placeholder="0"/></label>
-            <p className={styles.readonly}><span>Multiple-choice questions</span><output>{questions} {questions===1?'question':'questions'}</output></p>
-            <label className={styles.slateEdge}>Structured marks<input type="number" inputMode="numeric" min={0} value={structuredMarks ?? ''} disabled={!validTotal} onChange={e=>{const s=Number(e.target.value);if(Number.isInteger(s)&&validTotal)setMc(String(Math.max(0,t-s)));}}/></label>
+        <p className={styles['card__lead']}>Set the totals first. The catalogue and the paper builder then show how each question fits. You can change them at any time before you submit.</p>
+        <label className={styles['form-field']}>Total marks<span className={styles['number-input']}><input type="number" inputMode="numeric" min={1} max={3000} value={total} onChange={e=>setTotal(e.target.value)} placeholder="For example 150"/><span>marks</span></span></label>
+        <fieldset className={styles['form-field']}><legend>Split between question types</legend>
+          <p className={styles['form-field__hint']}>Multiple-choice questions are worth 2 marks each. Enter 0 for a structured-only paper, or leave the field blank to set only the paper total.</p>
+          {validTotal&&<input className={styles['split-slider']} type="range" min={0} max={sliderMax} step={2} value={Math.min(m,sliderMax)} aria-label="Multiple-choice marks slider" style={{'--pct':`${sliderMax?Math.min(100,m/sliderMax*100):0}%`} as CSSProperties} onChange={e=>setMc(e.target.value)}/>}
+          <div className={styles['split-slider__legend']}><span className={styles['eyebrow--multiple-choice']}>Multiple choice</span><span className={styles['eyebrow--structured']}>Structured</span></div>
+          <div className={styles['form__row']}>
+            <label className={styles['number-input--multiple-choice']}>Multiple-choice marks<input type="number" inputMode="numeric" min={0} step={2} value={mc} onChange={e=>setMc(e.target.value)} placeholder="0"/></label>
+            <p className={styles['number-input--readonly']}><span>Multiple-choice questions</span><output>{questions} {questions===1?'question':'questions'}</output></p>
+            <label className={styles['number-input--structured']}>Structured marks<input type="number" inputMode="numeric" min={0} value={structuredMarks ?? ''} disabled={!validTotal} onChange={e=>{const s=Number(e.target.value);if(Number.isInteger(s)&&validTotal)setMc(String(Math.max(0,t-s)));}}/></label>
           </div>
         </fieldset>
-        {problems.map(p=><p key={p} role="alert" className={styles.noteWarm}>{p}</p>)}
-        <div className={styles.formActions}>
-          <button type="button" className={styles.textLink} onClick={()=>paper.go('home')}>Cancel</button>
-          {(paper.paperTarget!==null||Object.keys(sectionTargets).length>0)&&<button type="button" className={styles.textLink} onClick={()=>{paper.setPaperTarget(null);paper.setSectionTarget('multiple_choice',undefined);paper.setSectionTarget('structured',undefined);setTotal('');setMc('');}}>Clear the shape</button>}
-          <button type="submit" className={styles.primaryPill} disabled={!canApply}>{paper.occurrences.length?'Save and open the builder':'Continue to catalogue'} {Icon.arrow()}</button>
+        {problems.map(p=><p key={p} role="alert" className={styles['notice--caution']}>{p}</p>)}
+        <div className={styles['form__actions']}>
+          <button type="button" className={styles['link']} onClick={()=>paper.go('home')}>Cancel</button>
+          {(paper.paperTarget!==null||Object.keys(sectionTargets).length>0)&&<button type="button" className={styles['link']} onClick={()=>{paper.setPaperTarget(null);paper.setSectionTarget('multiple_choice',undefined);paper.setSectionTarget('structured',undefined);setTotal('');setMc('');}}>Clear the shape</button>}
+          <button type="submit" className={styles['button--primary-compact']} disabled={!canApply}>{paper.occurrences.length?'Save and open the builder':'Continue to catalogue'} {Icon.arrow()}</button>
         </div>
       </form>
-      <aside className={styles.rail} aria-label="Your paper’s shape">
-        <section className={`${styles.railCard} ${styles.topNavy}`}>
-          <p className={styles.eyebrowMid}>Your paper’s shape</p>
-          <h2 className={styles.shapeHeadline}>{validTotal?`${t} marks: ${questions?`${questions} multiple-choice ${questions===1?'question':'questions'} (${m} marks)`:'no multiple choice'}${structuredMarks?`, ${about?`about ${about} `:''}structured ${about===1?'question':'questions'} (${structuredMarks} marks)`:''}`:'Set a total to see the shape'}</h2>
-          {validTotal&&<div className={styles.shapeBlocks} aria-hidden="true">{m>0&&<i className={styles.gold} style={{flexGrow:m}}>{m}</i>}{about&&structuredMarks?Array.from({length:Math.min(about,12)},(_,i)=><i key={i} className={styles.slate} style={{flexGrow:structuredMarks/Math.min(about,12)}}>~{Math.round(structuredMarks/about)}</i>):null}</div>}
-          <ul className={styles.legend}><li><i className={styles.gold}/>Multiple choice<strong>{questions} × 2 = {questions*2} marks</strong></li><li><i className={styles.slate}/>Structured<strong>{structuredMarks ?? 0} marks</strong></li></ul>
-          {min!==null&&<div className={styles.fits}><strong>Fits the catalogue</strong><span>{ready.length?'Ready':'Published'} structured questions range from {min} to {max} marks; {c.mcq} multiple-choice types are published and {data.entries.filter(e=>kindOf(e)==='multiple_choice'&&e.orderable).length} are ready to order.</span></div>}
+      <aside className={styles['page-body__aside']} aria-label="Your paper’s shape">
+        <section className={`${styles['card']} ${styles['section--summary']}`}>
+          <p className={styles['eyebrow--neutral']}>Your paper’s shape</p>
+          <h2 className={styles['paper-shape__headline']}>{validTotal?`${t} marks: ${questions?`${questions} multiple-choice ${questions===1?'question':'questions'} (${m} marks)`:'no multiple choice'}${structuredMarks?`, ${about?`about ${about} `:''}structured ${about===1?'question':'questions'} (${structuredMarks} marks)`:''}`:'Set a total to see the shape'}</h2>
+          {validTotal&&<div className={styles['paper-shape__bar']} aria-hidden="true">{m>0&&<i className={styles['type-split__segment--multiple-choice']} style={{flexGrow:m}}>{m}</i>}{about&&structuredMarks?Array.from({length:Math.min(about,12)},(_,i)=><i key={i} className={styles['type-split__segment--structured']} style={{flexGrow:structuredMarks/Math.min(about,12)}}>~{Math.round(structuredMarks/about)}</i>):null}</div>}
+          <ul className={styles['legend']}><li><i className={styles['type-split__segment--multiple-choice']}/>Multiple choice<strong>{questions} × 2 = {questions*2} marks</strong></li><li><i className={styles['type-split__segment--structured']}/>Structured<strong>{structuredMarks ?? 0} marks</strong></li></ul>
+          {min!==null&&<div className={styles['paper-shape__feasibility']}><strong>Fits the catalogue</strong><span>{ready.length?'Ready':'Published'} structured questions range from {min} to {max} marks; {c.mcq} multiple-choice types are published and {data.entries.filter(e=>kindOf(e)==='multiple_choice'&&e.orderable).length} are ready to order.</span></div>}
         </section>
-        <div className={styles.whyNote}><strong>Why we ask first</strong><p>These totals become the targets your marks must match before payment. The estimate of structured questions uses the published mark ranges and is only a guide.</p></div>
+        <div className={styles['paper-shape__note']}><strong>Why we ask first</strong><p>These totals become the targets your marks must match before payment. The estimate of structured questions uses the published mark ranges and is only a guide.</p></div>
       </aside>
     </div>
   </>;

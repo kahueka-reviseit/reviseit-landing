@@ -260,45 +260,45 @@ export default function TimeStarvation() {
   const showCaption = phase >= 6;
 
   return (
-    <section className={styles.section} ref={sectionRef}>
+    <section className={styles['teacher-week']} ref={sectionRef}>
       <div className="container">
         <p className="eyebrow eyebrow-terracotta" style={{ marginBottom: '12px' }}>
           THE REALITY
         </p>
-        <h2 className={styles.headline}>Where does the exam paper go?</h2>
-        <p className={styles.intro}>
+        <h2 className={styles['teacher-week__title']}>Where does the exam paper go?</h2>
+        <p className={styles['teacher-week__lead']}>
           A South African teacher&apos;s week — every hour, accounted for.
         </p>
 
         {/* ── Desktop calendar ─────────────────────────────────── */}
-        <div className={styles.calendarWrap}>
+        <div className={styles['calendar']}>
 
-          <div className={styles.calendarHeader}>
-            <div className={styles.timeGutter} />
+          <div className={styles['calendar__header']}>
+            <div className={styles['calendar__gutter']} />
             {DAYS.map(d => (
               <div
                 key={d.key}
-                className={`${styles.dayHeader} ${d.key === 'sun' && examLanded ? styles.dayHeaderSun : ''}`}
+                className={`${styles['calendar__day-heading']} ${d.key === 'sun' && examLanded ? styles['calendar__day-heading--sunday'] : ''}`}
               >
                 {d.label}
               </div>
             ))}
           </div>
 
-          <div className={styles.scrollWrap} ref={scrollRef} style={{ height: CONTAINER_H }}>
-            <div className={styles.gridContent} style={{ height: GRID_HEIGHT }}>
+          <div className={styles['calendar__scroll']} ref={scrollRef} style={{ height: CONTAINER_H }}>
+            <div className={styles['calendar__grid']} style={{ height: GRID_HEIGHT }}>
 
               {/* Time labels */}
-              <div className={styles.timeCol}>
+              <div className={styles['calendar__times']}>
                 {TIME_LABELS.map(t => (
-                  <div key={t.min} className={styles.timeLabel} style={{ top: minTop(t.min) }}>
+                  <div key={t.min} className={styles['calendar__time']} style={{ top: minTop(t.min) }}>
                     {t.label}
                   </div>
                 ))}
               </div>
 
               {/* Day columns */}
-              <div className={styles.dayColumns} ref={colsRef}>
+              <div className={styles['calendar__days']} ref={colsRef}>
                 {DAYS.map((day, i) => {
                   const isSat     = day.key === 'sat';
                   const isSun     = day.key === 'sun';
@@ -309,22 +309,22 @@ export default function TimeStarvation() {
                   return (
                     <div
                       key={day.key}
-                      className={`${styles.dayCol} ${isSun && examLanded ? styles.dayColSun : ''}`}
+                      className={`${styles['calendar__day']} ${isSun && examLanded ? styles['calendar__day--sunday'] : ''}`}
                       ref={el => { dayRefs.current[i] = el; }}
                     >
                       {/* Grid lines */}
                       {TIME_LABELS.map(t => (
-                        <div key={t.min} className={styles.hLine} style={{ top: minTop(t.min) }} />
+                        <div key={t.min} className={styles['calendar__hour-rule']} style={{ top: minTop(t.min) }} />
                       ))}
                       {TIME_LABELS.slice(0, -1).map(t => (
-                        <div key={`h${t.min}`} className={`${styles.hLine} ${styles.halfLine}`} style={{ top: minTop(t.min + 30) }} />
+                        <div key={`h${t.min}`} className={`${styles['calendar__hour-rule']} ${styles['calendar__half-hour-rule']}`} style={{ top: minTop(t.min + 30) }} />
                       ))}
 
                       {/* Teaching + break/lunch blocks */}
                       {isWeekday && teaching.map(b => (
                         <div
                           key={b.id}
-                          className={`${styles.block} ${b.sm ? styles.blockSm : ''}`}
+                          className={`${styles['calendar__event']} ${b.sm ? styles['calendar__event--compact'] : ''}`}
                           style={{
                             top: minTop(b.start) + 1,
                             height: Math.max(minH(b.dur) - 2, 14),
@@ -332,9 +332,9 @@ export default function TimeStarvation() {
                             borderLeftColor: b.bdr === 'none' ? 'transparent' : b.bdr,
                           }}
                         >
-                          {!b.sm && <span className={styles.blockLabel}>{b.label}</span>}
-                          {!b.sm && b.sub && <span className={styles.blockSub}>{b.sub}</span>}
-                          {b.sm && <span className={styles.blockSmLabel}>{b.label}</span>}
+                          {!b.sm && <span className={styles['calendar__event-label']}>{b.label}</span>}
+                          {!b.sm && b.sub && <span className={styles['calendar__event-detail']}>{b.sub}</span>}
+                          {b.sm && <span className={styles['calendar__event-label--compact']}>{b.label}</span>}
                         </div>
                       ))}
 
@@ -342,7 +342,7 @@ export default function TimeStarvation() {
                       {isWeekday && afternoon.map(b => (
                         <div
                           key={b.id}
-                          className={styles.block}
+                          className={styles['calendar__event']}
                           style={{
                             top: minTop(b.start) + 1,
                             height: Math.max(minH(b.dur) - 2, 14),
@@ -350,26 +350,26 @@ export default function TimeStarvation() {
                             borderLeftColor: b.bdr,
                           }}
                         >
-                          <span className={styles.blockLabel}>{b.label}</span>
-                          <span className={styles.blockSub}>{b.sub}</span>
+                          <span className={styles['calendar__event-label']}>{b.label}</span>
+                          <span className={styles['calendar__event-detail']}>{b.sub}</span>
                         </div>
                       ))}
 
                       {/* Saturday */}
                       {isSat && (
                         <div
-                          className={`${styles.satBlock} ${styles.satVisible}`}
+                          className={`${styles['teacher-week__sat-block']} ${styles['teacher-week__sat-visible']}`}
                           style={{ top: 1, height: GRID_HEIGHT - 2 }}
                         >
-                          <span className={styles.blockLabel}>Inter-school Rugby Festival</span>
-                          <span className={styles.blockSub}>All day</span>
+                          <span className={styles['calendar__event-label']}>Inter-school Rugby Festival</span>
+                          <span className={styles['calendar__event-detail']}>All day</span>
                         </div>
                       )}
 
                       {/* Sunday church (always visible) */}
                       {isSun && (
                         <div
-                          className={styles.block}
+                          className={styles['calendar__event']}
                           style={{
                             top: 1,
                             height: Math.max(minH(120) - 2, 14),
@@ -377,18 +377,18 @@ export default function TimeStarvation() {
                             borderLeftColor: '#9A6DD7',
                           }}
                         >
-                          <span className={styles.blockLabel}>Church</span>
-                          <span className={styles.blockSub}>8:00–10:00 am</span>
+                          <span className={styles['calendar__event-label']}>Church</span>
+                          <span className={styles['calendar__event-detail']}>8:00–10:00 am</span>
                         </div>
                       )}
 
                       {/* Sunday exam landed */}
                       {isSun && examLanded && (
                         <div
-                          className={styles.examLanded}
+                          className={styles['teacher-week__exam-landed']}
                           style={{ top: SUN_EXAM_TOP, height: SUN_EXAM_HEIGHT }}
                         >
-                          <span className={styles.examText}>✎ Create June Exam</span>
+                          <span className={styles['teacher-week__exam-text']}>✎ Create June Exam</span>
                         </div>
                       )}
                     </div>
@@ -398,25 +398,25 @@ export default function TimeStarvation() {
                 {/* Floating exam block + cursor */}
                 {showFloat && (
                   <div
-                    className={styles.examGroup}
+                    className={styles['teacher-week__exam-group']}
                     style={{ left: examLeft, width: examWidth, top: examTop, height: examHeight }}
                   >
-                    <div className={styles.cursorWrap} aria-hidden="true"><Cursor /></div>
-                    <div className={styles.examFloat}>
-                      <span className={styles.examText}>✎ Create June Exam</span>
+                    <div className={styles['teacher-week__cursor-wrap']} aria-hidden="true"><Cursor /></div>
+                    <div className={styles['teacher-week__exam-float']}>
+                      <span className={styles['teacher-week__exam-text']}>✎ Create June Exam</span>
                     </div>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className={styles.fadeTop} />
-            <div className={styles.fadeBottom} />
+            <div className={styles['teacher-week__fade-top']} />
+            <div className={styles['teacher-week__fade-bottom']} />
           </div>
         </div>
 
         {/* ── Mobile timeline ───────────────────────────────────── */}
-        <div className={styles.mobileList}>
+        <div className={styles['teacher-week__list']}>
           {DAYS.map((day, i) => {
             const isSat = day.key === 'sat';
             const isSun = day.key === 'sun';
@@ -426,20 +426,20 @@ export default function TimeStarvation() {
             return (
               <div
                 key={day.key}
-                className={`${styles.mobileRow} ${isSun && examLanded ? styles.mobileRowSun : ''}`}
+                className={`${styles['teacher-week__mobile-row']} ${isSun && examLanded ? styles['teacher-week__mobile-row-sun'] : ''}`}
               >
-                <span className={`${styles.mobileDay} ${isSun && examLanded ? styles.mobileDaySun : ''}`}>
+                <span className={`${styles['teacher-week__mobile-day']} ${isSun && examLanded ? styles['teacher-week__mobile-day-sun'] : ''}`}>
                   {day.label}
                 </span>
-                <div className={styles.mobileDetail}>
+                <div className={styles['teacher-week__mobile-detail']}>
                   {!isSat && !isSun && (
-                    <span className={styles.mobileSchool}>
+                    <span className={styles['teacher-week__mobile-school']}>
                       {grades}{hasCoaching ? ' · Coaching' : ''}
                     </span>
                   )}
-                  {isSat && <span className={`${styles.mobileGhost} ${styles.mobileVisible}`}>Rugby Festival — All day</span>}
-                  {isSun && <span className={styles.mobileSchool}>Church 8–10am{examLanded ? '' : ' · Free'}</span>}
-                  {isSun && examLanded && <span className={styles.mobileExam}>✎ Create June Exam — 10am–6pm</span>}
+                  {isSat && <span className={`${styles['teacher-week__mobile-ghost']} ${styles['teacher-week__mobile-visible']}`}>Rugby Festival — All day</span>}
+                  {isSun && <span className={styles['teacher-week__mobile-school']}>Church 8–10am{examLanded ? '' : ' · Free'}</span>}
+                  {isSun && examLanded && <span className={styles['teacher-week__mobile-exam']}>✎ Create June Exam — 10am–6pm</span>}
                 </div>
               </div>
             );
@@ -447,15 +447,15 @@ export default function TimeStarvation() {
         </div>
 
         {/* Caption */}
-        <div className={`${styles.caption} ${showCaption ? styles.captionVisible : ''}`}>
-          <p className={styles.captionHead}>Sunday. Every time.</p>
-          <p className={styles.captionBody}>
+        <div className={`${styles['teacher-week__caption']} ${showCaption ? styles['teacher-week__caption-visible'] : ''}`}>
+          <p className={styles['teacher-week__caption-head']}>Sunday. Every time.</p>
+          <p className={styles['teacher-week__caption-body']}>
             Your teachers aren&apos;t choosing to work on weekends. Their weeks leave them no choice.
           </p>
         </div>
 
         {hasPlayed && !noMotion && (
-          <button onClick={replay} className={styles.replayBtn} type="button">↺ Replay</button>
+          <button onClick={replay} className={styles['button--replay']} type="button">↺ Replay</button>
         )}
       </div>
     </section>

@@ -50,40 +50,40 @@ export default function CompareModule() {
   const isToday = activeTab === 'today';
 
   return (
-    <section className={styles.compare}>
+    <section className={styles['pilot__compare']}>
       <div className="container">
-        <p className={styles.sectionEyebrow}>How This Compares</p>
-        <h2 className={styles.sectionHeadline}>
+        <p className={styles['section__eyebrow']}>How This Compares</p>
+        <h2 className={styles['section__title']}>
           What assessment looks like today — and what it could.
         </h2>
 
-        <div className={styles.compareTabs}>
+        <div className={styles['pilot__compare-tabs']}>
           <button
-            className={`${styles.compareTab} ${isToday ? styles.compareTabTodayActive : styles.compareTabInactive}`}
+            className={`${styles['pilot__compare-tab']} ${isToday ? styles['pilot__compare-tab-today-active'] : styles['pilot__compare-tab-inactive']}`}
             onClick={() => setActiveTab('today')}
           >
             How departments do it today
           </button>
           <button
-            className={`${styles.compareTab} ${!isToday ? styles.compareTabReviseActive : styles.compareTabInactive}`}
+            className={`${styles['pilot__compare-tab']} ${!isToday ? styles['pilot__compare-tab-revise-active'] : styles['pilot__compare-tab-inactive']}`}
             onClick={() => setActiveTab('revise')}
           >
             With Revise It
           </button>
         </div>
 
-        <div className={styles.compareRows}>
+        <div className={styles['pilot__compare-rows']}>
           {rows.map((row) => (
-            <div key={row.id} className={styles.compareRow}>
-              <div className={styles.compareRowLeft}>
+            <div key={row.id} className={styles['pilot__compare-row']}>
+              <div className={styles['pilot__compare-row-left']}>
                 <div
-                  className={`${styles.compareRowIconWrap} ${isToday ? styles.compareRowIconWrapToday : styles.compareRowIconWrapRevise}`}
+                  className={`${styles['pilot__compare-row-icon-wrap']} ${isToday ? styles['pilot__compare-row-icon-wrap-today'] : styles['pilot__compare-row-icon-wrap-revise']}`}
                 >
                   {row.icon}
                 </div>
-                <span className={styles.compareRowDimension}>{row.dimension}</span>
+                <span className={styles['pilot__compare-row-dimension']}>{row.dimension}</span>
               </div>
-              <p key={`${row.id}-${activeTab}`} className={styles.compareRowBody}>
+              <p key={`${row.id}-${activeTab}`} className={styles['pilot__compare-row-body']}>
                 {isToday ? row.today : row.revise}
               </p>
             </div>

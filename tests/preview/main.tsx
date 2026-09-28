@@ -44,4 +44,4 @@ window.fetch=async(input,options)=>{
 };
 createRoot(document.getElementById('root')!).render(<>
  <div style={{padding:'10px 24px',background:'#1A1A2E',color:'white',textAlign:'center',fontSize:14}}>Local demonstration · synthetic catalogue and school · changes saved only in this browser</div>
- <div className={shell.shell}><AccountNav path="/teacher"/><main className={shell.main}><WorkspaceView initial={get(curricula[0].id)}/></main></div></>);
+ <div className={shell['site-shell']}><AccountNav path="/teacher"/><main className={shell['page-body']}><WorkspaceView initial={get(curricula[0].id)}/></main></div></>);

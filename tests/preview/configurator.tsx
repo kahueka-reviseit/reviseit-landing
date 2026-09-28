@@ -35,4 +35,4 @@ window.fetch=async(input,options)=>{
 (window as unknown as {simulateOtherTab:()=>void}).simulateOtherTab=()=>{revision++;};
 createRoot(document.getElementById('root')!).render(<>
  <div style={{padding:'10px 24px',background:'#1A1A2E',color:'white',textAlign:'center',fontSize:14}}>Local demonstration · synthetic questions · nothing is saved or charged</div>
- <div className={shell.shell}><AccountNav path="/teacher/orders/synthetic"/><main className={shell.main}><OrderView initial={order()}/></main></div></>);
+ <div className={shell['site-shell']}><AccountNav path="/teacher/orders/synthetic"/><main className={shell['page-body']}><OrderView initial={order()}/></main></div></>);

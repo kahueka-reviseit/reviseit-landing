@@ -1,17 +1,17 @@
 /* ─── Section ───────────────────────────────────────────────── */
-.section {
+.teacher-week {
   padding: 80px 0;
-  background: #fff;
+  background: var(--color-white);
 }
 
-.headline {
+.teacher-week__title {
   font-size: clamp(1.5rem, 3vw, 2.25rem);
   margin-bottom: 12px;
   max-width: 680px;
   color: var(--dark-text);
 }
 
-.intro {
+.teacher-week__lead {
   font-size: 1.05rem;
   color: var(--mid-text);
   margin-bottom: 32px;
@@ -19,29 +19,29 @@
 }
 
 /* ─── Calendar wrapper ───────────────────────────────────────── */
-.calendarWrap {
+.calendar {
   border: 1.5px solid var(--light-gray);
   border-radius: 8px;
   overflow: hidden;
-  background: #fff;
+  background: var(--color-white);
   margin-bottom: 32px;
-  font-family: 'Source Sans 3', sans-serif;
+  font-family: var(--font-body), sans-serif;
 }
 
 /* ─── Header row ─────────────────────────────────────────────── */
-.calendarHeader {
+.calendar__header {
   display: flex;
   background: var(--off-white);
   border-bottom: 1.5px solid var(--light-gray);
 }
 
-.timeGutter {
+.calendar__gutter {
   width: 52px;
   flex-shrink: 0;
   border-right: 1px solid var(--light-gray);
 }
 
-.dayHeader {
+.calendar__day-heading {
   flex: 1;
   text-align: center;
   font-size: 0.72rem;
@@ -54,27 +54,27 @@
   transition: color 0.4s ease, background 0.4s ease;
 }
 
-.dayHeader:last-child { border-right: none; }
+.calendar__day-heading:last-child { border-right: none; }
 
-.dayHeaderSun {
+.calendar__day-heading--sunday {
   color: var(--terracotta);
   background: rgba(184, 80, 66, 0.04);
 }
 
 /* ─── Scrollable grid ────────────────────────────────────────── */
-.scrollWrap {
+.calendar__scroll {
   position: relative;
   overflow-y: hidden;
   overflow-x: hidden;
 }
 
-.gridContent {
+.calendar__grid {
   display: flex;
   position: relative;
 }
 
 /* ─── Time column ────────────────────────────────────────────── */
-.timeCol {
+.calendar__times {
   width: 52px;
   flex-shrink: 0;
   position: relative;
@@ -82,7 +82,7 @@
   background: var(--off-white);
 }
 
-.timeLabel {
+.calendar__time {
   position: absolute;
   right: 8px;
   font-size: 0.6rem;
@@ -93,25 +93,25 @@
 }
 
 /* ─── Day columns ────────────────────────────────────────────── */
-.dayColumns {
+.calendar__days {
   flex: 1;
   display: flex;
   position: relative;
 }
 
-.dayCol {
+.calendar__day {
   flex: 1;
   position: relative;
   border-right: 1px solid var(--light-gray);
   transition: background 0.4s ease;
 }
 
-.dayCol:last-child { border-right: none; }
+.calendar__day:last-child { border-right: none; }
 
-.dayColSun { background: rgba(184, 80, 66, 0.04); }
+.calendar__day--sunday { background: rgba(184, 80, 66, 0.04); }
 
 /* ─── Grid lines ─────────────────────────────────────────────── */
-.hLine {
+.calendar__hour-rule {
   position: absolute;
   left: 0;
   right: 0;
@@ -120,10 +120,10 @@
   pointer-events: none;
 }
 
-.halfLine { background: transparent; }
+.calendar__half-hour-rule { background: transparent; }
 
 /* ─── Event blocks ───────────────────────────────────────────── */
-.block {
+.calendar__event {
   position: absolute;
   left: 3px;
   right: 3px;
@@ -134,12 +134,12 @@
   box-sizing: border-box;
 }
 
-.blockSm {
+.calendar__event--compact {
   display: flex;
   align-items: center;
 }
 
-.blockLabel {
+.calendar__event-label {
   display: block;
   font-size: 0.67rem;
   font-weight: 600;
@@ -150,7 +150,7 @@
   text-overflow: ellipsis;
 }
 
-.blockSub {
+.calendar__event-detail {
   display: block;
   font-size: 0.59rem;
   color: var(--mid-text);
@@ -161,7 +161,7 @@
   text-overflow: ellipsis;
 }
 
-.blockSmLabel {
+.calendar__event-label--compact {
   font-size: 0.6rem;
   font-weight: 500;
   color: var(--med-gray);
@@ -171,7 +171,7 @@
 }
 
 /* ─── Saturday all-day block ─────────────────────────────────── */
-.satBlock {
+.teacher-week__sat-block {
   position: absolute;
   left: 3px;
   right: 3px;
@@ -187,17 +187,17 @@
   box-sizing: border-box;
 }
 
-.satVisible { opacity: 1; }
+.teacher-week__sat-visible { opacity: 1; }
 
-.satBlock .blockLabel {
+.teacher-week__sat-block .calendar__event-label {
   color: var(--med-gray);
   font-style: italic;
 }
 
-.satBlock .blockSub { color: var(--med-gray); }
+.teacher-week__sat-block .calendar__event-detail { color: var(--med-gray); }
 
 /* ─── Floating exam block group ──────────────────────────────── */
-.examGroup {
+.teacher-week__exam-group {
   position: absolute;
   z-index: 20;
   pointer-events: none;
@@ -210,7 +210,7 @@
 }
 
 /* ─── Cursor wrapper ─────────────────────────────────────────── */
-.cursorWrap {
+.teacher-week__cursor-wrap {
   position: absolute;
   top: -14px;
   left: -6px;
@@ -219,14 +219,14 @@
 }
 
 /* ─── Floating exam card ─────────────────────────────────────── */
-.examFloat {
+.teacher-week__exam-float {
   width: 100%;
   height: 100%;
   border-radius: 4px;
   padding: 7px 8px;
   background: var(--terracotta);
-  color: #fff;
-  font-family: 'Source Sans 3', sans-serif;
+  color: var(--color-white);
+  font-family: var(--font-body), sans-serif;
   font-weight: 600;
   font-size: 0.75rem;
   box-shadow: 0 4px 16px rgba(184, 80, 66, 0.4);
@@ -237,7 +237,7 @@
   align-items: flex-start;
 }
 
-.examText {
+.teacher-week__exam-text {
   display: block;
   line-height: 1.35;
   overflow: hidden;
@@ -251,15 +251,15 @@
 }
 
 /* ─── Landed exam block (Sunday) ─────────────────────────────── */
-.examLanded {
+.teacher-week__exam-landed {
   position: absolute;
   left: 3px;
   right: 3px;
   border-radius: 4px;
   padding: 8px 8px;
   background: var(--terracotta);
-  color: #fff;
-  font-family: 'Source Sans 3', sans-serif;
+  color: var(--color-white);
+  font-family: var(--font-body), sans-serif;
   font-weight: 600;
   font-size: 0.75rem;
   animation: landIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
@@ -273,31 +273,31 @@
 }
 
 /* ─── Scroll-fade overlays ───────────────────────────────────── */
-.fadeTop { display: none; }
-.fadeBottom { display: none; }
+.teacher-week__fade-top { display: none; }
+.teacher-week__fade-bottom { display: none; }
 
 /* ─── Caption ────────────────────────────────────────────────── */
-.caption {
+.teacher-week__caption {
   opacity: 0;
   transform: translateY(8px);
   transition: opacity 0.55s ease, transform 0.55s ease;
   margin-bottom: 20px;
 }
 
-.captionVisible {
+.teacher-week__caption-visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-.captionHead {
-  font-family: 'Playfair Display', serif;
+.teacher-week__caption-head {
+  font-family: var(--font-display), serif;
   font-size: 1.4rem;
   font-weight: 700;
   color: var(--terracotta);
   margin-bottom: 8px;
 }
 
-.captionBody {
+.teacher-week__caption-body {
   font-size: 1rem;
   color: var(--mid-text);
   line-height: 1.7;
@@ -305,25 +305,25 @@
 }
 
 /* ─── Replay button ──────────────────────────────────────────── */
-.replayBtn {
+.button--replay {
   background: none;
   border: 1.5px solid var(--light-gray);
   border-radius: 4px;
   padding: 6px 16px;
-  font-family: 'Source Sans 3', sans-serif;
+  font-family: var(--font-body), sans-serif;
   font-size: 0.85rem;
   color: var(--mid-text);
   cursor: pointer;
   transition: border-color 0.15s ease, color 0.15s ease;
 }
 
-.replayBtn:hover {
+.button--replay:hover {
   border-color: var(--mid-text);
   color: var(--dark-text);
 }
 
 /* ─── Mobile timeline ────────────────────────────────────────── */
-.mobileList {
+.teacher-week__list {
   display: none;
   flex-direction: column;
   border: 1.5px solid var(--light-gray);
@@ -331,10 +331,10 @@
   overflow: hidden;
   margin-bottom: 32px;
   background: var(--off-white);
-  font-family: 'Source Sans 3', sans-serif;
+  font-family: var(--font-body), sans-serif;
 }
 
-.mobileRow {
+.teacher-week__mobile-row {
   display: flex;
   align-items: center;
   min-height: 44px;
@@ -343,11 +343,11 @@
   transition: background 0.4s ease;
 }
 
-.mobileRow:last-child { border-bottom: none; }
+.teacher-week__mobile-row:last-child { border-bottom: none; }
 
-.mobileRowSun { background: rgba(184, 80, 66, 0.05); }
+.teacher-week__mobile-row-sun { background: rgba(184, 80, 66, 0.05); }
 
-.mobileDay {
+.teacher-week__mobile-day {
   flex-shrink: 0;
   width: 48px;
   font-size: 0.72rem;
@@ -359,19 +359,19 @@
   transition: color 0.4s ease;
 }
 
-.mobileDaySun { color: var(--terracotta); }
+.teacher-week__mobile-day-sun { color: var(--terracotta); }
 
-.mobileDetail {
+.teacher-week__mobile-detail {
   flex: 1;
   padding: 0 12px 0 0;
 }
 
-.mobileSchool {
+.teacher-week__mobile-school {
   font-size: 0.72rem;
   color: var(--med-gray);
 }
 
-.mobileGhost {
+.teacher-week__mobile-ghost {
   font-size: 0.78rem;
   color: var(--med-gray);
   font-style: italic;
@@ -379,7 +379,7 @@
   transition: opacity 0.4s ease;
 }
 
-.mobileCommit {
+.teacher-week__mobile-commit {
   font-size: 0.78rem;
   color: var(--mid-text);
   font-weight: 500;
@@ -387,13 +387,13 @@
   transition: opacity 0.4s ease;
 }
 
-.mobileVisible { opacity: 1; }
+.teacher-week__mobile-visible { opacity: 1; }
 
-.mobileExam {
+.teacher-week__mobile-exam {
   display: inline-block;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--color-white);
   background: var(--terracotta);
   border-radius: 4px;
   padding: 3px 10px;
@@ -402,17 +402,17 @@
 
 /* ─── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 720px) {
-  .section    { padding: 56px 0; }
-  .calendarWrap { display: none; }
-  .mobileList { display: flex; }
+  .teacher-week    { padding: 56px 0; }
+  .calendar { display: none; }
+  .teacher-week__list { display: flex; }
 }
 
 /* ─── Reduced motion ─────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .examGroup  { transition: none; }
-  .examFloat  { animation: none; }
-  .examLanded { animation: none; }
-  .caption    { transition: none; }
-  .satBlock   { transition: none; }
-  .mobileExam { animation: none; }
+  .teacher-week__exam-group  { transition: none; }
+  .teacher-week__exam-float  { animation: none; }
+  .teacher-week__exam-landed { animation: none; }
+  .teacher-week__caption    { transition: none; }
+  .teacher-week__sat-block   { transition: none; }
+  .teacher-week__mobile-exam { animation: none; }
 }
