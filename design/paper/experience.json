@@ -1,0 +1,37 @@
+{
+  "meta": { "last_updated": "2026-09-28", "assignment": "C08" },
+  "fileId": "01M36MRM9HCJ4T87N081XDT4MX",
+  "tokenHash": "b9f678ac",
+  "designSystem": { "fileId": "01M39C8ME02J6YMB2BGFQFE1V4", "tokenHash": "9065ba3a", "components": ["9 Question table 2F8-0", "10 Question editor 2JL-0", "11 Status, delivery and staff records 2M2-0"], "patterns": ["09 Journey patterns"] },
+  "stylesheet": "app/(accounts)/experience.module.css",
+  "sources": {
+    "site-header, site-nav, site-nav__avatar": { "artboard": "M1 AHC-0", "nodes": ["AHD-0", "AHF-0", "AHG-0", "AHK-0", "AHN-0"] },
+    "page-header": { "artboard": "M1 AHC-0", "nodes": ["AHR-0", "AHT-0", "AHU-0", "AHV-0"] },
+    "paper-list": { "artboard": "M1 AHC-0", "nodes": ["AI1-0", "AI2-0", "AIA-0", "AJ8-0", "AKG-0", "AKI-0", "AIC-0", "AKK-0"] },
+    "paper-list phone": { "artboard": "M1p AZ7-0" },
+    "journey-steps, paper-facts, document-card, submitted-summary, key-value-list, help-card": { "artboard": "M4 AL3-0" },
+    "stage-list": { "artboard": "M3 AQ0-0" },
+    "notice (progress, caution, success, neutral, problem)": { "artboard": "M2 AVW-0", "nodes": ["AW8-0", "AWK-0", "AX0-0", "AXC-0", "AYC-0"] },
+    "document phone list": { "artboard": "M4p B13-0" },
+    "auth-layout, auth-steps, form-card, field": { "artboard": "T1 B44-0" },
+    "sign-in and recovery states": { "artboard": "T2 B63-0" },
+    "access-status, access-path, aside-card": { "artboard": "T3 B8W-0", "nodes": ["B9G-0", "B9J-0", "B9L-0", "B9N-0", "B9Q-0", "BAK-0", "BAV-0"] },
+    "access state copy": { "artboard": "T4 BB3-0" },
+    "formatting": { "artboard": "F1 C00-0, F1p C2Q-0" },
+    "staff-header, staff-nav, filter-chip, search-field, record-table, record-panel, segmented-control": { "artboard": "S3 BF1-0" },
+    "papers queue and record": { "artboard": "S5 BIR-0" },
+    "queue-card": { "artboard": "S2 BQ7-0" },
+    "staff sheet and phone record": { "artboard": "S6 BRW-0, S7p C5F-0, S8p C5G-0" },
+    "staff feedback and team sign in": { "artboard": "S4 BO2-0" },
+    "public wordmark, Sign in, pill buttons": { "page": "p-2-0", "nodes": ["8R-0", "90-0", "B5-0", "B7-0", "19Q-0", "1NC-0", "19V-0"] },
+    "builder row action Set marks": { "page": "p-6-0", "nodes": ["382-0", "3A9-0"] }
+  },
+  "deliberateDifferences": [
+    "The staff decision has no default selection; the S3 mock-up shows Approve highlighted only as an example.",
+    "Configured orders store no paper name, so titles are generated from the curriculum name; start dates sit in the meta line.",
+    "The paid-order list does not expose configured counts, payment dates or release dates; those details are shown only where the server provides them.",
+    "A held paper has no recorded stopping stage, so its page shows the problem notice without marking a stage.",
+    "Paid orders needing attention do not carry the amount; the record shows Paid with the Stripe mode.",
+    "The pilot page keeps its navy header; only the wordmark, label and button shape changed."
+  ]
+}

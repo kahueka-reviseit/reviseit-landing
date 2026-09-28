@@ -1,8 +1,8 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 import OrderView from '../../app/(accounts)/teacher/orders/[id]/view';
-import AccountNav from '../../app/(accounts)/account-nav';
-import shell from '../../app/(accounts)/accounts.module.css';
+import {TeacherHeader} from '../../app/(accounts)/shell';
+import ui from '../../app/(accounts)/experience.module.css';
 import {applyInterpretation} from '../../lib/configurator/brief';
 import {evaluate,project} from '../../lib/configurator/engine';
 import {previewCatalogue,previewConfiguration,previewDefinitions} from '../fixtures/configurator';
@@ -57,4 +57,4 @@ window.fetch=async(input,options)=>{
 (window as unknown as {simulateOtherTab:()=>void}).simulateOtherTab=()=>{revision++;};
 createRoot(document.getElementById('root')!).render(<>
  <div style={{padding:'10px 24px',background:'#1A1A2E',color:'white',textAlign:'center',fontSize:14}}>Local demonstration · synthetic questions · nothing is saved or charged</div>
- <div className={shell['site-shell']}><AccountNav path="/teacher/orders/synthetic"/><main className={shell['page-body']}><OrderView initial={order()} catalogue={catalogue}/></main></div></>);
+ <div className={ui['site-shell']}><TeacherHeader current="papers" name="Synthetic Teacher"/><main className={ui['site-shell__main']}><OrderView initial={order()} catalogue={catalogue}/></main></div></>);

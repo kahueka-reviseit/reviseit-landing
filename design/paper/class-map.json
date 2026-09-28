@@ -1,6 +1,7 @@
 {
   "meta": {
-    "last_updated": "2026-09-28"
+    "last_updated": "2026-09-28",
+    "retired": {"app/(accounts)/accounts.module.css": "Deleted in C08; the renewed shell and account screens use app/(accounts)/experience.module.css. Entries below are the historical naming map."}
   },
   "fileId": "01M36MRM9HCJ4T87N081XDT4MX",
   "modules": {

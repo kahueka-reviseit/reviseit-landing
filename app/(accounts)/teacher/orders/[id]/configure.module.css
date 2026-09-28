@@ -13,12 +13,8 @@
 
 .question-tabs { display:flex; gap:8px; overflow-x:auto; padding:2px 2px 6px; margin-bottom:20px; }
 .question-tabs__tab { flex:1 0 130px; text-align:left; background:var(--color-white); border:1px solid var(--color-light-gray); border-radius:10px; padding:12px 14px; display:grid; gap:6px; font:inherit; cursor:pointer; }
-.question-tabs__tab.question-tabs__tab--current { border:2px solid var(--color-sage-dark); padding:11px 13px; }
 .question-tabs__tab:focus-visible,.chip:focus-within,.stepper button:focus-visible,.button--primary:focus-visible,.button--secondary:focus-visible,.button--secondary-wide:focus-visible,.button--text:focus-visible,.subquestion-toggle__control:focus-within { outline:3px solid var(--color-slate-blue); outline-offset:2px; }
-.question-tabs__label,.question-tabs__label--multiple-choice { font-size:12px; font-weight:600; line-height:16px; color:var(--color-slate-blue); }
-.question-tabs__label--multiple-choice { color:#A87A45; }
-.question-tabs__status--ready { font-size:12px; font-weight:600; color:var(--color-sage-dark); }
-.question-tabs__status--to-complete { font-size:12px; color:var(--color-med-gray); }
+.question-tabs__label { font-size:12px; font-weight:600; line-height:16px; color:var(--color-slate-blue); }
 
 .page-body { display:grid; grid-template-columns:minmax(0,1fr) 460px; gap:32px; align-items:start; scroll-margin-top:24px; }
 .page-body__main,.page-body__aside { display:grid; gap:20px; min-width:0; }
@@ -89,7 +85,6 @@
 .card__summary strong { font:700 28px/34px var(--font-display),Georgia,serif; }
 .list { list-style:none; margin:0; padding:0; display:grid; gap:6px; font-size:15px; line-height:21px; color:var(--color-med-gray); }
 .list li::before { content:'· '; }
-.list li.list__item--done { color:var(--color-dark-text); } .list li.list__item--done::before { content:'✓ '; color:var(--color-sage-dark); }
 .totals__paper-target { display:flex; justify-content:space-between; align-items:center; gap:12px; font-weight:600; }
 .totals__paper-target input,.totals__section-target input { width:88px; padding:6px 10px; border:1px solid #D5D1C8; border-radius:8px; font:inherit; text-align:right; }
 .budget-line { display:grid; grid-template-columns:1fr auto; gap:6px 12px; align-items:center; font-size:15px; }
@@ -123,8 +118,6 @@
 .question-list li>span:nth-child(2) { display:grid; gap:2px; }
 .question-list strong { font-size:16px; } .question-list small { font-size:13px; color:var(--color-mid-text); }
 .question-list li>strong { text-align:right; font-weight:600; }
-.question-list__number--multiple-choice,.question-list__number--structured { font:700 16px/20px var(--font-display),Georgia,serif; }
-.question-list__number--multiple-choice { color:#A87A45; } .question-list__number--structured { color:var(--color-slate-blue); }
 .question-list .button--text { justify-self:end; }
 
 @media (max-width:1100px) {
@@ -148,16 +141,6 @@
 /* Order page frame for configured orders: widened to the journey's 1248px measure. */
 .order-page { width:min(1248px, calc(100vw - 32px)); margin-left:calc(50% - min(624px, 50vw - 16px)); padding-bottom:48px; }
 .breadcrumb__back { display:inline-block; color:var(--color-slate-blue); font-size:12px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; padding:8px 0; }
-.order-page__notices { display:grid; gap:10px; margin:0 0 20px; font-size:15px; }
-.order-page__notices button { padding:9px 16px; border:1px solid var(--color-sage); border-radius:999px; background:var(--color-white); color:var(--color-sage-dark); font:600 14px/18px var(--font-body),sans-serif; cursor:pointer; margin-right:8px; }
-.order-page__notices a { text-decoration:underline; }
-.order-page__notices [role=alert] { padding:10px 14px; border-left:3px solid var(--color-terracotta); background:#fcf0ee; color:#802f25; }
-.order-page__meta { font-size:14px; color:var(--color-med-gray); margin:0; }
-.order-page__meta code { font-size:12px; }
-.card--order { background:var(--color-white); border-radius:12px; box-shadow:0 8px 30px #1A1A2E0F; padding:32px; display:grid; gap:14px; margin-top:12px; }
-.card--order h1 { font:700 40px/46px var(--font-display),Georgia,serif; margin:0; }
-.card--order a { text-decoration:underline; }
-.order-page__eyebrow { font-size:12px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:var(--color-slate-blue); margin:0; }
 .button--refresh { margin-top:20px; padding:9px 16px; border:1px solid #D5D1C8; border-radius:999px; background:var(--color-white); font:600 14px/18px var(--font-body),sans-serif; cursor:pointer; }
 
 /* Direct Paper D6 / D8 CSS export: design/paper/paragraph-styles.json. */
@@ -215,7 +198,6 @@
 .question-table__mobile-label { display:none; }
 .paper-record { margin-top:20px; color:var(--color-med-gray); font-size:14px; }
 .paper-record summary { cursor:pointer; }
-.paper-record[open] .order-page__notices { margin-top:12px; }
 .side-panel { position:fixed; inset:var(--panel-top,81px) 0 0 auto; margin:0; width:480px; max-width:100vw; height:calc(100dvh - var(--panel-top,81px)); max-height:none; padding:0; border:0; border-left:1px solid var(--color-light-gray); color:var(--color-dark-text); background:var(--color-white); box-shadow:-16px 0 40px #1A1A2E1F; }
 .side-panel[open] { display:flex; flex-direction:column; }
 .side-panel::backdrop { background:transparent; }

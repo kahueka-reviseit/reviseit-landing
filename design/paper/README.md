@@ -33,3 +33,7 @@ The separate table-and-side-panel proposal and the separate Design System 1.0 pr
 `check:paper` checks BEM syntax in all application CSS modules, literal CSS Module references in application and test TypeScript, and token equality against the saved export. It does not contact Paper, validate every dynamic class expression, or prove full visual equivalence. Browser tests exercise the dynamic states.
 
 Browser coverage: `tests/workspace-browser/paper-alignment.spec.ts` compares representative computed values with the saved Paper source and checks long questionnaire hints for overlap. Existing workspace and public browser suites cover interaction continuity. All use local synthetic data.
+
+## Renewed experience (C08)
+
+`experience.json` records the Paper artboards and representative nodes behind `app/(accounts)/experience.module.css`, which carries the shell, notices, status markers, My papers, the paper page, account access, school formatting and the staff workspace. It also lists the deliberate differences where the application shows only data the server actually provides. `accounts.module.css` and `account-nav.tsx` were deleted; `tests/preview/screens.html` renders My papers and the paper page with synthetic orders, and `tests/workspace-browser/experience.spec.ts` checks them at desktop and phone widths.

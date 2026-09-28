@@ -1,8 +1,8 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 import WorkspaceView from '../../app/(accounts)/teacher/workspace';
-import AccountNav from '../../app/(accounts)/account-nav';
-import shell from '../../app/(accounts)/accounts.module.css';
+import {TeacherHeader} from '../../app/(accounts)/shell';
+import ui from '../../app/(accounts)/experience.module.css';
 import {workspace,sampleWorkspace} from '../fixtures/workspace';
 import {paperCurriculum,paperWorkspace} from '../fixtures/paper-catalogue';
 import {denseWorkspace} from '../fixtures/dense-catalogue';
@@ -44,4 +44,4 @@ window.fetch=async(input,options)=>{
 };
 createRoot(document.getElementById('root')!).render(<>
  <div style={{padding:'10px 24px',background:'#1A1A2E',color:'white',textAlign:'center',fontSize:14}}>Local demonstration · synthetic catalogue and school · changes saved only in this browser</div>
- <div className={shell['site-shell']}><AccountNav path="/teacher"/><main className={shell['page-body']}><WorkspaceView initial={get(curricula[0].id)}/></main></div></>);
+ <div className={ui['site-shell']}><TeacherHeader current="curricula" name="Synthetic Teacher"/><main className={ui['site-shell__main']}><WorkspaceView initial={get(curricula[0].id)}/></main></div></>);
