@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { requireAccount } from '../../../../lib/auth/access';
 import { StaffHeader } from '../../staff-header';
-import { accountCounts, papersNeedingAttention, reasonTone, searchTerm, type Attention } from '../data';
+import { accountCounts, emailKindLabels, emailNotifications, emailStatusLabels, papersNeedingAttention, reasonTone, searchTerm, type Attention } from '../data';
 import { CopyReference, FocusRow, RecordKeys } from './record';
 import ui from '../../experience.module.css';
 export const dynamic='force-dynamic';
@@ -21,7 +21,7 @@ export default async function ReviewPapers({ searchParams }: { searchParams: Pro
   const [{ paid, queue }, reviewer] = await Promise.all([papersNeedingAttention(supabase), supabase.rpc('is_account_reviewer')]);
   if (!paid && !queue) redirect('/account');
   const isReviewer = reviewer.data === true;
-  const counts = isReviewer ? await accountCounts(supabase, user.id) : null;
+  const [counts, emailRows] = isReviewer ? await Promise.all([accountCounts(supabase, user.id), emailNotifications(supabase)]) : [null, null];
   const emails = [...new Set((paid || []).map(p => p.teacherEmail))];
   const names = emails.length && isReviewer ? await supabase.from('teacher_accounts').select('email,full_name').in('email', emails) : null;
   const nameOf = new Map((names?.data || []).map(n => [String(n.email).toLowerCase(), n.full_name as string]));
@@ -37,6 +37,7 @@ export default async function ReviewPapers({ searchParams }: { searchParams: Pro
   const q = searchTerm(params.q).toLowerCase();
   const shown = items.filter(i => (reason === 'all' || i.reason === reason) && (!q || [i.title, i.teacher, i.school, i.email, i.id].join(' ').toLowerCase().includes(q)));
   const current = items.find(i => i.id === params.record);
+  const email = current ? (emailRows || []).find(e => e.orderId === current.id) : undefined;
   const href = (next: Partial<Params>) => { const u = new URLSearchParams(); const merged = { reason: reason === 'all' ? undefined : reason, q: q || undefined, ...next };
     for (const [k, v] of Object.entries(merged)) if (v) u.set(k, v); const s = u.toString(); return `/admin/papers${s ? `?${s}` : ''}`; };
   const firstName = (account.full_name || '').split(/\s+/)[0] || undefined;
@@ -74,7 +75,7 @@ export default async function ReviewPapers({ searchParams }: { searchParams: Pro
           <p className={ui['status']}><span className={ui[`status__dot--${current.tone}`]} aria-hidden="true"/><span className={ui[`status__label--${current.tone}`]}>{current.reason}{current.state === 'held' ? ' · no partial documents released' : ''}</span></p></div>
           <Link className={ui['record-panel__close']} href={href({ focus: current.id })} scroll={false} aria-label="Close paper record"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2 2 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></Link></div>
         <div className={ui['record-panel__body']}>
-          <dl className={ui['key-value-list__rows']}>{([['Teacher', [current.teacher !== current.email ? current.teacher : '', current.email].filter(Boolean).join(' · ')], ['School', current.school], ['Payment', [current.payment, current.mode && `Stripe ${current.mode.toLowerCase()} mode`].filter(Boolean).join(' · ')], ['Payment reference', current.paymentIntent || (current.mode ? 'Reference pending' : '')], ['Order reference', current.id], ['Order state', current.state]] as const)
+          <dl className={ui['key-value-list__rows']}>{([['Teacher', [current.teacher !== current.email ? current.teacher : '', current.email].filter(Boolean).join(' · ')], ['School', current.school], ['Payment', [current.payment, current.mode && `Stripe ${current.mode.toLowerCase()} mode`].filter(Boolean).join(' · ')], ['Payment reference', current.paymentIntent || (current.mode ? 'Reference pending' : '')], ['Order reference', current.id], ['Order state', current.state], ['Email', email ? `${emailKindLabels[email.kind]} · ${emailStatusLabels[email.status]?.label || email.status}` : '']] as const)
             .filter(([, v]) => v).map(([k, v]) => <div key={k} className={ui['key-value-list__row']}><dt className={ui['key-value-list__key']}>{k}</dt><dd className={k === 'Order reference' ? ui['key-value-list__value--subtle'] : ui['key-value-list__value']}>{v}</dd></div>)}</dl>
           <div className={ui['notice--neutral']}><p className={ui['notice__title--compact']}>What you can do</p><p className={ui['notice__body']}>Contact the teacher, or refund in Stripe using the payment reference. A full refund recorded by Stripe closes the paper automatically. This page cannot approve, restart or refund.</p></div>
           <div className={ui['record-panel__actions']}>{current.email && <a className={ui['button--secondary']} href={`mailto:${current.email}?subject=${encodeURIComponent('Your Revise It paper ' + current.id.slice(0, 8))}`}>Email teacher</a>}

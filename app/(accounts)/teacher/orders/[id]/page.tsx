@@ -15,6 +15,9 @@ export default async function OrderPage({params}:{params:Promise<{id:string}>}){
  const [catalogue,module]=await Promise.all([
   order.configurable?supabase.from('teacher_catalogue_summaries').select('entry_id,topic,description,thumbnail_alt').eq('module_id',order.moduleId).eq('release',order.release):null,
   supabase.from('curriculum_modules').select('name').eq('id',order.moduleId).maybeSingle()]);
+ // Promise an email only when completion email is actually on for this teacher.
+ const delivery=await supabase.rpc('my_email_delivery');
+ const completionEmail=!delivery.error&&delivery.data?.completionEmail===true&&typeof delivery.data.address==='string'?delivery.data.address:null;
  return <><TeacherHeader current="papers" name={account.full_name}/><main className={ui['site-shell__main']}>
-  <OrderView initial={order} curriculum={module.data?.name??undefined} catalogue={questionContexts(order.moduleId,order.release,catalogue?.data)}/></main></>;
+  <OrderView initial={order} curriculum={module.data?.name??undefined} catalogue={questionContexts(order.moduleId,order.release,catalogue?.data)} completionEmail={completionEmail}/></main></>;
 }

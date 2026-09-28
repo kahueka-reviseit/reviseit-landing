@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { requireReviewer } from '../../../lib/auth/access';
 import { StaffHeader } from '../staff-header';
-import { accountCounts, papersNeedingAttention, reasonTone } from './data';
+import { accountCounts, emailKindLabels, emailNeedsLook, emailNotifications, emailStatusLabels, papersNeedingAttention, reasonTone } from './data';
 import ui from '../experience.module.css';
 export const dynamic='force-dynamic';
 
@@ -9,11 +9,13 @@ export const dynamic='force-dynamic';
 function greeting(){const h=Number(new Intl.DateTimeFormat('en-ZA',{hour:'numeric',hourCycle:'h23',timeZone:'Africa/Johannesburg'}).format(new Date()));return h<12?'Good morning':h<17?'Good afternoon':'Good evening';}
 export default async function Administration() {
   const { supabase, user, account } = await requireReviewer();
-  const [counts, pending, { paid, queue }] = await Promise.all([
+  const [counts, pending, { paid, queue }, emails] = await Promise.all([
     accountCounts(supabase, user.id),
     supabase.from('teacher_accounts').select('user_id,full_name,requested_school,email_confirmed_at').neq('user_id', user.id).eq('status', 'pending').order('created_at', { ascending: false }).limit(5),
     papersNeedingAttention(supabase),
+    emailNotifications(supabase),
   ]);
+  const emailProblems = (emails || []).filter(emailNeedsLook);
   const papers = [...(paid || []).map(p => ({ id: p.orderId, title: queue?.find(q => q.id === p.orderId)?.title || `Paper ${p.orderId.slice(0, 8)}`, reason: p.reason })),
     ...(queue || []).filter(q => !(paid || []).some(p => p.orderId === q.id)).map(q => ({ id: q.id, title: q.title, reason: q.state === 'held' ? 'Generation held' : 'Being checked' }))];
   const first = (account.full_name || '').split(/\s+/)[0];
@@ -36,5 +38,11 @@ export default async function Administration() {
         {papers.length > 5 && <p className={ui['queue-card__more']}>and {papers.length - 5} more</p>}
         <div><Link className={ui['button--inverse']} href="/admin/papers">Open papers →</Link></div></section>
     </div>
+    {emails && emails.length > 0 && <section className={ui['queue-card']} aria-labelledby="email-queue"><h2 id="email-queue" className={ui['queue-card__label']}>Email to teachers</h2>
+      <p className={ui['queue-card__more']}>{emailProblems.length === 0 ? `No delivery problems in the last ${emails.length} messages. Delivered means the school's mail server accepted it, not that it was read.` : `${emailProblems.length} ${emailProblems.length === 1 ? 'message needs' : 'messages need'} a look. A failed email never holds a paper; the teacher can still open it from My papers.`}</p>
+      {emailProblems.length > 0 && <ul className={ui['queue-card__list']}>{emailProblems.slice(0, 5).map(e => <li key={e.id} className={ui['queue-card__item']}>
+        {e.orderId ? <Link className={ui['link']} href={`/admin/papers?record=${e.orderId}`}>{emailKindLabels[e.kind]}</Link> : <span>{emailKindLabels[e.kind]}</span>}
+        <span className={emailStatusLabels[e.status]?.tone === 'problem' ? ui['queue-card__item-note--problem'] : ui['queue-card__item-note--caution']}>{emailStatusLabels[e.status]?.label || e.status} · {e.recipient}</span></li>)}</ul>}
+    </section>}
   </div></main></>;
 }

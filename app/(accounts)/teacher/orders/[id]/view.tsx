@@ -30,7 +30,7 @@ const DocumentIcon=()=><svg width="22" height="26" viewBox="0 0 22 26" aria-hidd
 const DownloadIcon=()=><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1.5v8M3.5 6.5 7 10l3.5-3.5M2 12.5h10" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const Check=()=><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 
-export default function OrderView({initial,catalogue={},curriculum}:{initial:Order;catalogue?:Record<string,QuestionContext>;curriculum?:string}){
+export default function OrderView({initial,catalogue={},curriculum,completionEmail}:{initial:Order;catalogue?:Record<string,QuestionContext>;curriculum?:string;completionEmail?:string|null}){
  const [order,setOrder]=useState(initial),[answers,setAnswers]=useState<Record<string,string>>(initial.answers&&!isQuestionnaireAnswers(initial.answers)?initial.answers:{}),[key,setKey]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const [checking,setChecking]=useState(false);
  const [fieldError,setFieldError]=useState<QuestionnaireFieldError|null>(null);
@@ -41,7 +41,7 @@ export default function OrderView({initial,catalogue={},curriculum}:{initial:Ord
  // keep answers already entered for the same form revision.
  useEffect(()=>{if(isQuestionnaire(order.form)&&grouped?.revision!==order.form.revision)setGrouped(emptyQuestionnaireAnswers(order.form));},[order.form]);
  useEffect(()=>{const storageKey='paper-submit:'+initial.id;let value=sessionStorage.getItem(storageKey);if(!value){value=crypto.randomUUID();sessionStorage.setItem(storageKey,value);}setKey(value);},[initial.id]);
- async function refresh(){try{const r=await fetch(`/api/teacher/orders/${initial.id}`,{cache:'no-store'});if(r.status===401){window.location.assign('/login');return;}if(!r.ok){setError('We could not refresh this paper. Check your account access or try again.');return;}setOrder(await r.json());setError('');}catch{setError(submitted(order.state)?'Connection lost. Your paper is still being created; refresh in a moment.':'Connection lost. Your saved work is safe; refresh in a moment.');}}
+ async function refresh(){try{const r=await fetch(`/api/teacher/orders/${initial.id}`,{cache:'no-store'});if(r.status===401){window.location.assign(`/login?next=${encodeURIComponent(`/teacher/orders/${initial.id}`)}`);return;}if(!r.ok){setError('We could not refresh this paper. Check your account access or try again.');return;}setOrder(await r.json());setError('');}catch{setError(submitted(order.state)?'Connection lost. Your paper is still being created; refresh in a moment.':'Connection lost. Your saved work is safe; refresh in a moment.');}}
  useEffect(()=>{if(['released','held','cancelled','awaiting_answers'].includes(order.state))return;const timer=setInterval(()=>{if(document.visibilityState==='visible')void refresh();},5000);return()=>clearInterval(timer);},[order.state,initial.id]);
  async function payment(action:'reconcile'|'cancel'){setBusy(true);setChecking(action==='reconcile');setError('');try{const r=await fetch(`/api/teacher/orders/${initial.id}/payment`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action})});const data=await r.json();if(!r.ok)setError(data.error||'We could not confirm your payment yet. Refresh in a moment.');else setOrder(data);}catch{setError('Connection lost. If you paid, your payment is safe; refresh in a moment.');}finally{setBusy(false);setChecking(false);}}
  useEffect(()=>{if(initial.state==='awaiting_payment'&&new URLSearchParams(window.location.search).get('checkout')==='returned')void payment('reconcile');},[initial.id]);
@@ -107,7 +107,7 @@ export default function OrderView({initial,catalogue={},curriculum}:{initial:Ord
        <span className={ui[`stage-list__marker--${st}`]} aria-hidden="true">{st==='done'&&<Check/>}</span>
        <p className={ui[`stage-list__label--${st}`]}>{stateLabels[s]}</p>
        <p className={st==='current'?ui['stage-list__state--current']:ui['stage-list__state']}>{st==='done'?'Done':st==='current'?'In progress':'Next'}</p>
-       {st==='current'&&<p className={ui['stage-list__note']}>Your answers are saved. You can close this page and come back to My papers at any time.</p>}
+       {st==='current'&&<p className={ui['stage-list__note']}>{completionEmail?`Your answers are saved. You can close this page. We will email ${completionEmail} when all four documents are ready.`:'Your answers are saved. You can close this page and come back to My papers at any time.'}</p>}
       </li>;})}</ol></section>}
      {legacyForm&&<form onSubmit={submit} className={ui['form-card--inline']}>
       <h2 className={ui['form-card__title']}>Your answers</h2>

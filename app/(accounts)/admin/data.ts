@@ -39,3 +39,18 @@ export async function papersNeedingAttention(supabase:SupabaseClient) {
   return {paid,queue};
 }
 export const reasonTone=(reason:string)=>/held/i.test(reason)?'problem' as const:'attention' as const;
+
+/** C09 outbox, read through the reviewer's own session. Delivered is not read, and accepted is not delivered. */
+export type EmailRow = {id:string; kind:'access_approved'|'paper_ready'|'paper_attention'; status:string; reason:string|null; orderId:string|null; recipient:string; attempts:number; createdAt:string; updatedAt:string};
+export const emailKindLabels:Record<EmailRow['kind'],string> = {access_approved:'Account ready',paper_ready:'Paper ready',paper_attention:'Paper needs attention'};
+export const emailStatusLabels:Record<string,{label:string;tone:'done'|'progress'|'attention'|'problem'|'closed'}> = {
+  queued:{label:'Queued',tone:'progress'},sending:{label:'Sending',tone:'progress'},accepted:{label:'Accepted by Resend',tone:'progress'},
+  delayed:{label:'Delivery delayed',tone:'attention'},delivered:{label:'Delivered to mail server',tone:'done'},bounced:{label:'Bounced',tone:'problem'},
+  complained:{label:'Marked as spam',tone:'problem'},failed:{label:'Failed',tone:'problem'},suppressed:{label:'Suppressed address',tone:'problem'},
+  unknown:{label:'Unknown, needs a decision',tone:'attention'},cancelled:{label:'Not sent',tone:'closed'},resolved:{label:'Resolved by staff',tone:'closed'},
+};
+export const emailNeedsLook = (e:EmailRow) => ['bounced','complained','failed','suppressed','unknown'].includes(e.status) || (e.status==='cancelled' && e.reason==='recipient_changed');
+export async function emailNotifications(supabase:SupabaseClient):Promise<EmailRow[]|null> {
+  const r = await supabase.rpc('email_notifications_for_staff');
+  return r.error ? null : (r.data || []) as EmailRow[];
+}

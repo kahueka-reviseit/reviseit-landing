@@ -42,3 +42,15 @@ test('confirmation links are not consumed by opening a page, and invalid links s
   await expect(page.getByText('This confirmation link is incomplete.',{exact:false})).toBeVisible();
   await expect(page.getByRole('link',{name:'Back to sign in'})).toBeVisible();
 });
+test('an email link that needs sign-in explains the return and keeps only a same-site paper path', async ({ page }) => {
+  const order = '3f2b9c41-0000-4000-8000-000000000100';
+  await page.goto(`/login?next=${encodeURIComponent(`/teacher/orders/${order}`)}`);
+  await expect(page.getByText('Sign in to continue to your paper')).toBeVisible();
+  await expect(page.locator('input[name="next"]')).toHaveValue(`/teacher/orders/${order}`);
+  for (const bad of ['//evil.example/teacher', 'https://evil.example/teacher', '/admin/accounts']) {
+    await page.goto(`/login?next=${encodeURIComponent(bad)}`);
+    await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
+    await expect(page.getByText('Sign in to continue', { exact: false })).toHaveCount(0);
+    await expect(page.locator('input[name="next"]')).toHaveCount(0);
+  }
+});

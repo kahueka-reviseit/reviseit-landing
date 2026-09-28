@@ -5,7 +5,7 @@ import { headers } from 'next/headers';
 import { createClient } from '../../lib/supabase/server';
 import { authConfig } from '../../lib/supabase/config';
 import { requireAccount, requireReviewer } from '../../lib/auth/access';
-import { ACCOUNT_UNAVAILABLE, schoolEmailError, passwordError } from '../../lib/auth/policy';
+import { ACCOUNT_UNAVAILABLE, schoolEmailError, passwordError, safeNext } from '../../lib/auth/policy';
 /** `field` marks the input the message belongs to; `title` heads a notice; `attempt` lets a refused form reset its password. */
 export type FormState = { message: string; success?: boolean; title?: string; field?: string; email?: string; attempt?: number };
 const text = (form: FormData, name: string) => String(form.get(name) || '').trim();
@@ -41,7 +41,7 @@ export async function login(_: FormState, form: FormData): Promise<FormState> {
   if (!supabase) return { message: ACCOUNT_UNAVAILABLE };
   const { error } = await supabase.auth.signInWithPassword({ email: text(form, 'email').toLowerCase(), password: password(form) });
   if (error) return { title: 'We could not sign you in', message: 'Check your email and password. If you have just registered, confirm your school email first.', attempt: Date.now() };
-  redirect('/account');
+  redirect(safeNext(form.get('next')) || '/account');
 }
 export async function forgotPassword(_: FormState, form: FormData): Promise<FormState> {
   const supabase = await createClient(), config = authConfig();
