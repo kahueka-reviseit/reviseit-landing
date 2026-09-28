@@ -84,7 +84,7 @@ export default async function ReviewAccounts({ searchParams }: { searchParams: P
         </div>}
         <nav className={ui['pagination']} aria-label="Account review pages">{currentPage > 1 && <Link href={href({ page: String(currentPage - 1) })}>Previous page</Link>}{(accountsResult.count || 0) > offset + 50 && <Link href={href({ page: String(currentPage + 1) })}>Next page</Link>}</nav>
       </div>
-      {current && <ReviewPanel key={`${current.user_id}:${current.revision}`} account={{ ...current, schoolName: current.school_id ? schools.get(current.school_id) : undefined }} departments={departments}
+      {current && <ReviewPanel key={current.user_id} account={{ ...current, schoolName: current.school_id ? schools.get(current.school_id) : undefined }} departments={departments}
         closeHref={href({ focus: current.user_id })} nextHref={nextId ? href({ review: nextId }) : undefined} statusLabel={statusLabels[current.status].label}/>}
       {selected && !current && <aside className={ui['record-panel']}><div className={ui['record-panel__body']}><div className={ui['notice--neutral']} role="status"><p className={ui['notice__body']}>This account is not available to review. It may be your own account or no longer exist.</p></div><Link className={ui['link']} href={href({})}>Back to school accounts</Link></div></aside>}
     </div>}
