@@ -75,14 +75,14 @@
     "A28-0": {
       "fontSize": "14px",
       "lineHeight": "18px",
-      "fontFamily": "system-ui, sans-serif",
+      "fontFamily": "var(--font-body)",
       "fontWeight": 600,
       "color": "#000000"
     },
     "A29-0": {
       "fontSize": "15px",
       "lineHeight": "21px",
-      "fontFamily": "system-ui, sans-serif",
+      "fontFamily": "var(--font-body)",
       "fontWeight": 400,
       "color": "var(--color-mid-text)"
     },
@@ -95,14 +95,14 @@
     "A2C-0": {
       "fontSize": "14px",
       "lineHeight": "20px",
-      "fontFamily": "system-ui, sans-serif",
+      "fontFamily": "var(--font-body)",
       "fontWeight": 600,
       "color": "#000000"
     },
     "A2D-0": {
       "fontSize": "14px",
       "lineHeight": "20px",
-      "fontFamily": "system-ui, sans-serif",
+      "fontFamily": "var(--font-body)",
       "fontWeight": 400,
       "color": "var(--color-mid-text)"
     },
@@ -118,7 +118,7 @@
     "A2H-0": {
       "fontSize": "14px",
       "lineHeight": "20px",
-      "fontFamily": "system-ui, sans-serif",
+      "fontFamily": "var(--font-body)",
       "fontWeight": 600,
       "color": "var(--color-sage-dark)"
     },
@@ -129,7 +129,7 @@
     "AEA-0": {
       "fontSize": "13px",
       "lineHeight": "18px",
-      "fontFamily": "system-ui, sans-serif",
+      "fontFamily": "var(--font-body)",
       "fontWeight": 400,
       "color": "var(--color-mid-text)"
     },
@@ -147,7 +147,7 @@
       "flexShrink": "0",
       "fontSize": "13px",
       "lineHeight": "18px",
-      "fontFamily": "system-ui, sans-serif",
+      "fontFamily": "var(--font-body)",
       "fontWeight": 400,
       "color": "var(--color-mid-text)"
     },
@@ -156,7 +156,7 @@
       "flexBasis": "0%",
       "fontSize": "14px",
       "lineHeight": "19px",
-      "fontFamily": "system-ui, sans-serif",
+      "fontFamily": "var(--font-body)",
       "fontWeight": 400,
       "color": "#000000"
     },
@@ -173,7 +173,7 @@
     "AEG-0": {
       "fontSize": "12px",
       "lineHeight": "16px",
-      "fontFamily": "system-ui, sans-serif",
+      "fontFamily": "var(--font-body)",
       "fontWeight": 600,
       "color": "var(--color-white)"
     },
@@ -189,14 +189,14 @@
     "A2P-0": {
       "fontSize": "13px",
       "lineHeight": "18px",
-      "fontFamily": "system-ui, sans-serif",
+      "fontFamily": "var(--font-body)",
       "fontWeight": 600,
       "color": "var(--color-sage-dark)"
     },
     "A2Q-0": {
       "fontSize": "15px",
       "lineHeight": "22px",
-      "fontFamily": "system-ui, sans-serif",
+      "fontFamily": "var(--font-body)",
       "fontWeight": 400,
       "color": "var(--color-mid-text)"
     },
@@ -207,12 +207,12 @@
       "backgroundColor": "var(--color-white)",
       "borderWidth": "1px",
       "borderStyle": "solid",
-      "borderColor": "var(--color-border)"
+      "borderColor": "var(--color-border-strong)"
     },
     "A2T-0": {
       "fontSize": "16px",
       "lineHeight": "23px",
-      "fontFamily": "system-ui, sans-serif",
+      "fontFamily": "var(--font-body)",
       "fontWeight": 400,
       "color": "var(--color-med-gray)"
     },

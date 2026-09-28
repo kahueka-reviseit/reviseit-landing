@@ -1,10 +1,14 @@
 # Paper alignment
 
-Source: **Revise It Website**, Paper file `01M36MRM9HCJ4T87N081XDT4MX`, read on 28 September 2026 after the BEM naming sweep. Token export hash: `d68b1774`.
+Source: **Revise It Website**, Paper file `01M36MRM9HCJ4T87N081XDT4MX`, re-read on 28 September 2026 for the C08 renewal. Token export hash: `b9f678ac` (Design System file `01M39C8ME02J6YMB2BGFQFE1V4`, hash `9065ba3a`, uses the same names and values).
+
+## Border and font migration (C08)
+
+The old Website `--color-border` (#898780) meant a control outline. In the accepted system that meaning belongs to `--color-border-strong`; `--color-border` is now the lighter divider (#D5D1C8). Before the change, every application use was inventoried: seven declarations, all input or textarea outlines (`accounts.module.css` 1, `paper.module.css` 2, `configure.module.css` 3 plus the brief text input). All seven now use `--color-border-strong`, so outline contrast is unchanged. The 23 `system-ui` declarations inherited from page 7 now use `var(--font-body)`; Paper page 7 was re-read and its nodes use the body font. `question-context.json` and `paragraph-styles.json` record the refreshed values.
 
 ## What is linked
 
-- `snapshot.json` records the 16 exported tokens and selected computed styles used by browser checks.
+- `snapshot.json` records the 175 exported tokens and selected computed styles used by browser checks.
 - `layers.json` records 621 named layers with representative Paper node identifiers.
 - `class-map.json` traces 765 existing class names to their replacement across 13 CSS modules. 353 mappings have a corresponding captured Paper layer. The other 412 are explicitly marked application extensions. This is a migration map, not an exhaustive index of every newly added class.
 - `app/paper-tokens.css` contains the exact token values. Existing global variable aliases point to these values.
