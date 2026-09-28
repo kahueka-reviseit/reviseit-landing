@@ -1,6 +1,7 @@
 import {readDefinitions} from '../../lib/configurator/engine';
 import type {Configuration} from '../../lib/configurator/contracts';
 import type {QuestionField} from '../../lib/jobs/questionnaire';
+import type {QuestionContext} from '../../lib/workspace/contracts';
 // Synthetic, deliberately non-scientific configurator fixture for the local preview only.
 const h=(c:string)=>c.repeat(64);
 const choice=(id:string,label:string,options:[string,string][],required=true,allowAutomatic=true):QuestionField=>({id,label,hint:'',required,allowAutomatic,type:'choice',allowOther:false,choices:options.map(([id,label])=>({id,label}))});
@@ -38,3 +39,9 @@ export function previewDefinitions(){
  return readDefinitions({schema:'reviseit/configured-authored-inputs@1',module:'synthetic-module',release:'1',formRevision:h('d'),lines,requirements:{'synthetic-profile@1':{sha256:h('7'),payload:profile}}},form,h('9'));
 }
 export const previewConfiguration:Configuration={schemaVersion:1,targets:{paper:30,sections:{multiple_choice:4}},lines:{q1:{marks:14,parts:null,facets:{}},q2:{marks:12,parts:null,facets:{}},q3:{marks:2,parts:null,facets:{}},q4:{marks:2,parts:null,facets:{}}},answers:{items:{},paper:{}}};
+// Synthetic catalogue reminders: one complete entry, one without a description or diagram,
+// and SYN-01 deliberately absent (no published topic, description, diagram or outline).
+export const previewCatalogue:Record<string,QuestionContext>={
+ 'structured:SYN-02':{topic:'Synthetic relationships',description:'Learners use a synthetic relationship and compare two synthetic cases.',thumbnail:{src:'/sample-diagrams/forces.png',alt:'Synthetic diagram for the authored question'}},
+ 'mcq:SYN-MCQ-01':{topic:'Synthetic options',description:''},
+};

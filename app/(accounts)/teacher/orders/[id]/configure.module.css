@@ -294,3 +294,34 @@
 @media(max-width:1050px) { .brief-card { padding:20px; } .retained-brief { padding:20px; margin:-20px -20px 0; } }
 
 .paper-save:empty { display:none; }
+
+/* C06 catalogue context (Paper D9 9R5-0, D10 A31-0, D11 AFC-0). Values from the exported CSS; see design/paper/question-context.json. */
+.question-context { display:flex; flex-direction:column; gap:16px; padding:24px 28px; background:var(--color-off-white); border-bottom:1px solid var(--color-light-gray); font-family:var(--font-body); overflow-wrap:anywhere; }
+.question-context__heading { margin:0; font:600 12px/16px var(--font-body),sans-serif; letter-spacing:.12em; text-transform:uppercase; color:var(--color-sage-dark); }
+.question-context__overview { display:flex; align-items:center; gap:16px; }
+.question-context__diagram { width:132px; height:100px; flex-shrink:0; object-fit:contain; background:var(--color-white); border:1px solid var(--color-light-gray); }
+.question-context__description { display:flex; flex-direction:column; gap:6px; flex:1 1 0%; min-width:0; }
+.question-context__topic { margin:0; font:600 14px/18px system-ui,sans-serif; color:#000000; }
+.question-context__summary,.question-context__summary--clamped,.question-context__summary--missing { margin:0; font:400 15px/21px system-ui,sans-serif; color:var(--color-mid-text); }
+.question-context__summary--clamped { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:4; overflow:hidden; }
+.question-context__more { align-self:flex-start; margin:0; padding:0; border:0; background:none; font:600 14px/20px system-ui,sans-serif; color:var(--color-sage-dark); cursor:pointer; }
+.question-context__metadata { display:flex; flex-wrap:wrap; column-gap:16px; row-gap:8px; }
+.question-context__marks { font:600 14px/20px system-ui,sans-serif; color:#000000; }
+.question-context__range,.question-context__parts { font:400 14px/20px system-ui,sans-serif; color:var(--color-mid-text); }
+.question-context__outline-trigger { display:flex; justify-content:space-between; align-items:center; width:100%; margin:0; padding:12px 0 0; border:0; border-top:1px solid var(--color-light-gray); background:none; text-align:left; font:600 14px/20px system-ui,sans-serif; color:var(--color-sage-dark); cursor:pointer; }
+.question-context__outline-label,.question-context__chevron { font:inherit; color:inherit; }
+.question-context__outline { display:flex; flex-direction:column; }
+.question-context__outline[hidden] { display:none; }
+.question-context__outline-caption { margin:0; padding-bottom:12px; font:400 13px/18px system-ui,sans-serif; color:var(--color-mid-text); }
+.question-context__outline-list { margin:0; padding:0; list-style:none; }
+.question-context__outline-row { display:flex; align-items:center; gap:12px; padding:9px 0; border-top:1px solid var(--color-light-gray); }
+.question-context__part-number { width:28px; flex-shrink:0; font:400 13px/18px system-ui,sans-serif; color:var(--color-mid-text); }
+.question-context__part-summary { flex:1 1 0%; min-width:0; font:400 14px/19px system-ui,sans-serif; color:#000000; }
+.question-context__tag { width:78px; flex-shrink:0; padding:3px 5px; text-align:center; font:600 12px/16px system-ui,sans-serif; }
+.question-context__outline-missing { margin:0; padding-top:12px; border-top:1px solid var(--color-light-gray); font:400 13px/18px system-ui,sans-serif; color:var(--color-mid-text); }
+.question-brief__prompts { display:flex; flex-direction:column; gap:6px; padding-left:14px; border-left:2px solid var(--color-sage-light); }
+.question-brief__prompts-label { margin:0; font:600 13px/18px system-ui,sans-serif; text-transform:uppercase; color:var(--color-sage-dark); }
+.question-brief__prompts-list { margin:0; padding-left:18px; font:400 15px/22px system-ui,sans-serif; color:var(--color-mid-text); }
+.brief-card .text-input { min-height:164px; padding:16px; border-color:var(--color-border); font-size:16px; line-height:23px; }
+@media(max-width:1050px) { .question-context { padding:24px 20px; } }
+@media(max-width:380px) { .question-context__overview { flex-direction:column; align-items:flex-start; } }

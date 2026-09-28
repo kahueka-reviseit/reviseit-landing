@@ -5,6 +5,8 @@ import { groupLabel, type Attention, type Configuration, type ConfigurationView,
 import styles from './configure.module.css';
 import JevAdvice from './jev-advice';
 import PaperPanel from './paper-panel';
+import QuestionContext,{briefPrompts} from './question-context';
+import type {QuestionContext as Catalogue} from '../../../../../lib/workspace/contracts';
 import {emptyBrief,briefConflicts} from '../../../../../lib/configurator/brief';
 
 /**
@@ -67,7 +69,7 @@ function Chips({name,field,facet,value,onChange,disabled,attention}:{name:string
   </fieldset>;
 }
 
-export default function ConfigureOrder({orderId,onSubmitted,title,children,topics={}}:{topics?:Record<string,string>;orderId:string;onSubmitted:()=>void;title?:string;children?:ReactNode}) {
+export default function ConfigureOrder({orderId,onSubmitted,title,children,catalogue={}}:{catalogue?:Record<string,Catalogue>;orderId:string;onSubmitted:()=>void;title?:string;children?:ReactNode}) {
   const [view,setView]=useState<ConfigurationView|null>(null);
   const [draft,setDraft]=useState<Configuration|null>(null);
   const [active,setActive]=useState<string|null>(null);
@@ -78,6 +80,8 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,topic
   const [manual,setManual]=useState<Record<string,boolean>>({});
   const [briefError,setBriefError]=useState('');
   const [editingBrief,setEditingBrief]=useState<Record<string,boolean>>({});
+  // Disclosure only: kept per occurrence identity so reordering or switching questions keeps it.
+  const [outlineOpen,setOutlineOpen]=useState<Record<string,boolean>>({});
   const revision=useRef(0), latest=useRef<Configuration|null>(null), timer=useRef<ReturnType<typeof setTimeout>|null>(null), inFlight=useRef(false);
   const detailsRef=useRef<HTMLDivElement>(null);
 
@@ -159,6 +163,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,topic
   const conflicts=briefConflicts(brief,draft.answers.items[line.id]??{});
   const briefDone=!!brief&&brief.interpretedText===brief.text;
   const showManual=!briefOn||manual[line.id];
+  const prompts=briefPrompts(line.fields);
   function manualOptions(){
     setManual(m=>({...m,[line.id]:true}));setBriefError('');
     if(brief)update(c=>{const b=c.briefs![line.id];b.interpretedText=b.text;b.suggestions={};b.resolutions={};return c;});
@@ -206,7 +211,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,topic
       return <div key={l.id} role="row" className={`${styles['question-table__row']} ${panel==='question'&&i===index?styles['question-table__row--active']:''}`}>
         <div role="cell" className={l.kind==='multiple_choice'?styles['question-table__number--mcq']:styles['question-table__number']}>{l.number}</div>
         <div role="cell" className={styles['question-table__question']}><strong>{l.title}</strong>{l.entryId&&<small>{l.entryId.split(':').slice(1).join(':')}</small>}</div>
-        <div role="cell" className={styles['question-table__topic']}>{l.entryId&&topics[l.entryId]||'Not published'}</div>
+        <div role="cell" className={styles['question-table__topic']}>{l.entryId&&catalogue[l.entryId]?.topic||'Not published'}</div>
         <div role="cell" className={l.kind==='multiple_choice'?styles['question-table__kind--mcq']:styles['question-table__kind']}>{l.kind==='multiple_choice'?'Multiple choice':'Structured'}</div>
         <div role="cell" className={styles['question-table__marks']}>
           {l.marks.fixed?<><strong>{l.marks.min}</strong><small>fixed</small></>:<><input aria-label={`Table marks for question ${l.number}`} inputMode="numeric" value={m??''} placeholder="Set" disabled={!editable}
@@ -223,16 +228,19 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,topic
     summary={`${own.marks??'—'} marks · ${line.outstanding.length?`${line.outstanding.length} choices still to decide`:lineStatus(line,paid).text}`}
     footer={<>{saveNotice}<button type="button" className={styles['button--secondary']} onClick={closePanel}>Close</button></>}>
     <div className={styles['question-editor']} ref={detailsRef}>
+      <QuestionContext line={line} marks={own.marks} catalogue={line.entryId?catalogue[line.entryId]:undefined} open={!!outlineOpen[line.id]} onToggle={()=>setOutlineOpen(o=>({...o,[line.id]:!o[line.id]}))}/>
       {paid&&briefOn&&<section className={styles['brief-card']} aria-label="Your question brief">
         {briefDone&&!editingBrief[line.id]?<div className={styles['retained-brief']}>
           <div><h3>Your brief</h3><button type="button" className={styles['button--text']} disabled={!editable} onClick={()=>setEditingBrief(m=>({...m,[line.id]:true}))}>Edit brief</button></div>
           <p>{brief.text}</p>
         </div>:<>
         <h2 id="brief-heading" className={styles['card__title']}>What would you like this question to do?</h2>
-        <p className={styles['paragraph']}>Describe the scenario, what learners should do and anything you want included or left out.</p>
+        <p className={styles['paragraph']}>Start with what matters to you. We’ll show you any choices still to make.</p>
+        {prompts.length>0&&<div className={styles['question-brief__prompts']}><p id="brief-prompts-label" className={styles['question-brief__prompts-label']}>For this question, you could describe</p>
+          <ul id="brief-prompts" aria-labelledby="brief-prompts-label" className={styles['question-brief__prompts-list']}>{prompts.map(p=><li key={p}>{p}</li>)}</ul></div>}
         <label className={styles['text-field__label']} htmlFor="teacher-brief">Your brief</label>
-        <textarea id="teacher-brief" className={styles['text-input']} value={brief?.text??''} maxLength={4000} disabled={!editable}
-          placeholder="Tell us what you want from this question…"
+        <textarea id="teacher-brief" aria-describedby={prompts.length?'brief-prompts':undefined} className={styles['text-input']} value={brief?.text??''} maxLength={4000} disabled={!editable}
+          placeholder="For example: the setting you want, what learners are given and what they should work out…"
           onChange={e=>{const text=e.target.value;setBriefError('');update(c=>{c.briefs??={};c.briefs[line.id]??=emptyBrief();c.briefs[line.id].text=text;return c;});}}/>
         <div className={styles['question-order-controls']}><span className={styles['paragraph']}>Your words stay with this question.</span>
           <button type="button" className={styles['button--primary']} disabled={!editable||save!=='saved'||!brief?.text.trim()||!view.briefEnabled} onClick={()=>void configureBrief()}>{busy?'Configuring…':'Configure →'}</button></div>

@@ -15,6 +15,10 @@ The teacher navigation, catalogue card, questionnaire choices, status layout and
 
 The separate table-and-side-panel proposal and the separate Design System 1.0 proposal were not substituted for the current implemented journey. No question-generation or payment rules were changed.
 
+## Catalogue context (C06)
+
+`question-context.json` records the exported layout and typography of the question-editor reminder (D9 `9R5-0`, D10 `A31-0`, D11 `AFC-0`) and the prompt block, keyed by Paper node with each layer's BEM name. `tests/workspace-browser/question-context.spec.ts` compares the rendered editor with these values. The Paper summary and starter sentence are proposed copy, not published catalogue text, so the application shows the published description or an explicit fallback, and lists the item's authored form questions as prompts.
+
 ## Maintaining the link
 
 1. Read the changed artboard through Paper and obtain its layer names, computed styles and token export.

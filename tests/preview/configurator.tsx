@@ -5,7 +5,7 @@ import AccountNav from '../../app/(accounts)/account-nav';
 import shell from '../../app/(accounts)/accounts.module.css';
 import {applyInterpretation} from '../../lib/configurator/brief';
 import {evaluate,project} from '../../lib/configurator/engine';
-import {previewConfiguration,previewDefinitions} from '../fixtures/configurator';
+import {previewCatalogue,previewConfiguration,previewDefinitions} from '../fixtures/configurator';
 import type {Configuration} from '../../lib/configurator/contracts';
 import type {Order} from '../../lib/jobs/contracts';
 import '../../app/globals.css';
@@ -23,6 +23,10 @@ if(params.get('many')==='1'){
   ...(i<10?{}:{range:{min:8,max:30}})}));
  cfg={schemaVersion:1,targets:{paper:150,sections:{multiple_choice:20,structured:130}},lines:Object.fromEntries(defs.lines.map((l,i)=>[l.id,{marks:i<10?2:marks[i-10],parts:null,facets:{}}])),answers:{items:{},paper:{}}};
 }
+// ?long=1 stretches the catalogue reminder to check it never buries the teacher's brief.
+const catalogue=structuredClone(previewCatalogue);
+if(params.get('long')==='1'){catalogue['structured:SYN-02']={...catalogue['structured:SYN-02'],topic:'A deliberately long synthetic topic name that has to wrap across several lines in the panel',
+ description:'A deliberately long synthetic description. '.repeat(8).trim()};defs.lines[1].title='A deliberately long synthetic question title that wraps across more than one line in the editor heading';}
 const id='00000000-0000-4000-8000-0000000000c5';
 const order=():Order=>({id,title:'Grade 11 Physical Sciences paper',moduleId:'synthetic-module',release:'1',internalTest:false,createdAt:'',updatedAt:'',configurable:true,
  state:submitted?'queued':paid?'awaiting_answers':'awaiting_payment',form:null,answers:null,documents:[],
@@ -53,4 +57,4 @@ window.fetch=async(input,options)=>{
 (window as unknown as {simulateOtherTab:()=>void}).simulateOtherTab=()=>{revision++;};
 createRoot(document.getElementById('root')!).render(<>
  <div style={{padding:'10px 24px',background:'#1A1A2E',color:'white',textAlign:'center',fontSize:14}}>Local demonstration · synthetic questions · nothing is saved or charged</div>
- <div className={shell['site-shell']}><AccountNav path="/teacher/orders/synthetic"/><main className={shell['page-body']}><OrderView initial={order()}/></main></div></>);
+ <div className={shell['site-shell']}><AccountNav path="/teacher/orders/synthetic"/><main className={shell['page-body']}><OrderView initial={order()} catalogue={catalogue}/></main></div></>);

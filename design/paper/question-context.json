@@ -1,0 +1,231 @@
+{
+  "fileId": "01M36MRM9HCJ4T87N081XDT4MX",
+  "pageId": "p-8-0",
+  "tokens": "d68b1774",
+  "read": "2026-09-28",
+  "source": "Paper get_computed_styles and get_jsx (inline styles) for D9 9R5-0, D10 A31-0 and D11 AFC-0; screenshots inspected alongside. Layout and typography declarations only; the diagram background URL is a Paper asset and is replaced by the authenticated catalogue thumbnail.",
+  "artboards": {
+    "9R5-0": "D9 Context before writing · catalogue reminder",
+    "A31-0": "D10 Context expanded · see the question outline",
+    "AFC-0": "D11 Phone · context before writing",
+    "AGS-0": "Note F · catalogue context in the question editor"
+  },
+  "layers": {
+    "A22-0": "question-context",
+    "A23-0": "question-context__heading",
+    "A25-0": "question-context__overview",
+    "A26-0": "question-context__diagram",
+    "A28-0": "question-context__topic",
+    "A29-0": "question-context__summary",
+    "A2B-0": "question-context__metadata",
+    "A2C-0": "question-context__marks",
+    "A2D-0": "question-context__range",
+    "A2G-0": "question-context__outline-trigger",
+    "A2H-0": "question-context__outline-label",
+    "AE8-0": "question-context__outline",
+    "AEA-0": "question-context__outline-caption",
+    "AEC-0": "question-context__outline-row",
+    "AED-0": "question-context__part-number",
+    "AEE-0": "question-context__part-summary",
+    "AEF-0": "tag--remember (question-context__tag)",
+    "AEG-0": "tag__label",
+    "A2O-0": "question-brief__prompts",
+    "A2P-0": "question-brief__prompts-label",
+    "A2Q-0": "question-brief__prompts-copy (question-brief__prompts-list)",
+    "A2S-0": "question-brief__input (brief-card .text-input)",
+    "A2T-0": "question-brief__placeholder",
+    "AG2-0": "question-context (phone, max-width 1050px)"
+  },
+  "styles": {
+    "A22-0": {
+      "display": "flex",
+      "flexDirection": "column",
+      "fontFamily": "var(--font-body)",
+      "paddingBlock": "24px",
+      "paddingInline": "28px",
+      "gap": "16px",
+      "backgroundColor": "var(--color-off-white)",
+      "borderBottomWidth": "1px",
+      "borderBottomStyle": "solid",
+      "borderBottomColor": "var(--color-light-gray)"
+    },
+    "A23-0": {
+      "fontSize": "12px",
+      "lineHeight": "16px",
+      "letterSpacing": "0.12em",
+      "fontFamily": "var(--font-body)",
+      "fontWeight": 600,
+      "color": "var(--color-sage-dark)"
+    },
+    "A25-0": {
+      "display": "flex",
+      "alignItems": "center",
+      "gap": "16px"
+    },
+    "A26-0": {
+      "width": "132px",
+      "height": "100px",
+      "flexShrink": "0",
+      "backgroundColor": "var(--color-white)",
+      "backgroundSize": "contain",
+      "borderWidth": "1px",
+      "borderStyle": "solid",
+      "borderColor": "var(--color-light-gray)"
+    },
+    "A28-0": {
+      "fontSize": "14px",
+      "lineHeight": "18px",
+      "fontFamily": "system-ui, sans-serif",
+      "fontWeight": 600,
+      "color": "#000000"
+    },
+    "A29-0": {
+      "fontSize": "15px",
+      "lineHeight": "21px",
+      "fontFamily": "system-ui, sans-serif",
+      "fontWeight": 400,
+      "color": "var(--color-mid-text)"
+    },
+    "A2B-0": {
+      "display": "flex",
+      "flexWrap": "wrap",
+      "columnGap": "16px",
+      "rowGap": "8px"
+    },
+    "A2C-0": {
+      "fontSize": "14px",
+      "lineHeight": "20px",
+      "fontFamily": "system-ui, sans-serif",
+      "fontWeight": 600,
+      "color": "#000000"
+    },
+    "A2D-0": {
+      "fontSize": "14px",
+      "lineHeight": "20px",
+      "fontFamily": "system-ui, sans-serif",
+      "fontWeight": 400,
+      "color": "var(--color-mid-text)"
+    },
+    "A2G-0": {
+      "display": "flex",
+      "justifyContent": "space-between",
+      "alignItems": "center",
+      "paddingTop": "12px",
+      "borderTopWidth": "1px",
+      "borderTopStyle": "solid",
+      "borderTopColor": "var(--color-light-gray)"
+    },
+    "A2H-0": {
+      "fontSize": "14px",
+      "lineHeight": "20px",
+      "fontFamily": "system-ui, sans-serif",
+      "fontWeight": 600,
+      "color": "var(--color-sage-dark)"
+    },
+    "AE8-0": {
+      "display": "flex",
+      "flexDirection": "column"
+    },
+    "AEA-0": {
+      "fontSize": "13px",
+      "lineHeight": "18px",
+      "fontFamily": "system-ui, sans-serif",
+      "fontWeight": 400,
+      "color": "var(--color-mid-text)"
+    },
+    "AEC-0": {
+      "display": "flex",
+      "alignItems": "center",
+      "paddingBlock": "9px",
+      "gap": "12px",
+      "borderTopWidth": "1px",
+      "borderTopStyle": "solid",
+      "borderTopColor": "var(--color-light-gray)"
+    },
+    "AED-0": {
+      "width": "28px",
+      "flexShrink": "0",
+      "fontSize": "13px",
+      "lineHeight": "18px",
+      "fontFamily": "system-ui, sans-serif",
+      "fontWeight": 400,
+      "color": "var(--color-mid-text)"
+    },
+    "AEE-0": {
+      "flexGrow": "1",
+      "flexBasis": "0%",
+      "fontSize": "14px",
+      "lineHeight": "19px",
+      "fontFamily": "system-ui, sans-serif",
+      "fontWeight": 400,
+      "color": "#000000"
+    },
+    "AEF-0": {
+      "width": "78px",
+      "flexShrink": "0",
+      "display": "flex",
+      "justifyContent": "center",
+      "paddingBlock": "3px",
+      "paddingInline": "5px",
+      "borderRadius": "4px",
+      "backgroundColor": "var(--color-sage-dark)"
+    },
+    "AEG-0": {
+      "fontSize": "12px",
+      "lineHeight": "16px",
+      "fontFamily": "system-ui, sans-serif",
+      "fontWeight": 600,
+      "color": "var(--color-white)"
+    },
+    "A2O-0": {
+      "display": "flex",
+      "flexDirection": "column",
+      "paddingLeft": "14px",
+      "gap": "6px",
+      "borderLeftWidth": "2px",
+      "borderLeftStyle": "solid",
+      "borderLeftColor": "var(--color-sage-light)"
+    },
+    "A2P-0": {
+      "fontSize": "13px",
+      "lineHeight": "18px",
+      "fontFamily": "system-ui, sans-serif",
+      "fontWeight": 600,
+      "color": "var(--color-sage-dark)"
+    },
+    "A2Q-0": {
+      "fontSize": "15px",
+      "lineHeight": "22px",
+      "fontFamily": "system-ui, sans-serif",
+      "fontWeight": 400,
+      "color": "var(--color-mid-text)"
+    },
+    "A2S-0": {
+      "height": "164px",
+      "padding": "16px",
+      "borderRadius": "8px",
+      "backgroundColor": "var(--color-white)",
+      "borderWidth": "1px",
+      "borderStyle": "solid",
+      "borderColor": "var(--color-border)"
+    },
+    "A2T-0": {
+      "fontSize": "16px",
+      "lineHeight": "23px",
+      "fontFamily": "system-ui, sans-serif",
+      "fontWeight": 400,
+      "color": "var(--color-med-gray)"
+    },
+    "AG2-0": {
+      "display": "flex",
+      "flexDirection": "column",
+      "paddingBlock": "24px",
+      "paddingInline": "20px",
+      "gap": "16px",
+      "backgroundColor": "var(--color-off-white)",
+      "borderBottomWidth": "1px",
+      "borderBottomStyle": "solid",
+      "borderBottomColor": "var(--color-light-gray)"
+    }
+  }
+}
