@@ -20,16 +20,16 @@ async function context(id:string){
 function failure(e:unknown){return e instanceof ConfigurationError?reply({error:e.message},e.status):reply({error:'Configuration is unavailable. Please try again.'},503);}
 export async function GET(_:Request,{params}:Params){
  const {id}=await params;const x=await context(id);if(x instanceof NextResponse)return x;
- try{const loaded=await loadConfiguration(x.service,id,x.c.user.id);return loaded?reply({...loaded.view,advice:{enabled:jevAllowed(id),lineIds:jevAllowed(id)?eligibleLines(loaded):[]}}):reply({error:'Request not found'},404);}catch(e){return failure(e);}
+ try{const loaded=await loadConfiguration(x.service,id,x.c.user.id);return loaded?reply({...loaded.view,briefEnabled:jevAllowed(id),advice:{enabled:jevAllowed(id),lineIds:jevAllowed(id)?eligibleLines(loaded):[]}}):reply({error:'Request not found'},404);}catch(e){return failure(e);}
 }
 export async function PUT(request:Request,{params}:Params){
  const origin=originError(request);if(origin)return origin;
  const {id}=await params;const x=await context(id);if(x instanceof NextResponse)return x;
- let value;try{value=await body(request,70000);}catch{return reply({error:'Invalid request'},400);}
+ let value;try{value=await body(request,190000);}catch{return reply({error:'Invalid request'},400);}
  if(!isConfigurationSave(value))return reply({error:'Check your choices and try again.'},422);
  try{
   const loaded=await loadConfiguration(x.service,id,x.c.user.id);if(!loaded)return reply({error:'Request not found'},404);
   const after=await saveConfiguration(x.service,loaded,x.c.user.id,value.revision,value.configuration);
-  return reply({...after.view,advice:{enabled:jevAllowed(id),lineIds:jevAllowed(id)?eligibleLines(after):[]}});
+  return reply({...after.view,briefEnabled:jevAllowed(id),advice:{enabled:jevAllowed(id),lineIds:jevAllowed(id)?eligibleLines(after):[]}});
  }catch(e){return failure(e);}
 }

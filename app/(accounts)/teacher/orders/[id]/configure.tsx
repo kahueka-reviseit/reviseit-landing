@@ -4,6 +4,7 @@ import type { Answer, QuestionField } from '../../../../../lib/jobs/questionnair
 import { groupLabel, type Attention, type Configuration, type ConfigurationView, type FacetView, type LineView } from '../../../../../lib/configurator/contracts';
 import styles from './configure.module.css';
 import JevAdvice from './jev-advice';
+import {emptyBrief,briefConflicts} from '../../../../../lib/configurator/brief';
 
 /**
  * Configured order (Paper C5, C6 and C3a): marks, parts and authored details stay
@@ -72,6 +73,8 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
   const [save,setSave]=useState<SaveState>('saved');
   const [error,setError]=useState('');
   const [busy,setBusy]=useState(false);
+  const [manual,setManual]=useState<Record<string,boolean>>({});
+  const [briefError,setBriefError]=useState('');
   const revision=useRef(0), latest=useRef<Configuration|null>(null), timer=useRef<ReturnType<typeof setTimeout>|null>(null), inFlight=useRef(false);
   const detailsRef=useRef<HTMLDivElement>(null);
 
@@ -126,21 +129,22 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
 
   if(!view||!draft) return <section className={styles['card']}><p>{error||'Loading your paper…'}</p>{children}</section>;
   const paid=view.paid&&view.state==='awaiting_answers';
-  const editable=!view.submitted&&['awaiting_payment','awaiting_answers'].includes(view.state);
+  const editable=!busy&&!view.submitted&&['awaiting_payment','awaiting_answers'].includes(view.state);
   const index=Math.min(active,view.lines.length-1);
   const line=view.lines[index];
   const own=draft.lines[line.id];
   const setMarks=(id:string,value:number|null)=>update(c=>{c.lines[id].marks=value;return c;});
   const setAnswer=(scope:'item'|'paper',field:string,answer:Answer|null)=>update(c=>{
     const section=scope==='paper'?c.answers.paper:(c.answers.items[line.id]??={});
-    if(answer===null) delete section[field]; else section[field]=answer;return c;});
+    if(answer===null) delete section[field]; else section[field]=answer;
+    const b=c.briefs?.[line.id];if(scope==='item'&&b?.suggestions[field])b.resolutions[field]='choice';return c;});
   const togglePart=(id:string,on:boolean)=>update(c=>{const cur=new Set(c.lines[line.id].parts??[]);if(on)cur.add(id);else cur.delete(id);c.lines[line.id].parts=[...cur];return c;});
   const chooseAll=()=>update(c=>{const section=(c.answers.items[line.id]??={});for(const f of line.fields)if(f.allowAutomatic&&!section[f.id])section[f.id]={kind:'automatic'};return c;});
   const attentionFor=(id:string,scope='field')=>line.attention.find(a=>a.scope===scope&&a.id===id);
   const saveText={saved:'All changes saved',pending:'Unsaved changes',saving:'Saving…',conflict:'Not saved: this paper changed elsewhere',failed:'Not saved'}[save];
   const t=view.totals;
   const maxBloom=Math.max(1,...view.cognitive.map(r=>r.max));
-  const go=(i:number)=>{setActive(i);detailsRef.current?.scrollIntoView?.({behavior:'smooth',block:'start'});};
+  const go=(i:number)=>{setBriefError('');setActive(i);detailsRef.current?.scrollIntoView?.({behavior:'smooth',block:'start'});};
 
   // Reorder the purchased occurrences (identities and answers unchanged); saved as a revision.
   const moveLine=(id:string,by:number)=>update(c=>{const o=[...(c.order??Object.keys(c.lines))];
@@ -154,6 +158,29 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
   const itemAnswers=Object.values(draft.answers.items).flatMap(s=>Object.values(s));
   const yours=itemAnswers.filter(a=>a.kind==='choice'||a.kind==='text').length, delegated=itemAnswers.filter(a=>a.kind==='automatic').length;
   const nextLine=view.lines[index+1];
+  const brief=draft.briefs?.[line.id],briefOn=!!view.briefEnabled||!!brief;
+  const conflicts=briefConflicts(brief,draft.answers.items[line.id]??{});
+  const briefDone=!!brief&&brief.interpretedText===brief.text;
+  const showManual=!briefOn||manual[line.id];
+  function manualOptions(){
+    setManual(m=>({...m,[line.id]:true}));setBriefError('');
+    if(brief)update(c=>{const b=c.briefs![line.id];b.interpretedText=b.text;b.suggestions={};b.resolutions={};return c;});
+  }
+  async function configureBrief(){
+    if(save!=='saved'||busy||!view)return;
+    setBusy(true);setBriefError('');
+    try{
+      const r=await fetch(`/api/teacher/orders/${orderId}/configuration/interpret`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({revision:view.revision,lineId:line.id,requestKey:crypto.randomUUID()})});
+      const data=await r.json();
+      if(!r.ok){setBriefError(data.error||'Your brief is saved. Try again or choose options yourself.');if(r.status===409){setSave('conflict');setError(data.error);}return;}
+      setView(data);setDraft(data.configuration);latest.current=data.configuration;revision.current=data.revision;setSave('saved');setManual(m=>({...m,[line.id]:false}));
+    }catch{setBriefError('Your brief is saved. We could not configure it just now. Try again or choose options yourself.');}
+    finally{setBusy(false);}
+  }
+  function resolveBrief(field:string,useBrief:boolean){update(c=>{
+    const b=c.briefs![line.id];if(useBrief)c.answers.items[line.id][field]=b.suggestions[field];
+    b.resolutions[field]=useBrief?'brief':'choice';return c;
+  });}
   const heading=view.submitted?'Submitted for generation':allReady?'Your paper is fully configured':paid?'Finish your paper':'Your paper is waiting for payment';
   return <>
   <header className={styles['page-header']}>
@@ -185,6 +212,34 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
   </nav>
   <div className={styles['page-body']} ref={detailsRef}>
     <div className={styles['page-body__main']}>
+      {paid&&briefOn&&<section className={styles['card']} aria-labelledby="brief-heading">
+        <p className={styles['card__eyebrow--structured']}>Question {line.number} · {line.title}</p>
+        <h2 id="brief-heading" className={styles['card__title']}>What would you like this question to do?</h2>
+        <p className={styles['paragraph']}>Describe the scenario, what learners should do and anything you want included or left out.</p>
+        <label className={styles['text-field__label']} htmlFor="teacher-brief">Your brief</label>
+        <textarea id="teacher-brief" className={styles['text-input']} value={brief?.text??''} maxLength={4000} disabled={!editable}
+          placeholder="Tell us what you want from this question…"
+          onChange={e=>{const text=e.target.value;setBriefError('');update(c=>{c.briefs??={};c.briefs[line.id]??=emptyBrief();c.briefs[line.id].text=text;return c;});}}/>
+        <div className={styles['question-order-controls']}><span className={styles['paragraph']}>Your words stay with this question.</span>
+          <button type="button" className={styles['button--primary']} disabled={!editable||save!=='saved'||!brief?.text.trim()||!view.briefEnabled} onClick={()=>void configureBrief()}>{busy?'Configuring…':'Configure →'}</button></div>
+        {save!=='saved'&&<p className={styles['paragraph']} role="status">{saveText}</p>}
+        {briefError&&<p role="alert" className={styles['notice--error']}>{briefError}</p>}
+        <button type="button" className={styles['button--text']} disabled={!editable} onClick={manualOptions}>{brief?.text?'Keep my words and choose options myself →':'Or choose the options yourself →'}</button>
+        {brief?.text&&<p className={styles['card__note']}>Your full description accompanies the final choices. Where they differ, your explicit choices take precedence.</p>}
+        {briefDone&&Object.keys(brief.suggestions).length>0&&<div className={styles['brief-summary']}>
+          <h3 className={styles['card__title']}>What we understood</h3><p className={styles['paragraph']}>Taken from your words. Existing choices are kept until you change them.</p>
+          {Object.entries(brief.suggestions).map(([id,answer])=>{const field=line.fields.find(f=>f.id===id);return field&&<div key={id} className={styles['brief-summary__row']}>
+            <div><span className={styles['paragraph']}>{field.label}</span><strong>{describe(field,answer)}</strong></div>
+            <button type="button" className={styles['button--text']} aria-label={`Change ${field.label}`} disabled={!editable} onClick={()=>setManual(m=>({...m,[line.id]:true}))}>Change</button>
+            {conflicts.includes(id)&&<div className={styles['brief-summary__conflict']} role="alert"><p>Your current choice differs: {describe(field,draft.answers.items[line.id]?.[id])}.</p>
+              <button type="button" className={styles['button--secondary']} disabled={!editable} onClick={()=>resolveBrief(id,true)}>Use the choice from my brief</button>{' '}
+              <button type="button" className={styles['button--secondary']} disabled={!editable} onClick={()=>resolveBrief(id,false)}>Keep my current choice</button></div>}
+            {brief.resolutions[id]==='choice'&&<p className={styles['brief-summary__conflict']}>Your current choice takes precedence: {describe(field,draft.answers.items[line.id]?.[id])}</p>}
+          </div>;})}
+        </div>}
+        {briefDone&&!line.fields.length&&<p className={styles['paragraph']}>Your brief is saved for generation. This question has no additional options to choose.</p>}
+        {briefDone&&line.ready&&!conflicts.length&&<p className={styles['save-status']}>Configured · Everything stays editable until you submit.</p>}
+      </section>}
       <section className={styles['card']} aria-labelledby="allocation-heading">
         <p id="allocation-heading" className={styles['card__eyebrow--positive']}>{paid?'Your allocation · still editable':'Marks for this question'}</p>
         <div className={styles['marks-control']}>
@@ -219,7 +274,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
 
       {paid&&<section className={styles['card']} aria-labelledby="details-heading">
         <div className={styles['card__header']}><div><p className={styles['card__eyebrow--structured']}>Question {line.number} · {line.title} · {own.marks??'?'} marks</p>
-          <h2 id="details-heading" className={styles['card__title']}>{line.fields.length?'Set the details':'No further details are needed'}</h2></div>
+          <h2 id="details-heading" className={styles['card__title']}>{briefOn?(showManual?'Choose options yourself':'Still to decide'):(line.fields.length?'Set the details':'No further details are needed')}</h2></div>
           {editable&&line.fields.some(f=>f.allowAutomatic&&!draft.answers.items[line.id]?.[f.id])&&<button type="button" className={styles['button--text']} onClick={chooseAll}>Choose for me on all</button>}</div>
         {line.configurable==='authored'&&<p className={styles['paragraph']}>This question uses its authored details. Parts and cognitive levels are not yet classified.</p>}
         {line.issues.map((m,i)=><p key={i} role="alert" className={styles['notice--error']}>{m}</p>)}
@@ -236,9 +291,9 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
           </li>)}</ol></fieldset>}
         {line.diagram&&<div className={styles['notice--info']}><strong>{line.diagram.locked?'Stimulus diagram set by your choices':line.diagram.stimulus==='required'?'This question needs its diagram':line.diagram.stimulus==='not_applicable'?'No stimulus diagram for this question':'Stimulus diagram'}</strong>
           <span>{line.diagram.learnerDrawn.length?'A drawing learners make themselves is a separate part and is not affected by the stimulus diagram choice.':'The stimulus diagram is what learners are given; it is separate from anything learners draw.'}</span></div>}
-        {line.fields.map(f=><Chips key={f.id} name={`q-${line.id}`} field={f} facet={line.facets.find(x=>x.id===f.id)} value={draft.answers.items[line.id]?.[f.id]} disabled={!editable}
+        {line.fields.filter(f=>showManual||!draft.answers.items[line.id]?.[f.id]||!!attentionFor(f.id)).map(f=><Chips key={f.id} name={`q-${line.id}`} field={f} facet={line.facets.find(x=>x.id===f.id)} value={draft.answers.items[line.id]?.[f.id]} disabled={!editable}
           attention={attentionFor(f.id)} onChange={a=>setAnswer('item',f.id,a)}/>)}
-        <JevAdvice orderId={orderId} lineId={line.id} revision={view.revision} enabled={!!view.advice?.enabled&&view.advice.lineIds.includes(line.id)&&editable&&!busy}
+        <JevAdvice orderId={orderId} lineId={line.id} revision={view.revision} enabled={!briefOn&&!!view.advice?.enabled&&view.advice.lineIds.includes(line.id)&&editable&&!busy}
           saved={save==='saved'} answers={draft.answers.items[line.id]??{}} fields={line.fields} onAccept={(field,answer)=>setAnswer('item',field,answer)}/>
       </section>}
 

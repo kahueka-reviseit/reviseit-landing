@@ -55,7 +55,7 @@ export async function submitConfiguration(service:SupabaseClient, loaded:Loaded,
   if(expected!==loaded.row.revision) throw refusal('Configuration changed');
   if(!loaded.evaluation.ready) throw refusal(loaded.row.submitted?'Order already submitted':'Configuration is not ready');
   const {plan,answers}=generationPlan(loaded.defs,loaded.configuration,loaded.evaluation,loaded.row.orderId,loaded.row.revision);
-  const r=await service.rpc('submit_configured_paper_v3',{target:loaded.row.orderId,target_teacher:teacherId,request_key:requestKey,expected_revision:expected,submitted_answers:answers,plan,current_evaluation:storedEvaluation(loaded.evaluation)});
+  const r=await service.rpc(plan.schema==='reviseit/configured-generation-plan@4'?'submit_configured_paper_v4':'submit_configured_paper_v3',{target:loaded.row.orderId,target_teacher:teacherId,request_key:requestKey,expected_revision:expected,submitted_answers:answers,plan,current_evaluation:storedEvaluation(loaded.evaluation)});
   if(r.error) throw refusal(r.error.message);
   return r.data as string;
 }

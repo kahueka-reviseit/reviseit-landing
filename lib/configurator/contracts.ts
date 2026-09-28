@@ -14,7 +14,9 @@ export const sectionLabels: Record<SectionKey,string> = {multiple_choice:'Multip
 
 export type Targets = {paper:number|null; sections?:Partial<Record<SectionKey,number>>};
 export type LineChoice = {marks:number|null; parts:string[]|null; facets:Record<string,Answer>};
+export type TeacherBrief = {text:string; interpretedText:string|null; suggestions:Record<string,Answer>; resolutions:Record<string,'brief'|'choice'>};
 export type Configuration = {
+  briefs?:Record<string,TeacherBrief>;
   schemaVersion:1; targets:Targets; lines:Record<string,LineChoice>; order?:string[];
   answers:{items:Record<string,Record<string,Answer>>; paper:Record<string,Answer>};
 };
@@ -37,7 +39,7 @@ function answers(section:unknown,max:number):section is Record<string,Answer> {
 
 /** Closed shape only. Identities, ranges and rules are checked against pinned definitions on the server. */
 export function isConfiguration(value:unknown):value is Configuration {
-  if(!record(value) || !exact(value,['schemaVersion','targets','lines','answers'],['order']) || value.schemaVersion!==1) return false;
+  if(!record(value) || !exact(value,['schemaVersion','targets','lines','answers'],['order','briefs']) || value.schemaVersion!==1) return false;
   if(Object.hasOwn(value,'order') && !(Array.isArray(value.order) && record(value.lines) && value.order.length===Object.keys(value.lines).length
     && new Set(value.order).size===value.order.length && value.order.every(id=>typeof id==='string' && Object.hasOwn(value.lines as object,id)))) return false;
   const t=value.targets;
@@ -50,7 +52,13 @@ export function isConfiguration(value:unknown):value is Configuration {
   const a=value.answers;
   if(!record(a) || !exact(a,['items','paper']) || !record(a.items) || !answers(a.paper,20)) return false;
   if(!Object.entries(a.items).every(([id,s])=>Object.hasOwn(value.lines as object,id) && answers(s,30))) return false;
-  return new TextEncoder().encode(JSON.stringify(value)).byteLength<=64000;
+  if(value.briefs!==undefined && (!record(value.briefs)||Object.entries(value.briefs).some(([id,b])=>!Object.hasOwn(value.lines as object,id)||!isTeacherBrief(b)))) return false;
+  return new TextEncoder().encode(JSON.stringify(value)).byteLength<=180000;
+}
+export function isTeacherBrief(b:unknown):b is TeacherBrief {
+  return record(b)&&exact(b,['text','interpretedText','suggestions','resolutions'])&&typeof b.text==='string'&&b.text.length<=4000&&
+    (b.interpretedText===null||typeof b.interpretedText==='string'&&b.interpretedText.length<=4000)&&answers(b.suggestions,30)&&record(b.resolutions)&&
+    Object.entries(b.resolutions).every(([id,v])=>identifier(id)&&Object.hasOwn(b.suggestions as object,id)&&(v==='brief'||v==='choice'));
 }
 
 export type ConfigurationSave = {revision:number; configuration:Configuration};
@@ -85,6 +93,7 @@ export type CognitiveRow = {key:string; label:string; min:number; max:number; gr
 export const groupLabel=(key:string)=>key.split('-or-').map(k=>bloomLabels[k as BloomKey]??k).join(' or ');
 export type CurriculumComparison = {profile:string; basis:'marks'|'item-count'; rows:{key:string; label:string; min:number; max:number; target:string}[]; note:string};
 export type ConfigurationView = {
+  briefEnabled?:boolean;
   advice?:{enabled:boolean;lineIds:string[]};
   orderId:string; state:string; paid:boolean; paymentStatus:string; revision:number; submitted:boolean;
   status:ReadinessStatus; statusLabel:string; outstanding:number; canSubmit:boolean;

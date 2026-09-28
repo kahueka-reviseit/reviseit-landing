@@ -159,3 +159,11 @@
 .card--order a { text-decoration:underline; }
 .order-page__eyebrow { font-size:12px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:var(--color-slate-blue); margin:0; }
 .button--refresh { margin-top:20px; padding:9px 16px; border:1px solid #D5D1C8; border-radius:999px; background:var(--color-white); font:600 14px/18px var(--font-body),sans-serif; cursor:pointer; }
+
+/* Paper D6 / D8 interpretation rows: native editable form controls share existing tokens. */
+.brief-summary { display:flex; flex-direction:column; gap:10px; padding-top:20px; }
+.brief-summary__row { display:flex; flex-wrap:wrap; align-items:center; gap:14px; padding:12px 0; border-top:1px solid var(--color-light-gray); }
+.brief-summary__row > div:first-child { flex:1; min-width:0; display:grid; gap:4px; }
+.brief-summary__row strong { font-size:16px; line-height:22px; overflow-wrap:anywhere; }
+.brief-summary__row > button { width:58px; flex-shrink:0; text-align:right; }
+.brief-summary__conflict { width:100%; margin:0; padding:14px; background:var(--color-off-white); border-left:3px solid var(--color-gold); overflow-wrap:anywhere; }

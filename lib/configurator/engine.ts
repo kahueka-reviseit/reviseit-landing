@@ -1,3 +1,4 @@
+import {briefConflicts} from './brief';
 import { cataloguePreview, type CataloguePreview } from '../workspace/contracts';
 import { isQuestionnaire, type Answer, type QuestionField, type QuestionnaireAnswers } from '../jobs/questionnaire';
 import { bloomKeys, bloomLabels, groupLabel, readinessLabels, sectionLabels, type Attention, type BloomKey, type CognitiveRow, type Configuration,
@@ -138,6 +139,13 @@ export function evaluate(defs:Definitions, cfg:Configuration, opts:{paid:boolean
       // Classified lines report answer problems through the contract evaluator's authored wording.
       attention.push(...(classified?classified.attention:fields.attention));
     }
+    const brief=cfg.briefs?.[def.id];
+    if(brief) {
+      if(!opts.paid)throw new Error('Briefs are available after payment');
+      if(Object.entries(brief.suggestions).some(([id,a])=>!def.fields.some(f=>f.id===id&&answerFits(f,a))))throw new Error('Brief options do not match the purchased form');
+      if(brief.text!==brief.interpretedText) attention.push({scope:'field',id:'teacher-brief',message:'Your description changed. Configure it or keep your current choices explicitly.'});
+      for(const id of briefConflicts(brief,cfg.answers.items[def.id]??{})) attention.push({scope:'field',id,message:'Your description and existing choice differ. Choose which to use.'});
+    }
     return {id:def.id,marks:marksProblem?null:marks,marksProblem,classified,outstanding,attention,issues:lineIssues,ready:!marksProblem&&!outstanding.length&&!attention.length&&!lineIssues.length};
   });
   // Product policy: only per-item answers are requested. Retained shared answers are historical data.
@@ -173,11 +181,11 @@ export function submittedAnswers(defs:Definitions, cfg:Configuration):Questionna
   return {schemaVersion:2,revision:defs.formRevision,items:Object.fromEntries(defs.lines.map(l=>[l.id,fill(l.fields,cfg.answers.items[l.id])])),paper:{}};
 }
 
-export type PlanLine = {id:string; entryId:string; identity:LineDefinition['identity']; kind:LineDefinition['legacyKind']; marks:number;
+export type PlanLine = {teacherBrief?:Configuration['briefs'] extends Record<string,infer B>|undefined?B|null:never; id:string; entryId:string; identity:LineDefinition['identity']; kind:LineDefinition['legacyKind']; marks:number;
   parts:{id:string; marks:{min:number;max:number}|null; bloom:BloomKey|null; learnerDrawn:boolean}[]|null;
   facets:Record<string,Answer>; answers:Record<string,Answer>; classificationSha256:string|null; requirementsRef:string|null;
   diagram:{stimulus:string; learnerDrawn:string[]}|null; sourceBinding:SourceBinding};
-export type GenerationPlan = {schema:'reviseit/configured-generation-plan@3'; order:string[]; orderId:string; module:string; release:string; formRevision:string;
+export type GenerationPlan = {schema:'reviseit/configured-generation-plan@3'|'reviseit/configured-generation-plan@4'; order:string[]; orderId:string; module:string; release:string; formRevision:string;
   configurationRevision:number; definitionsSha256:string; targets:Configuration['targets']; lines:PlanLine[]};
 
 /** Freeze the resolved configuration the worker and skill must consume. Refuses anything not ready. */
@@ -188,9 +196,9 @@ export function generationPlan(defs:Definitions, cfg:Configuration, e:Evaluation
     const r=e.lines[i];
     return {id:def.id,entryId:def.entryId,identity:def.identity,kind:def.legacyKind,marks:r.marks!,
       parts:r.classified?r.classified.plannedParts:null,facets:cfg.lines[def.id].facets,answers:answers.items[def.id],
-      classificationSha256:def.classificationSha256,requirementsRef:def.requirementsRef,diagram:r.classified?.diagram??null,sourceBinding:def.sourceBinding};
+      classificationSha256:def.classificationSha256,requirementsRef:def.requirementsRef,diagram:r.classified?.diagram??null,sourceBinding:def.sourceBinding,...(cfg.briefs?{teacherBrief:cfg.briefs[def.id]??null}:{})};
   });
-  return {plan:{schema:'reviseit/configured-generation-plan@3',order:lineOrder(defs,cfg),orderId,module:defs.module,release:defs.release,formRevision:defs.formRevision,
+  return {plan:{schema:cfg.briefs?'reviseit/configured-generation-plan@4':'reviseit/configured-generation-plan@3',order:lineOrder(defs,cfg),orderId,module:defs.module,release:defs.release,formRevision:defs.formRevision,
     configurationRevision:revision,definitionsSha256:defs.sha256,targets:cfg.targets,lines},answers};
 }
 

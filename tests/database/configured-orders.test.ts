@@ -348,3 +348,28 @@ test('individual-only submission ignores shared requirements and preserves saved
  const job=await claim(['configured-plan@3']);expect(job.answers.paper).toEqual({});expect(job.answers.items).toEqual(answers.items);
  expect(job.snapshot).toEqual(cur.snapshot);
 });
+
+
+test('paragraphs are revisioned per occurrence and frozen exactly; old workers cannot claim them',async()=>{
+ const orderId=await paidOrder(),cfg={...configured(),briefs:{q1:{text:'Use a blue setting. Keep my words.',interpretedText:'Use a blue setting. Keep my words.',suggestions:{setting:chosen},resolutions:{}},q3:{text:'No hints in this question.',interpretedText:'No hints in this question.',suggestions:{},resolutions:{}}}};
+ await save(orderId,cfg,1,true);const cur=await read(orderId);
+ expect(cur.configuration.briefs).toEqual(cfg.briefs);
+ await refuse(()=>save(orderId,{...cfg,briefs:{...cfg.briefs,unknown:cfg.briefs.q1}},2,true),/Invalid configuration/);
+ await refuse(()=>save(orderId,{...cfg,briefs:{q1:{...cfg.briefs.q1,resolutions:{missing:'choice'}}}},2,true),/Invalid configuration/);
+ await refuse(()=>save(orderId,cfg,1,true),/Configuration changed/);
+ const answers={...answersFor(cur),paper:{}};
+ const plan={...planFor(cur,orderId),schema:'reviseit/configured-generation-plan@4',lines:planFor(cur,orderId).lines.map((l:any)=>({...l,teacherBrief:(cfg.briefs as any)[l.id]??null}))};
+ const call=(p:any=plan)=>one('select public.submit_configured_paper_v4($1,$2,$3,$4,$5,$6,$7) as r',[orderId,teacher,submission,cur.revision,JSON.stringify(answers),JSON.stringify(p),JSON.stringify({...evaluation(cur,true),engine:'cfg01-engine@2'})]);
+ const corrupt=structuredClone(plan);corrupt.lines[0].teacherBrief.text='Silently changed';
+ await service();await refuse(()=>call(corrupt),/Invalid generation plan/);
+ expect(await call()).toBe(orderId);expect(await call()).toBe(orderId);
+ expect(await claim(['configured-plan@1','configured-plan@2','configured-plan@3'])).toBeNull();
+ const job=await claim(['configured-plan@4']);expect(job.configurationPlan).toEqual(plan);expect(job.answers.paper).toEqual({});
+ expect((await read(orderId)).configuration).toEqual(cur.configuration);
+});
+test('a changed paragraph cannot be submitted with a stale interpretation',async()=>{
+ const orderId=await paidOrder(),cfg={...configured(),briefs:{q1:{text:'New wording',interpretedText:'Old wording',suggestions:{},resolutions:{}}}};
+ await save(orderId,cfg,1,true);const cur=await read(orderId),plan=planFor(cur,orderId);
+ const next={...plan,schema:'reviseit/configured-generation-plan@4',lines:plan.lines.map((l:any)=>({...l,teacherBrief:l.id==='q1'?cfg.briefs.q1:null}))};
+ await service();await refuse(()=>one('select public.submit_configured_paper_v4($1,$2,$3,$4,$5,$6,$7) as r',[orderId,teacher,submission,cur.revision,JSON.stringify({...answersFor(cur),paper:{}}),JSON.stringify(next),JSON.stringify({...evaluation(cur,true),engine:'cfg01-engine@2'})]),/Invalid generation plan/);
+});

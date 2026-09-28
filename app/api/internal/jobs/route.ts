@@ -16,7 +16,7 @@ export async function POST(request:Request){
  let name:string,args:Record<string,unknown>;
  if(v.action==='claim'&&typeof v.worker==='string'&&/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$/.test(v.worker)){
   // Optional declared execution capabilities. Omitted: the previous claim exactly.
-  if(v.capabilities!==undefined&&!(Array.isArray(v.capabilities)&&v.capabilities.length<=10&&v.capabilities.every((x:unknown)=>x==='configured-plan@1'||x==='configured-plan@2'||x==='configured-plan@3')))return reply({error:'Invalid worker operation'},400);
+  if(v.capabilities!==undefined&&!(Array.isArray(v.capabilities)&&v.capabilities.length<=10&&v.capabilities.every((x:unknown)=>x==='configured-plan@1'||x==='configured-plan@2'||x==='configured-plan@3'||x==='configured-plan@4')))return reply({error:'Invalid worker operation'},400);
   name='claim_paper_job';args=v.capabilities===undefined?{worker:v.worker}:{worker:v.worker,capabilities:v.capabilities};}
  else{
   if(!isUuid(v.id)||!isUuid(v.lease))return reply({error:'Invalid job identity'},400);
