@@ -22,11 +22,14 @@ const view=()=>project(defs,cfg,evaluate(defs,cfg,{paid}),{orderId:id,state:subm
 const reply=(body:unknown,status=200)=>new Response(JSON.stringify(body),{status});
 window.fetch=async(input,options)=>{
  const url=String(input);
+ if(url.endsWith('/configuration/hints')){
+  return reply({status:'checked',hints:[{checkId:'synthetic-note-conflict',field:'note',text:'Your synthetic note may conflict with the selected setting.'}]});
+ }
  if(url.endsWith('/payment')){const action=JSON.parse(String(options?.body??'{}')).action;if(action==='reconcile')paid=true;return reply(order());}
  if(url.endsWith('/configuration/submit')){submitted=true;return reply({ok:true});}
  if(url.includes('/configuration')){
   if(options?.method==='PUT'){const body=JSON.parse(String(options.body));if(body.revision!==revision)return reply({error:'This paper changed in another tab or window. Your edits are still on this page.'},409);cfg=body.configuration;revision++;}
-  return reply(view());
+  return reply({...view(),...(params.get('jev')==='1'?{advice:{enabled:true,lineIds:defs.lines.map(l=>l.id)}}:{})});
  }
  if(url.startsWith(`/api/teacher/orders/${id}`)) return reply(order());
  throw new Error('Only synthetic order requests are supported');

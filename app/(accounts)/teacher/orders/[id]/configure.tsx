@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { Answer, QuestionField } from '../../../../../lib/jobs/questionnaire';
 import { groupLabel, type Attention, type Configuration, type ConfigurationView, type FacetView, type LineView } from '../../../../../lib/configurator/contracts';
 import styles from './configure.module.css';
+import JevAdvice from './jev-advice';
 
 /**
  * Configured order (Paper C5, C6 and C3a): marks, parts and authored details stay
@@ -237,6 +238,8 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
           <span>{line.diagram.learnerDrawn.length?'A drawing learners make themselves is a separate part and is not affected by the stimulus diagram choice.':'The stimulus diagram is what learners are given; it is separate from anything learners draw.'}</span></div>}
         {line.fields.map(f=><Chips key={f.id} name={`q-${line.id}`} field={f} facet={line.facets.find(x=>x.id===f.id)} value={draft.answers.items[line.id]?.[f.id]} disabled={!editable}
           attention={attentionFor(f.id)} onChange={a=>setAnswer('item',f.id,a)}/>)}
+        <JevAdvice orderId={orderId} lineId={line.id} revision={view.revision} enabled={!!view.advice?.enabled&&view.advice.lineIds.includes(line.id)&&editable&&!busy}
+          saved={save==='saved'} answers={draft.answers.items[line.id]??{}} fields={line.fields} onAccept={(field,answer)=>setAnswer('item',field,answer)}/>
       </section>}
 
 

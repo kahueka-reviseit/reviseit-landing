@@ -85,6 +85,7 @@ export type CognitiveRow = {key:string; label:string; min:number; max:number; gr
 export const groupLabel=(key:string)=>key.split('-or-').map(k=>bloomLabels[k as BloomKey]??k).join(' or ');
 export type CurriculumComparison = {profile:string; basis:'marks'|'item-count'; rows:{key:string; label:string; min:number; max:number; target:string}[]; note:string};
 export type ConfigurationView = {
+  advice?:{enabled:boolean;lineIds:string[]};
   orderId:string; state:string; paid:boolean; paymentStatus:string; revision:number; submitted:boolean;
   status:ReadinessStatus; statusLabel:string; outstanding:number; canSubmit:boolean;
   totals:{target:number|null; allocated:number; remaining:number; excess:number; complete:boolean;

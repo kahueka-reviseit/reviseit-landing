@@ -134,7 +134,7 @@ export class Advisor {
   }
 }
 
-function hintFor(doc:Classification, c:JevCheck, a:{noul?:number; choice?:string; probability?:number}, answers:Record<string,Answer>):Hint|null {
+export function hintFor(doc:Classification, c:JevCheck, a:{noul?:number; choice?:string; probability?:number}, answers:Record<string,Answer>):Hint|null {
   const template=doc.hints[c.hint];
   if(!template) return null;
   if(c.type==='noul') return (a.noul??0)>=(c.flagAbove??1)?{checkId:c.id,field:c.fields[0],text:template}:null;
