@@ -8,6 +8,7 @@ vi.mock('@supabase/supabase-js', () => ({ createClient: () => ({ rpc }) }));
 import { authTemplate, cleanText, destination, escapeHtml, renderNotification, COMPLETION_DOCUMENTS } from '../../lib/email/templates';
 import { buildPayload, dispatchOnce, emailConfig, parseWebhook, sendEmail, verifyWebhook, type Payload } from '../../lib/email/delivery';
 import { safeNext } from '../../lib/auth/policy';
+import { documentLabels, documents } from '../../lib/jobs/contracts';
 import { POST as dispatchRoute } from '../../app/api/internal/email/dispatch/route';
 import { POST as webhookRoute } from '../../app/api/resend/webhook/route';
 
@@ -29,6 +30,10 @@ describe('templates', () => {
     expect(links).toEqual([`${origin}/teacher/orders/${order}`]);
     expect(r.text).toContain(`View your documents: ${origin}/teacher/orders/${order}`);
     expect(r.html).not.toMatch(/<script|<img|<form|<input|\.docx|download\?/i);
+  });
+  it('the email names the documents exactly as the paper page labels them', () => {
+    expect(documents.map(d => documentLabels[d])).toEqual(COMPLETION_DOCUMENTS);
+    expect(documentLabels.memo).toBe('Teacher marking memorandum');
   });
   it('attention copy promises no retry, refund or date', () => {
     const r = renderNotification('paper_attention', { name: 'Nomsa', curriculum: 'Grade 10 Physical Sciences', orderId: order }, origin);

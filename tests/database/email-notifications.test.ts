@@ -1,7 +1,9 @@
 // @vitest-environment node
 import { PGlite } from '@electric-sql/pglite';
 import { readFileSync, readdirSync } from 'node:fs';
-import { beforeAll, beforeEach, afterEach, afterAll, test, expect, describe } from 'vitest';
+import { beforeAll, beforeEach, afterEach, afterAll, test, expect, describe, vi } from 'vitest';
+vi.mock('server-only', () => ({}));
+import { dispatchOnce } from '../../lib/email/delivery';
 
 // C09 outbox against the real migration stack. Synthetic identities only.
 let db: PGlite;
@@ -251,5 +253,114 @@ describe('permissions', () => {
     await asUser(teacher); expect((await db.query<{ d: any }>('select public.my_email_delivery() as d')).rows[0].d).toEqual({ completionEmail: true, address: address(teacher) });
     await mode('allowlist', [address(other)]); await asUser(teacher); expect((await db.query<{ d: any }>('select public.my_email_delivery() as d')).rows[0].d.completionEmail).toBe(false);
     await mode('off'); await asUser(teacher); expect((await db.query<{ d: any }>('select public.my_email_delivery() as d')).rows[0].d.completionEmail).toBe(false);
+  });
+});
+
+
+describe('coordinator C09 regressions', () => {
+  test('uncertain queued retry is withheld before dispatch once its first send is older than 23 hours', async () => {
+    await release(); const [c] = await claim(); await payload(c.id, c.lease);
+    expect(await complete(c.id, c.lease, 'retry', null, true)).toBe('queued');
+    await age(c.id, "first_attempt_at=now()-interval '25 hours',next_attempt_at=now()");
+    expect(await claim()).toEqual([]);
+    expect((await rows())[0]).toMatchObject({ status: 'unknown' });
+  });
+  test('a release whose enqueue failed is recoverable after the fault is removed', async () => {
+    await owner(); await db.exec("alter table private.email_notifications add constraint synthetic_break check(false) not valid");
+    await release();
+    await owner(); expect((await db.query<{ state: string }>('select state from private.paper_orders where id=$1', [order])).rows[0].state).toBe('released');
+    await db.exec('alter table private.email_notifications drop constraint synthetic_break');
+    expect(await claim()).toHaveLength(1);
+  });
+});
+
+
+// C09A: the real dispatcher against the real claim, through a minimal client
+// that forwards rpc calls to this database as the service role.
+const service_client = { rpc: async (name: string, args: Record<string, unknown>) => {
+  await service(); const keys = Object.keys(args);
+  try {
+    await db.exec('savepoint rpc');
+    const r = await db.query<{ r: unknown }>(`select public.${name}(${keys.map((k, i) => `${k}=>$${i + 1}`).join(',')}) as r`,
+      keys.map(k => { const v = args[k]; return v !== null && typeof v === 'object' ? JSON.stringify(v) : v; }));
+    await db.exec('release savepoint rpc'); return { data: r.rows[0].r, error: null };
+  } catch (error) { await db.exec('rollback to savepoint rpc'); return { data: null, error }; }
+} } as any;
+const config = { apiKey: 're_synthetic_key_123', from: 'Revise It <notifications@auth.reviseit.io>', replyTo: 'kahueka@reviseit.io', origin: 'https://pilot.reviseit.io' };
+function transport(respond: () => Response | Promise<Response>) {
+  const calls: { key: string; body: string }[] = [];
+  const fetcher = async (_url: string, init: RequestInit) => { calls.push({ key: (init.headers as Record<string, string>)['Idempotency-Key'], body: String(init.body) }); return respond(); };
+  return { calls, fetcher };
+}
+const accept = () => new Response(JSON.stringify({ id: 'em_synthetic_ok' }), { status: 200 });
+const timeout = () => { const e = new Error('timed out'); e.name = 'TimeoutError'; throw e; };
+
+describe('C09A R1: uncertain retries and the idempotency window', () => {
+  test('within 23 hours an uncertain retry resends the identical payload with the same key', async () => {
+    await release();
+    const first = transport(timeout); expect(await dispatchOnce(service_client, config, { fetcher: first.fetcher })).toMatchObject({ claimed: 1, retried: 1 });
+    const [n] = await rows(); expect(n).toMatchObject({ status: 'queued', ambiguous: true });
+    await age(n.id, "first_attempt_at=now()-interval '22 hours 59 minutes',next_attempt_at=now()");
+    const second = transport(accept); expect(await dispatchOnce(service_client, config, { fetcher: second.fetcher })).toMatchObject({ claimed: 1, accepted: 1 });
+    expect(second.calls).toHaveLength(1);
+    expect(second.calls[0]).toEqual(first.calls[0]);
+    expect((await rows())[0]).toMatchObject({ status: 'accepted', attempts: 2 });
+  });
+  test('past 23 hours the uncertain retry is withheld and the transport is never called', async () => {
+    await release();
+    await dispatchOnce(service_client, config, { fetcher: transport(timeout).fetcher });
+    const [n] = await rows(); await age(n.id, "first_attempt_at=now()-interval '23 hours 1 minute',next_attempt_at=now()");
+    const later = transport(accept);
+    expect(await dispatchOnce(service_client, config, { fetcher: later.fetcher })).toMatchObject({ claimed: 0 });
+    expect(later.calls).toEqual([]);
+    expect((await rows())[0]).toMatchObject({ status: 'unknown', reason: 'acceptance_unresolved', attempts: 1 });
+  });
+  test('a definite refusal (rate limit) is not uncertain and may still retry after the window', async () => {
+    await release();
+    await dispatchOnce(service_client, config, { fetcher: transport(() => new Response('{"name":"rate_limit_exceeded"}', { status: 429 })).fetcher });
+    const [n] = await rows(); expect(n.ambiguous).toBe(false);
+    await age(n.id, "first_attempt_at=now()-interval '30 hours',next_attempt_at=now()");
+    const later = transport(accept); await dispatchOnce(service_client, config, { fetcher: later.fetcher });
+    expect(later.calls).toHaveLength(1);
+  });
+});
+
+describe('C09A R2: intents lost to a bookkeeping fault are recovered from the committed event', () => {
+  async function breakOutbox() { await owner(); await db.exec('alter table private.email_notifications add constraint synthetic_break check(false) not valid'); }
+  async function repairOutbox() { await owner(); await db.exec('alter table private.email_notifications drop constraint synthetic_break'); }
+  test('a release survives the fault, and the scheduled dispatch later sends exactly one message', async () => {
+    await breakOutbox(); await release(); expect(await rows()).toEqual([]);
+    const during = transport(accept); expect(await dispatchOnce(service_client, config, { fetcher: during.fetcher })).toMatchObject({ claimed: 0 });
+    expect(during.calls).toEqual([]);
+    await repairOutbox();
+    const after = transport(accept);
+    expect(await dispatchOnce(service_client, config, { fetcher: after.fetcher })).toMatchObject({ claimed: 1, accepted: 1 });
+    expect(await dispatchOnce(service_client, config, { fetcher: after.fetcher })).toMatchObject({ claimed: 0 });
+    expect(after.calls).toHaveLength(1);
+    await owner(); const pack = (await db.query<{ pack_hash: string }>('select pack_hash from private.paper_orders where id=$1', [order])).rows[0].pack_hash;
+    expect(await rows()).toMatchObject([{ kind: 'paper_ready', logical_key: `paper-ready:${order}:${pack}`, recipient: address(teacher), status: 'accepted' }]);
+  });
+  test('an approval and a creation hold are recovered with their original keys', async () => {
+    await breakOutbox(); await approve(); await hold(); await repairOutbox();
+    await owner(); const rev = (await db.query<{ revision: number }>('select revision from public.teacher_accounts where user_id=$1', [applicant])).rows[0].revision;
+    expect(await claim()).toHaveLength(2);
+    expect((await rows()).map(r => r.logical_key).sort()).toEqual([`access-approved:${applicant}:${rev}`, `paper-attention:${order}`].sort());
+  });
+  test('an event from a moment when delivery was off is never recovered into a send', async () => {
+    await owner(); await db.exec('delete from private.email_setting_changes');
+    await breakOutbox(); await release(); await repairOutbox();
+    await owner(); await db.exec("update private.paper_job_events set at=now()-interval '10 minutes'");
+    await mode('on');
+    expect(await claim()).toEqual([]); expect(await rows()).toEqual([]);
+  });
+  test('an address change after the event is not retargeted', async () => {
+    await breakOutbox(); await release(); await repairOutbox();
+    await owner(); await db.query("update auth.users set email='moved@synthetic.example' where id=$1", [teacher]);
+    expect(await claim()).toEqual([]); expect(await rows()).toEqual([]);
+  });
+  test('events older than 48 hours are left alone', async () => {
+    await breakOutbox(); await release(); await repairOutbox();
+    await owner(); await db.exec("update private.paper_job_events set at=now()-interval '49 hours'");
+    expect(await claim()).toEqual([]); expect(await rows()).toEqual([]);
   });
 });

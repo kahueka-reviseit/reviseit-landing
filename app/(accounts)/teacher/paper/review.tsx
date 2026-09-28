@@ -7,7 +7,7 @@ import { Icon, PageHeader, Stages } from './ui';
 
 const documents=[
   {name:'Question paper',detail:'In your school’s formatting',tone:styles['download-list__item--question-paper']},
-  {name:'First-draft marking memorandum',detail:'Mark by mark, for moderation',tone:styles['download-list__item--marking-memo']},
+  {name:'Teacher marking memorandum',detail:'Mark by mark, for moderation',tone:styles['download-list__item--marking-memo']},
   {name:'Learner memorandum',detail:'Worked answers for feedback',tone:styles['download-list__item--learner-memo']},
   {name:'Teacher description',detail:'Bloom’s level for every subquestion',tone:styles['download-list__item--teacher-description']},
 ];

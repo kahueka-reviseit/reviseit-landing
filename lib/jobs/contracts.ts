@@ -1,7 +1,7 @@
 import {isQuestionnaireAnswers,type Questionnaire,type QuestionnaireAnswers} from './questionnaire';
 export const documents = ['paper','memo','learner-memo','teacher-description'] as const;
 export type DocumentName = typeof documents[number];
-export const documentLabels: Record<DocumentName,string> = {paper:'Question paper',memo:'First-draft marking memorandum','learner-memo':'Learner memorandum','teacher-description':'Teacher description'};
+export const documentLabels: Record<DocumentName,string> = {paper:'Question paper',memo:'Teacher marking memorandum','learner-memo':'Learner memorandum','teacher-description':'Teacher description'};
 export type Order = {id:string;title:string;moduleId:string;release:string;internalTest:boolean;state:string;createdAt:string;updatedAt:string;form:{id:string;label:string;options:string[]}[]|Questionnaire|null;answers:Record<string,string>|QuestionnaireAnswers|null;answerSummary?:{title:string;fields:{label:string;value:string}[]}[]|null;documents:DocumentName[];payment?:OrderPayment|null;configurable?:boolean};
 export type OrderPayment={status:'creating'|'open'|'paid'|'expired'|'failed'|'cancelled'|'refunded';amountMinor:number;currency:string;testMode:boolean;checkoutUrl:string|null;needsAttention:boolean};
 export const stateLabels:Record<string,string> = {awaiting_payment:'Awaiting payment',awaiting_answers:'Ready for your answers',queued:'Queued',generating:'Preparing your paper',awaiting_memo_review:'Checking the memorandum',rendering:'Formatting your documents',awaiting_release:'Checking your documents',released:'Ready to download',held:'Your request needs attention',cancelled:'Cancelled'};
