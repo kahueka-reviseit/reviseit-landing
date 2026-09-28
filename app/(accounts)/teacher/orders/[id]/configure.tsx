@@ -4,6 +4,7 @@ import type { Answer, QuestionField } from '../../../../../lib/jobs/questionnair
 import { groupLabel, type Attention, type Configuration, type ConfigurationView, type FacetView, type LineView } from '../../../../../lib/configurator/contracts';
 import styles from './configure.module.css';
 import JevAdvice from './jev-advice';
+import PaperPanel from './paper-panel';
 import {emptyBrief,briefConflicts} from '../../../../../lib/configurator/brief';
 
 /**
@@ -66,15 +67,17 @@ function Chips({name,field,facet,value,onChange,disabled,attention}:{name:string
   </fieldset>;
 }
 
-export default function ConfigureOrder({orderId,onSubmitted,title,children}:{orderId:string;onSubmitted:()=>void;title?:string;children?:ReactNode}) {
+export default function ConfigureOrder({orderId,onSubmitted,title,children,topics={}}:{topics?:Record<string,string>;orderId:string;onSubmitted:()=>void;title?:string;children?:ReactNode}) {
   const [view,setView]=useState<ConfigurationView|null>(null);
   const [draft,setDraft]=useState<Configuration|null>(null);
-  const [active,setActive]=useState(0);
+  const [active,setActive]=useState<string|null>(null);
+  const [panel,setPanel]=useState<'question'|'review'|null>(null);
   const [save,setSave]=useState<SaveState>('saved');
   const [error,setError]=useState('');
   const [busy,setBusy]=useState(false);
   const [manual,setManual]=useState<Record<string,boolean>>({});
   const [briefError,setBriefError]=useState('');
+  const [editingBrief,setEditingBrief]=useState<Record<string,boolean>>({});
   const revision=useRef(0), latest=useRef<Configuration|null>(null), timer=useRef<ReturnType<typeof setTimeout>|null>(null), inFlight=useRef(false);
   const detailsRef=useRef<HTMLDivElement>(null);
 
@@ -130,7 +133,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
   if(!view||!draft) return <section className={styles['card']}><p>{error||'Loading your paper…'}</p>{children}</section>;
   const paid=view.paid&&view.state==='awaiting_answers';
   const editable=!busy&&!view.submitted&&['awaiting_payment','awaiting_answers'].includes(view.state);
-  const index=Math.min(active,view.lines.length-1);
+  const index=Math.max(0,view.lines.findIndex(l=>l.id===active));
   const line=view.lines[index];
   const own=draft.lines[line.id];
   const setMarks=(id:string,value:number|null)=>update(c=>{c.lines[id].marks=value;return c;});
@@ -144,20 +147,14 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
   const saveText={saved:'All changes saved',pending:'Unsaved changes',saving:'Saving…',conflict:'Not saved: this paper changed elsewhere',failed:'Not saved'}[save];
   const t=view.totals;
   const maxBloom=Math.max(1,...view.cognitive.map(r=>r.max));
-  const go=(i:number)=>{setBriefError('');setActive(i);detailsRef.current?.scrollIntoView?.({behavior:'smooth',block:'start'});};
+  const go=(i:number)=>{setBriefError('');setActive(view.lines[i].id);setPanel('question');};
 
   // Reorder the purchased occurrences (identities and answers unchanged); saved as a revision.
   const moveLine=(id:string,by:number)=>update(c=>{const o=[...(c.order??Object.keys(c.lines))];
     const kind=view.lines.find(l=>l.id===id)!.kind;const same=o.filter(x=>view.lines.find(l=>l.id===x)!.kind===kind);
     const at=same.indexOf(id),to=same[at+by];if(to===undefined)return c;const i=o.indexOf(id),j=o.indexOf(to);[o[i],o[j]]=[o[j],o[i]];c.order=o;return c;});
   const sameKind=view.lines.filter(l=>l.kind===line.kind);const position=sameKind.findIndex(l=>l.id===line.id);
-  // Questions are chosen before this page exists; payment is a fact, not a readiness state.
-  const stage=view.submitted?5:paid?(view.status==='ready_to_generate'?4:3):(view.status==='ready_for_payment'?2:1);
-  const steps=['Choose questions','Set marks','Pay','Complete details','Submit'];
   const allReady=paid&&!view.submitted&&view.canSubmit;
-  const itemAnswers=Object.values(draft.answers.items).flatMap(s=>Object.values(s));
-  const yours=itemAnswers.filter(a=>a.kind==='choice'||a.kind==='text').length, delegated=itemAnswers.filter(a=>a.kind==='automatic').length;
-  const nextLine=view.lines[index+1];
   const brief=draft.briefs?.[line.id],briefOn=!!view.briefEnabled||!!brief;
   const conflicts=briefConflicts(brief,draft.answers.items[line.id]??{});
   const briefDone=!!brief&&brief.interpretedText===brief.text;
@@ -173,7 +170,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
       const r=await fetch(`/api/teacher/orders/${orderId}/configuration/interpret`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({revision:view.revision,lineId:line.id,requestKey:crypto.randomUUID()})});
       const data=await r.json();
       if(!r.ok){setBriefError(data.error||'Your brief is saved. Try again or choose options yourself.');if(r.status===409){setSave('conflict');setError(data.error);}return;}
-      setView(data);setDraft(data.configuration);latest.current=data.configuration;revision.current=data.revision;setSave('saved');setManual(m=>({...m,[line.id]:false}));
+      setView(data);setDraft(data.configuration);latest.current=data.configuration;revision.current=data.revision;setSave('saved');setManual(m=>({...m,[line.id]:false}));setEditingBrief(m=>({...m,[line.id]:false}));
     }catch{setBriefError('Your brief is saved. We could not configure it just now. Try again or choose options yourself.');}
     finally{setBusy(false);}
   }
@@ -181,39 +178,56 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
     const b=c.briefs![line.id];if(useBrief)c.answers.items[line.id][field]=b.suggestions[field];
     b.resolutions[field]=useBrief?'brief':'choice';return c;
   });}
-  const heading=view.submitted?'Submitted for generation':allReady?'Your paper is fully configured':paid?'Finish your paper':'Your paper is waiting for payment';
+  const closePanel=()=>setPanel(null);
+  const saveNotice=<><p className={styles['save-status']} role="status">{saveText}</p>
+    {save==='conflict'&&<button type="button" className={styles['button--secondary']} onClick={()=>void load()}>Load the latest saved choices</button>}
+    {save==='failed'&&<button type="button" className={styles['button--secondary']} onClick={()=>void flush()}>Try saving again</button>}
+    {error&&<p role="alert" className={styles['notice--error']}>{error}</p>}</>;
   return <>
-  <header className={styles['page-header']}>
-    <div className={styles['page-header__titles']}>
-      <p className={styles['card__eyebrow']}>{[title,paid?'Paid':view.submitted?'Submitted':'Awaiting payment',paid&&!view.submitted?(allReady?'Ready to submit':'Complete configuration'):null].filter(Boolean).join(' · ')}</p>
-      <h1 className={styles['page-header__title']}>{heading}</h1>
-      <p className={styles['page-header__subtitle']}>{paid?'Answer the details for each question, or let us choose. Your answers are saved as you go.':view.submitted?'Your choices are fixed for this paper. Follow its progress on Your paper requests.':'Your questions and marks are saved with this checkout. You can still adjust marks; the detailed questions open when Stripe confirms your payment.'}</p>
+  <header className={styles['paper-header']}>
+    <div><p className={styles['paper-header__breadcrumb']}>{title||'Your selected questions'} / Your paper · {paid?'Paid':view.submitted?'Submitted':'Awaiting payment'}</p>
+      <h1 className={styles['paper-header__title']}>Your paper</h1></div>
+    <div className={styles['paper-header__actions']}>
+      <button type="button" className={styles['button--secondary']} onClick={()=>setPanel('review')}>Marks and cognitive mix</button>
+      <button type="button" className={styles['button--primary']} onClick={()=>setPanel('review')}>Review paper →</button>
     </div>
-    <ol className={styles['progress-steps']} aria-label="Progress">{steps.map((label,i)=><li key={label} aria-current={i===stage?'step':undefined} className={i<stage?styles['progress-steps__step--done']:i===stage?styles['progress-steps__step--current']:''}>{i<stage?'✓ ':`${i+1} `}{label}</li>)}</ol>
   </header>
-  {children}
-  {allReady&&<>
-    <section className={styles['notice--complete']} aria-labelledby="ready-heading">
-      <div><p>Paper configured</p><h2 id="ready-heading">Ready</h2></div>
-      <div><p><span>Marks balance</span><span>Required choices complete</span></p>
-        <span>Every question has its marks and required details set. {yours} {yours===1?'answer was':'answers were'} yours; {delegated} {delegated===1?'was':'were'} chosen for you.</span></div>
-    </section>
-    <section className={styles['card']} aria-labelledby="final-review">
-      <div className={styles['card__header']}><p id="final-review" className={styles['card__eyebrow--neutral']}>Final review</p><span className={styles['paragraph']}>Edit any question until you submit</span></div>
-      <ol className={styles['question-list']}>{view.lines.map((l,i)=>{const summary=l.fields.map(f=>describe(f,draft.answers.items[l.id]?.[f.id])).filter(Boolean).join(' · ');
-        return <li key={l.id}><span className={l.kind==='multiple_choice'?styles['question-list__number--multiple-choice']:styles['question-list__number--structured']}>{l.number}</span><span><strong>{l.title}</strong><small>{summary||'No further details needed'}</small></span><strong>{l.marks.value}</strong>
-          <button type="button" className={styles['button--text']} aria-label={`Edit question ${l.number}`} onClick={()=>go(i)}>Edit</button></li>;})}</ol>
-    </section>
-  </>}
-  <nav className={styles['question-tabs']} aria-label="Questions in this paper">
-    {view.lines.map((l,i)=>{const s=lineStatus(l,paid);return <button key={l.id} type="button" aria-current={i===index?'step':undefined} className={`${styles['question-tabs__tab']} ${i===index?styles['question-tabs__tab--current']:''}`} onClick={()=>setActive(i)}>
-      <span className={l.kind==='multiple_choice'?styles['question-tabs__label--multiple-choice']:styles['question-tabs__label']}>Q{l.number} · {l.title}</span>
-      <span className={s.ready?styles['question-tabs__status--ready']:styles['question-tabs__status--to-complete']}>{s.text}</span></button>;})}
-  </nav>
-  <div className={styles['page-body']} ref={detailsRef}>
-    <div className={styles['page-body__main']}>
-      {paid&&briefOn&&<section className={styles['card']} aria-labelledby="brief-heading">
-        <p className={styles['card__eyebrow--structured']}>Question {line.number} · {line.title}</p>
+  <div className={styles['paper-totals']}>
+    <label>Paper total <input aria-label="Paper total" inputMode="numeric" value={draft.targets.paper??''} disabled={!editable}
+      onChange={e=>{const v=e.target.value.trim();update(c=>{c.targets.paper=v===''?null:Number.isInteger(Number(v))?Number(v):c.targets.paper;return c;});}}/> marks</label>
+    <strong className={t.complete?styles['paper-totals__balanced']:styles['paper-totals__remaining']}>{t.allocated} allocated · {t.excess?`${t.excess} over total`:t.remaining?`${t.remaining} still to allocate`:t.complete?'balanced':t.target===null?'set a total':'check question marks'}</strong>
+    <span>{t.sections.map(s=>`${s.label} ${s.allocated}${s.target!==null?` of ${s.target}`:''}`).join(' · ')}</span>
+    <span>{view.lines.filter(l=>l.ready).length} of {view.lines.length} questions {paid?'configured':'have marks'}</span>
+  </div>
+  <div className={styles['paper-save']}>{!panel&&save!=='saved'&&saveNotice}</div>
+  <div className={styles['question-table']} role="table" aria-label="Questions in your paper">
+    <div className={styles['question-table__head']} role="row">{['No.','Question','Topic','Type','Marks','Subquestions','Status','Actions'].map(h=><div role="columnheader" key={h}>{h}</div>)}</div>
+    {view.lines.map((l,i)=>{const status=lineStatus(l,paid),m=draft.lines[l.id].marks;
+      return <div key={l.id} role="row" className={`${styles['question-table__row']} ${panel==='question'&&i===index?styles['question-table__row--active']:''}`}>
+        <div role="cell" className={l.kind==='multiple_choice'?styles['question-table__number--mcq']:styles['question-table__number']}>{l.number}</div>
+        <div role="cell" className={styles['question-table__question']}><strong>{l.title}</strong>{l.entryId&&<small>{l.entryId.split(':').slice(1).join(':')}</small>}</div>
+        <div role="cell" className={styles['question-table__topic']}>{l.entryId&&topics[l.entryId]||'Not published'}</div>
+        <div role="cell" className={l.kind==='multiple_choice'?styles['question-table__kind--mcq']:styles['question-table__kind']}>{l.kind==='multiple_choice'?'Multiple choice':'Structured'}</div>
+        <div role="cell" className={styles['question-table__marks']}>
+          {l.marks.fixed?<><strong>{l.marks.min}</strong><small>fixed</small></>:<><input aria-label={`Table marks for question ${l.number}`} inputMode="numeric" value={m??''} placeholder="Set" disabled={!editable}
+            onChange={e=>{const v=e.target.value.trim();setMarks(l.id,v===''?null:Number.isInteger(Number(v))?Number(v):m);}}/><small>of {range(l.marks)}</small></>}
+        </div>
+        <div role="cell" className={styles['question-table__parts']}>{l.kind==='multiple_choice'?'1':l.outline?range(l.outline.subquestions):'Not published'}<span className={styles['question-table__mobile-label']}> subquestions</span></div>
+        <div role="cell" className={`${styles['question-table__status']} ${status.ready?styles['question-table__status--ready']:''}`}><i aria-hidden="true"/>{paid&&status.ready?'Configured':status.text}</div>
+        <div role="cell" className={styles['question-table__actions']}><button type="button" className={styles['button--secondary']} disabled={busy} aria-label={`Edit question ${l.number}`} onClick={()=>go(i)}>Edit question</button></div>
+      </div>;
+    })}
+  </div>
+  <details className={styles['paper-record']}><summary>Payment and request details</summary>{children}</details>
+  {panel==='question'&&<PaperPanel title={line.title} eyebrow={`Question ${line.number} · ${line.kind==='multiple_choice'?'Multiple choice':'Structured'}${line.entryId?` · ${line.entryId.split(':').slice(1).join(':')}`:''}`} onClose={closePanel}
+    summary={`${own.marks??'—'} marks · ${line.outstanding.length?`${line.outstanding.length} choices still to decide`:lineStatus(line,paid).text}`}
+    footer={<>{saveNotice}<button type="button" className={styles['button--secondary']} onClick={closePanel}>Close</button></>}>
+    <div className={styles['question-editor']} ref={detailsRef}>
+      {paid&&briefOn&&<section className={styles['brief-card']} aria-label="Your question brief">
+        {briefDone&&!editingBrief[line.id]?<div className={styles['retained-brief']}>
+          <div><h3>Your brief</h3><button type="button" className={styles['button--text']} disabled={!editable} onClick={()=>setEditingBrief(m=>({...m,[line.id]:true}))}>Edit brief</button></div>
+          <p>{brief.text}</p>
+        </div>:<>
         <h2 id="brief-heading" className={styles['card__title']}>What would you like this question to do?</h2>
         <p className={styles['paragraph']}>Describe the scenario, what learners should do and anything you want included or left out.</p>
         <label className={styles['text-field__label']} htmlFor="teacher-brief">Your brief</label>
@@ -225,6 +239,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
         {save!=='saved'&&<p className={styles['paragraph']} role="status">{saveText}</p>}
         {briefError&&<p role="alert" className={styles['notice--error']}>{briefError}</p>}
         <button type="button" className={styles['button--text']} disabled={!editable} onClick={manualOptions}>{brief?.text?'Keep my words and choose options myself →':'Or choose the options yourself →'}</button>
+        </>}
         {brief?.text&&<p className={styles['card__note']}>Your full description accompanies the final choices. Where they differ, your explicit choices take precedence.</p>}
         {briefDone&&Object.keys(brief.suggestions).length>0&&<div className={styles['interpretation']}>
           <h3 className={styles['interpretation__title']}>What we understood</h3><p className={styles['interpretation__description']}>Taken from your words. Existing choices are kept until you change them.</p>
@@ -240,7 +255,23 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
         {briefDone&&!line.fields.length&&<p className={styles['paragraph']}>Your brief is saved for generation. This question has no additional options to choose.</p>}
         {briefDone&&line.ready&&!conflicts.length&&<p className={styles['save-status']}>Configured · Everything stays editable until you submit.</p>}
       </section>}
-      <section className={styles['card']} aria-labelledby="allocation-heading">
+      {!paid&&!view.submitted&&<section className={styles['card']}><p className={styles['card__eyebrow--structured']}>After payment</p><p className={styles['paragraph']}>Detailed choices for each question unlock once Stripe confirms your payment. You can still change marks, parts and every other choice until you submit.</p></section>}
+
+      {paid&&(!briefOn||briefDone||showManual)&&<section className={styles['card']} aria-labelledby="details-heading">
+        <div className={styles['card__header']}><div><p className={styles['card__eyebrow--structured']}>Question {line.number} · {line.title} · {own.marks??'?'} marks</p>
+          <h2 id="details-heading" className={styles['card__title']}>{briefOn?(showManual?'Choose options yourself':'Still to decide'):(line.fields.length?'Set the details':'No further details are needed')}</h2></div>
+          {editable&&line.fields.some(f=>f.allowAutomatic&&!draft.answers.items[line.id]?.[f.id])&&<button type="button" className={styles['button--text']} onClick={chooseAll}>Choose for me on all</button>}</div>
+        {line.configurable==='authored'&&<p className={styles['paragraph']}>This question uses its authored details. Parts and cognitive levels are not yet classified.</p>}
+        {line.issues.map((m,i)=><p key={i} role="alert" className={styles['notice--error']}>{m}</p>)}
+        {line.diagram&&<div className={styles['notice--info']}><strong>{line.diagram.locked?'Stimulus diagram set by your choices':line.diagram.stimulus==='required'?'This question needs its diagram':line.diagram.stimulus==='not_applicable'?'No stimulus diagram for this question':'Stimulus diagram'}</strong>
+          <span>{line.diagram.learnerDrawn.length?'A drawing learners make themselves is a separate part and is not affected by the stimulus diagram choice.':'The stimulus diagram is what learners are given; it is separate from anything learners draw.'}</span></div>}
+        {line.fields.filter(f=>showManual||!draft.answers.items[line.id]?.[f.id]||!!attentionFor(f.id)).map(f=><Chips key={f.id} name={`q-${line.id}`} field={f} facet={line.facets.find(x=>x.id===f.id)} value={draft.answers.items[line.id]?.[f.id]} disabled={!editable}
+          attention={attentionFor(f.id)} onChange={a=>setAnswer('item',f.id,a)}/>)}
+        <JevAdvice orderId={orderId} lineId={line.id} revision={view.revision} enabled={!briefOn&&!!view.advice?.enabled&&view.advice.lineIds.includes(line.id)&&editable&&!busy}
+          saved={save==='saved'} answers={draft.answers.items[line.id]??{}} fields={line.fields} onAccept={(field,answer)=>setAnswer('item',field,answer)}/>
+      </section>}
+
+      <details className={styles['question-allocation']}><summary>Marks and question outline <strong>{own.marks??'—'} marks</strong></summary><section className={styles['card']} aria-labelledby="allocation-heading">
         <p id="allocation-heading" className={styles['card__eyebrow--positive']}>{paid?'Your allocation · still editable':'Marks for this question'}</p>
         <div className={styles['marks-control']}>
           <p>Question {line.number} · {line.title}<br/><span className={styles['paragraph']}>{line.marks.fixed?`${line.marks.min} marks · fixed for this type`:`Permitted range ${range(line.marks)} marks`}</span></p>
@@ -260,25 +291,15 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
           <button type="button" className={styles['button--secondary']} disabled={position===0} onClick={()=>moveLine(line.id,-1)}>Move earlier</button>
           <button type="button" className={styles['button--secondary']} disabled={position===sameKind.length-1} onClick={()=>moveLine(line.id,1)}>Move later</button>
         </div>}
-      </section>
-
-      {!paid&&<section className={styles['card']} aria-labelledby="outline-heading">
+      </section>      <section className={styles['card']} aria-labelledby="outline-heading">
         <p id="outline-heading" className={styles['card__eyebrow--structured']}>Question outline</p>
         {line.outline&&line.outline.rows.length?<><p className={styles['paragraph']}>One published example structure ({range(line.outline.subquestions)} subquestions). Your paper can differ within the published ranges.</p>
           <ol className={styles['paper-preview']}>{line.outline.rows.map((r,i)=><li key={i}><span>{line.number}.{i+1} {r.summary}</span><span className={`${styles['tag']} ${bloomClass[r.bloom.toLowerCase()]??styles['tag--unclassified']}`}>{r.bloom}</span><span>{r.marks?range(r.marks):''}</span></li>)}</ol></>:
          line.outline?<p className={styles['paragraph']}>{range(line.outline.subquestions)} subquestions. A reviewed outline has not been published for this question.</p>:
          <p className={styles['paragraph']}>A reviewed outline has not been published for this question yet.</p>}
-      </section>}
+      </section>
 
-      {!paid&&!view.submitted&&<section className={styles['card']}><p className={styles['card__eyebrow--structured']}>After payment</p><p className={styles['paragraph']}>Detailed choices for each question unlock once Stripe confirms your payment. You can still change marks, parts and every other choice until you submit.</p></section>}
-
-      {paid&&<section className={styles['card']} aria-labelledby="details-heading">
-        <div className={styles['card__header']}><div><p className={styles['card__eyebrow--structured']}>Question {line.number} · {line.title} · {own.marks??'?'} marks</p>
-          <h2 id="details-heading" className={styles['card__title']}>{briefOn?(showManual?'Choose options yourself':'Still to decide'):(line.fields.length?'Set the details':'No further details are needed')}</h2></div>
-          {editable&&line.fields.some(f=>f.allowAutomatic&&!draft.answers.items[line.id]?.[f.id])&&<button type="button" className={styles['button--text']} onClick={chooseAll}>Choose for me on all</button>}</div>
-        {line.configurable==='authored'&&<p className={styles['paragraph']}>This question uses its authored details. Parts and cognitive levels are not yet classified.</p>}
-        {line.issues.map((m,i)=><p key={i} role="alert" className={styles['notice--error']}>{m}</p>)}
-        {(line.parts.length>1||line.parts.some(p=>!p.locked))&&<fieldset className={styles['choice-field']}><legend>What the question covers</legend><span className={styles['choice-field__message']} aria-hidden="true">Include or leave out each part</span>
+<section className={styles['card']}>        {(line.parts.length>1||line.parts.some(p=>!p.locked))&&<fieldset className={styles['choice-field']}><legend>What the question covers</legend><span className={styles['choice-field__message']} aria-hidden="true">Include or leave out each part</span>
           <ol className={styles['subquestion-list']}>{line.parts.map(p=><li key={p.id} className={p.included?'':styles['subquestion-toggle--excluded']}>
             <label className={styles['subquestion-toggle__control']}><input type="checkbox" checked={p.included} disabled={!editable||p.locked} onChange={e=>togglePart(p.id,e.target.checked)}/><span aria-hidden="true" className={styles['switch']}/> <span className={styles['subquestion-toggle__number']}>{line.number}.{p.number}</span> <span className={styles['subquestion-toggle__text']}>{p.summary}</span></label>
             <span className={`${styles['tag']} ${bloomClass[p.bloom??(p.bloomOptions.length?'grouped':'unclassified')]}`} title={p.bloomBasis==='profile-authorised-fallback'?'Taken from the curriculum level under the agreed Grade 10 assumption':p.bloomBasis==='profile-single-mapping'?'Taken from the curriculum level':p.bloomOptions.length?'The curriculum level allows either category; the source does not say which':undefined}>
@@ -289,26 +310,11 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
             {p.reason&&<span className={styles['paragraph']}>{p.reason}</span>}
             {attentionFor(p.id,'part')&&<span role="alert" className={styles['notice--error']}>{attentionFor(p.id,'part')!.message}</span>}
           </li>)}</ol></fieldset>}
-        {line.diagram&&<div className={styles['notice--info']}><strong>{line.diagram.locked?'Stimulus diagram set by your choices':line.diagram.stimulus==='required'?'This question needs its diagram':line.diagram.stimulus==='not_applicable'?'No stimulus diagram for this question':'Stimulus diagram'}</strong>
-          <span>{line.diagram.learnerDrawn.length?'A drawing learners make themselves is a separate part and is not affected by the stimulus diagram choice.':'The stimulus diagram is what learners are given; it is separate from anything learners draw.'}</span></div>}
-        {line.fields.filter(f=>showManual||!draft.answers.items[line.id]?.[f.id]||!!attentionFor(f.id)).map(f=><Chips key={f.id} name={`q-${line.id}`} field={f} facet={line.facets.find(x=>x.id===f.id)} value={draft.answers.items[line.id]?.[f.id]} disabled={!editable}
-          attention={attentionFor(f.id)} onChange={a=>setAnswer('item',f.id,a)}/>)}
-        <JevAdvice orderId={orderId} lineId={line.id} revision={view.revision} enabled={!briefOn&&!!view.advice?.enabled&&view.advice.lineIds.includes(line.id)&&editable&&!busy}
-          saved={save==='saved'} answers={draft.answers.items[line.id]??{}} fields={line.fields} onAccept={(field,answer)=>setAnswer('item',field,answer)}/>
-      </section>}
-
-
-    </div>
-
-    <aside className={styles['page-body__aside']} aria-label="Paper status">
-      {paid&&<section className={styles['card']} aria-labelledby="line-summary">
-        <p id="line-summary" className={styles['card__eyebrow--neutral']}>Question {line.number} {line.ready?'configured':'details'}</p>
-        <div className={styles['card__summary']}><span>{own.marks??'?'} marks</span><strong>{lineStatus(line,paid).ready?'Ready':'In progress'}</strong></div>
-        <ul className={styles['list']}>
-          <li className={styles['list__item--done']}>Marks{line.parts.some(p=>!p.locked)?', parts':''} and details remain editable</li>
-          {line.fields.map(f=>{const d=describe(f,draft.answers.items[line.id]?.[f.id]);return <li key={f.id} className={d?styles['list__item--done']:''}>{f.label}: {d ?? (f.required?'to choose':'can stay blank')}</li>;})}
-        </ul>
-      </section>}
+</section></details>
+    </div></PaperPanel>}
+  {panel==='review'&&<PaperPanel title="Review your paper" eyebrow={allReady?'Ready to submit':'Your paper'} onClose={closePanel}
+    summary={`${t.allocated} of ${t.target??'—'} marks · ${view.outstanding} choices to complete`}>
+    <aside className={styles['paper-review']} aria-label="Paper status">
       <section className={styles['card']}>
         <p className={styles['card__eyebrow--neutral']}>{view.submitted?'Submitted':'Paper status'}</p>
         <p className={styles['card__meta']} aria-live="polite">{view.submitted?'Submitted for generation':view.statusLabel}</p>
@@ -321,7 +327,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
       </section>
       <section className={styles['card']} aria-labelledby="budget-heading">
         <p id="budget-heading" className={styles['card__eyebrow--neutral']}>Marks budget</p>
-        <label className={styles['totals__paper-target']}>Paper total<input inputMode="numeric" value={draft.targets.paper??''} disabled={!editable} onChange={e=>{const v=e.target.value.trim();update(c=>{c.targets.paper=v===''?null:Number.isInteger(Number(v))?Number(v):c.targets.paper;return c;});}}/></label>
+        <label className={styles['totals__paper-target']}>Paper total<input aria-label="Review paper total" inputMode="numeric" value={draft.targets.paper??''} disabled={!editable} onChange={e=>{const v=e.target.value.trim();update(c=>{c.targets.paper=v===''?null:Number.isInteger(Number(v))?Number(v):c.targets.paper;return c;});}}/></label>
         {t.sections.map(s=><div key={s.key} className={styles['budget-line']}><label className={styles['totals__section-target']}><span>{s.label}</span>
           <input inputMode="numeric" aria-label={`${s.label} section total (optional)`} placeholder="Any" value={draft.targets.sections?.[s.key]??''} disabled={!editable}
             onChange={e=>{const v=e.target.value.trim();update(c=>{const sec={...(c.targets.sections??{})};if(v==='')delete sec[s.key];else if(Number.isInteger(Number(v)))sec[s.key]=Number(v);
@@ -346,8 +352,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
             <tbody>{c.rows.map(r=><tr key={r.key}><td>{r.label}</td><td>{r.min===r.max?r.min:`${r.min}–${r.max}`} marks</td><td>{r.target}</td></tr>)}</tbody></table></div>)}
       </section>}
       {paid&&!view.submitted&&<button type="button" className={styles['button--primary']} disabled={busy||!view.canSubmit||save!=='saved'} onClick={()=>void submit()}>{busy?'Submitting…':'Submit for generation →'}</button>}
-      {!view.submitted&&nextLine&&<button type="button" className={paid?styles['button--secondary-wide']:styles['button--primary']} onClick={()=>go(index+1)}>Next: Question {nextLine.number} →</button>}
       {paid&&!view.submitted&&<p className={styles['card__note']}>Once submitted, your choices are fixed for this paper. All four documents are released together.</p>}
-    </aside>
-  </div></>;
+    </aside></PaperPanel>}
+  </>;
 }

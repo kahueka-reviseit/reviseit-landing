@@ -84,6 +84,15 @@ beforeEach(()=>{
  }));
 });
 afterEach(()=>vi.unstubAllGlobals());
+async function editQuestion(user:ReturnType<typeof userEvent.setup>,number:string){
+ const close=screen.queryByRole('button',{name:'Close editor'});if(close)await user.click(close);
+ await user.click(await screen.findByRole('button',{name:`Edit question ${number}`}));
+ await user.click(screen.getByText('Marks and question outline',{exact:false}));
+}
+async function reviewPaper(user:ReturnType<typeof userEvent.setup>){
+ const close=screen.queryByRole('button',{name:'Close editor'});if(close)await user.click(close);
+ await user.click(screen.getByRole('button',{name:'Review paper →'}));
+}
 const row=async(id:string)=>(await as('owner','select o.state,o.answers,c.revision,c.configuration,p.plan from private.paper_orders o join private.paper_configurations c on c.order_id=o.id left join private.paper_configuration_plans p on p.order_id=o.id where o.id=$1',[id])).rows[0];
 
 test('marks are explicit before payment, every choice stays editable after payment, and submission freezes the final edit',async()=>{
@@ -105,19 +114,20 @@ test('marks are explicit before payment, every choice stays editable after payme
  await as('service',"select public.record_stripe_checkout('evt_paid','checkout.session.completed',false,$1)",[JSON.stringify({id:'cs_test_'+orderId.replace(/-/g,''),clientReferenceId:orderId,metadataOrderId:orderId,livemode:false,amountTotal:10000,currency:'zar',paymentStatus:'paid',status:'complete',paymentIntent:'pi_Synthetic1'})]);
 
  const submitted=vi.fn();render(<ConfigureOrder orderId={orderId} onSubmitted={submitted}/>);
- await user.click(await screen.findByRole('button',{name:/Q2 ·/}));
- expect(await screen.findByText('Details to complete',{selector:'p'})).toBeInTheDocument();
+ await editQuestion(user,'2');
+ expect(await screen.findByRole('dialog')).toBeInTheDocument();
  // Rebalance after payment: question 1 down, question 2 up.
  await user.click(screen.getByRole('button',{name:'One mark fewer for question 2'}));
- expect(await screen.findByText('1 marks still to allocate',{selector:'p'},{timeout:4000})).toBeInTheDocument();
- await user.click(screen.getByRole('button',{name:/Q3 ·/}));
+ expect(await screen.findByText(/Paper total: 15 of 16 marks allocated/,{selector:'p'},{timeout:4000})).toBeInTheDocument();
+ await editQuestion(user,'3');
  await user.click(screen.getByRole('button',{name:'One mark more for question 3'}));
  await waitFor(async()=>expect((await row(orderId)).configuration.lines).toMatchObject({q1:{marks:7},q2:{marks:7}}),{timeout:4000});
  // Authored details, including an explicit delegation. The optional note stays blank.
  await user.click(within(screen.getByRole('group',{name:'Synthetic setting'})).getByLabelText(/Choose for me/));
- await user.click(screen.getByRole('button',{name:/Q2 ·/}));
+ await editQuestion(user,'2');
  await user.click(within(screen.getByRole('group',{name:'Synthetic setting'})).getByLabelText('Blue'));
  for(const name of ['Synthetic logistics','Synthetic block']) expect(screen.queryByRole('group',{name})).not.toBeInTheDocument();
+ await reviewPaper(user);
  await waitFor(()=>expect(screen.getByText('Ready to generate')).toBeInTheDocument(),{timeout:4000});
  await waitFor(()=>expect(screen.getByRole('button',{name:'Submit for generation →'})).toBeEnabled(),{timeout:4000});
  await user.click(screen.getByRole('button',{name:'Submit for generation →'}));
@@ -137,8 +147,8 @@ test('a stale tab cannot overwrite a newer saved revision and keeps its own edit
  await openReview(user);await user.click(payButton());await waitFor(()=>expect(assign).toHaveBeenCalled());unmount();
  const orderId=(await as('owner','select id from private.paper_orders')).rows[0].id as string;
  render(<ConfigureOrder orderId={orderId} onSubmitted={()=>{}}/>);
- await screen.findByText('Ready for payment');
- await user.click(screen.getByRole('button',{name:/Q2 ·/}));
+ await screen.findByRole('heading',{name:'Your paper'});
+ await editQuestion(user,'2');
  // Another tab saves first.
  const current=(await row(orderId)).configuration;current.lines.q1.marks=9;current.lines.q2.marks=5;
  const other=await fetch(`/api/teacher/orders/${orderId}/configuration`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({revision:1,configuration:current})});
@@ -178,16 +188,17 @@ test('a repeated multiple-choice type and reordering survive checkout, payment, 
  await as('service',"select public.record_stripe_checkout('evt_paid_repeat','checkout.session.completed',false,$1)",[JSON.stringify({id:'cs_test_'+orderId.replace(/-/g,''),clientReferenceId:orderId,metadataOrderId:orderId,livemode:false,amountTotal:10000,currency:'zar',paymentStatus:'paid',status:'complete',paymentIntent:'pi_Synthetic2'})]);
  const submitted=vi.fn();render(<ConfigureOrder orderId={orderId} onSubmitted={submitted}/>);
  // After payment: the two occurrences are 1.1 and 1.2; move the second one earlier.
- expect(await screen.findByRole('button',{name:/Q1.1 ·/})).toBeInTheDocument();expect(screen.getByRole('button',{name:/Q1.2 ·/})).toBeInTheDocument();
- await user.click(screen.getByRole('button',{name:/Q1.2 ·/}));
+ expect(await screen.findByRole('button',{name:'Edit question 1.1'})).toBeInTheDocument();expect(screen.getByRole('button',{name:'Edit question 1.2'})).toBeInTheDocument();
+ await editQuestion(user,'1.2');
  await user.click(screen.getByRole('button',{name:'Move earlier'}));
  await waitFor(async()=>expect((await row(orderId)).configuration.order).toEqual(['q1','q2','q4','q3']),{timeout:4000});
  // Answer each structured question differently; the multiple-choice occurrences need nothing.
- await user.click(screen.getByRole('button',{name:/Q2 ·/}));
+ await editQuestion(user,'2');
  await user.click(within(screen.getByRole('group',{name:'Synthetic setting'})).getByLabelText('Blue'));
- await user.click(screen.getByRole('button',{name:/Q3 ·/}));
+ await editQuestion(user,'3');
  await user.click(within(screen.getByRole('group',{name:'Synthetic setting'})).getByLabelText('Red'));
  for(const name of ['Synthetic logistics','Synthetic block']) expect(screen.queryByRole('group',{name})).not.toBeInTheDocument();
+ await reviewPaper(user);
  await waitFor(()=>expect(screen.getByRole('button',{name:'Submit for generation →'})).toBeEnabled(),{timeout:5000});
  await user.click(screen.getByRole('button',{name:'Submit for generation →'}));await waitFor(()=>expect(submitted).toHaveBeenCalled());
  const done=await row(orderId);

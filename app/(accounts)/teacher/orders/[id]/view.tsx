@@ -8,7 +8,7 @@ import {formatRand} from '../../../../../lib/payments/contracts';
 import styles from '../../../accounts.module.css';
 import ConfigureOrder from './configure';
 import paper from './configure.module.css';
-export default function OrderView({initial}:{initial:Order}){
+export default function OrderView({initial,topics={}}:{initial:Order;topics?:Record<string,string>}){
  const [order,setOrder]=useState(initial),[answers,setAnswers]=useState<Record<string,string>>(initial.answers&&!isQuestionnaireAnswers(initial.answers)?initial.answers:{}),[key,setKey]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const [fieldError,setFieldError]=useState<QuestionnaireFieldError|null>(null);
  useEffect(()=>{if(fieldError&&!busy)document.getElementById(questionFieldId(fieldError.itemId,fieldError.fieldId))?.focus();},[fieldError,busy]);
@@ -40,8 +40,8 @@ export default function OrderView({initial}:{initial:Order}){
  {order.answerSummary?<details><summary>Your submitted answers</summary>{order.answerSummary.map((section,i)=><section key={i}><h3>{section.title}</h3><dl>{section.fields.map((field,j)=><div key={j}><dt>{field.label}</dt><dd>{field.value}</dd></div>)}</dl></section>)}</details>:order.answers&&!isQuestionnaireAnswers(order.answers)&&<details><summary>Your submitted answers</summary><dl>{Object.entries(order.answers).map(([k,v])=><div key={k}><dt>{k.replaceAll('_',' ')}</dt><dd>{v}</dd></div>)}</dl></details>}
  </>;
  // Configured orders use the paper journey's layout (Paper C5/C6); earlier questionnaire orders keep their card.
- if(order.configurable) return <div className={paper['order-page']}><Link className={paper['breadcrumb__back']} href="/teacher/orders">← My papers</Link>
-  {configuring?<ConfigureOrder key={order.state} orderId={order.id} title={order.title} onSubmitted={()=>void refresh()}>
+ if(order.configurable) return <div className={paper['order-page']}>{!configuring&&<Link className={paper['breadcrumb__back']} href="/teacher/orders">← My papers</Link>}
+  {configuring?<ConfigureOrder key={order.state} orderId={order.id} topics={topics} title={order.title} onSubmitted={()=>void refresh()}>
     <div className={paper['order-page__notices']}><p className={paper['order-page__meta']}><span aria-live="polite">{stateLabels[order.state]||'Status unavailable'}</span> · Request reference <code>{order.id}</code></p>{notices}</div></ConfigureOrder>:
    <section className={paper['card--order']}><p className={paper['order-page__eyebrow']}>{order.title}</p><h1>{stateLabels[order.state]||'Status unavailable'}</h1><p className={paper['order-page__meta']}>Request reference <code>{order.id}</code></p>{notices}{progress}</section>}
   <button type="button" className={paper['button--refresh']} onClick={()=>void refresh()}>Refresh status</button></div>;

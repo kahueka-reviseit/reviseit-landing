@@ -20,7 +20,7 @@ test('catalogue and navigation render Paper typography and card spacing',async({
 
 test('paid choices use Paper labels and keep hints clear of their status',async({page},info)=>{
   await page.goto('/configurator.html');
-  await page.getByRole('button',{name:/^Q2 ·/}).click();
+  await page.getByRole('button',{name:'Edit question 2',exact:true}).click();
   const setting=page.getByRole('group',{name:'Synthetic setting'});
   const choice=setting.getByLabel('Setting two');
   await choice.check();

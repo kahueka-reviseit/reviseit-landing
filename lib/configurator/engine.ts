@@ -222,7 +222,7 @@ export function project(defs:Definitions, cfg:Configuration, e:Evaluation, meta:
   const lines=defs.lines.map((def,i):LineView=>{
     const r=e.lines[i];
     const c=paid && r.classified ? r.classified : null;
-    return {id:def.id,number:numbers[i],title:def.title,kind:def.identity.kind,configurable:def.classification?'classified':'authored',
+    return {id:def.id,entryId:def.entryId,number:numbers[i],title:def.title,kind:def.identity.kind,configurable:def.classification?'classified':'authored',
       marks:{value:def.fixedMarks ?? cfg.lines[def.id].marks,min:def.range.min,max:def.range.max,fixed:def.fixedMarks!==null},
       parts:c?c.parts:[],facets:c?c.facets:[],fields:paid?def.fields:[],answers:paid?(cfg.answers.items[def.id]||{}):{},
       outstanding:paid?r.outstanding:[],attention:paid?r.attention:r.attention.filter(a=>a.scope==='marks'),issues:r.issues,ready:r.ready,

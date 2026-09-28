@@ -1,6 +1,6 @@
 import {test,expect} from '@playwright/test';
 test('optional Jev advice follows a saved note and can be dismissed without changing it',async({page},info)=>{
- await page.goto('/configurator.html?jev=1');await page.getByRole('button',{name:/^Q2 ·/}).click();
+ await page.goto('/configurator.html?jev=1');await page.getByRole('button',{name:'Edit question 2',exact:true}).click();
  const advice=page.getByRole('region',{name:'Jev suggestions'});
  await expect(advice.getByText('Jev can help when you describe a choice in your own words.')).toBeVisible();
  const note=page.getByRole('group',{name:'Anything else (optional)'});await note.getByLabel('Write my answer').check();

@@ -81,18 +81,20 @@ test('builder: repeated multiple choice, reorder within a section, marks and rev
 
 test('payment confirmation unlocks details; a stale tab keeps its unsaved edit',async({page},info)=>{
  await page.goto('/configurator.html?paid=0');
- await expect(page.getByRole('heading',{name:'Your paper is waiting for payment'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Your paper',exact:true})).toBeVisible();
  await expect(page.getByRole('group',{name:'Synthetic setting'})).toHaveCount(0);
+ await page.getByText('Payment and request details',{exact:true}).click();
  await page.getByRole('button',{name:'I have paid: check again'}).click();
- await expect(page.getByRole('heading',{name:'Finish your paper'})).toBeVisible();
- await page.getByRole('button',{name:/^Q2 ·/}).click();
+ await expect(page.getByRole('heading',{name:'Your paper',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Edit question 2',exact:true}).click();
  const setting=page.getByRole('group',{name:'Synthetic setting'});await setting.getByLabel('Setting two').focus();await page.keyboard.press('Space');
  await expect(setting.getByLabel('Setting two')).toBeChecked();
  await expect(page.getByText('All changes saved')).toBeVisible({timeout:5000});
  await page.evaluate(()=>(window as unknown as {simulateOtherTab:()=>void}).simulateOtherTab());
+ await page.getByText('Marks and question outline',{exact:false}).click();
  await page.getByRole('button',{name:'One mark more for question 2'}).click();
  await expect(page.getByText('Not saved: this paper changed elsewhere')).toBeVisible({timeout:5000});
- await expect(page.getByLabel('Marks for question 2')).toHaveValue('15');
+ await expect(page.getByLabel('Marks for question 2',{exact:true})).toHaveValue('15');
  await noSideScroll(page);
  await page.screenshot({path:`workspace-test-results/configure-${info.project.name}.png`,fullPage:true});
 });

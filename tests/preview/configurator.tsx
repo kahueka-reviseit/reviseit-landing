@@ -15,6 +15,14 @@ import '../../app/globals.css';
 // server confirming payment, which unlocks the detailed questions without a reload.
 const params=new URLSearchParams(location.search);let paid=params.get('paid')!=='0';
 const defs=previewDefinitions();let cfg:Configuration=structuredClone(previewConfiguration);let revision=1;let submitted=false;
+if(params.get('many')==='1'){
+ const structured=structuredClone(defs.lines[1]),mcq=structuredClone(defs.lines[2]);
+ const marks=[18,16,27,15,16,14,10,14];
+ defs.lines=Array.from({length:18},(_,i)=>({...structuredClone(i<10?mcq:structured),id:`q${i+1}`,
+  title:i<10?`Synthetic multiple-choice question ${i+1}`:`Synthetic structured question ${i-8}: interpreting relationships and explaining results`,
+  ...(i<10?{}:{range:{min:8,max:30}})}));
+ cfg={schemaVersion:1,targets:{paper:150,sections:{multiple_choice:20,structured:130}},lines:Object.fromEntries(defs.lines.map((l,i)=>[l.id,{marks:i<10?2:marks[i-10],parts:null,facets:{}}])),answers:{items:{},paper:{}}};
+}
 const id='00000000-0000-4000-8000-0000000000c5';
 const order=():Order=>({id,title:'Grade 11 Physical Sciences paper',moduleId:'synthetic-module',release:'1',internalTest:false,createdAt:'',updatedAt:'',configurable:true,
  state:submitted?'queued':paid?'awaiting_answers':'awaiting_payment',form:null,answers:null,documents:[],

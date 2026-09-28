@@ -80,7 +80,7 @@ export type PartView = {id:string; number:string; summary:string; bloom:BloomKey
   inclusion:'required'|'optional'; included:boolean; locked:boolean; reason?:string; learnerDrawn:boolean};
 export type Attention = {scope:'field'|'facet'|'part'|'marks'; id:string; message:string};
 export type LineView = {
-  id:string; number:string; title:string; kind:SectionKey; configurable:'classified'|'authored';
+  id:string; entryId?:string; number:string; title:string; kind:SectionKey; configurable:'classified'|'authored';
   marks:{value:number|null; min:number; max:number; fixed:boolean};
   parts:PartView[]; facets:FacetView[]; fields:QuestionField[]; answers:Record<string,Answer>;
   outstanding:string[]; attention:Attention[]; issues:string[]; ready:boolean;
