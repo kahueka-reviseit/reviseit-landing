@@ -226,15 +226,15 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children}:{ord
         {briefError&&<p role="alert" className={styles['notice--error']}>{briefError}</p>}
         <button type="button" className={styles['button--text']} disabled={!editable} onClick={manualOptions}>{brief?.text?'Keep my words and choose options myself →':'Or choose the options yourself →'}</button>
         {brief?.text&&<p className={styles['card__note']}>Your full description accompanies the final choices. Where they differ, your explicit choices take precedence.</p>}
-        {briefDone&&Object.keys(brief.suggestions).length>0&&<div className={styles['brief-summary']}>
-          <h3 className={styles['card__title']}>What we understood</h3><p className={styles['paragraph']}>Taken from your words. Existing choices are kept until you change them.</p>
-          {Object.entries(brief.suggestions).map(([id,answer])=>{const field=line.fields.find(f=>f.id===id);return field&&<div key={id} className={styles['brief-summary__row']}>
-            <div><span className={styles['paragraph']}>{field.label}</span><strong>{describe(field,answer)}</strong></div>
-            <button type="button" className={styles['button--text']} aria-label={`Change ${field.label}`} disabled={!editable} onClick={()=>setManual(m=>({...m,[line.id]:true}))}>Change</button>
-            {conflicts.includes(id)&&<div className={styles['brief-summary__conflict']} role="alert"><p>Your current choice differs: {describe(field,draft.answers.items[line.id]?.[id])}.</p>
+        {briefDone&&Object.keys(brief.suggestions).length>0&&<div className={styles['interpretation']}>
+          <h3 className={styles['interpretation__title']}>What we understood</h3><p className={styles['interpretation__description']}>Taken from your words. Existing choices are kept until you change them.</p>
+          {Object.entries(brief.suggestions).map(([id,answer])=>{const field=line.fields.find(f=>f.id===id);return field&&<div key={id} className={styles['interpretation__row']}>
+            <div className={styles['interpretation__answer']}><span className={styles['interpretation__label']}>{field.label}</span><strong className={styles['interpretation__value']}>{describe(field,answer)}</strong></div>
+            <button type="button" className={styles['interpretation__change']} aria-label={`Change ${field.label}`} disabled={!editable} onClick={()=>setManual(m=>({...m,[line.id]:true}))}>Change</button>
+            {conflicts.includes(id)&&<div className={styles['interpretation__conflict']} role="alert"><p>Your current choice differs: {describe(field,draft.answers.items[line.id]?.[id])}.</p>
               <button type="button" className={styles['button--secondary']} disabled={!editable} onClick={()=>resolveBrief(id,true)}>Use the choice from my brief</button>{' '}
               <button type="button" className={styles['button--secondary']} disabled={!editable} onClick={()=>resolveBrief(id,false)}>Keep my current choice</button></div>}
-            {brief.resolutions[id]==='choice'&&<p className={styles['brief-summary__conflict']}>Your current choice takes precedence: {describe(field,draft.answers.items[line.id]?.[id])}</p>}
+            {brief.resolutions[id]==='choice'&&<p className={styles['interpretation__conflict']}>Your current choice takes precedence: {describe(field,draft.answers.items[line.id]?.[id])}</p>}
           </div>;})}
         </div>}
         {briefDone&&!line.fields.length&&<p className={styles['paragraph']}>Your brief is saved for generation. This question has no additional options to choose.</p>}

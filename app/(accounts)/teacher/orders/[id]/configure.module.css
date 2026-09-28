@@ -160,10 +160,19 @@
 .order-page__eyebrow { font-size:12px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:var(--color-slate-blue); margin:0; }
 .button--refresh { margin-top:20px; padding:9px 16px; border:1px solid #D5D1C8; border-radius:999px; background:var(--color-white); font:600 14px/18px var(--font-body),sans-serif; cursor:pointer; }
 
-/* Paper D6 / D8 interpretation rows: native editable form controls share existing tokens. */
-.brief-summary { display:flex; flex-direction:column; gap:10px; padding-top:20px; }
-.brief-summary__row { display:flex; flex-wrap:wrap; align-items:center; gap:14px; padding:12px 0; border-top:1px solid var(--color-light-gray); }
-.brief-summary__row > div:first-child { flex:1; min-width:0; display:grid; gap:4px; }
-.brief-summary__row strong { font-size:16px; line-height:22px; overflow-wrap:anywhere; }
-.brief-summary__row > button { width:58px; flex-shrink:0; text-align:right; }
-.brief-summary__conflict { width:100%; margin:0; padding:14px; background:var(--color-off-white); border-left:3px solid var(--color-gold); overflow-wrap:anywhere; }
+/* Direct Paper D6 / D8 CSS export: design/paper/paragraph-styles.json. */
+.interpretation { display:flex; flex-direction:column; padding-top:20px; gap:0px; }
+.interpretation__title { font-family:var(--font-display); font-size:23px; line-height:29px; white-space:pre-wrap; font-weight:600; color:#000000; }
+.interpretation__description { font-size:14px; line-height:20px; white-space:pre-wrap; font-family:system-ui, sans-serif; font-weight:400; color:var(--color-mid-text); }
+.interpretation__row { display:flex; align-items:center; padding-block:12px; gap:14px; border-top-width:1px; border-top-style:solid; border-top-color:var(--color-light-gray); }
+.interpretation__answer { display:flex; flex-direction:column; flex-grow:1; flex-basis:0%; gap:4px; }
+.interpretation__label { font-size:13px; line-height:18px; white-space:pre-wrap; font-family:system-ui, sans-serif; font-weight:400; color:var(--color-mid-text); }
+.interpretation__value { font-size:16px; line-height:22px; white-space:pre-wrap; font-family:system-ui, sans-serif; font-weight:600; color:#000000; }
+.interpretation__change { width:58px; flex-shrink:0; text-align:right; font-size:14px; white-space:pre-wrap; font-family:system-ui, sans-serif; font-weight:600; line-height:18px; display:flex; justify-content:end; flex-wrap:wrap; color:var(--color-sage-dark); }
+.interpretation__title { margin:0; padding-bottom:6px; }
+.interpretation__description { margin:0; padding-bottom:12px; }
+.interpretation__row { flex-wrap:wrap; }
+.interpretation__answer { min-width:0; }
+.interpretation__value { overflow-wrap:anywhere; }
+.interpretation__change { padding:0; border:0; background:transparent; cursor:pointer; }
+.interpretation__conflict { width:100%; margin:0; padding:14px; background:var(--color-off-white); border-left:3px solid var(--color-gold); overflow-wrap:anywhere; }
