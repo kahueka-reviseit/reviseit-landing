@@ -15,7 +15,7 @@ export async function adminLogin(_: FormState, form: FormData): Promise<FormStat
   const role = await supabase.rpc('is_account_reviewer');
   if (!data.user.email_confirmed_at || role.error || role.data !== true) {
     await supabase.auth.signOut();
-    return { message: 'This account does not have administration access.' };
+    return { message: 'This account does not have administration access. Teachers use pilot.reviseit.io.' };
   }
-  redirect('/admin/accounts');
+  redirect('/admin');
 }

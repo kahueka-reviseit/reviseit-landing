@@ -13,7 +13,7 @@ function client(role: unknown = true, confirmed = true, roleError: unknown = nul
 beforeEach(() => vi.clearAllMocks());
 test('confirmed reviewers reach the existing verification screen', async () => {
   const c = client();
-  await expect(adminLogin({message:''}, form())).rejects.toThrow('redirect:/admin/accounts');
+  await expect(adminLogin({message:''}, form())).rejects.toThrow('redirect:/admin');
   expect(c.rpc).toHaveBeenCalledWith('is_account_reviewer');
   expect(c.auth.signInWithPassword).toHaveBeenCalledWith({email:'team@reviseit.io',password:'private-test-password'});
 });
