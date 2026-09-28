@@ -18,8 +18,7 @@ export default function Home() {
         <div className="container">
           <div className={styles['site-nav__inner']}>
             <span className={styles['site-nav__brand']}>
-              <span className={styles['site-nav__wordmark']}>REVISE</span>{' '}
-              <span className={styles['site-nav__wordmark--accent']}>IT</span>
+              <span className={styles['site-nav__wordmark']}>Revise It</span>
             </span>
             <div className={styles['site-nav__links']}>
               <a href="#how-it-works" className={styles['site-nav__link']}>How it works</a>
@@ -30,7 +29,7 @@ export default function Home() {
             </div>
             <div className={styles['site-nav__actions']}>
               <a href="/login" className={styles['site-nav__action']}>
-                Log in
+                Sign in
               </a>
             </div>
           </div>

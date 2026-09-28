@@ -16,8 +16,7 @@ export default function Footer() {
       <div className="container">
         <div className={styles['site-footer__row']}>
           <span className={styles['site-footer__brand']}>
-            <span className={styles['site-footer__wordmark']}>REVISE</span>{' '}
-            <span className={styles['site-footer__wordmark--accent']}>IT</span>
+            <span className={styles['site-footer__wordmark']}>Revise It</span>
           </span>
           <p className={styles['site-footer__text']}>
             &copy; {new Date().getFullYear()} Revise It. Built for teachers who do more than teach.

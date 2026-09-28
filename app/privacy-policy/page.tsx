@@ -19,8 +19,7 @@ export default function PrivacyPolicyPage() {
       <div className="sage-bar" />
       <nav className={styles['site-nav']}>
         <Link href="/" className={styles['site-nav__brand']}>
-          <span className={styles['site-nav__wordmark']}>REVISE</span>{' '}
-          <span className={styles['site-nav__wordmark--accent']}>IT</span>
+          <span className={styles['site-nav__wordmark']}>Revise It</span>
         </Link>
       </nav>
       <main className={styles['page-body']}>

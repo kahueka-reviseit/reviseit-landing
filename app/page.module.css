@@ -7,21 +7,20 @@
 
 /* ─── Logo ──────────────────────────────────────────────────── */
 .site-nav__brand {
-  font-family: var(--font-body), sans-serif;
-  font-weight: 600;
-  font-size: 1.1rem;
-  letter-spacing: 0.08em;
+  display: inline-flex;
+  text-decoration: none;
 }
 
 .site-nav__wordmark {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--color-dark-text);
   color: var(--dark-text);
 }
 
-.site-nav__wordmark--accent {
-  color: var(--color-gold);
-  color: var(--gold);
-}
 
 /* ─── Nav ───────────────────────────────────────────────────── */
 .site-nav {
@@ -78,16 +77,19 @@
 
 .site-nav__action {
   font-family: var(--font-body), sans-serif;
-  font-size: 0.875rem;
-  color: var(--color-mid-text);
-  color: var(--mid-text);
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 600;
+  color: var(--color-action-strong);
   text-decoration: none;
-  transition: color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }
 
 .site-nav__action:hover {
-  color: var(--color-dark-text);
-  color: var(--dark-text);
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 /* ─── Hero ──────────────────────────────────────────────────── */
@@ -136,38 +138,35 @@
 /* ─── Buttons ───────────────────────────────────────────────── */
 .button--primary {
   display: inline-block;
-  background: var(--color-sage);
-  background: var(--sage);
+  background: var(--color-action-strong);
   color: var(--color-white);
   font-family: var(--font-body), sans-serif;
   font-size: 0.95rem;
   font-weight: 600;
   padding: 13px 30px;
-  border-radius: 4px;
+  border-radius: 999px;
   transition: background 0.15s ease;
 }
 
 .button--primary:hover {
-  background: #4a7360;
+  filter: brightness(0.92);
 }
 
 .button--secondary {
   display: inline-block;
   background: transparent;
-  color: var(--color-dark-text);
-  color: var(--dark-text);
+  color: var(--color-action-strong);
   font-family: var(--font-body), sans-serif;
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
   padding: 13px 30px;
-  border-radius: 4px;
-  border: 1.5px solid #ccc8bf;
-  transition: border-color 0.15s ease;
+  border-radius: 999px;
+  border: 1px solid var(--color-action-strong);
+  transition: background 0.15s ease;
 }
 
 .button--secondary:hover {
-  border-color: var(--color-mid-text);
-  border-color: var(--mid-text);
+  background: var(--color-action-tint);
 }
 
 /* ─── Section helpers ───────────────────────────────────────── */
@@ -1098,15 +1097,14 @@
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--color-white);
-  background: var(--color-terracotta);
-  background: var(--terracotta);
-  padding: 10px 24px;
-  border-radius: 4px;
+  background: var(--color-action);
+  padding: 11px 24px;
+  border-radius: 999px;
   text-decoration: none;
   transition: background 0.15s ease;
 }
 .button--pilot:hover {
-  background: #9e4238;
+  background: var(--color-action-strong);
 }
 
 /* ─── Footer ────────────────────────────────────────────────── */
@@ -1125,10 +1123,8 @@
 }
 
 .site-footer__brand {
-  font-family: var(--font-body), sans-serif;
-  font-weight: 600;
-  font-size: 0.95rem;
-  letter-spacing: 0.08em;
+  display: inline-flex;
+  text-decoration: none;
 }
 
 .site-footer__text {
