@@ -134,6 +134,19 @@ test('real signup, email confirmation, team approval, suspension and password re
     await reviewPage.goto('/admin/accounts?status=suspended');
     await expect(reviewPage.getByRole('row').filter({hasText:email})).toContainText('Paused');
     await reviewPage.screenshot({path:'test-results/staff-accounts-desktop.png',fullPage:true});
+    // S6 tablet sheet and S8p phone record page, with real data: no sideways scrolling, Escape returns to the queue.
+    for (const [name,width,height] of [['tablet',768,1024],['phone',390,844]] as const) {
+      await reviewPage.setViewportSize({width,height});
+      await reviewPage.getByRole('row').filter({hasText:email}).click();
+      const panel=reviewPage.getByRole('complementary',{name:'Synthetic Teacher'});
+      await expect(panel.getByRole('button',{name:'Save decision'})).toBeVisible();
+      await expect.poll(()=>reviewPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+      await reviewPage.screenshot({path:`test-results/staff-review-${name}.png`,fullPage:true});
+      await reviewPage.keyboard.press('Escape');
+      await expect(panel).toHaveCount(0);
+      await expect(reviewPage.getByRole('row').filter({hasText:email})).toBeFocused();
+    }
+    await reviewPage.setViewportSize({width:1280,height:720});
     expect((await page.request.get('/api/teacher/session')).status()).toBe(403);
     expect((await page.request.get('/api/teacher/workspace')).status()).toBe(403);
     expect((await page.request.get('/api/teacher/catalogue/search?q=electricity')).status()).toBe(403);
