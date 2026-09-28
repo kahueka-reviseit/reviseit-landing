@@ -1,3 +1,47 @@
-<h2>Confirm your school email</h2>
-<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=signup">Confirm school email</a></p>
-<p>Our team will verify your school account before you can use the teacher workspace.</p>
+<!doctype html>
+<html lang="en-ZA" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="x-apple-disable-message-reformatting">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>Confirm your school email</title>
+<style>
+:root { color-scheme: light; supported-color-schemes: light; }
+@media (max-width: 620px) {
+  .ri-card { width: 100% !important; }
+  .ri-inner { padding-left: 24px !important; padding-right: 24px !important; }
+  .ri-title { font-size: 26px !important; line-height: 32px !important; }
+  .ri-button, .ri-button tbody, .ri-button tr, .ri-button td, .ri-button a { display: block !important; width: 100% !important; text-align: center !important; box-sizing: border-box !important; }
+  .ri-button a { padding-left: 12px !important; padding-right: 12px !important; }
+}
+</style>
+</head>
+<body style="margin:0;padding:0;background-color:#F8F6F0;-webkit-text-size-adjust:100%;">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">One step before our team verifies your school account.&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F8F6F0;">
+<tr><td align="center" style="padding:32px 12px;">
+<table role="presentation" class="ri-card" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background-color:#FFFFFF;border:1px solid #D5D1C8;border-top:4px solid #5B8A72;border-radius:12px;border-collapse:separate;">
+<tr><td class="ri-inner" style="padding:28px 40px 36px 40px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr><td class="ri-pad" style="padding:0 0 32px 0;"><p style="margin:0;font-family:'Playfair Display', Georgia, 'Times New Roman', serif;font-size:22px;line-height:28px;font-weight:700;color:#2D2D2D;">Revise It</p></td></tr>
+<tr><td class="ri-pad" style="padding:0 0 20px 0;"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td width="8" style="width:8px;"><div style="width:8px;height:8px;border-radius:4px;background-color:#3B5F8A;font-size:0;line-height:0;">&nbsp;</div></td><td style="padding-left:8px;font-family:'Source Sans 3', 'Source Sans Pro', Arial, Helvetica, sans-serif;font-size:13px;line-height:18px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#3B5F8A;">School email</td></tr></table></td></tr>
+<tr><td class="ri-pad" style="padding:0 0 20px 0;"><h1 class="ri-title" style="margin:0;font-family:'Playfair Display', Georgia, 'Times New Roman', serif;font-size:30px;line-height:38px;font-weight:700;color:#2D2D2D;">Confirm your school email</h1></td></tr>
+<tr><td class="ri-pad" style="padding:0 0 20px 0;"><p style="margin:0;font-family:'Source Sans 3', 'Source Sans Pro', Arial, Helvetica, sans-serif;font-size:16px;line-height:26px;color:#2D2D2D;">Please confirm that this is your school email address. After that, our team checks your school details before you can use the teacher workspace.</p></td></tr>
+<tr><td class="ri-pad" style="padding:4px 0 24px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate;background-color:#F0EDE6;border-radius:8px;"><tr><td style="padding:12px 16px;"><p style="margin:0;font-family:'Source Sans 3', 'Source Sans Pro', Arial, Helvetica, sans-serif;font-size:13px;line-height:18px;color:#4A4A4A;">If the button does not work, copy this address into your browser:</p><p style="margin:0;padding-top:4px;font-family:'Source Sans 3', 'Source Sans Pro', Arial, Helvetica, sans-serif;font-size:13px;line-height:18px;color:#2D2D2D;word-break:break-all;">{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=signup</p></td></tr></table></td></tr>
+<tr><td class="ri-pad" style="padding:4px 0 20px 0;"><table role="presentation" class="ri-button" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" bgcolor="#436B56" style="background-color:#436B56;border-radius:999px;"><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=signup" style="display:inline-block;padding:14px 28px;font-family:'Source Sans 3', 'Source Sans Pro', Arial, Helvetica, sans-serif;font-size:16px;line-height:20px;font-weight:600;color:#FFFFFF;text-decoration:none;border-radius:999px;">Confirm school email</a></td></tr></table></td></tr>
+<tr><td class="ri-pad" style="padding:0;"><p style="margin:0;font-family:'Source Sans 3', 'Source Sans Pro', Arial, Helvetica, sans-serif;font-size:14px;line-height:22px;color:#4A4A4A;">If you did not create a Revise It account, you can ignore this email.</p></td></tr>
+</table>
+</td></tr>
+</table>
+<table role="presentation" class="ri-card" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;">
+<tr><td class="ri-inner" style="padding:20px 40px 0 40px;">
+<p style="margin:0;padding-bottom:6px;font-family:'Source Sans 3', 'Source Sans Pro', Arial, Helvetica, sans-serif;font-size:13px;line-height:20px;color:#4A4A4A;">Questions? Write to kahueka@reviseit.io.</p>
+<p style="margin:0;padding-bottom:6px;font-family:'Source Sans 3', 'Source Sans Pro', Arial, Helvetica, sans-serif;font-size:13px;line-height:20px;color:#4A4A4A;">You are receiving this because this address was used on the Revise It teacher sign-up page. Revise It · Cape Town</p>
+</td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>

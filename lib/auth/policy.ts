@@ -18,3 +18,13 @@ export type TeacherAccount = {
 export function canEnterWorkspace(account: TeacherAccount | null, email: string, confirmed: boolean): boolean {
   return !!(confirmed && account?.status === 'approved' && account.school_id && account.department_id && account.email.toLowerCase() === email.toLowerCase());
 }
+/**
+ * The only destinations a sign-in may return to: same-site teacher and account
+ * pages. Anything else (another host, a protocol-relative or backslash path,
+ * the API, the admin area, encoded tricks) falls back to My account.
+ */
+export function safeNext(value: unknown): string | null {
+  if (typeof value !== 'string' || value.length > 200) return null;
+  if (!/^\/(teacher|account)(\/[A-Za-z0-9-]+)*\/?(\?[A-Za-z0-9=&_-]*)?$/.test(value)) return null;
+  return value;
+}
