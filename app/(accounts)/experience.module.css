@@ -539,6 +539,7 @@
   .record-table__cell--chevron { display:flex; align-self:center; color:var(--color-text-muted); }
   /* S8p: on phones the selected record is its own page with a sticky decision bar. */
   .record-layout--reviewing .record-layout__list { display:none; }
+  .page--reviewing .page-header--staff, .page--reviewing .filter-bar { display:none; }
   .record-panel { position:static; max-height:none; overflow:visible; border:0; border-radius:0; background:none; box-shadow:none; width:100%; }
   .record-panel::before { display:none; }
   .record-panel__header { padding:16px 0; border:0; }
@@ -547,7 +548,7 @@
   .record-panel__footer { position:sticky; bottom:0; flex-direction:column; align-items:stretch; margin:0 -16px; padding:12px 16px 16px; background:var(--color-surface); }
   .record-panel__footer .button--primary { height:48px; }
   .segmented-control--stack { flex-direction:column; gap:8px; padding:0; border-radius:0; background:none; }
-  .segmented-control--stack .segmented-control__option { justify-content:flex-start; gap:12px; height:48px; padding:0 16px; border:1px solid var(--color-border-strong); border-radius:10px; background:var(--color-surface); }
+  .segmented-control--stack .segmented-control__option { flex:0 0 auto; justify-content:flex-start; gap:12px; height:48px; padding:0 16px; border:1px solid var(--color-border-strong); border-radius:10px; background:var(--color-surface); }
   .segmented-control--stack .segmented-control__option:has(input:checked) { border:2px solid var(--color-action-strong); background:var(--color-action-tint-subtle); box-shadow:none; }
   .segmented-control--stack .segmented-control__radio { display:block; width:20px; height:20px; border:1.5px solid var(--color-border-strong); border-radius:999px; }
   .segmented-control--stack .segmented-control__option:has(input:checked) .segmented-control__radio { border:6px solid var(--color-action-strong); }

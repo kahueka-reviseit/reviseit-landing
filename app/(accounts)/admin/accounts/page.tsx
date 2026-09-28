@@ -45,7 +45,7 @@ export default async function ReviewAccounts({ searchParams }: { searchParams: P
   const firstName = (account.full_name || '').split(/\s+/)[0] || undefined;
   return <><StaffHeader current="accounts" signedIn name={firstName} counts={{ accounts: counts?.pending ?? null, papers: paperCount }}
       record={current ? { back: href({ focus: current.user_id }), label: 'School accounts', position: position && !position.startsWith('0') ? position : undefined } : undefined}/>
-    <main className={ui['site-shell__main']}><div className={ui['page--staff']}>
+    <main className={ui['site-shell__main']}><div className={`${ui['page--staff']} ${current ? ui['page--reviewing'] : ''}`}>
     <FocusRow id={params.focus}/>
     <header className={ui['page-header--staff']}>
       <div className={ui['page-header__titles--staff']}><h1 className={ui['page-header__title--staff']}>School accounts</h1>
