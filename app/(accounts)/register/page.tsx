@@ -1,13 +1,13 @@
-import Link from 'next/link';
-import { AccountForm, EmailField, PasswordField, SchoolFields } from '../forms';
-import { register } from '../actions';
-import { SCHOOL_EMAIL_NOTICE, ACCOUNT_UNAVAILABLE } from '../../../lib/auth/policy';
+import { ACCOUNT_UNAVAILABLE } from '../../../lib/auth/policy';
 import { authConfig } from '../../../lib/supabase/config';
-import styles from '../accounts.module.css';
+import AuthLayout from '../auth-layout';
+import RegisterForm from './form';
+import ui from '../experience.module.css';
 export default function Register() {
-  return <section className={styles['card']}><span className={styles['card__eyebrow']}>Teacher platform</span><h1>Create your account</h1><p className={styles['notice--info']}>{SCHOOL_EMAIL_NOTICE}</p>
-    {!authConfig() && <p role="status">{ACCOUNT_UNAVAILABLE}</p>}
-    <AccountForm action={register} label="Create account"><SchoolFields /><EmailField /><PasswordField newPassword /></AccountForm>
-    <p>We use these details to verify your school affiliation and manage access. <Link href="/privacy-policy">Read our privacy policy</Link>.</p>
-    <Link href="/login">Already have an account? Log in</Link></section>;
+  return <AuthLayout entry="sign-in" step={1} title="Create your teacher account" lede="Use your school email address. Our team checks every account against the school before the workspace opens, so papers stay within verified departments.">
+    <section className={ui['form-card']} aria-label="Create account">
+      {!authConfig() && <div className={ui['notice--neutral']} role="status"><p className={ui['notice__body']}>{ACCOUNT_UNAVAILABLE}</p></div>}
+      <RegisterForm/>
+    </section>
+  </AuthLayout>;
 }

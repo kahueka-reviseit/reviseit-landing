@@ -1,16 +1,16 @@
-import Link from 'next/link';
-import { AccountForm, EmailField, PasswordField } from '../forms';
-import { login, resendConfirmation } from '../actions';
-import { SCHOOL_EMAIL_NOTICE, ACCOUNT_UNAVAILABLE } from '../../../lib/auth/policy';
+import { ACCOUNT_UNAVAILABLE, SCHOOL_EMAIL_NOTICE } from '../../../lib/auth/policy';
 import { authConfig } from '../../../lib/supabase/config';
-import styles from '../accounts.module.css';
-export default async function Login({ searchParams }: { searchParams: Promise<{ message?: string }> }) {
-  const { message } = await searchParams;
-  return <section className={styles['card']}><span className={styles['card__eyebrow']}>Teacher platform</span><h1>Welcome back</h1><p className={styles['notice--info']}>{SCHOOL_EMAIL_NOTICE}</p>
-    {(!authConfig() || message === 'unavailable') && <p role="status">{ACCOUNT_UNAVAILABLE}</p>}
-    {message === 'password-updated' && <p role="status">Your password has been updated. Log in with your new password.</p>}
-    <AccountForm action={login} label="Log in"><EmailField /><PasswordField /></AccountForm>
-    <div className={styles['card__actions']}><Link href="/register">Create an account</Link><Link href="/forgot-password">Forgot your password?</Link></div>
-    <details className={styles['disclosure']}><summary>Resend email confirmation</summary><AccountForm action={resendConfirmation} label="Send confirmation link"><EmailField /></AccountForm></details>
-  </section>;
+import AuthLayout from '../auth-layout';
+import LoginForm from './form';
+import ui from '../experience.module.css';
+export default async function Login({ searchParams }: { searchParams: Promise<{ message?: string; resend?: string }> }) {
+  const { message, resend } = await searchParams;
+  return <AuthLayout entry="create" title="Sign in to your teacher account" lede={SCHOOL_EMAIL_NOTICE}>
+    <section className={ui['form-card']} aria-labelledby="sign-in-title">
+      <h2 id="sign-in-title" className={ui['form-card__title']}>Welcome back</h2>
+      {(!authConfig() || message === 'unavailable') && <div className={ui['notice--neutral']} role="status"><p className={ui['notice__body']}>{ACCOUNT_UNAVAILABLE}</p></div>}
+      {message === 'password-updated' && <div className={ui['notice--success']} role="status"><p className={ui['notice__title--compact']}>Password updated</p><p className={ui['notice__body']}>Sign in with your new password.</p></div>}
+      <LoginForm resend={resend === '1'}/>
+    </section>
+  </AuthLayout>;
 }
