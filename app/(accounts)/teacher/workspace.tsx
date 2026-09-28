@@ -11,6 +11,7 @@ import { BuilderView, BuilderQuestion, BuilderMultipleChoice } from './paper/bui
 import ReviewView from './paper/review';
 import { HomeView, ShapeView } from './paper/home';
 import FormattingView from './paper/formatting';
+import ui from '../experience.module.css';
 import PaperBar from './paper/paper-bar';
 
 const views:View[]=['home','shape','catalogue','question','builder','builder-question','builder-mcq','review','formatting'];
@@ -25,6 +26,8 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
   const [preferences,setPreferences]=useState<Formatting>(initial.formatting.preferences);
   const [ids,setIds]=useState(initial.selection.release===initial.module?.release ? initial.selection.entryIds : []);
   const [busy,setBusy]=useState(false), [error,setError]=useState(''), [notice,setNotice]=useState('');
+  // School formatting shows the server's reply next to its form (409 changed elsewhere, 422 unsupported, 503 unavailable).
+  const [formattingFailure,setFormattingFailure]=useState<number|null>(null);
   const [query,setQuery]=useState('');
   const [search,setSearch]=useState<{query:string;result:CatalogueSearch;error:string}|null>(null);
   const [view,setView]=useState<View>('catalogue');
@@ -154,17 +157,17 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
   }
   async function save(kind:'formatting'|'selection'):Promise<boolean> {
     if(!data.module) return false;
-    setBusy(true);setError('');setNotice('');
+    setBusy(true);setError('');setNotice('');if(kind==='formatting')setFormattingFailure(null);
     const body:WorkspaceWrite=kind==='formatting' ? {kind,moduleId:data.module.id,revision:data.formatting.revision,preferences} :
       {kind,moduleId:data.module.id,revision:data.selection.revision,release:data.module.release,entryIds:ids};
     try {
       const r=await fetch('/api/teacher/workspace',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-      const result=await r.json();if(!r.ok) throw new Error(result.error || 'Could not save. Try again.');
+      const result=await r.json();if(!r.ok){if(kind==='formatting')setFormattingFailure(r.status);throw new Error(result.error || 'Could not save. Try again.');}
       setData(current=>kind==='formatting'?{...current,formatting:{revision:result.revision,preferences}}:
         {...current,selection:{revision:result.revision,release:current.module!.release,entryIds:ids}});
       setNotice(kind==='formatting'?'School formatting saved for this curriculum.':ids.length?'Your paper selection is saved. You can return to it later.':'Your saved selection is cleared.');
       return true;
-    }catch(e){setError(e instanceof Error?e.message:'Could not save. Your changes are still here; try again.');return false;}
+    }catch(e){if(kind==='formatting'){setFormattingFailure(f=>f??503);return false;}setError(e instanceof Error?e.message:'Could not save. Your changes are still here; try again.');return false;}
     finally{setBusy(false);}
   }
 
@@ -175,18 +178,19 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
   // Return keyboard focus to the card that opened a detail view.
   useEffect(()=>{if((view==='catalogue'||view==='builder')&&returnFocus.current){const el=document.getElementById(returnFocus.current);returnFocus.current=null;el?.focus();}},[view]);
 
-  if(!data.module) return <div className={styles['paper-journey']}><section className={styles['empty-state']}><h2>Your curricula will appear here</h2><p>Your school account is verified. Contact our team to arrange curriculum access for your department.</p><a href="mailto:kahueka@reviseit.io">Contact Revise It</a></section></div>;
+  if(!data.module) return <div className={ui['page']}><header className={ui['page-header']}><div className={ui['page-header__titles']}><h1 className={ui['page-header__title']}>My curricula</h1></div></header>
+    <section className={ui['empty-state']}><p className={ui['status']}><span className={ui['status__dot--done']} aria-hidden="true"/><span className={ui['status__label--done']}>Access verified</span></p><h2 className={ui['empty-state__title']}>Your curricula will appear here</h2><p className={ui['empty-state__body']}>Your school is verified but no curriculum has been opened for your department yet. Contact Revise It to arrange access.</p><a className={ui['button--secondary']} href="mailto:kahueka@reviseit.io">Contact Revise It</a></section></div>;
   const detail=question?byId.get(question):undefined;
   const status=<>
-    <div aria-live="polite">{notice && <p role="status" className={styles['notice--success']}>{notice}</p>}</div>
-    {error && <p role="alert" className={styles['notice--error']}>{error} <a href="/teacher">Reload workspace</a></p>}
+    <div aria-live="polite">{notice && <p role="status" className={ui['notice--success']}><span className={ui['notice__body']}>{notice}</span></p>}</div>
+    {error && <p role="alert" className={ui['notice--problem']}><span className={ui['notice__body']}>{error} <a className={ui['link']} href="/teacher">Reload workspace</a></span></p>}
   </>;
   const withBar=['catalogue','question'].includes(view);
   return <div className={`${styles['paper-journey']} ${withBar?styles['paper-journey--with-bottom-bar']:''}`}>
     {data.module.isDemo && <p className={styles['demo-notice']}>Explore with sample entries. These are demonstration selections; purchasing and paper generation are not available yet.</p>}
     {view==='home' ? <HomeView paper={paper} status={status} switchCurriculum={switchCurriculum}/> :
      view==='shape' ? <ShapeView paper={paper} status={status}/> :
-     view==='formatting' ? <FormattingView paper={paper} status={status} preferences={preferences} setPreferences={setPreferences} dirty={formattingDirty} save={()=>void save('formatting')}/> :
+     view==='formatting' ? <FormattingView paper={paper} saved={notice==='School formatting saved for this curriculum.'&&!formattingDirty} failure={formattingFailure} preferences={preferences} setPreferences={setPreferences} dirty={formattingDirty} save={()=>void save('formatting')}/> :
      view==='question' && detail ? <QuestionDetail paper={paper} entry={detail} status={status} query={searchQuery}/> :
      view==='builder' ? <BuilderView paper={paper} status={status}/> :
      view==='builder-question' && detail ? <BuilderQuestion paper={paper} entry={detail} status={status}/> :
