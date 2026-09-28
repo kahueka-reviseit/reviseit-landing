@@ -143,7 +143,7 @@ export function BuilderView({paper,status}:{paper:PaperModel;status:ReactNode}) 
                 <span role="cell"><MarksInput paper={paper} entry={e}/></span>
                 <span role="cell" className={styles['question-table__cell--bloom']}>{mix.length?<><BloomBar rows={mix.map(m=>({bloom:m.bloom,weight:m.min}))}/><small>{mix.map(m=>`${m.bloom} ${m.min===m.max?m.min:`${m.min}–${m.max}`}`).join(' · ')}</small></>:<small>{e.preview?.outline?'Outline without part marks':'Not yet classified'}</small>}</span>
                 <span role="cell" className={`${styles['question-table__cell--status']} ${styles[({ok:'status--ready',todo:'status--to-complete',bad:'status--invalid'} as const)[s.tone]]}`}>{s.text}</span>
-                <span role="cell" className={styles['question-table__cell--actions']}><button type="button" className={styles['button--text']} onClick={()=>paper.go('builder-question',e.id)}>Configure</button></span>
+                <span role="cell" className={styles['question-table__cell--actions']}><button type="button" className={styles['button--text']} onClick={()=>paper.go('builder-question',e.id)}>Set marks</button></span>
               </div>;})}
           </div>
         </section>}

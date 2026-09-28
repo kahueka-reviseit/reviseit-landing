@@ -13,9 +13,9 @@
 .paper-journey--with-bottom-bar { padding-bottom:0; }
 .visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 .demo-notice { font-size:14px; margin:0 0 12px; }
-.notice--success,.notice--error,.empty-state { padding:16px 20px; margin:16px 0; background:var(--color-white); border-radius:10px; font-size:15px; }
-.notice--success { border-left:3px solid var(--sage); background:#eef5f0; }
-.notice--error { border-left:3px solid var(--terracotta); background:#fcf0ee; color:#802f25; }
+.notice--success,.notice--error,.empty-state { padding:18px 20px; margin:16px 0; background:var(--color-surface); border-radius:10px; font-size:14px; line-height:21px; }
+.notice--success { border-left:3px solid var(--color-status-done); background:var(--color-action-tint-subtle); }
+.notice--error { border-left:3px solid var(--color-status-problem); background:var(--color-warning-tint); color:var(--color-warning-text); }
 .notice--error a { text-decoration:underline; }
 .empty-state { box-shadow:var(--shadow); padding:28px; }
 .empty-state h2,.empty-state h3 { font-size:22px; margin-bottom:8px; }
