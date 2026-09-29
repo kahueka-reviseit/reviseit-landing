@@ -42,7 +42,8 @@ export default function QuestionDetail({paper,entry,status,query}:{paper:PaperMo
       </div>
       <section className={styles['buy-panel']} aria-labelledby="detail-title">
         <div className={styles['catalogue-card__header']}><span className={kind==='structured'?styles['catalogue-card__type--structured']:styles['catalogue-card__type--multiple-choice']}>{kindLabels[kind]} {kind==='structured'?'question':'type'}</span><span className={styles['catalogue-card__code']}>{codeOf(entry.id)}</span></div>
-        <div><h1 id="detail-title" ref={heading} tabIndex={-1}>{entry.title}</h1><p className={styles['buy-panel__subtitle']}>{[entry.topic,entry.description].filter(Boolean).join(' · ')}</p></div>
+        <div><h1 id="detail-title" ref={heading} tabIndex={-1}>{entry.title}</h1><p className={styles['buy-panel__subtitle']}>{entry.topic}</p>
+          {entry.description&&<p className={styles['buy-panel__description']}>{entry.description}</p>}</div>
         <p className={styles['buy-panel__marks']}><strong>{formatMarks(entry.marks)}</strong> <span>marks</span></p>
         <ul className={styles['buy-panel__facts']}>
           <li>{entry.preview?`${formatMarks(entry.preview.subquestions)} ${entry.preview.subquestions.max===1?(kind==='multiple_choice'?'item':'part'):'parts'}`:'Parts not yet published'}</li>

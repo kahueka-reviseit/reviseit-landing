@@ -38,6 +38,9 @@ test('type to search suggests topics and questions; the detail view opens, focus
  await expect(page.getByRole('listbox')).toBeVisible();await page.keyboard.press('ArrowDown');await page.keyboard.press('ArrowDown');
  await page.keyboard.press('Enter');
  const heading=page.getByRole('heading',{level:1});await expect(heading).toBeFocused();
+ // The published description is its own paragraph, not appended to the topic line.
+ await expect(page.getByText(/^Synthetic electric circuits question for the demonstration\.$/)).toBeVisible();
+ await expect(page.getByText('Electric circuits',{exact:true}).first()).toBeVisible();
  await page.getByRole('button',{name:'Add to your paper'}).click();await expect(page.getByText(/In your paper/)).toBeVisible();
  await page.screenshot({path:`workspace-test-results/detail-${info.project.name}.png`,fullPage:true});
  await page.getByRole('button',{name:/Back to results|Back to catalogue/}).click();
