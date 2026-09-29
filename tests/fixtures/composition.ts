@@ -57,6 +57,12 @@ export const variantItem=()=>classification('VARIANT','structured',[9,18],[part(
    {id:'compressed',label:'Compressed',parts:['p5','p6','p7'],count:{min:3,max:3},required:['p5','p6','p7'],additional:{min:0,max:0},locator:null}],
   effects:[{id:'form-trim-conflict',when:{facet:'trim',is:'drop'},excludeParts:['p5'],additional:null,reason:'hint.conflict',origin:{type:'form',locators:[],heldBecause:null}}]});
 export const mcqItem=()=>classification('MCQ','multiple_choice',[2,2],[part('p1',{bloom:'understand'},{basis:'range',min:2,max:2},'required','B2')],[],[]);
+// Two required Apply parts in different legacy bands: the Bloom's split is fixed whatever the band split.
+export const hiddenBandItem=()=>classification('HIDDEN','structured',[5,5],[part('p1',{bloom:'apply'},{basis:'range',min:1,max:4},'required','B1'),
+ part('p2',{bloom:'apply'},{basis:'range',min:1,max:4},'required','B3')],[],[]);
+// The same shape with two different Bloom's categories: the split is genuinely uncertain.
+export const openBloomItem=()=>classification('OPENBLOOM','structured',[5,5],[part('p1',{bloom:'remember'},{basis:'range',min:1,max:4},'required','B1'),
+ part('p2',{bloom:'apply'},{basis:'range',min:1,max:4},'required','B1')],[],[]);
 export const noPartsItem=()=>classification('VARIANTS','structured',[10,14],[],[],[]);
 const profile={profileId:'synthetic-profile',version:1,curriculumId:'synthetic-curriculum',bands:[{id:'B1',label:'Band one'},{id:'B2',label:'Band two'},{id:'B3',label:'Band three'},{id:'B4',label:'Band four'}],
  distributions:[{id:'bands',taxonomy:'curriculum-band',basis:'marks',targets:[{key:'B1',percent:20},{key:'B2',percent:30},{key:'B3',percent:40},{key:'B4',percent:10}]}]};

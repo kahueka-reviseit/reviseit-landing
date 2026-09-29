@@ -138,8 +138,9 @@ export function lineComposition(doc:Classification, structure:LineStructure, mar
       for(const k of [...new Set([...slots.map(of),...(extra.max?[UNLISTED]:[])])].sort()){const b=targetBounds(slots,of,k,[c.count.min,c.count.max],marks,extra);if(!b)return null;out[k]={min:b[0],max:b[1]};}
       return Object.keys(out).length?out:null;
     };
-    const cat=solve(s=>s.category), band=cat&&solve(s=>s.band);
-    return cat&&band?[{c,cat,band}]:[];
+    // Only Bloom's categories decide feasibility and exactness; legacy bands are carried but never shown.
+    const cat=solve(s=>s.category), band=cat?solve(s=>s.band)??{}:{};
+    return cat?[{c,cat,band}]:[];
   });
   // Parts left out by rules or effects mean the teacher's choices, not the marks, removed every structure.
   const chosenOut=dropped.size>0 || doc.parts.some(p=>!listed.has(p.id));
@@ -149,7 +150,7 @@ export function lineComposition(doc:Classification, structure:LineStructure, mar
     [k,{min:Math.min(...xs.map(x=>x[k]?.min??0)),max:Math.max(...xs.map(x=>x[k]?.max??0))}]));
   const categories=merge(solved.map(x=>x.cat)), bands=merge(solved.map(x=>x.band)), feasible=solved.map(x=>x.c);
   const unknown=categories[UNLISTED]??{min:0,max:0};
-  const status=unknown.min===marks?'unclassified':!unknown.max && [...Object.values(categories),...Object.values(bands)].every(r=>r.min===r.max)?'exact':'bounded';
+  const status=unknown.min===marks?'unclassified':!unknown.max && Object.values(categories).every(r=>r.min===r.max)?'exact':'bounded';
   return {...describe(feasible),marks,status,reason:null,categories,bands};
 }
 
@@ -162,6 +163,6 @@ export function sumCompositions(lines:{marks:number|null; composition:LineCompos
     if(l.composition.status==='not-calculable') pending+=l.marks??0;
     else {add(categories,l.composition.categories);add(bands,l.composition.bands);}
   }
-  const exact=!pending && !categories[UNLISTED]?.max && [...Object.values(categories),...Object.values(bands)].every(r=>r.min===r.max);
+  const exact=!pending && !categories[UNLISTED]?.max && Object.values(categories).every(r=>r.min===r.max);
   return {categories,bands,known:[...new Set(known)].sort(),pending,exact};
 }

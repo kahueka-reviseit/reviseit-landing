@@ -29,6 +29,8 @@ test('the review shows settled and open marks per category, never the whole ques
  expect(rowText(mix,'Understand')).toBe('Understand2');expect(rowText(mix,'Remember')).toBe('Remember0–9');expect(rowText(mix,'Not yet classified')).toBe('Not yet classified0');
  expect(screen.getByText('2 marks settled in a category · 10 still open between categories')).toBeVisible();
  expect(screen.getByText(/highest values of different categories cannot all happen together/)).toBeVisible();
+ // Bloom's is the only cognitive model: nothing rendered refers to curriculum levels, bands or targets.
+ expect(document.body.textContent).not.toMatch(/curriculum (band|level|requirement)|\blevels?\b|\bL[1-4]\b/i);
 });
 
 test('a linked choice narrows the question’s range and explains the included subquestions',async()=>{

@@ -3,8 +3,8 @@
 import {describe,it,expect} from 'vitest';
 import {evaluate,generationPlan,project} from '../../lib/configurator/engine';
 import {evaluateLine} from '../../lib/configurator/contract-v1';
-import {lineComposition} from '../../lib/configurator/composition';
-import {brute,ch,closed,closedItem,config,definitions,example,exampleItem,legacy,legacyItem,mcq,noPartsItem,open,openItem,variant,variantItem} from '../fixtures/composition';
+import {lineComposition,sumCompositions} from '../../lib/configurator/composition';
+import {brute,ch,closed,closedItem,config,hiddenBandItem,openBloomItem,definitions,example,exampleItem,legacy,legacyItem,mcq,noPartsItem,open,openItem,variant,variantItem} from '../fixtures/composition';
 import type {Classification} from '../../lib/configurator/contract-v1';
 
 const meta={orderId:'o',state:'awaiting_answers',paymentStatus:'paid',revision:1,submitted:false};
@@ -186,5 +186,21 @@ describe('older definitions without a structure (C10B)',()=>{
   const d=definitions([mcq,closed]);const cfg=config([2,6]);cfg.lines.q2.parts=['p3'];const e=evaluate(d,cfg,{paid:true});
   expect(e.lines.map(l=>[l.composition!.status,l.composition!.coverage])).toEqual([['exact','complete'],['exact','complete']]);
   expect(e.composition.exact).toBe(true);expect(project(d,cfg,e,meta).composition.notes).toEqual([]);
+ });
+});
+
+describe('Bloom’s alone decides exactness',()=>{
+ const compose=(doc:any)=>{const {structure}=evaluateLine(doc,{lineId:'l',identity:{moduleId:'synthetic-module',kind:'structured',itemId:doc.itemId,release:'1'},marks:5,parts:null,answers:{}});return lineComposition(doc,structure,5);};
+ it('a fixed Bloom’s split is exact even when hidden legacy bands vary',()=>{
+  const c=compose(hiddenBandItem());
+  expect(c.categories).toEqual({apply:r(5)});expect(c.bands.B1).toEqual(r(1,4));
+  expect(c.status).toBe('exact');
+  expect(sumCompositions([{marks:5,composition:c}]).exact).toBe(true);
+ });
+ it('a genuinely open Bloom’s split stays bounded',()=>{
+  const c=compose(openBloomItem());
+  expect(c.categories).toEqual({remember:r(1,4),apply:r(1,4)});
+  expect(c.status).toBe('bounded');
+  expect(sumCompositions([{marks:5,composition:c}]).exact).toBe(false);
  });
 });
