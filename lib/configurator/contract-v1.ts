@@ -44,6 +44,9 @@ export type LineOutput = {lineId:string; identity:LineInput['identity']; marks:n
   excludedOptions:Effect[]; forcedOptions:Effect[]; preferredOptions:Effect[]; feasibility:'feasible'|'infeasible'|'not-determinable'|'not-evaluated';
   cognitive:{basis:'marks'; determinable:boolean; ranges:Record<Category,Range>|null; groupedRanges?:Record<string,Range>|null; reason:string|null}};
 export type Internal = {mandatory:[string,number,number][]; flexible:[string,number,number][]; count:[number,number]; marks:number};
+/** Resolved part structure behind a line result, for the composition layer. Not part of the producer's result. */
+export type LineStructure = {valid:boolean; included:{id:string; inclusion:'required'|'selected'|'rule-required'}[]; flexible:string[];
+  ranges:Record<string,Range|null>; count:[number,number]; countRules:[number,number]|null; ruleRequired:Record<string,string[]>};
 
 /** Version 2: an unresolved grouped label is its own bucket, e.g. apply-or-analyse. */
 export function partCategory(p:Part):string {
@@ -115,7 +118,7 @@ function answerError(facet:Facet, answer:Answer):string|null {
 }
 const resolved=(a:Answer|undefined)=>!!a && (a.kind!=='text' || !!a.text.trim());
 
-export function evaluateLine(doc:Classification, line:LineInput, version:1|2=doc.schemaVersion):{result:LineOutput; internal:Internal|null} {
+export function evaluateLine(doc:Classification, line:LineInput, version:1|2=doc.schemaVersion):{result:LineOutput; internal:Internal|null; structure:LineStructure} {
   const v2=version===2;
   const lid=line.lineId;const errors:Issue[]=[],attention:Issue[]=[];
   const facets=new Map(doc.facets.map(f=>[f.id,f]));
@@ -264,7 +267,11 @@ export function evaluateLine(doc:Classification, line:LineInput, version:1|2=doc
   }
   const effects=(m:Map<string,Set<string>>):Effect[]=>sortedKeys(m).map(k=>{const [facet,option]=split(k);return {facet,option,ruleIds:sortedSet(m.get(k)!)};});
   const valid=!errors.length;
-  return {internal,result:{lineId:lid,identity:{...line.identity},marks,valid,complete:valid && !outstanding.length && feasibility!=='infeasible',
+  const ruleCount:[number,number]|null=counts.length?[Math.max(...counts.map(c=>c[0])),Math.min(...counts.map(c=>c[1]))]:null;
+  const structure:LineStructure={valid,included:included.map(([id,inclusion])=>({id,inclusion:inclusion as 'required'|'selected'|'rule-required'})),flexible:flexible.map(([id])=>id),
+    ranges:Object.fromEntries([...ranges].map(([id,[lo,hi]])=>[id,lo===null||hi===null||lo>hi?null:{min:lo,max:hi}])),
+    count:[cmin,cmax],countRules:ruleCount,ruleRequired:Object.fromEntries([...requiredParts].map(([p,ids])=>[p,sortedSet(ids)]))};
+  return {internal,structure,result:{lineId:lid,identity:{...line.identity},marks,valid,complete:valid && !outstanding.length && feasibility!=='infeasible',
     errors:sortIssues(errors),attention:sortIssues(attention),outstanding:sortedSet(outstanding),effectiveParts:effective,
     excludedParts:[...excludedParts.keys()].sort(cmp).map(p=>({part:p,ruleIds:sortedSet(excludedParts.get(p)!)})),
     excludedOptions:effects(excludedOpts),forcedOptions:effects(forced),preferredOptions:effects(preferred),feasibility,cognitive}};

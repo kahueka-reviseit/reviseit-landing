@@ -96,6 +96,9 @@
 .bloom-mix li span:last-child { text-align:right; }
 .meter__track { height:8px; background:var(--color-light-gray); border-radius:999px; overflow:hidden; display:block; }
 .meter__track i { display:block; height:100%; border-radius:999px; }
+.meter__track--split { display:flex; }
+.meter__track--split i { border-radius:0; flex:none; }
+.meter__open { opacity:.35; }
 .meter__fill--multiple-choice { background:var(--color-gold); } .meter__fill--structured { background:var(--color-slate-blue); }
 .data-table { width:100%; border-collapse:collapse; font-size:14px; }
 .data-table th,.data-table td { text-align:left; padding:6px 4px; border-top:1px solid var(--color-light-gray); }

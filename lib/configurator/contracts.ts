@@ -77,7 +77,11 @@ export type ConfiguredCheckoutRequest = {requestKey:string; moduleId:string; sel
 export type OptionView = {id:string; label:string; disabled:boolean; reason?:string; preferred?:boolean};
 export type FacetView = {id:string; label:string; hint:string; type:'choice'; required:boolean; allowAutomatic:boolean; options:OptionView[]; value:Answer|null; forced?:string; reason?:string};
 export type PartView = {id:string; number:string; summary:string; bloom:BloomKey|null; bloomOptions:BloomKey[]; bloomBasis:'source-label'|'profile-single-mapping'|'profile-authorised-fallback'|null; bloomUnknownReason?:string; band:string|null; marks:{min:number;max:number}|null;
-  inclusion:'required'|'optional'; included:boolean; locked:boolean; reason?:string; learnerDrawn:boolean};
+  /** Marks this part carries in the source's own example, when the source gives only an example. Never a bound. */
+  exampleMarks:{min:number;max:number}|null;
+  inclusion:'required'|'optional'; included:boolean; locked:boolean; reason?:string; learnerDrawn:boolean;
+  /** Neither required nor left out: the generation skill decides whether to include it. */
+  possible:boolean};
 export type Attention = {scope:'field'|'facet'|'part'|'marks'; id:string; message:string};
 export type LineView = {
   id:string; entryId?:string; number:string; title:string; kind:SectionKey; configurable:'classified'|'authored';
@@ -85,10 +89,18 @@ export type LineView = {
   parts:PartView[]; facets:FacetView[]; fields:QuestionField[]; answers:Record<string,Answer>;
   outstanding:string[]; attention:Attention[]; issues:string[]; ready:boolean;
   diagram:{stimulus:'required'|'optional'|'not_applicable'|'unknown'; learnerDrawn:string[]; locked?:string}|null;
+  /** After payment: this question's cognitive composition (null before payment or without a classification). */
+  composition:LineCompositionView|null;
   /** Reviewed public catalogue outline only (one example structure), or null when none was published. */
   outline:{subquestions:{min:number;max:number}; rows:{summary:string; bloom:string; marks:{min:number;max:number}|null}[]}|null;
 };
-export type CognitiveRow = {key:string; label:string; min:number; max:number; grouped?:boolean};
+/** One category's marks: exact when min equals max. `known` means a question in play contains this category. */
+export type CognitiveRow = {key:string; label:string; min:number; max:number; grouped?:boolean; known?:boolean};
+export type LineCompositionView = {status:'exact'|'bounded'|'unclassified'|'not-calculable'; note:string; open:boolean; rows:CognitiveRow[];
+  /** The source's own example instance, labelled as an example; never a promise for this paper. */
+  example:{marks:{min:number;max:number}; parts:number; rows:{key:string; label:string; min:number; max:number}[]}|null};
+/** Paper summary: marks settled in a known category, certainly unclassified, still open between categories, or not yet calculable. */
+export type CompositionSummary = {exact:boolean; settled:number; unclassified:number; open:number; pending:number; notes:string[]};
 /** 'apply-or-analyse' -> 'Apply or Analyse' */
 export const groupLabel=(key:string)=>key.split('-or-').map(k=>bloomLabels[k as BloomKey]??k).join(' or ');
 export type CurriculumComparison = {profile:string; basis:'marks'|'item-count'; rows:{key:string; label:string; min:number; max:number; target:string}[]; note:string};
@@ -99,7 +111,7 @@ export type ConfigurationView = {
   status:ReadinessStatus; statusLabel:string; outstanding:number; canSubmit:boolean;
   totals:{target:number|null; allocated:number; remaining:number; excess:number; complete:boolean;
     sections:{key:SectionKey; label:string; allocated:number; target:number|null}[]};
-  cognitive:CognitiveRow[]; curriculum:CurriculumComparison[];
+  cognitive:CognitiveRow[]; composition:CompositionSummary; curriculum:CurriculumComparison[];
   lines:LineView[]; paper:{fields:QuestionField[]; answers:Record<string,Answer>; outstanding:string[]};
   issues:string[]; configuration:Configuration;
 };

@@ -59,6 +59,31 @@ Worker registry for a coherent candidate (private, additive): retain its bundles
 `bundles/<private manifest SHA-256>` and add its workflow directory to the `workflows`
 map under its manifest hash. Existing entries stay for issued orders.
 
+## Cognitive composition (C10)
+
+`lib/configurator/composition.ts` computes each line's Bloom and curriculum-band marks from
+supported facts only, replacing the old fallback that put a whole line under "Not yet
+classified" whenever part marks were not source ranges.
+
+- **Facts used.** Listed parts and their categories (grouped candidates stay one bucket),
+  inclusion from the classification, the teacher's parts, and active rules (including
+  `origin.type: form` links such as `requireParts`/`excludeParts` on an answer), source mark
+  ranges and rule `partMarks`, the part-count rule and the line's marks.
+- **Open lines.** When any part's marks are only `typical` (the source's own example) or the
+  item has no parts table, the listed parts are one instance: each included part carries at
+  least one mark, and other subquestions may be written; their marks count under
+  `unclassified`. Example marks are reported separately (`example`, `exampleMarks`) and never
+  used as bounds. Lines whose every part has source ranges are closed and equal the producer's
+  `evaluateLine` ranges.
+- **Result.** Per category, the least and greatest marks over every permitted split (exact per
+  category; extremes are not jointly achievable). Status `exact`, `bounded`, `unclassified` or
+  `not-calculable` (marks not set, an answer needing attention, an unreadable definition); the
+  last keeps its known categories and its marks in their own "Not yet calculable" row. Paper
+  rows sum the lines. Curriculum comparisons use the same composition.
+- **Unchanged.** Producer conformance (`evaluateLine`/`evaluatePaper` results), readiness,
+  `cfg01-engine@2`, the database and plan schemas. Plan parts additionally carry `label` and
+  `inclusion`, so generation receives the same parts the teacher was shown.
+
 ## Activation order
 
 1. Pass the sealed Linux image suites for the service branch (see below).

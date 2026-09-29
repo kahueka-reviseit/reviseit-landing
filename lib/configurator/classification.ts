@@ -1,6 +1,7 @@
 import type { Answer, QuestionField } from '../jobs/questionnaire';
-import type { Attention, BloomKey, CurriculumComparison, FacetView, LineChoice, PartView } from './contracts';
-import { bandRanges, evaluateLine, evaluatePaper, BLOOM, CATEGORIES, type Classification, type Issue, type LineInput, type PaperInput, type Profile } from './contract-v1';
+import type { Attention, BloomKey, FacetView, LineChoice, PartView } from './contracts';
+import { evaluateLine, BLOOM, type Classification, type Issue, type LineInput, type Profile } from './contract-v1';
+import { lineComposition, type LineComposition } from './composition';
 
 /**
  * Adapter between a pinned contract-v1 classification and the order engine.
@@ -9,12 +10,15 @@ import { bandRanges, evaluateLine, evaluatePaper, BLOOM, CATEGORIES, type Classi
  * and turns results into authored teacher wording (hint keys, never model text).
  */
 export type RequirementsProfile = Profile;
+/** One subquestion as handed to generation: the same parts, inclusion and categories the teacher was shown. */
+export type PlannedPart = {id:string; label:string; inclusion:'required'|'selected'|'rule-required'|'flexible'; marks:{min:number;max:number}|null; bloom:BloomKey|null; bloomOptions:BloomKey[]; learnerDrawn:boolean};
 export type ClassifiedItem = {contract:'configurator-contract-v1'; doc:Classification; profile:Profile|null; fields:QuestionField[]};
 export type ClassifiedResult = {
   feasible:boolean; issues:string[]; outstanding:string[]; attention:Attention[];
-  cognitive:Record<BloomKey|'unclassified',{min:number;max:number}>; grouped:Record<string,{min:number;max:number}>; bands:Record<string,{min:number;max:number}>;
+  /** Cognitive composition from supported facts (source ranges, teacher choices, rules); never the whole line as unclassified. */
+  composition:LineComposition;
   parts:PartView[]; facets:FacetView[]; blockedFieldOptions:Record<string,Set<string>>;
-  plannedParts:{id:string; marks:{min:number;max:number}|null; bloom:BloomKey|null; bloomOptions:BloomKey[]; learnerDrawn:boolean}[];
+  plannedParts:PlannedPart[];
   diagram:{stimulus:string; learnerDrawn:string[]}|null;
   diagramView:{stimulus:'required'|'optional'|'not_applicable'|'unknown'; learnerDrawn:string[]; locked?:string}|null;
 };
@@ -94,7 +98,7 @@ export function evaluateClassified(item:ClassifiedItem, choice:LineChoice, marks
   // count as possible, so marks are refused only when no selection could fit.
   const doc=opts.paid?item.doc:{...item.doc,parts:item.doc.parts.map(p=>p.inclusion==='optional'?{...p,inclusion:'unspecified' as const}:p)};
   const line:LineInput={lineId:'line',identity:{moduleId:doc.moduleId,kind:doc.kind,itemId:doc.itemId,release:doc.release},marks,parts:opts.paid?choice.parts:null,answers:opts.paid?answers:{}};
-  const {result,internal}=evaluateLine(doc,line);
+  const {result,structure}=evaluateLine(doc,line);
   const marksFacet=doc.facets.find(f=>f.binding.scope==='line-marks')!.id;
   const issues:string[]=[],attention:Attention[]=[];
   for(const e of result.errors) {
@@ -105,14 +109,7 @@ export function evaluateClassified(item:ClassifiedItem, choice:LineChoice, marks
   }
   if(opts.paid) for(const a of result.attention) attention.push({scope:a.facet?'field':'part',id:a.facet??a.part??'',message:wording(doc,a)});
   const feasible=!result.errors.some(e=>MARK_CODES.has(e.code));
-  const unclassified=Object.fromEntries(CATEGORIES.map(k=>[k,{min:0,max:0}])) as ClassifiedResult['cognitive'];
-  let cognitive=unclassified;
-  const grouped:ClassifiedResult['grouped']={...(result.cognitive.groupedRanges??{})};
-  if(result.cognitive.determinable && result.cognitive.ranges) cognitive=result.cognitive.ranges as ClassifiedResult['cognitive'];
-  else cognitive={...unclassified,unclassified:{min:marks,max:marks}};
-  const bands:ClassifiedResult['bands']={};
-  if(internal) for(const [k,[lo,hi]] of Object.entries(bandRanges(doc,internal))) bands[k]={min:lo,max:hi};
-  else bands.unclassified={min:marks,max:marks};
+  const composition=lineComposition(doc,structure,marks);
   const effective=new Map(result.effectiveParts.map(p=>[p.id,p]));
   const excluded=new Map(result.excludedParts.map(p=>[p.part,p]));
   const drawn=new Set(doc.diagramPolicy.learnerDrawnParts);
@@ -124,8 +121,11 @@ export function evaluateClassified(item:ClassifiedItem, choice:LineChoice, marks
       band:p.cognitive.curriculumBand,marks:e?.marks??(p.marks.basis==='range'&&p.marks.min!==null&&p.marks.max!==null?{min:p.marks.min,max:p.marks.max}:null),
       inclusion:p.inclusion==='required'?'required':'optional',included:!!e && e.inclusion!=='flexible',
       locked:p.inclusion==='required' || e?.inclusion==='rule-required' || !!x || !partsFacet || !(partsFacet.domain.parts as string[]).includes(p.id),
-      reason:x?x.ruleIds.map(r=>doc.hints[doc.rules.find(y=>y.id===r)?.reason??'']).filter(Boolean).join(' ')||'Ruled out by another choice.':e?.inclusion==='flexible'?'The generation skill decides whether to include this part.':undefined,
-      learnerDrawn:drawn.has(p.id)};
+      reason:x?x.ruleIds.map(r=>doc.hints[doc.rules.find(y=>y.id===r)?.reason??'']).filter(Boolean).join(' ')||'Ruled out by another choice.':
+        e?.inclusion==='rule-required'?(structure.ruleRequired[p.id]??[]).map(r=>doc.hints[doc.rules.find(y=>y.id===r)?.reason??'']).filter(Boolean).join(' ')||'Included because of another choice.':
+        e?.inclusion==='flexible'?'The generation skill decides whether to include this part.':undefined,
+      exampleMarks:p.marks.basis==='typical'&&p.marks.min!==null&&p.marks.max!==null?{min:p.marks.min,max:p.marks.max}:null,
+      learnerDrawn:drawn.has(p.id),possible:e?.inclusion==='flexible'};
   });
   const facets:FacetView[]=[];const blocked:Record<string,Set<string>>={};
   for(const f of doc.facets) {
@@ -143,28 +143,9 @@ export function evaluateClassified(item:ClassifiedItem, choice:LineChoice, marks
   const stimulusAnswer=doc.diagramPolicy.stimulusFacet?answers[doc.diagramPolicy.stimulusFacet]:undefined;
   const lockedStimulus=doc.diagramPolicy.stimulusFacet?result.forcedOptions.find(o=>o.facet===doc.diagramPolicy.stimulusFacet)?.option:undefined;
   const stimulus=doc.diagramPolicy.stimulus==='unspecified'?'unknown':doc.diagramPolicy.stimulus;
-  return {feasible,issues,outstanding:opts.paid?result.outstanding.filter(x=>x!==marksFacet):[],attention,cognitive,grouped,bands,parts,facets,blockedFieldOptions:blocked,
-    plannedParts:result.effectiveParts.map(p=>({id:p.id,marks:p.marks,bloom:doc.parts.find(x=>x.id===p.id)?.cognitive.bloom??null,bloomOptions:(BLOOM as readonly string[]).filter(k=>(doc.parts.find(x=>x.id===p.id)?.cognitive.bloomCandidates??[]).includes(k)) as BloomKey[],learnerDrawn:drawn.has(p.id)})),
+  return {feasible,issues,outstanding:opts.paid?result.outstanding.filter(x=>x!==marksFacet):[],attention,composition,parts,facets,blockedFieldOptions:blocked,
+    plannedParts:result.effectiveParts.map(p=>{const d=doc.parts.find(x=>x.id===p.id)!;
+      return {id:p.id,label:d.label,inclusion:p.inclusion as PlannedPart['inclusion'],marks:p.marks,bloom:d.cognitive.bloom,bloomOptions:(BLOOM as readonly string[]).filter(k=>(d.cognitive.bloomCandidates??[]).includes(k)) as BloomKey[],learnerDrawn:drawn.has(p.id)};}),
     diagram:{stimulus:lockedStimulus??(stimulusAnswer?.kind==='choice'?stimulusAnswer.choiceId:doc.diagramPolicy.stimulus),learnerDrawn:[...doc.diagramPolicy.learnerDrawnParts]},
     diagramView:{stimulus,learnerDrawn:[...doc.diagramPolicy.learnerDrawnParts],locked:lockedStimulus}};
-}
-
-/** Descriptive comparison against each marks-based distribution, with the producer's semantics. */
-export function curriculumComparisons(lines:{lineId:string; item:ClassifiedItem|null; marks:number|null; parts:string[]|null; answers:Record<string,Answer>}[], profiles:Profile[]):CurriculumComparison[] {
-  const docs=lines.flatMap(l=>l.item?[l.item.doc]:[]);
-  const version=docs.some(d=>d.schemaVersion===2)?2:1;
-  const input=(comparison:PaperInput['comparison']):PaperInput=>({schemaVersion:version,targetMarks:null,comparison,
-    lines:lines.map(l=>({lineId:l.lineId,identity:l.item?{moduleId:l.item.doc.moduleId,kind:l.item.doc.kind,itemId:l.item.doc.itemId,release:l.item.doc.release}:{moduleId:'unclassified',kind:'structured',itemId:l.lineId,release:'none'},
-      marks:l.marks,parts:l.parts,answers:l.answers}))});
-  const out:CurriculumComparison[]=[];
-  for(const profile of profiles) for(const d of profile.distributions) {
-    const c=evaluatePaper(input({profile:{profileId:profile.profileId,version:profile.version},distributionId:d.id}),docs,[profile]).comparison;
-    if(!c) continue;
-    const label=(key:string)=>profile.bands.find(b=>b.id===key)?.label??((BLOOM as readonly string[]).includes(key)?key.charAt(0).toUpperCase()+key.slice(1):key);
-    const note=c.status==='described'?'Described against this curriculum’s own targets. Not a pass or fail.':c.status==='insufficient-classification'?'Some marks are not yet classified, so this comparison is incomplete.':
-      c.status==='unsupported-basis'?'This requirement is not measured in marks, so it is not compared here.':'This requirement is not compared here.';
-    out.push({profile:`${profile.profileId} · ${d.id}`,basis:d.basis==='marks'?'marks':'item-count',note,
-      rows:(c.byKey as {key:string;targetPercent:number|null;actualMarks:{min:number;max:number}|null}[]).map(r=>({key:r.key,label:label(r.key),min:r.actualMarks?.min??0,max:r.actualMarks?.max??0,target:r.targetPercent===null?'Not specified':`${r.targetPercent}%`}))});
-  }
-  return out;
 }

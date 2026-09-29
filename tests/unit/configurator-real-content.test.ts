@@ -1,7 +1,9 @@
 // @vitest-environment node
 import {readFileSync} from 'node:fs';
 import {describe,it,expect} from 'vitest';
-import {evaluate,readDefinitions} from '../../lib/configurator/engine';
+import {evaluate,generationPlan,readDefinitions} from '../../lib/configurator/engine';
+import {evaluateLine} from '../../lib/configurator/contract-v1';
+import {lineComposition} from '../../lib/configurator/composition';
 import {compile} from '../../lib/jev/advisor';
 import type {Configuration} from '../../lib/configurator/contracts';
 // Private content consumption check. The registrations file (from the private
@@ -49,5 +51,57 @@ describe.skipIf(!path)('real classifications (private, content-v1)',()=>{
    grouped+=Object.keys(e.grouped).length;classified+=Object.entries(e.cognitive).filter(([k,v])=>k!=='unclassified'&&v.max>0).length;}
   // Recorded for the return; no assertion on content-specific counts.
   console.log(JSON.stringify({realContentCognitive:{linesWithGroupedBuckets:grouped,knownCategoryBuckets:classified}}));
+ });
+ it('C10: every supported definition gets supported bounds at every total, before and after payment',()=>{
+  const statuses:Record<string,number>={};let disagreements=0;
+  for(const r of regs.classifications){const d=definitions(r);const {min,max}=d.lines[0].range;const doc=d.lines[0].classification!.doc;
+   for(let m=min;m<=max;m++) for(const paid of [false,true]){
+    const e=evaluate(d,{schemaVersion:1,targets:{paper:m},lines:{q1:{marks:m,parts:null,facets:{}}},answers:{items:{},paper:{}}},{paid});
+    const c=e.lines[0].composition!;statuses[c.status]=(statuses[c.status]??0)+1;
+    expect(c.status).not.toBe('not-calculable');
+    const rows=Object.values(c.categories);expect(rows.reduce((n,x)=>n+x.min,0)).toBeLessThanOrEqual(m);expect(rows.reduce((n,x)=>n+x.max,0)).toBeGreaterThanOrEqual(m);
+    if(c.status==='unclassified') expect(doc.parts.length).toBe(0);
+    // Where the source states every part's marks, the result equals the producer evaluator's.
+    if(!c.open){const x=paid?doc:{...doc,parts:doc.parts.map(p=>p.inclusion==='optional'?{...p,inclusion:'unspecified' as const}:p)};
+     const {result,structure}=evaluateLine(x,{lineId:'l',identity:{moduleId:doc.moduleId,kind:doc.kind,itemId:doc.itemId,release:doc.release},marks:m,parts:null,answers:{}});
+     const again=lineComposition(x,structure,m);
+     for(const [k,v] of Object.entries(result.cognitive.ranges??{})) if(JSON.stringify(again.categories[k]??{min:0,max:0})!==JSON.stringify(v)) disagreements++;}
+   }}
+  expect(disagreements).toBe(0);
+  console.log(JSON.stringify({c10Statuses:statuses}));
+ });
+ it('C10: recorded teacher-choice links narrow the composition and reach the generation plan',()=>{
+  let links=0;
+  for(const r of regs.classifications){const d=definitions(r);const doc=d.lines[0].classification!.doc;
+   for(const rule of doc.rules.filter(x=>(x.origin as {type:string}).type==='form' && x.activation==='active')){
+    // A link is a facet condition, optionally limited to totals at or below a mark.
+    const parts=(rule.when as any).all??[rule.when];const w=parts.find((c:any)=>'facet' in c) as {facet:string;is?:string;in?:string[]};
+    const m=parts.find((c:any)=>'marksAtMost' in c)?.marksAtMost??d.lines[0].range.min;const option=w.is??w.in?.[0];if(!option)continue;links++;
+    const answers:Record<string,any>={[w.facet]:{kind:'choice',choiceId:option}};
+    for(const f of d.lines[0].fields) if(f.required&&!answers[f.id]) answers[f.id]=f.type==='choice'?{kind:'choice',choiceId:f.choices[0].id}:{kind:'text',text:'x'};
+    const cfg={schemaVersion:1 as const,targets:{paper:m},lines:{q1:{marks:m,parts:null,facets:{}}},answers:{items:{q1:answers},paper:{}}};
+    const before=evaluate(d,{...cfg,answers:{items:{q1:{}},paper:{}}},{paid:true}),after=evaluate(d,cfg,{paid:true});
+    const need=rule.then.flatMap(a=>'requireParts' in a?a.requireParts:[]),drop=rule.then.flatMap(a=>'excludeParts' in a?a.excludeParts:[]);
+    const c=after.lines[0].composition!;expect(c.status).not.toBe('not-calculable');
+    for(const [k,v] of Object.entries(before.lines[0].composition!.categories)) expect((c.categories[k]??{min:0}).min).toBeGreaterThanOrEqual(drop.length?0:v.min);
+    if(after.ready){const parts=generationPlan(d,cfg,after,'o',1).plan.lines[0].parts!;
+     for(const id of need) expect(parts.find(p=>p.id===id)?.inclusion).toBe('rule-required');
+     for(const id of drop) expect(parts.some(p=>p.id===id)).toBe(false);}
+   }}
+  console.log(JSON.stringify({c10FormLinks:links}));
+ });
+ it('C10: every combination of linked answers keeps a calculable composition at every total',()=>{
+  let checked=0;
+  for(const r of regs.classifications){const d=definitions(r);const doc=d.lines[0].classification!.doc;const {min,max}=d.lines[0].range;
+   const facets=[...new Set(doc.rules.filter(x=>(x.origin as {type:string}).type==='form').map(x=>{const w=x.when as any;return (w.all?w.all[0]:w).facet as string;}))].sort();
+   if(!facets.length)continue;
+   const options=facets.map(f=>[null,...d.lines[0].fields.find(x=>x.id===f)!.type==='choice'?(d.lines[0].fields.find(x=>x.id===f) as any).choices.map((c:any)=>c.id):[]]);
+   const combos=options.reduce<(string|null)[][]>((acc,o)=>acc.flatMap(a=>o.map((x:string|null)=>[...a,x])),[[]]);
+   for(const combo of combos) for(let m=min;m<=max;m++){
+    const answers=Object.fromEntries(facets.flatMap((f,i)=>combo[i]?[[f,{kind:'choice' as const,choiceId:combo[i]!}]]:[]));
+    const e=evaluate(d,{schemaVersion:1,targets:{paper:m},lines:{q1:{marks:m,parts:null,facets:{}}},answers:{items:{q1:answers},paper:{}}},{paid:true});
+    expect(e.lines[0].composition!.status).not.toBe('not-calculable');checked++;}
+  }
+  console.log(JSON.stringify({c10LinkedCombinations:checked}));
  });
 });

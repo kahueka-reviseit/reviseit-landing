@@ -1,9 +1,10 @@
 import {briefConflicts} from './brief';
 import { cataloguePreview, type CataloguePreview } from '../workspace/contracts';
 import { isQuestionnaire, type Answer, type QuestionField, type QuestionnaireAnswers } from '../jobs/questionnaire';
-import { bloomKeys, bloomLabels, groupLabel, readinessLabels, sectionLabels, type Attention, type BloomKey, type CognitiveRow, type Configuration,
-  type ConfigurationView, type CurriculumComparison, type LineView, type ReadinessStatus, type SectionKey } from './contracts';
-import { interpretClassification, evaluateClassified, curriculumComparisons, type ClassifiedItem, type ClassifiedResult, type RequirementsProfile } from './classification';
+import { bloomKeys, bloomLabels, groupLabel, readinessLabels, sectionLabels, type Attention, type BloomKey, type CognitiveRow, type CompositionSummary, type Configuration,
+  type ConfigurationView, type CurriculumComparison, type LineCompositionView, type LineView, type ReadinessStatus, type SectionKey } from './contracts';
+import { interpretClassification, evaluateClassified, type ClassifiedItem, type ClassifiedResult, type PlannedPart, type RequirementsProfile } from './classification';
+import { sumCompositions, UNLISTED, type CompositionReason, type LineComposition, type Range } from './composition';
 
 /**
  * Deterministic configuration engine. Runs on the server only: it reads pinned
@@ -90,22 +91,26 @@ function authoredFields(fields:QuestionField[], given:Record<string,Answer>|unde
 
 // ---------------------------------------------------------------- evaluation
 export type LineResult = {
-  id:string; marks:number|null; marksProblem:string|null; classified:ClassifiedResult|null;
+  id:string; marks:number|null; marksProblem:string|null; classified:ClassifiedResult|null; composition:LineComposition|null;
   outstanding:string[]; attention:Attention[]; issues:string[]; ready:boolean;
 };
 export type Evaluation = {
   engine:string; definitionsSha256:string; paid:boolean; ready:boolean; status:ReadinessStatus; outstanding:number;
   totals:{target:number|null; allocated:number; complete:boolean; sections:Record<SectionKey,number>; sectionTargets:Partial<Record<SectionKey,number>>; problems:string[]};
   cognitive:Record<BloomKey|'unclassified',{min:number;max:number}>; grouped:Record<string,{min:number;max:number}>;
+  bands:Record<string,Range>; composition:{exact:boolean; known:string[]; pending:number; pendingLines:{id:string; reason:CompositionReason}[]};
   lines:LineResult[]; paper:{outstanding:string[]; attention:Attention[]}; issues:string[];
 };
+
+/** A line without a classification: every mark's category is unknown, and says so. */
+const unclassifiedLine=(marks:number):LineComposition=>({status:'unclassified',reason:null,marks,open:true,known:[],example:null,
+  categories:{[UNLISTED]:{min:marks,max:marks}},bands:{[UNLISTED]:{min:marks,max:marks}}});
+const pendingLine=(marks:number,reason:CompositionReason):LineComposition=>({status:'not-calculable',reason,marks,open:true,known:[],example:null,categories:{},bands:{}});
 
 export function evaluate(defs:Definitions, cfg:Configuration, opts:{paid:boolean}):Evaluation {
   const issues:string[]=[];
   const lineIds=defs.lines.map(l=>l.id);
   if(Object.keys(cfg.lines).sort().join()!==[...lineIds].sort().join()) throw new Error('Configuration lines do not match the order');
-  const cognitive=Object.fromEntries([...bloomKeys,'unclassified'].map(k=>[k,{min:0,max:0}])) as Evaluation['cognitive'];
-  const grouped:Record<string,{min:number;max:number}>={};
   const sections:Record<SectionKey,number>={multiple_choice:0,structured:0};
   let allocated=0, marksMissing=false;
   const lines=defs.lines.map((def):LineResult=>{
@@ -123,12 +128,9 @@ export function evaluate(defs:Definitions, cfg:Configuration, opts:{paid:boolean
       classified=evaluateClassified(def.classification, choice, marks, cfg.answers.items[def.id]||{}, {paid:opts.paid});
       blocked=classified.blockedFieldOptions;
       lineIssues.push(...classified.issues);
-      for(const [k,v] of Object.entries(classified.cognitive)) { cognitive[k as BloomKey].min+=v.min; cognitive[k as BloomKey].max+=v.max; }
-      for(const [k,v] of Object.entries(classified.grouped)) { grouped[k]??={min:0,max:0}; grouped[k].min+=v.min; grouped[k].max+=v.max; }
-    } else if(marks!==null && !marksProblem) {
-      // Without a genuine classification the marks stay visibly unclassified.
-      cognitive.unclassified.min+=marks; cognitive.unclassified.max+=marks;
     }
+    // Without a genuine classification the marks stay visibly unclassified; an unreadable one is not calculable.
+    const composition=classified?classified.composition:marks===null||marksProblem?null:def.classificationProblem?pendingLine(marks,'definition-unreadable'):unclassifiedLine(marks);
     if(!def.classification && choice.parts!==null) lineIssues.push('This question has no configurable parts.');
     if(!def.classification && Object.keys(choice.facets).length) lineIssues.push('This question has no additional choices.');
     const outstanding:string[]=[], attention:Attention[]=[];
@@ -146,7 +148,7 @@ export function evaluate(defs:Definitions, cfg:Configuration, opts:{paid:boolean
       if(brief.text!==brief.interpretedText) attention.push({scope:'field',id:'teacher-brief',message:'Your description changed. Configure it or keep your current choices explicitly.'});
       for(const id of briefConflicts(brief,cfg.answers.items[def.id]??{})) attention.push({scope:'field',id,message:'Your description and existing choice differ. Choose which to use.'});
     }
-    return {id:def.id,marks:marksProblem?null:marks,marksProblem,classified,outstanding,attention,issues:lineIssues,ready:!marksProblem&&!outstanding.length&&!attention.length&&!lineIssues.length};
+    return {id:def.id,marks:marksProblem?null:marks,marksProblem,classified,composition,outstanding,attention,issues:lineIssues,ready:!marksProblem&&!outstanding.length&&!attention.length&&!lineIssues.length};
   });
   // Product policy: only per-item answers are requested. Retained shared answers are historical data.
   const paper:FieldState={outstanding:[],attention:[]};
@@ -164,8 +166,13 @@ export function evaluate(defs:Definitions, cfg:Configuration, opts:{paid:boolean
   if(!complete) status='marks_needed';
   else if(!opts.paid) status='ready_for_payment';
   else status=outstanding||attentionCount||lineIssues?'details_to_complete':'ready_to_generate';
+  const sum=sumCompositions(lines.flatMap(l=>l.composition?[{marks:l.marks,composition:l.composition}]:[]));
+  const cognitive=Object.fromEntries([...bloomKeys,UNLISTED].map(k=>[k,sum.categories[k]??{min:0,max:0}])) as Evaluation['cognitive'];
+  const grouped=Object.fromEntries(Object.entries(sum.categories).filter(([k])=>k.includes('-or-')));
+  const pendingLines=lines.flatMap(l=>l.composition?.status==='not-calculable'?[{id:l.id,reason:l.composition.reason!}]:[]);
   return {engine:ENGINE_VERSION,definitionsSha256:defs.sha256,paid:opts.paid,ready:status==='ready_to_generate',status,outstanding,
-    totals:{target,allocated,complete,sections,sectionTargets,problems},cognitive,grouped,lines,paper,issues};
+    totals:{target,allocated,complete,sections,sectionTargets,problems},cognitive,grouped,bands:sum.bands,
+    composition:{exact:sum.exact,known:sum.known,pending:sum.pending,pendingLines},lines,paper,issues};
 }
 
 /** The compact verdict bound to a saved revision. */
@@ -182,7 +189,7 @@ export function submittedAnswers(defs:Definitions, cfg:Configuration):Questionna
 }
 
 export type PlanLine = {teacherBrief?:Configuration['briefs'] extends Record<string,infer B>|undefined?B|null:never; id:string; entryId:string; identity:LineDefinition['identity']; kind:LineDefinition['legacyKind']; marks:number;
-  parts:{id:string; marks:{min:number;max:number}|null; bloom:BloomKey|null; learnerDrawn:boolean}[]|null;
+  parts:PlannedPart[]|null;
   facets:Record<string,Answer>; answers:Record<string,Answer>; classificationSha256:string|null; requirementsRef:string|null;
   diagram:{stimulus:string; learnerDrawn:string[]}|null; sourceBinding:SourceBinding};
 export type GenerationPlan = {schema:'reviseit/configured-generation-plan@3'|'reviseit/configured-generation-plan@4'; order:string[]; orderId:string; module:string; release:string; formRevision:string;
@@ -226,13 +233,16 @@ export function project(defs:Definitions, cfg:Configuration, e:Evaluation, meta:
       marks:{value:def.fixedMarks ?? cfg.lines[def.id].marks,min:def.range.min,max:def.range.max,fixed:def.fixedMarks!==null},
       parts:c?c.parts:[],facets:c?c.facets:[],fields:paid?def.fields:[],answers:paid?(cfg.answers.items[def.id]||{}):{},
       outstanding:paid?r.outstanding:[],attention:paid?r.attention:r.attention.filter(a=>a.scope==='marks'),issues:r.issues,ready:r.ready,
-      diagram:c?c.diagramView:null,outline:def.outline?{subquestions:def.outline.subquestions,rows:(def.outline.outline??[]).map(r=>({summary:r.summary,bloom:r.bloom,marks:r.marks??null}))}:null};
+      diagram:c?c.diagramView:null,composition:c?compositionView(c.composition):null,outline:def.outline?{subquestions:def.outline.subquestions,rows:(def.outline.outline??[]).map(r=>({summary:r.summary,bloom:r.bloom,marks:r.marks??null}))}:null};
   });
-  // Six categories, then unresolved groups as their own rows (never split), then unknown. Each mark appears once.
-  const cognitive:CognitiveRow[]=[...bloomKeys.map(k=>({key:k,label:bloomLabels[k],...e.cognitive[k]})),
-    ...Object.keys(e.grouped).sort().filter(g=>e.grouped[g].max>0).map(g=>({key:g,label:groupLabel(g),grouped:true,...e.grouped[g]})),
-    {key:'unclassified',label:'Not yet classified',...e.cognitive.unclassified}];
-  const curriculum:CurriculumComparison[]=paid?comparisons(defs,cfg,e):[];
+  // Six categories, then unresolved groups as their own rows (never split), then unknown, then marks not yet
+  // calculable. Each mark appears in exactly one row.
+  const known=new Set(e.composition.known);
+  const cognitive:CognitiveRow[]=[...bloomKeys.map(k=>({key:k,label:bloomLabels[k],known:known.has(k),...e.cognitive[k]})),
+    ...Object.keys(e.grouped).sort().filter(g=>e.grouped[g].max>0||known.has(g)).map(g=>({key:g,label:groupLabel(g),grouped:true,known:known.has(g),...e.grouped[g]})),
+    {key:UNLISTED,label:'Not yet classified',...e.cognitive.unclassified},
+    ...(e.composition.pending?[{key:'pending',label:'Not yet calculable',min:e.composition.pending,max:e.composition.pending}]:[])];
+  const curriculum:CurriculumComparison[]=paid?comparisons(defs,e):[];
   const remaining=e.totals.target===null?0:Math.max(0,e.totals.target-e.totals.allocated);
   const excess=e.totals.target===null?0:Math.max(0,e.totals.allocated-e.totals.target);
   return {orderId:meta.orderId,state:meta.state,paid,paymentStatus:meta.paymentStatus,revision:meta.revision,submitted:meta.submitted,
@@ -240,12 +250,51 @@ export function project(defs:Definitions, cfg:Configuration, e:Evaluation, meta:
     totals:{target:e.totals.target,allocated:e.totals.allocated,remaining,excess,complete:e.totals.complete,
       sections:(['multiple_choice','structured'] as SectionKey[]).filter(k=>defs.lines.some(l=>l.identity.kind===k)).map(k=>({key:k,label:sectionLabels[k],allocated:e.totals.sections[k],target:e.totals.sectionTargets[k]??null}))},
     // Presentation order matches the paper: multiple choice as question 1, then structured.
-    cognitive,curriculum,lines:shown.map(x=>lines.find(l=>l.id===x.id)!),paper:{fields:[],answers:{},outstanding:[]},
+    cognitive,composition:summary(e,shown),curriculum,lines:shown.map(x=>lines.find(l=>l.id===x.id)!),paper:{fields:[],answers:{},outstanding:[]},
     issues:[...e.totals.problems,...e.issues],configuration:cfg};
 }
 
-function comparisons(defs:Definitions, cfg:Configuration, e:Evaluation):CurriculumComparison[] {
-  const profiles=Object.values(defs.profiles);
-  if(!profiles.length) return [];
-  return curriculumComparisons(defs.lines.map((def,i)=>({lineId:def.id,item:def.classification,marks:e.lines[i].marks,parts:cfg.lines[def.id].parts,answers:cfg.answers.items[def.id]||{}})),profiles as never);
+const PENDING_REASONS:Record<CompositionReason,string>={
+  'marks-not-set':'its marks are not set','invalid-configuration':'one of its choices needs attention','no-supported-allocation':'no split of its marks fits its subquestions',
+  'definition-unreadable':'its definition could not be read'};
+const categoryLabel=(k:string)=>k===UNLISTED?'Not yet classified':k.includes('-or-')?groupLabel(k):bloomLabels[k as BloomKey]??k;
+
+function summary(e:Evaluation, shown:{id:string; number:string}[]):CompositionSummary {
+  const counted=e.lines.reduce((n,l)=>n+(l.composition&&l.composition.status!=='not-calculable'?l.marks??0:0),0);
+  // Settled: at least this many marks are in a known category in every permitted split. Unclassified: at least this many are not.
+  const settled=[...bloomKeys.map(k=>e.cognitive[k]),...Object.values(e.grouped)].reduce((n,r)=>n+r.min,0), unclassified=e.cognitive.unclassified.min;
+  const notes=e.composition.pendingLines.map(p=>`Question ${shown.find(x=>x.id===p.id)?.number??''}: not yet calculable because ${PENDING_REASONS[p.reason]}.`);
+  return {exact:e.composition.exact,settled,unclassified,open:counted-settled-unclassified,pending:e.composition.pending,notes};
+}
+
+function compositionView(c:LineComposition):LineCompositionView {
+  const rows=Object.entries(c.categories).filter(([k,r])=>r.max>0||c.known.includes(k)).map(([k,r])=>({key:k,label:categoryLabel(k),grouped:k.includes('-or-')||undefined,known:c.known.includes(k),...r}));
+  for(const k of c.known) if(!rows.some(r=>r.key===k)) rows.push({key:k,label:categoryLabel(k),grouped:k.includes('-or-')||undefined,known:true,min:0,max:0});
+  const order=(k:string)=>{const i=(bloomKeys as readonly string[]).indexOf(k);return i>=0?i:k===UNLISTED?99:50;};
+  rows.sort((a,b)=>order(a.key)-order(b.key)||(a.key<b.key?-1:1));
+  const note=c.status==='not-calculable'?`Categories known; marks not yet calculable because ${PENDING_REASONS[c.reason!]}.`:
+    c.status==='exact'?'Exact: the source and your choices fix every mark’s category.':
+    c.status==='unclassified'?'This question’s subquestions are not yet classified, so its marks have no category yet.':
+    c.open?'The source lists example subquestions. Each one included carries at least one mark. The rest of the split, and any other subquestions, are decided when the question is written.':
+    'The source’s part marks allow more than one split; the ranges show every split they allow.';
+  return {status:c.status,note,open:c.open,rows,
+    example:c.example?{marks:c.example.marks,parts:c.example.parts,rows:Object.entries(c.example.categories).map(([k,m])=>({key:k,label:categoryLabel(k),...m})).sort((a,b)=>order(a.key)-order(b.key))}:null};
+}
+
+/** Descriptive comparison with each marks-based curriculum distribution, from the same composition as the Bloom view. */
+function comparisons(defs:Definitions, e:Evaluation):CurriculumComparison[] {
+  const out:CurriculumComparison[]=[];
+  for(const profile of Object.values(defs.profiles)) for(const d of profile.distributions) {
+    const label=(key:string)=>profile.bands.find(b=>b.id===key)?.label??categoryLabel(key);
+    const base={profile:`${profile.profileId} · ${d.id}`,basis:d.basis==='marks'?'marks' as const:'item-count' as const};
+    if(d.basis!=='marks') { out.push({...base,rows:[],note:'This requirement is not measured in marks, so it is not compared here.'}); continue; }
+    if(d.taxonomy==='knowledge-area') { out.push({...base,rows:[],note:'This requirement is not compared here.'}); continue; }
+    const actual:Record<string,Range>=d.taxonomy==='bloom'?{...e.cognitive,...e.grouped}:e.bands;
+    const incomplete=e.composition.pending>0 || (actual[UNLISTED]?.max??0)>0 || (d.taxonomy==='bloom' && Object.values(e.grouped).some(r=>r.max>0));
+    const ranged=d.targets.some(t=>actual[t.key] && actual[t.key].min!==actual[t.key].max);
+    out.push({...base,note:incomplete?'Some marks are not yet classified, so this comparison is incomplete.':
+      `Described against this curriculum’s own targets. Not a pass or fail.${ranged?' Ranges show splits that are still open.':''}`,
+      rows:d.targets.map(t=>({key:t.key,label:label(t.key),min:actual[t.key]?.min??0,max:actual[t.key]?.max??0,target:t.percent===null?'Not specified':`${t.percent}%`}))});
+  }
+  return out;
 }

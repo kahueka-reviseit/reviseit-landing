@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import type { Answer, QuestionField } from '../../../../../lib/jobs/questionnaire';
-import { groupLabel, type Attention, type Configuration, type ConfigurationView, type FacetView, type LineView } from '../../../../../lib/configurator/contracts';
+import { groupLabel, type Attention, type CognitiveRow, type Configuration, type ConfigurationView, type FacetView, type LineView } from '../../../../../lib/configurator/contracts';
 import styles from './configure.module.css';
 import JevAdvice from './jev-advice';
 import PaperPanel from './paper-panel';
@@ -25,6 +25,14 @@ function lineStatus(line:LineView,paid:boolean){
   return line.ready?{text:'Details ready',ready:true}:{text:'Details to complete',ready:false};
 }
 const range=(r:{min:number;max:number})=>r.min===r.max?String(r.min):`${r.min}–${r.max}`;
+/** Marks per category: the solid bar is settled in every permitted split, the pale bar is still open. */
+function MixRows({rows,scale,pending,label}:{rows:CognitiveRow[]; scale:number; pending:boolean; label:string}) {
+  const pct=(n:number)=>`${Math.round(n/Math.max(1,scale)*100)}%`;
+  return <ul className={styles['bloom-mix']} aria-label={label}>{rows.map(r=>{const tone=bloomClass[r.grouped?'grouped':r.key]??bloomClass.unclassified;
+    return <li key={r.key}><span>{r.label}</span>
+      <span className={`${styles['meter__track']} ${styles['meter__track--split']}`} aria-hidden="true"><i className={tone} style={{width:pct(r.min)}}/><i className={`${tone} ${styles['meter__open']}`} style={{width:pct(r.max-r.min)}}/></span>
+      <span>{pending&&r.known&&r.max===0?'—':range(r)}</span></li>;})}</ul>;
+}
 /** Plain-language summary of one answer, for the side summary and final review. */
 function describe(field:QuestionField,answer:Answer|undefined):string|null {
   if(!answer) return null;
@@ -152,6 +160,9 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
   const saveText={saved:'All changes saved',pending:'Unsaved changes',saving:'Saving…',conflict:'Not saved: this paper changed elsewhere',failed:'Not saved'}[save];
   const t=view.totals;
   const maxBloom=Math.max(1,...view.cognitive.map(r=>r.max));
+  const mix=view.composition;
+  const mixSummary=mix.exact?'Exact: every mark’s category is fixed.':[mix.settled?`${mix.settled} marks settled in a category`:'',mix.open?`${mix.open} still open between categories`:'',
+    mix.unclassified?`${mix.unclassified} not yet classified`:'',mix.pending?`${mix.pending} not yet calculable`:''].filter(Boolean).join(' · ');
   const go=(i:number)=>{setBriefError('');setActive(view.lines[i].id);setPanel('question');};
 
   // Reorder the purchased occurrences (identities and answers unchanged); saved as a revision.
@@ -310,17 +321,23 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
       </section>
 
 <section className={styles['card']}>        {(line.parts.length>1||line.parts.some(p=>!p.locked))&&<fieldset className={styles['choice-field']}><legend>What the question covers</legend><span className={styles['choice-field__message']} aria-hidden="true">Include or leave out each part</span>
-          <ol className={styles['subquestion-list']}>{line.parts.map(p=><li key={p.id} className={p.included?'':styles['subquestion-toggle--excluded']}>
+          <ol className={styles['subquestion-list']}>{line.parts.map(p=><li key={p.id} className={p.included||p.possible?'':styles['subquestion-toggle--excluded']}>
             <label className={styles['subquestion-toggle__control']}><input type="checkbox" checked={p.included} disabled={!editable||p.locked} onChange={e=>togglePart(p.id,e.target.checked)}/><span aria-hidden="true" className={styles['switch']}/> <span className={styles['subquestion-toggle__number']}>{line.number}.{p.number}</span> <span className={styles['subquestion-toggle__text']}>{p.summary}</span></label>
             <span className={`${styles['tag']} ${bloomClass[p.bloom??(p.bloomOptions.length?'grouped':'unclassified')]}`} title={p.bloomBasis==='profile-authorised-fallback'?'Taken from the curriculum level under the agreed Grade 10 assumption':p.bloomBasis==='profile-single-mapping'?'Taken from the curriculum level':p.bloomOptions.length?'The curriculum level allows either category; the source does not say which':undefined}>
               {p.bloom?p.bloom.charAt(0).toUpperCase()+p.bloom.slice(1):p.bloomOptions.length?groupLabel(p.bloomOptions.join('-or-')):'Not yet classified'}</span>
             {p.band?<span className={styles['subquestion-toggle__level']}>Curriculum band {p.band}</span>:<span/>}
-            <span className={styles['subquestion-toggle__marks']}>{p.included?(p.marks?range(p.marks):'—'):<em>Left out</em>}</span>
+            <span className={styles['subquestion-toggle__marks']}>{p.included||p.possible?(p.marks?range(p.marks):p.exampleMarks?`${range(p.exampleMarks)} in the source example`:'—'):<em>Left out</em>}</span>
             {p.learnerDrawn&&<span className={styles['paragraph']}>Learners draw this themselves</span>}
             {p.reason&&<span className={styles['paragraph']}>{p.reason}</span>}
             {attentionFor(p.id,'part')&&<span role="alert" className={styles['notice--error']}>{attentionFor(p.id,'part')!.message}</span>}
           </li>)}</ol></fieldset>}
-</section></details>
+</section>
+{paid&&line.composition&&<section className={styles['card']} aria-labelledby="line-mix-heading">
+  <p id="line-mix-heading" className={styles['card__eyebrow--neutral']}>Bloom’s cognitive mix · this question</p>
+  <MixRows rows={line.composition.rows} scale={own.marks??1} pending={line.composition.status==='not-calculable'} label={`Cognitive mix for question ${line.number}`}/>
+  <p className={styles['card__note']}>{line.composition.note}</p>
+  {line.composition.example&&<p className={styles['card__note']}>Source example ({line.composition.example.parts} subquestions, {range(line.composition.example.marks)} marks): {line.composition.example.rows.map(r=>`${r.label} ${range(r)}`).join(' · ')}. This is the specification’s own example, not a promise for your paper.</p>}
+</section>}</details>
     </div></PaperPanel>}
   {panel==='review'&&<PaperPanel title="Review your paper" eyebrow={allReady?'Ready to submit':'Your paper'} onClose={closePanel}
     summary={`${t.allocated} of ${t.target??'—'} marks · ${view.outstanding} choices to complete`}>
@@ -350,10 +367,10 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
       </section>
       <section className={styles['card']} aria-labelledby="bloom-heading">
         <p id="bloom-heading" className={styles['card__eyebrow--neutral']}>Bloom’s cognitive mix · by marks</p>
-        <ul className={styles['bloom-mix']}>{view.cognitive.map(r=><li key={r.key}><span>{r.label}</span>
-          <span className={styles['meter__track']} aria-hidden="true"><i className={bloomClass[r.grouped?'grouped':r.key]} style={{width:`${Math.round(r.max/maxBloom*100)}%`}}/></span>
-          <span>{r.min===r.max?r.min:`${r.min}–${r.max}`}</span></li>)}</ul>
-        <p className={styles['card__note']}>A range means the final split between parts is decided within their permitted marks. Marks whose level allows two categories are shown together, and marks without a classification as not yet classified; neither is spread across categories.</p>
+        <p className={styles['paragraph']}><strong>{mixSummary}</strong></p>
+        <MixRows rows={view.cognitive} scale={maxBloom} pending={mix.pending>0} label="Cognitive mix for the paper"/>
+        {mix.notes.map((n,i)=><p key={i} className={styles['paragraph']}>{n}</p>)}
+        <p className={styles['card__note']}>A range shows every split that the specifications and your choices allow. The highest values of different categories cannot all happen together. Where a specification lists only example subquestions, other subquestions may be written; their marks count as not yet classified. Marks whose level allows two categories stay together, and nothing is spread across categories. A configured question has all its answers; its split can still be a range.</p>
       </section>
       {view.curriculum.length>0&&<section className={styles['card']} aria-labelledby="curriculum-heading">
         <p id="curriculum-heading" className={styles['card__eyebrow--neutral']}>Curriculum requirements</p>
