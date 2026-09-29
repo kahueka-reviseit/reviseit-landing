@@ -70,7 +70,8 @@ export default function QuestionDetail({paper,entry,status,query}:{paper:PaperMo
       <div className={styles['question-structure__intro']}>
         <p className={styles['eyebrow--positive']}>The structure</p>
         <h2 id="structure-heading">What learners would do</h2>
-        {outline ? <p>One published example structure with {outline.length} parts. The final parts and marks can vary within the published ranges.</p> :
+        {kind==='multiple_choice' && !outline ? <p>A single multiple-choice item: learners choose one of four options. It has no multi-part outline.</p> :
+          outline ? <p>One published example structure with {outline.length} parts. The final parts and marks can vary within the published ranges.</p> :
           <p>A reviewed outline has not been published for this question yet{entry.preview?`; it has ${formatMarks(entry.preview.subquestions)} ${entry.preview.subquestions.max===1?'part':'parts'}`:''}. Bloom’s levels are shown only where an outline is published.</p>}
         {mix.length>0 && <div className={styles['bloom-mix']}><p>Bloom’s mix at the full range</p><BloomBar rows={mix.map(m=>({bloom:m.bloom,weight:m.max}))}/>
           <p className={styles['bloom-mix__legend']}>{mix.map(m=><span key={m.bloom}>{m.bloom} {m.min===m.max?m.min:`${m.min} to ${m.max}`}</span>)}</p></div>}
@@ -78,7 +79,7 @@ export default function QuestionDetail({paper,entry,status,query}:{paper:PaperMo
       {outline ? <table className={styles['parts-table']}>
         <thead><tr><th scope="col">Part</th><th scope="col">What learners do</th><th scope="col">Bloom’s</th><th scope="col">Marks</th></tr></thead>
         <tbody>{outline.map((r,i)=><tr key={i}><td>{i+1}</td><td>{r.summary}</td><td><BloomTag bloom={r.bloom}/></td><td>{r.marks?formatMarks(r.marks):'—'}</td></tr>)}</tbody>
-      </table> : <div className={styles['parts-table__empty']}><p>Outline not yet published</p><span>The question is still orderable when marked ready; its parts are set by the generation skill within the published range.</span></div>}
+      </table> : kind==='multiple_choice' ? null : <div className={styles['parts-table__empty']}><p>Outline not yet published</p><span>The question is still orderable when marked ready; its parts are set by the generation skill within the published range.</span></div>}
     </section>
     {kind==='structured' && mcqSame.length>0 && <section className={styles['related-questions']} aria-labelledby="mcq-same">
       <div className={styles['related-questions__header']}><div><p className={styles['eyebrow--multiple-choice']}>Multiple choice on the same topic</p><h2 id="mcq-same">Warm learners up for this question</h2></div>
