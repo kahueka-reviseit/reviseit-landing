@@ -1,6 +1,6 @@
 import type { Answer, QuestionField } from '../jobs/questionnaire';
 import type { Attention, BloomKey, FacetView, LineChoice, PartView } from './contracts';
-import { evaluateLine, BLOOM, type Classification, type Issue, type LineInput, type Profile } from './contract-v1';
+import { evaluateLine, BLOOM, type Classification, type Issue, type LineInput } from './contract-v1';
 import { lineComposition, type LineComposition } from './composition';
 
 /**
@@ -9,12 +9,11 @@ import { lineComposition, type LineComposition } from './composition';
  * checks that the classification matches the order's pinned form and marks,
  * and turns results into authored teacher wording (hint keys, never model text).
  */
-export type RequirementsProfile = Profile;
 /** One subquestion as handed to generation: the same parts, inclusion and categories the teacher was shown. */
 export type PlannedPart = {id:string; label:string; inclusion:'required'|'selected'|'rule-required'|'structure-required'|'flexible'; marks:{min:number;max:number}|null; bloom:BloomKey|null; bloomOptions:BloomKey[]; learnerDrawn:boolean;
   /** The alternative structure this part belongs to, when the source has several. */
   alternative?:string};
-export type ClassifiedItem = {contract:'configurator-contract-v1'; doc:Classification; profile:Profile|null; fields:QuestionField[]};
+export type ClassifiedItem = {contract:'configurator-contract-v1'; doc:Classification; fields:QuestionField[]};
 export type ClassifiedResult = {
   feasible:boolean; issues:string[]; outstanding:string[]; attention:Attention[];
   /** Cognitive composition from supported facts (source ranges, teacher choices, rules); never the whole line as unclassified. */
@@ -45,7 +44,7 @@ function checkStructure(doc:Classification) {
 const TOP=['schemaVersion','moduleId','kind','itemId','release','title','curriculumId','curriculumRequirementsRef','marks','parts','facets','rules','diagramPolicy','formBinding','provenance','jevChecks','hints','coverage'];
 
 /** Defensive structural checks for what the evaluator relies on, plus binding to the pinned order. */
-export function interpretClassification(payload:unknown, profile:Profile|null, fields:QuestionField[], pinned?:{range:{min:number;max:number}; fixedMarks:number|null; formRevision?:string; kind:string}):ClassifiedItem {
+export function interpretClassification(payload:unknown, fields:QuestionField[], pinned?:{range:{min:number;max:number}; fixedMarks:number|null; formRevision?:string; kind:string}):ClassifiedItem {
   const v3=record(payload) && payload.schemaVersion===3;
   if(!record(payload) || ![1,2,3].includes(payload.schemaVersion) || Object.keys(payload).sort().join()!==[...TOP,...(v3?['structure']:[])].sort().join()) throw new Error('Unsupported classification schema');
   const doc=payload as Classification;
@@ -76,8 +75,7 @@ export function interpretClassification(payload:unknown, profile:Profile|null, f
       throw new Error('Classification facet permissions differ from the authored form');
     if(field.type==='choice' && (f.domain.options as {id:string}[]).map(o=>o.id).join()!==field.choices.map(c=>c.id).join()) throw new Error('Classification options differ from the authored form');
   }
-  if(profile && (profile.profileId!==doc.curriculumRequirementsRef.profileId || profile.version!==doc.curriculumRequirementsRef.version)) throw new Error('Classification requirements profile mismatch');
-  return {contract:'configurator-contract-v1',doc,profile,fields};
+  return {contract:'configurator-contract-v1',doc,fields};
 }
 
 const MESSAGES:Record<string,string>={

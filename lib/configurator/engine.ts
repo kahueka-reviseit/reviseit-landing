@@ -3,8 +3,8 @@ import { cataloguePreview, type CataloguePreview } from '../workspace/contracts'
 import { isQuestionnaire, type Answer, type QuestionField, type QuestionnaireAnswers } from '../jobs/questionnaire';
 import { bloomKeys, bloomLabels, groupLabel, readinessLabels, sectionLabels, type Attention, type BloomKey, type CognitiveRow, type CompositionSummary, type Configuration,
   type ConfigurationView, type LineCompositionView, type LineView, type ReadinessStatus, type SectionKey } from './contracts';
-import { interpretClassification, evaluateClassified, type ClassifiedItem, type ClassifiedResult, type PlannedPart, type RequirementsProfile } from './classification';
-import { sumCompositions, UNLISTED, type CompositionReason, type LineComposition, type Range } from './composition';
+import { interpretClassification, evaluateClassified, type ClassifiedItem, type ClassifiedResult, type PlannedPart } from './classification';
+import { sumCompositions, UNLISTED, type CompositionReason, type LineComposition } from './composition';
 
 /**
  * Deterministic configuration engine. Runs on the server only: it reads pinned
@@ -32,7 +32,7 @@ const same=(a:unknown,b:unknown)=>canonical(a)===canonical(b);
 const canonical=(v:unknown):string=>Array.isArray(v)?`[${v.map(canonical).join(',')}]`:v&&typeof v==='object'?`{${Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+canonical((v as any)[k])).join(',')}}`:JSON.stringify(v);
 export type Definitions = {
   sha256:string; module:string; release:string; formRevision:string;
-  lines:LineDefinition[]; paperFields:QuestionField[]; profiles:Record<string,RequirementsProfile>;
+  lines:LineDefinition[]; paperFields:QuestionField[];
 };
 
 const record=(x:unknown):x is Record<string,any>=>!!x&&typeof x==='object'&&!Array.isArray(x);
@@ -43,8 +43,6 @@ export function readDefinitions(snapshot:unknown, form:unknown, sha256:string, o
   // Checkout candidates do not yet carry the execution frozen by the order trigger.
   const workflow=typeof snapshot.execution?.workflowManifestSha256==='string'?snapshot.execution.workflowManifestSha256:(options.workflow??'');
   if(snapshot.formRevision!==form.revision) throw new Error('Pinned form mismatch');
-  const profiles:Record<string,RequirementsProfile>={};
-  for(const [ref,value] of Object.entries(record(snapshot.requirements)?snapshot.requirements:{})) if(record(value)) profiles[ref]=value.payload as RequirementsProfile;
   const lines=snapshot.lines.map((l:any,i:number):LineDefinition=>{
     const item=form.items[i];
     if(!item || item.id!==l.id) throw new Error('Pinned form and definitions disagree');
@@ -56,15 +54,14 @@ export function readDefinitions(snapshot:unknown, form:unknown, sha256:string, o
     const binding=sourceBindingOf(l.binding??{},workflow);
     if(l.classification && workflow && !same(l.classification.sourceBinding,binding)) problem='Classification describes other source bytes than this order generates from';
     else if(l.classification) {
-      try { classification=interpretClassification(l.classification.payload, l.classification.requirementsRef?profiles[l.classification.requirementsRef]??null:null, item.fields,
-        {range:l.range,fixedMarks:typeof l.fixedMarks==='number'?l.fixedMarks:null,formRevision:l.binding?.formRevision,kind}); }
+      try { classification=interpretClassification(l.classification.payload, item.fields, {range:l.range,fixedMarks:typeof l.fixedMarks==='number'?l.fixedMarks:null,formRevision:l.binding?.formRevision,kind}); }
       catch(e) { problem=e instanceof Error?e.message:'Unsupported classification'; }
     }
     return {id:l.id,entryId:l.entryId,legacyKind,identity:l.identity,title:l.title,range:l.range,fixedMarks:typeof l.fixedMarks==='number'?l.fixedMarks:null,
       fields:item.fields,classification,classificationSha256:l.classification?.sha256??null,requirementsRef:l.classification?.requirementsRef??null,classificationProblem:problem,
       sourceBinding:binding,outline:cataloguePreview(l.preview)??null};
   });
-  return {sha256,module:String(snapshot.module),release:String(snapshot.release),formRevision:form.revision,lines,paperFields:form.paperFields,profiles};
+  return {sha256,module:String(snapshot.module),release:String(snapshot.release),formRevision:form.revision,lines,paperFields:form.paperFields};
 }
 
 // ---------------------------------------------------------------- authored fields
@@ -98,14 +95,14 @@ export type Evaluation = {
   engine:string; definitionsSha256:string; paid:boolean; ready:boolean; status:ReadinessStatus; outstanding:number;
   totals:{target:number|null; allocated:number; complete:boolean; sections:Record<SectionKey,number>; sectionTargets:Partial<Record<SectionKey,number>>; problems:string[]};
   cognitive:Record<BloomKey|'unclassified',{min:number;max:number}>; grouped:Record<string,{min:number;max:number}>;
-  bands:Record<string,Range>; composition:{exact:boolean; known:string[]; pending:number; pendingLines:{id:string; reason:CompositionReason}[]};
+  composition:{exact:boolean; known:string[]; pending:number; pendingLines:{id:string; reason:CompositionReason}[]};
   lines:LineResult[]; paper:{outstanding:string[]; attention:Attention[]}; issues:string[];
 };
 
 /** A line without a classification: every mark's category is unknown, and says so. */
 const unclassifiedLine=(marks:number):LineComposition=>({status:'unclassified',reason:null,marks,open:true,coverage:'unknown',known:[],examples:[],alternatives:[],parts:{},droppedBy:{},
-  categories:{[UNLISTED]:{min:marks,max:marks}},bands:{[UNLISTED]:{min:marks,max:marks}}});
-const pendingLine=(marks:number,reason:CompositionReason):LineComposition=>({status:'not-calculable',reason,marks,open:true,coverage:'unknown',known:[],examples:[],alternatives:[],parts:{},droppedBy:{},categories:{},bands:{}});
+  categories:{[UNLISTED]:{min:marks,max:marks}}});
+const pendingLine=(marks:number,reason:CompositionReason):LineComposition=>({status:'not-calculable',reason,marks,open:true,coverage:'unknown',known:[],examples:[],alternatives:[],parts:{},droppedBy:{},categories:{}});
 
 export function evaluate(defs:Definitions, cfg:Configuration, opts:{paid:boolean}):Evaluation {
   const issues:string[]=[];
@@ -171,7 +168,7 @@ export function evaluate(defs:Definitions, cfg:Configuration, opts:{paid:boolean
   const grouped=Object.fromEntries(Object.entries(sum.categories).filter(([k])=>k.includes('-or-')));
   const pendingLines=lines.flatMap(l=>l.composition?.status==='not-calculable'?[{id:l.id,reason:l.composition.reason!}]:[]);
   return {engine:ENGINE_VERSION,definitionsSha256:defs.sha256,paid:opts.paid,ready:status==='ready_to_generate',status,outstanding,
-    totals:{target,allocated,complete,sections,sectionTargets,problems},cognitive,grouped,bands:sum.bands,
+    totals:{target,allocated,complete,sections,sectionTargets,problems},cognitive,grouped,
     composition:{exact:sum.exact,known:sum.known,pending:sum.pending,pendingLines},lines,paper,issues};
 }
 

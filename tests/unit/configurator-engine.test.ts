@@ -25,10 +25,11 @@ function classification(itemId:string,fields:QuestionField[],over:Record<string,
   provenance:{synthetic:true,sources:[],extractor:{name:'synthetic',version:'1'},labelNormalisations:[],requirementsProfileSha256:null},
   jevChecks:[],hints:{'hint.blue':'Synthetic: blue rules out red here.','hint.p4':'Synthetic: the fourth part needs blue.'},coverage:{status:'partial',gaps:[{code:'synthetic',detail:'Synthetic fixture',locator:null}]},...over};
 }
-const profile={profileId:'synthetic-profile',version:1,curriculumId:'synthetic-curriculum',bands:[{id:'B1',label:'Band one'},{id:'B2',label:'Band two'}],
+// Saved snapshots still carry legacy curriculum requirement profiles; the application no longer reads them.
+const legacyProfile={profileId:'synthetic-profile',version:1,curriculumId:'synthetic-curriculum',bands:[{id:'B1',label:'Band one'},{id:'B2',label:'Band two'}],
  distributions:[{id:'bands',taxonomy:'curriculum-band',basis:'marks',targets:[{key:'B1',percent:60},{key:'B2',percent:40}]},{id:'counted',taxonomy:'curriculum-band',basis:'item-count',targets:[{key:'B1',percent:null}]}]};
 const classifiedFields=[choice('colour'),choice('shade'),note];
-function definitions(opts:{classified?:boolean;repeat?:boolean;badMap?:boolean}={}){
+function definitions(opts:{classified?:boolean;repeat?:boolean;badMap?:boolean;requirements?:Record<string,unknown>}={}){
  const lines=[
   {id:'q1',entryId:'structured:S1',kind:'specification',identity:{moduleId:'synthetic-module',kind:'structured',itemId:'S1',release:'1'},title:'Synthetic one',range:{min:6,max:12},fixedMarks:null,checkoutMarks:8,
    binding:{formRevision:hash('f'),fields:classifiedFields},classification:opts.classified?{sha256:hash('c'),requirementsRef:'synthetic-profile@1',payload:classification('S1',opts.badMap?[choice('colour')]:classifiedFields)}:null},
@@ -38,7 +39,7 @@ function definitions(opts:{classified?:boolean;repeat?:boolean;badMap?:boolean}=
   ...(opts.repeat?[{id:'q4',entryId:'mcq:M1',kind:'multiple-choice',identity:{moduleId:'synthetic-module',kind:'multiple_choice',itemId:'M1',release:'1'},title:'Synthetic choice',range:{min:2,max:2},fixedMarks:2,checkoutMarks:2,binding:{formRevision:hash('b'),fields:[]},classification:null}]:[]),
  ];
  const form={schemaVersion:2,revision:hash('d'),items:lines.map(l=>({id:l.id,title:l.title,marks:l.checkoutMarks,fields:l.binding.fields})),paperFields:[choice('logistics',true,false),{...note,id:'paper_note'}]};
- const snapshot={schema:'reviseit/configured-authored-inputs@1',module:'synthetic-module',release:'1',formRevision:hash('d'),lines,requirements:opts.classified?{'synthetic-profile@1':{sha256:hash('7'),payload:profile}}:{}};
+ const snapshot={schema:'reviseit/configured-authored-inputs@1',module:'synthetic-module',release:'1',formRevision:hash('d'),lines,...(opts.requirements?{requirements:opts.requirements}:{})};
  return readDefinitions(snapshot,form,hash('9'));
 }
 function config(marks:(number|null)[],target:number|null=16,extra:Partial<Configuration>={}):Configuration{
@@ -135,14 +136,17 @@ describe('classified questions (contract v1, synthetic)',()=>{
   const view=project(d,cfg,e,{orderId:'o',state:'awaiting_answers',paymentStatus:'paid',revision:3,submitted:false});
   expect(view.lines.find(l=>l.id==='q1')!.facets.find(f=>f.id==='shade')!.options.find(o=>o.id==='red')).toMatchObject({disabled:true,reason:'Synthetic: blue rules out red here.'});
  });
- it('Bloom’s is the only cognitive view: no curriculum levels, bands or target comparisons reach the teacher',()=>{
-  const d=definitions({classified:true});const cfg=config([8,6,2],16,{answers:paidAnswers()});
-  const view=project(d,cfg,evaluate(d,cfg,{paid:true}),{orderId:'o',state:'awaiting_answers',paymentStatus:'paid',revision:1,submitted:false});
-  expect(view.cognitive.map(r=>r.label)).toEqual(['Remember','Understand','Apply','Analyse','Evaluate','Create','Not yet classified']);
-  expect(view).not.toHaveProperty('curriculum');
-  for(const l of view.lines) for(const part of l.parts) expect(part).not.toHaveProperty('band');
-  const text=JSON.stringify({cognitive:view.cognitive,lines:view.lines.map(l=>l.parts)});
-  expect(text).not.toMatch(/Band one|Band two|curriculum band/i);
+ it('a saved snapshot carrying legacy requirement profiles reads, evaluates, projects and plans exactly as one without them',()=>{
+  const cfg=config([8,6,2],16,{answers:paidAnswers()}),meta={orderId:'o',state:'awaiting_answers',paymentStatus:'paid',revision:1,submitted:false};
+  const run=(d:ReturnType<typeof definitions>)=>{const e=evaluate(d,cfg,{paid:true});return {lines:d.lines.map(l=>l.classificationProblem),e,view:project(d,cfg,e,meta),plan:generationPlan(d,cfg,e,'o',1)};};
+  const plain=run(definitions({classified:true}));expect(plain.e.ready).toBe(true);
+  // A profile, even one naming another version, is legacy storage only: nothing reads it, so it cannot change a result.
+  for(const payload of [legacyProfile,{...legacyProfile,version:2}]) expect(run(definitions({classified:true,requirements:{'synthetic-profile@1':{sha256:hash('7'),payload}}}))).toEqual(plain);
+  // Bloom’s is the only cognitive view: no curriculum levels, bands or target comparisons reach the teacher.
+  expect(plain.view.cognitive.map(r=>r.label)).toEqual(['Remember','Understand','Apply','Analyse','Evaluate','Create','Not yet classified']);
+  expect(plain.view).not.toHaveProperty('curriculum');
+  for(const l of plain.view.lines) for(const part of l.parts) expect(part).not.toHaveProperty('band');
+  expect(JSON.stringify(plain.view)).not.toMatch(/Band one|Band two|curriculum band/i);
  });
  it('a classification that does not match the pinned form is reported, and other lines keep working',()=>{
   const d=definitions({classified:true,badMap:true});
@@ -184,7 +188,7 @@ describe('CFG01A: source binding, order and grouped Bloom categories',()=>{
    classification:l.classification?{sha256:hash('c'),requirementsRef:'synthetic-profile@1',payload:l.classification.doc,
     sourceBinding:{schema:'reviseit/cfg-source-binding@1',moduleId:'synthetic-module',release:'1',entryId:l.entryId,privateManifestSha256:hash('c'),privateBundleDigest:hash('b'),formRevision:hash('f'),workflowManifestSha256:hash('8'),sources:[{role:'specification',path:'sources/x.md',sha256:hash('4')}]}}:null}));
   mutate?.(lines[0]);
-  return readDefinitions({schema:'reviseit/configured-authored-inputs@1',module:'synthetic-module',release:'1',formRevision:hash('d'),lines,execution:{workflowManifestSha256:hash('8')},requirements:{'synthetic-profile@1':{sha256:hash('7'),payload:profile}}},form,hash('9'));
+  return readDefinitions({schema:'reviseit/configured-authored-inputs@1',module:'synthetic-module',release:'1',formRevision:hash('d'),lines,execution:{workflowManifestSha256:hash('8')}},form,hash('9'));
  };
  it('uses a classification only when it describes the exact bytes the order generates from',()=>{
   expect(withExecution().lines[0].classificationProblem).toBeNull();

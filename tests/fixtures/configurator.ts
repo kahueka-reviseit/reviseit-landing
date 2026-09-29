@@ -22,7 +22,6 @@ const envelope=(itemId:string,kind:string,fields:QuestionField[],marks:[number,n
   fieldMap:fields.map(f=>({facetId:f.id,fieldId:f.id})),sharedForms:[]},provenance:{synthetic:true,sources:[],extractor:{name:'synthetic',version:'1'},labelNormalisations:[],requirementsProfileSha256:null},
  jevChecks:[],hints,coverage:{status:'partial',gaps:[{code:'synthetic',detail:'Synthetic preview fixture',locator:null}]}});
 const rule=(id:string,when:any,then:any[],reason:string)=>({id,kind:'constraint',activation:'active',when,then,reason,origin:{type:'synthetic',locators:[],heldBecause:null}});
-const profile={profileId:'synthetic-profile',version:1,curriculumId:'synthetic-curriculum',bands:[{id:'B1',label:'Band one'},{id:'B2',label:'Band two'}],distributions:[{id:'bands',taxonomy:'curriculum-band',basis:'marks',targets:[{key:'B1',percent:60},{key:'B2',percent:40}]}]};
 export function previewDefinitions(){
  const s1=envelope('SYN-01','structured',structuredFields,[10,16],[part('p1','State a synthetic definition','remember',2,2),part('p2','Draw a synthetic sketch','apply',3,5,'optional'),part('p3','Calculate a synthetic value','apply',3,5),part('p4','Explain a synthetic change','analyse',2,4,'required','B2')],
   [rule('r1',{facet:'setting',is:'three'},[{requireParts:['p2']}],'hint.three'),rule('r2',{facet:'setting',is:'two'},[{excludeOptions:{facet:'shade',options:['red']}}],'hint.two')],
@@ -36,7 +35,7 @@ export function previewDefinitions(){
   {id:'q4',entryId:'mcq:SYN-MCQ-01',kind:'multiple-choice',identity:{moduleId:'synthetic-module',kind:'multiple_choice',itemId:'SYN-MCQ-01',release:'1'},title:'Synthetic option item',range:{min:2,max:2},fixedMarks:2,checkoutMarks:2,binding:{formRevision:h('f'),fields:mcqFields},classification:{sha256:h('2'),requirementsRef:'synthetic-profile@1',payload:m1}},
  ];
  const form={schemaVersion:2 as const,revision:h('d'),items:lines.map(l=>({id:l.id,title:l.title,marks:l.checkoutMarks,fields:l.binding.fields})),paperFields:[choice('occasion','Synthetic paper setting',[['x','Option X'],['y','Option Y']],true,false)]};
- return readDefinitions({schema:'reviseit/configured-authored-inputs@1',module:'synthetic-module',release:'1',formRevision:h('d'),lines,requirements:{'synthetic-profile@1':{sha256:h('7'),payload:profile}}},form,h('9'));
+ return readDefinitions({schema:'reviseit/configured-authored-inputs@1',module:'synthetic-module',release:'1',formRevision:h('d'),lines},form,h('9'));
 }
 export const previewConfiguration:Configuration={schemaVersion:1,targets:{paper:30,sections:{multiple_choice:4}},lines:{q1:{marks:14,parts:null,facets:{}},q2:{marks:12,parts:null,facets:{}},q3:{marks:2,parts:null,facets:{}},q4:{marks:2,parts:null,facets:{}}},answers:{items:{},paper:{}}};
 // Synthetic catalogue reminders: one complete entry, one without a description or diagram,

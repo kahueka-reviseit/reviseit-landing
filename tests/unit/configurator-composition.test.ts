@@ -193,7 +193,7 @@ describe('Bloom’s alone decides exactness',()=>{
  const compose=(doc:any)=>{const {structure}=evaluateLine(doc,{lineId:'l',identity:{moduleId:'synthetic-module',kind:'structured',itemId:doc.itemId,release:'1'},marks:5,parts:null,answers:{}});return lineComposition(doc,structure,5);};
  it('a fixed Bloom’s split is exact even when hidden legacy bands vary',()=>{
   const c=compose(hiddenBandItem());
-  expect(c.categories).toEqual({apply:r(5)});expect(c.bands.B1).toEqual(r(1,4));
+  expect(c.categories).toEqual({apply:r(5)});
   expect(c.status).toBe('exact');
   expect(sumCompositions([{marks:5,composition:c}]).exact).toBe(true);
  });

@@ -64,8 +64,6 @@ export const hiddenBandItem=()=>classification('HIDDEN','structured',[5,5],[part
 export const openBloomItem=()=>classification('OPENBLOOM','structured',[5,5],[part('p1',{bloom:'remember'},{basis:'range',min:1,max:4},'required','B1'),
  part('p2',{bloom:'apply'},{basis:'range',min:1,max:4},'required','B1')],[],[]);
 export const noPartsItem=()=>classification('VARIANTS','structured',[10,14],[],[],[]);
-const profile={profileId:'synthetic-profile',version:1,curriculumId:'synthetic-curriculum',bands:[{id:'B1',label:'Band one'},{id:'B2',label:'Band two'},{id:'B3',label:'Band three'},{id:'B4',label:'Band four'}],
- distributions:[{id:'bands',taxonomy:'curriculum-band',basis:'marks',targets:[{key:'B1',percent:20},{key:'B2',percent:30},{key:'B3',percent:40},{key:'B4',percent:10}]}]};
 
 export type Item={doc:any;fields:QuestionField[];range:[number,number]}|null;
 export function definitions(items:Item[],opts:{badMap?:number}={}){
@@ -74,7 +72,7 @@ export function definitions(items:Item[],opts:{badMap?:number}={}){
    title:'Synthetic '+(it?.doc.itemId??'authored'),range:{min:range[0],max:range[1]},fixedMarks:mcq?2:null,checkoutMarks:range[0],binding:{formRevision:hash('f'),fields:it?.fields??[]},
    classification:it?{sha256:hash(String(i)),requirementsRef:'synthetic-profile@1',payload:opts.badMap===i?{...it.doc,formBinding:{...it.doc.formBinding,fieldMap:[]}}:it.doc}:null};});
  const form={schemaVersion:2,revision:hash('d'),items:lines.map(l=>({id:l.id,title:l.title,marks:l.checkoutMarks,fields:l.binding.fields})),paperFields:[]};
- return readDefinitions({schema:'reviseit/configured-authored-inputs@1',module:'synthetic-module',release:'1',formRevision:hash('d'),lines,requirements:{'synthetic-profile@1':{sha256:hash('7'),payload:profile}}},form,hash('9'));
+ return readDefinitions({schema:'reviseit/configured-authored-inputs@1',module:'synthetic-module',release:'1',formRevision:hash('d'),lines},form,hash('9'));
 }
 export const example={doc:exampleItem(),fields:exampleFields,range:[8,12] as [number,number]}, legacy={doc:legacyItem(),fields:exampleFields,range:[8,12] as [number,number]}, open={doc:openItem(),fields:[],range:[8,12] as [number,number]},
  variant={doc:variantItem(),fields:shapeFields,range:[9,18] as [number,number]}, closed={doc:closedItem(),fields:[],range:[6,8] as [number,number]}, mcq={doc:mcqItem(),fields:[],range:[2,2] as [number,number]};

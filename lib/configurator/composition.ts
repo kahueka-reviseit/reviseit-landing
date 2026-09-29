@@ -34,7 +34,7 @@ export type LineComposition = {
   /** complete: the listed structure is confirmed; stated-open: the source allows unlisted subquestions;
    * unknown: an older definition does not say whether its listed parts are complete. */
   coverage:'complete'|'stated-open'|'unknown';
-  categories:Record<string,Range>; bands:Record<string,Range>;
+  categories:Record<string,Range>;
   /** Categories of listed subquestions still in play, known even when marks cannot be calculated. */
   known:string[];
   /** Alternative structures still possible, by label; more than one means the choice is unresolved. */
@@ -48,16 +48,16 @@ export type LineComposition = {
 };
 export const UNLISTED = 'unclassified';
 
-type Slot = {category:string; band:string; lo:number; hi:number; must:boolean};
+type Slot = {category:string; lo:number; hi:number; must:boolean};
 
 /** Least and greatest marks `target` can receive, or null when no allocation reaches the total. */
-function targetBounds(slots:Slot[], of:(s:Slot)=>string, target:string, count:[number,number], total:number, extra:Range):[number,number]|null {
+function targetBounds(slots:Slot[], target:string, count:[number,number], total:number, extra:Range):[number,number]|null {
   const K=Math.min(slots.length,count[1]), S=total, W=S+1, NONE=1e9;
   let lo=new Float64Array((K+1)*W).fill(NONE), hi=new Float64Array((K+1)*W).fill(-NONE);
   lo[0]=0;hi[0]=0;
   for(const slot of slots) {
     const nlo=slot.must?new Float64Array((K+1)*W).fill(NONE):lo.slice(), nhi=slot.must?new Float64Array((K+1)*W).fill(-NONE):hi.slice();
-    const gain=of(slot)===target?1:0;
+    const gain=slot.category===target?1:0;
     for(let k=0;k<K;k++) for(let s=0;s<=S;s++) {
       const a=lo[k*W+s];if(a===NONE) continue;const b=hi[k*W+s];
       for(let m=slot.lo;m<=Math.min(slot.hi,S-s);m++) {
@@ -86,7 +86,6 @@ const intersect=(a:Range,b:Range|null):Range=>b?{min:Math.max(a.min,b.min),max:M
 export function lineComposition(doc:Classification, structure:LineStructure, marks:number|null, version:1|2|3=doc.schemaVersion):LineComposition {
   const byId=new Map(doc.parts.map(p=>[p.id,p]));
   const categoryOf=(id:string)=>{const p=byId.get(id)!;return version>=2?partCategory(p):p.cognitive.bloom??UNLISTED;};
-  const bandOf=(id:string)=>byId.get(id)!.cognitive.curriculumBand??UNLISTED;
   // Definitions without a structure: their listed parts are one closed alternative; none listed means none known.
   // Without a structure, only source-stated marks on every part confirm the listed parts are complete.
   const legacyComplete=!doc.structure && doc.parts.length>0 && doc.parts.every(p=>p.marks.basis==='range');
@@ -126,21 +125,16 @@ export function lineComposition(doc:Classification, structure:LineStructure, mar
       coverage:(!doc.structure&&!legacyComplete?'unknown':live.some(c=>c.extra.max>0)?'stated-open':'complete') as LineComposition['coverage']};
   };
   const live=candidates.filter(c=>c.possible);
-  const pending=(reason:CompositionReason,shown=live):LineComposition=>({...describe(shown),marks,status:'not-calculable',reason,categories:{},bands:{}});
+  const pending=(reason:CompositionReason,shown=live):LineComposition=>({...describe(shown),marks,status:'not-calculable',reason,categories:{}});
   if(!structure.valid) return pending('invalid-configuration');
   if(!live.length) return pending('choices-conflict-with-source',candidates);
   if(marks===null) return pending('marks-not-set');
   const solved=live.flatMap(c=>{
-    const slots=c.available.map(id=>{const r=range(id,marks);return {category:categoryOf(id),band:bandOf(id),lo:r.min,hi:r.max,must:c.mustHere.has(id)};});
+    const slots=c.available.map(id=>{const r=range(id,marks);return {category:categoryOf(id),lo:r.min,hi:r.max,must:c.mustHere.has(id)};});
     const extra={min:c.extra.min,max:Math.min(c.extra.max,marks)};
-    const solve=(of:(s:Slot)=>string)=>{
-      const out:Record<string,Range>={};
-      for(const k of [...new Set([...slots.map(of),...(extra.max?[UNLISTED]:[])])].sort()){const b=targetBounds(slots,of,k,[c.count.min,c.count.max],marks,extra);if(!b)return null;out[k]={min:b[0],max:b[1]};}
-      return Object.keys(out).length?out:null;
-    };
-    // Only Bloom's categories decide feasibility and exactness; legacy bands are carried but never shown.
-    const cat=solve(s=>s.category), band=cat?solve(s=>s.band)??{}:{};
-    return cat?[{c,cat,band}]:[];
+    const cat:Record<string,Range>={};
+    for(const k of [...new Set([...slots.map(s=>s.category),...(extra.max?[UNLISTED]:[])])].sort()){const b=targetBounds(slots,k,[c.count.min,c.count.max],marks,extra);if(!b)return [];cat[k]={min:b[0],max:b[1]};}
+    return Object.keys(cat).length?[{c,cat}]:[];
   });
   // Parts left out by rules or effects mean the teacher's choices, not the marks, removed every structure.
   const chosenOut=dropped.size>0 || doc.parts.some(p=>!listed.has(p.id));
@@ -148,21 +142,20 @@ export function lineComposition(doc:Classification, structure:LineStructure, mar
   // Union over feasible alternatives; a category an alternative lacks is zero there.
   const merge=(xs:Record<string,Range>[])=>Object.fromEntries([...new Set(xs.flatMap(Object.keys))].sort().map(k=>
     [k,{min:Math.min(...xs.map(x=>x[k]?.min??0)),max:Math.max(...xs.map(x=>x[k]?.max??0))}]));
-  const categories=merge(solved.map(x=>x.cat)), bands=merge(solved.map(x=>x.band)), feasible=solved.map(x=>x.c);
+  const categories=merge(solved.map(x=>x.cat)), feasible=solved.map(x=>x.c);
   const unknown=categories[UNLISTED]??{min:0,max:0};
   const status=unknown.min===marks?'unclassified':!unknown.max && Object.values(categories).every(r=>r.min===r.max)?'exact':'bounded';
-  return {...describe(feasible),marks,status,reason:null,categories,bands};
+  return {...describe(feasible),marks,status,reason:null,categories};
 }
 
 /** Line compositions summed per category. Lines are independent, so each paper range is exact per category. */
 export function sumCompositions(lines:{marks:number|null; composition:LineComposition}[]) {
-  const categories:Record<string,Range>={}, bands:Record<string,Range>={};const known=new Set<string>();let pending=0;
-  const add=(into:Record<string,Range>,from:Record<string,Range>)=>{for(const [k,r] of Object.entries(from)){into[k]??={min:0,max:0};into[k].min+=r.min;into[k].max+=r.max;}};
+  const categories:Record<string,Range>={};const known=new Set<string>();let pending=0;
   for(const l of lines) {
     l.composition.known.forEach(k=>known.add(k));
     if(l.composition.status==='not-calculable') pending+=l.marks??0;
-    else {add(categories,l.composition.categories);add(bands,l.composition.bands);}
+    else for(const [k,r] of Object.entries(l.composition.categories)){categories[k]??={min:0,max:0};categories[k].min+=r.min;categories[k].max+=r.max;}
   }
   const exact=!pending && !categories[UNLISTED]?.max && Object.values(categories).every(r=>r.min===r.max);
-  return {categories,bands,known:[...new Set(known)].sort(),pending,exact};
+  return {categories,known:[...new Set(known)].sort(),pending,exact};
 }
