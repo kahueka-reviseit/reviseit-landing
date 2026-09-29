@@ -146,7 +146,7 @@ export function evaluateClassified(item:ClassifiedItem, choice:LineChoice, marks
       state==='included'&&!e?.inclusion?.match(/^(required|selected)$/)?`Part of the ${alternativeOf(p.id)??'specified'} structure.`:
       state==='possible'?'The generation skill decides whether to include this part.':undefined;
     return {id:p.id,number:String(i+1),summary:p.summary??p.label,bloom:p.cognitive.bloom,bloomOptions:options,bloomBasis:p.cognitive.bloomBasis??null,bloomUnknownReason:p.cognitive.bloom||options.length?undefined:'Not yet classified',
-      band:p.cognitive.curriculumBand,marks:e?.marks??(p.marks.basis==='range'&&p.marks.min!==null&&p.marks.max!==null?{min:p.marks.min,max:p.marks.max}:null),
+      marks:e?.marks??(p.marks.basis==='range'&&p.marks.min!==null&&p.marks.max!==null?{min:p.marks.min,max:p.marks.max}:null),
       inclusion:p.inclusion==='required'?'required':'optional',included:state==='included',
       locked:p.inclusion==='required' || e?.inclusion==='rule-required' || !!x || !partsFacet || !(partsFacet.domain.parts as string[]).includes(p.id),
       reason,exampleMarks:p.marks.basis==='typical'&&p.marks.min!==null&&p.marks.max!==null?{min:p.marks.min,max:p.marks.max}:null,

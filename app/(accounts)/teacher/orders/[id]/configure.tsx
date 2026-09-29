@@ -322,9 +322,8 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
 <section className={styles['card']}>        {(line.parts.length>1||line.parts.some(p=>!p.locked))&&<fieldset className={styles['choice-field']}><legend>What the question covers</legend><span className={styles['choice-field__message']} aria-hidden="true">Include or leave out each part</span>
           <ol className={styles['subquestion-list']}>{line.parts.map(p=><li key={p.id} className={p.included||p.possible?'':styles['subquestion-toggle--excluded']}>
             <label className={styles['subquestion-toggle__control']}><input type="checkbox" checked={p.included} disabled={!editable||p.locked} onChange={e=>togglePart(p.id,e.target.checked)}/><span aria-hidden="true" className={styles['switch']}/> <span className={styles['subquestion-toggle__number']}>{line.number}.{p.number}</span> <span className={styles['subquestion-toggle__text']}>{p.summary}</span></label>
-            <span className={`${styles['tag']} ${bloomClass[p.bloom??(p.bloomOptions.length?'grouped':'unclassified')]}`} title={p.bloomBasis==='profile-authorised-fallback'?'Taken from the curriculum level under the agreed Grade 10 assumption':p.bloomBasis==='profile-single-mapping'?'Taken from the curriculum level':p.bloomOptions.length?'The curriculum level allows either category; the source does not say which':undefined}>
+            <span className={`${styles['tag']} ${bloomClass[p.bloom??(p.bloomOptions.length?'grouped':'unclassified')]}`} title={p.bloomOptions.length?'The source allows either category and does not say which':undefined}>
               {p.bloom?p.bloom.charAt(0).toUpperCase()+p.bloom.slice(1):p.bloomOptions.length?groupLabel(p.bloomOptions.join('-or-')):'Not yet classified'}</span>
-            {p.band?<span className={styles['subquestion-toggle__level']}>Curriculum band {p.band}</span>:<span/>}
             <span className={styles['subquestion-toggle__marks']}>{p.included||p.possible?(p.marks?range(p.marks):p.exampleMarks?`${range(p.exampleMarks)} in the source example`:'—'):<em>Left out</em>}</span>
             {p.learnerDrawn&&<span className={styles['paragraph']}>Learners draw this themselves</span>}
             {p.reason&&<span className={styles['paragraph']}>{p.reason}</span>}
@@ -372,13 +371,6 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
         {mix.notes.map((n,i)=><p key={i} className={styles['paragraph']}>{n}</p>)}
         <p className={styles['card__note']}>A range shows every split that the specifications and your choices allow. The highest values of different categories cannot all happen together. Specifications give example marks for their subquestions, so the split between them is a range. Where a specification states more subquestions than it lists, the others count as not yet classified; where a question’s structure is not yet chosen, each structure is calculated separately. Marks whose level allows two categories stay together, and nothing is spread across categories. A configured question has all its answers; its split can still be a range.</p>
       </section>
-      {view.curriculum.length>0&&<section className={styles['card']} aria-labelledby="curriculum-heading">
-        <p id="curriculum-heading" className={styles['card__eyebrow--neutral']}>Curriculum requirements</p>
-        {view.curriculum.filter(c=>c.compared).map(c=><div key={c.profile}><p className={styles['paragraph']}><strong>{c.title}</strong></p><p className={styles['paragraph']}>{c.note}</p>
-          <table className={styles['data-table']}><thead><tr><th scope="col">Curriculum band</th><th scope="col">This paper</th><th scope="col">Target</th></tr></thead>
-            <tbody>{c.rows.map(r=><tr key={r.key}><td>{r.label}</td><td>{r.min===r.max?r.min:`${r.min}–${r.max}`} marks</td><td>{r.target}</td></tr>)}</tbody></table></div>)}
-        {view.curriculum.some(c=>!c.compared)&&<p className={styles['card__note']}>Not compared here: {view.curriculum.filter(c=>!c.compared).map(c=>c.title).join(', ')}.</p>}
-      </section>}
       {paid&&!view.submitted&&<button type="button" className={styles['button--primary']} disabled={busy||!view.canSubmit||save!=='saved'} onClick={()=>void submit()}>{busy?'Submitting…':'Submit for generation →'}</button>}
       {paid&&!view.submitted&&<p className={styles['card__note']}>Once submitted, your choices are fixed for this paper. All four documents are released together.</p>}
     </aside></PaperPanel>}

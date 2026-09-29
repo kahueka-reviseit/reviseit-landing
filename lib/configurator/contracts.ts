@@ -76,7 +76,7 @@ export type ConfiguredCheckoutRequest = {requestKey:string; moduleId:string; sel
 // ---------------------------------------------------------------- projection
 export type OptionView = {id:string; label:string; disabled:boolean; reason?:string; preferred?:boolean};
 export type FacetView = {id:string; label:string; hint:string; type:'choice'; required:boolean; allowAutomatic:boolean; options:OptionView[]; value:Answer|null; forced?:string; reason?:string};
-export type PartView = {id:string; number:string; summary:string; bloom:BloomKey|null; bloomOptions:BloomKey[]; bloomBasis:'source-label'|'profile-single-mapping'|'profile-authorised-fallback'|null; bloomUnknownReason?:string; band:string|null; marks:{min:number;max:number}|null;
+export type PartView = {id:string; number:string; summary:string; bloom:BloomKey|null; bloomOptions:BloomKey[]; bloomBasis:'source-label'|'profile-single-mapping'|'profile-authorised-fallback'|null; bloomUnknownReason?:string; marks:{min:number;max:number}|null;
   /** Marks this part carries in the source's own example, when the source gives only an example. Never a bound. */
   exampleMarks:{min:number;max:number}|null;
   inclusion:'required'|'optional'; included:boolean; locked:boolean; reason?:string; learnerDrawn:boolean;
@@ -105,7 +105,6 @@ export type LineCompositionView = {status:'exact'|'bounded'|'unclassified'|'not-
 export type CompositionSummary = {exact:boolean; settled:number; unclassified:number; open:number; pending:number; notes:string[]};
 /** 'apply-or-analyse' -> 'Apply or Analyse' */
 export const groupLabel=(key:string)=>key.split('-or-').map(k=>bloomLabels[k as BloomKey]??k).join(' or ');
-export type CurriculumComparison = {profile:string; title:string; compared:boolean; basis:'marks'|'item-count'; rows:{key:string; label:string; min:number; max:number; target:string}[]; note:string};
 export type ConfigurationView = {
   briefEnabled?:boolean;
   advice?:{enabled:boolean;lineIds:string[]};
@@ -113,7 +112,7 @@ export type ConfigurationView = {
   status:ReadinessStatus; statusLabel:string; outstanding:number; canSubmit:boolean;
   totals:{target:number|null; allocated:number; remaining:number; excess:number; complete:boolean;
     sections:{key:SectionKey; label:string; allocated:number; target:number|null}[]};
-  cognitive:CognitiveRow[]; composition:CompositionSummary; curriculum:CurriculumComparison[];
+  cognitive:CognitiveRow[]; composition:CompositionSummary;
   lines:LineView[]; paper:{fields:QuestionField[]; answers:Record<string,Answer>; outstanding:string[]};
   issues:string[]; configuration:Configuration;
 };

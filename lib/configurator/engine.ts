@@ -2,7 +2,7 @@ import {briefConflicts} from './brief';
 import { cataloguePreview, type CataloguePreview } from '../workspace/contracts';
 import { isQuestionnaire, type Answer, type QuestionField, type QuestionnaireAnswers } from '../jobs/questionnaire';
 import { bloomKeys, bloomLabels, groupLabel, readinessLabels, sectionLabels, type Attention, type BloomKey, type CognitiveRow, type CompositionSummary, type Configuration,
-  type ConfigurationView, type CurriculumComparison, type LineCompositionView, type LineView, type ReadinessStatus, type SectionKey } from './contracts';
+  type ConfigurationView, type LineCompositionView, type LineView, type ReadinessStatus, type SectionKey } from './contracts';
 import { interpretClassification, evaluateClassified, type ClassifiedItem, type ClassifiedResult, type PlannedPart, type RequirementsProfile } from './classification';
 import { sumCompositions, UNLISTED, type CompositionReason, type LineComposition, type Range } from './composition';
 
@@ -242,7 +242,6 @@ export function project(defs:Definitions, cfg:Configuration, e:Evaluation, meta:
     ...Object.keys(e.grouped).sort().filter(g=>e.grouped[g].max>0||known.has(g)).map(g=>({key:g,label:groupLabel(g),grouped:true,known:known.has(g),...e.grouped[g]})),
     {key:UNLISTED,label:'Not yet classified',...e.cognitive.unclassified},
     ...(e.composition.pending?[{key:'pending',label:'Not yet calculable',min:e.composition.pending,max:e.composition.pending}]:[])];
-  const curriculum:CurriculumComparison[]=paid?comparisons(defs,e):[];
   const remaining=e.totals.target===null?0:Math.max(0,e.totals.target-e.totals.allocated);
   const excess=e.totals.target===null?0:Math.max(0,e.totals.allocated-e.totals.target);
   return {orderId:meta.orderId,state:meta.state,paid,paymentStatus:meta.paymentStatus,revision:meta.revision,submitted:meta.submitted,
@@ -250,7 +249,7 @@ export function project(defs:Definitions, cfg:Configuration, e:Evaluation, meta:
     totals:{target:e.totals.target,allocated:e.totals.allocated,remaining,excess,complete:e.totals.complete,
       sections:(['multiple_choice','structured'] as SectionKey[]).filter(k=>defs.lines.some(l=>l.identity.kind===k)).map(k=>({key:k,label:sectionLabels[k],allocated:e.totals.sections[k],target:e.totals.sectionTargets[k]??null}))},
     // Presentation order matches the paper: multiple choice as question 1, then structured.
-    cognitive,composition:summary(e,shown),curriculum,lines:shown.map(x=>lines.find(l=>l.id===x.id)!),paper:{fields:[],answers:{},outstanding:[]},
+    cognitive,composition:summary(e,shown),lines:shown.map(x=>lines.find(l=>l.id===x.id)!),paper:{fields:[],answers:{},outstanding:[]},
     issues:[...e.totals.problems,...e.issues],configuration:cfg};
 }
 
@@ -286,31 +285,3 @@ function compositionView(c:LineComposition):LineCompositionView {
     examples:c.examples.map(x=>({label:x.label,marks:x.marks,parts:x.parts,rows:Object.entries(x.categories).map(([k,m])=>({key:k,label:categoryLabel(k),...m})).sort((a,b)=>order(a.key)-order(b.key))}))};
 }
 
-/** A distribution's own name when the profile gives one, otherwise its identifier in plain words. */
-function distributionTitle(d:{id:string; [k:string]:unknown}):string {
-  for(const k of ['label','title','name']) if(typeof d[k]==='string' && (d[k] as string).trim()) return (d[k] as string).trim();
-  const words=d.id.replace(/[-_]+/g,' ').replace(/([a-z])(\d)/gi,'$1 $2').trim();
-  return words.charAt(0).toUpperCase()+words.slice(1);
-}
-
-/** Descriptive comparison with each marks-based curriculum distribution, from the same composition as the Bloom view.
- *  Every applicable distribution is kept and named: a paper may mix subjects, so none is chosen over another and
- *  targets are never blended. Distributions with identical targets are shown once. */
-function comparisons(defs:Definitions, e:Evaluation):CurriculumComparison[] {
-  const out:CurriculumComparison[]=[];const seen=new Set<string>();
-  for(const profile of Object.values(defs.profiles)) for(const d of profile.distributions) {
-    const label=(key:string)=>profile.bands.find(b=>b.id===key)?.label??categoryLabel(key);
-    const base={profile:`${profile.profileId} · ${d.id}`,title:distributionTitle(d),basis:d.basis==='marks'?'marks' as const:'item-count' as const};
-    if(d.basis!=='marks') { out.push({...base,compared:false,rows:[],note:'This requirement is not measured in marks, so it is not compared here.'}); continue; }
-    if(d.taxonomy==='knowledge-area') { out.push({...base,compared:false,rows:[],note:'This requirement is not compared here.'}); continue; }
-    const fingerprint=JSON.stringify([profile.profileId,d.taxonomy,d.targets.map(t=>[t.key,t.percent])]);
-    if(seen.has(fingerprint)) continue; seen.add(fingerprint);
-    const actual:Record<string,Range>=d.taxonomy==='bloom'?{...e.cognitive,...e.grouped}:e.bands;
-    const incomplete=e.composition.pending>0 || (actual[UNLISTED]?.max??0)>0 || (d.taxonomy==='bloom' && Object.values(e.grouped).some(r=>r.max>0));
-    const ranged=d.targets.some(t=>actual[t.key] && actual[t.key].min!==actual[t.key].max);
-    out.push({...base,compared:true,note:incomplete?'Some marks are not yet classified, so this comparison is incomplete.':
-      `Described against this curriculum’s own targets. Not a pass or fail.${ranged?' Ranges show splits that are still open.':''}`,
-      rows:d.targets.map(t=>({key:t.key,label:label(t.key),min:actual[t.key]?.min??0,max:actual[t.key]?.max??0,target:t.percent===null?'Not specified':`${t.percent}%`}))});
-  }
-  return out;
-}

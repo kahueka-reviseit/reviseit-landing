@@ -105,11 +105,6 @@ describe('honest treatment of insufficient information',()=>{
   const d=definitions([example]);const view=project(d,config([10]),evaluate(d,config([10]),{paid:false}),{...meta,state:'awaiting_payment',paymentStatus:'open'});
   expect(view.lines[0].composition).toBeNull();expect(JSON.stringify(view)).not.toContain('Synthetic part');
  });
- it('curriculum bands come from the same composition',()=>{
-  const d=definitions([mcq,closed]);const cfg=config([2,6]);cfg.lines.q2.parts=['p3'];const e=evaluate(d,cfg,{paid:true});
-  expect(project(d,cfg,e,meta).curriculum[0].rows.map(x=>[x.key,x.min,x.max])).toEqual([['B1',2,2],['B2',2,2],['B3',2,2],['B4',2,2]]);
-  expect(project(d,cfg,e,meta).curriculum[0].note).toBe('Described against this curriculum’s own targets. Not a pass or fail.');
- });
 });
 
 const asPairs=(c:Record<string,{min:number;max:number}>)=>Object.fromEntries(Object.entries(c).filter(([,v])=>v.max>0).map(([k,v])=>[k,[v.min,v.max]]));
