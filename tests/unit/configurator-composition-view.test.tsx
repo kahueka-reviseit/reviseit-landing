@@ -24,7 +24,7 @@ const rowText=(list:HTMLElement,label:string)=>within(list).getAllByRole('listit
 
 test('the review shows settled and open marks per category, never the whole question as unclassified',async()=>{
  server();render(<ConfigureOrder orderId={orderId} onSubmitted={()=>{}}/>);const user=userEvent.setup();
- await user.click(await screen.findByRole('button',{name:'Marks and cognitive mix'}));
+ await user.click(await screen.findByRole('button',{name:'Review paper →'}));
  const mix=screen.getByRole('list',{name:'Cognitive mix for the paper'});
  expect(rowText(mix,'Understand')).toBe('Understand2');expect(rowText(mix,'Remember')).toBe('Remember0–9');expect(rowText(mix,'Not yet classified')).toBe('Not yet classified0');
  expect(screen.getByText('2 marks settled in a category · 10 still open between categories')).toBeVisible();

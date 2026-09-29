@@ -142,6 +142,18 @@ describe('classified questions (contract v1, synthetic)',()=>{
   expect(view.curriculum[0].rows.map(r=>[r.label,r.target])).toEqual([['Band one','60%'],['Band two','40%']]);
   expect(view.cognitive.map(r=>r.label)).toEqual(['Remember','Understand','Apply','Analyse','Evaluate','Create','Not yet classified']);
  });
+ it('names every applicable comparison, keeps different targets apart, shows identical targets once and flags what is not compared',()=>{
+  const d=definitions({classified:true});const cfg=config([8,6,2],16,{answers:paidAnswers()});
+  const p=Object.values(d.profiles)[0];
+  p.distributions=[{id:'paper-1-physics',taxonomy:'curriculum-band',basis:'marks',targets:[{key:'B1',percent:60},{key:'B2',percent:40}]},
+   {id:'paper-2-chemistry',label:'Paper 2 (Chemistry) guideline',taxonomy:'curriculum-band',basis:'marks',targets:[{key:'B1',percent:40},{key:'B2',percent:60}]},
+   {id:'paper-1-copy',taxonomy:'curriculum-band',basis:'marks',targets:[{key:'B1',percent:60},{key:'B2',percent:40}]},
+   {id:'counted',taxonomy:'curriculum-band',basis:'item-count',targets:[{key:'B1',percent:null}]}];
+  const view=project(d,cfg,evaluate(d,cfg,{paid:true}),{orderId:'o',state:'awaiting_answers',paymentStatus:'paid',revision:1,submitted:false});
+  expect(view.curriculum.map(c=>[c.title,c.compared])).toEqual([['Paper 1 physics',true],['Paper 2 (Chemistry) guideline',true],['Counted',false]]);
+  expect(view.curriculum.filter(c=>c.compared).map(c=>c.rows.map(r=>r.target))).toEqual([['60%','40%'],['40%','60%']]);
+  expect(view.curriculum.find(c=>!c.compared)!.rows).toEqual([]);
+ });
  it('a classification that does not match the pinned form is reported, and other lines keep working',()=>{
   const d=definitions({classified:true,badMap:true});
   expect(d.lines[0].classification).toBeNull();expect(d.lines[0].classificationProblem).toMatch(/field map/);

@@ -205,7 +205,6 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
     <div><p className={styles['paper-header__breadcrumb']}><Link href="/teacher/orders">My papers</Link> / {title||'Your selected questions'} · {paid?'Paid':view.submitted?'Submitted':'Awaiting payment'}</p>
       <h1 className={styles['paper-header__title']}>Your paper</h1></div>
     <div className={styles['paper-header__actions']}>
-      <button type="button" className={styles['button--secondary']} onClick={()=>setPanel('review')}>Marks and cognitive mix</button>
       <button type="button" className={styles['button--primary']} onClick={()=>setPanel('review')}>Review paper →</button>
     </div>
   </header>
@@ -375,9 +374,10 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
       </section>
       {view.curriculum.length>0&&<section className={styles['card']} aria-labelledby="curriculum-heading">
         <p id="curriculum-heading" className={styles['card__eyebrow--neutral']}>Curriculum requirements</p>
-        {view.curriculum.map(c=><div key={c.profile}><p className={styles['paragraph']}>{c.note}</p>
+        {view.curriculum.filter(c=>c.compared).map(c=><div key={c.profile}><p className={styles['paragraph']}><strong>{c.title}</strong></p><p className={styles['paragraph']}>{c.note}</p>
           <table className={styles['data-table']}><thead><tr><th scope="col">Curriculum band</th><th scope="col">This paper</th><th scope="col">Target</th></tr></thead>
             <tbody>{c.rows.map(r=><tr key={r.key}><td>{r.label}</td><td>{r.min===r.max?r.min:`${r.min}–${r.max}`} marks</td><td>{r.target}</td></tr>)}</tbody></table></div>)}
+        {view.curriculum.some(c=>!c.compared)&&<p className={styles['card__note']}>Not compared here: {view.curriculum.filter(c=>!c.compared).map(c=>c.title).join(', ')}.</p>}
       </section>}
       {paid&&!view.submitted&&<button type="button" className={styles['button--primary']} disabled={busy||!view.canSubmit||save!=='saved'} onClick={()=>void submit()}>{busy?'Submitting…':'Submit for generation →'}</button>}
       {paid&&!view.submitted&&<p className={styles['card__note']}>Once submitted, your choices are fixed for this paper. All four documents are released together.</p>}

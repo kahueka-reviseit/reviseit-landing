@@ -105,7 +105,7 @@ export type LineCompositionView = {status:'exact'|'bounded'|'unclassified'|'not-
 export type CompositionSummary = {exact:boolean; settled:number; unclassified:number; open:number; pending:number; notes:string[]};
 /** 'apply-or-analyse' -> 'Apply or Analyse' */
 export const groupLabel=(key:string)=>key.split('-or-').map(k=>bloomLabels[k as BloomKey]??k).join(' or ');
-export type CurriculumComparison = {profile:string; basis:'marks'|'item-count'; rows:{key:string; label:string; min:number; max:number; target:string}[]; note:string};
+export type CurriculumComparison = {profile:string; title:string; compared:boolean; basis:'marks'|'item-count'; rows:{key:string; label:string; min:number; max:number; target:string}[]; note:string};
 export type ConfigurationView = {
   briefEnabled?:boolean;
   advice?:{enabled:boolean;lineIds:string[]};
