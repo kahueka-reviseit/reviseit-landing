@@ -5,13 +5,13 @@ import userEvent from '@testing-library/user-event';
 import {test,expect,vi,afterEach} from 'vitest';
 import ConfigureOrder from '../../app/(accounts)/teacher/orders/[id]/configure';
 import {evaluate,project} from '../../lib/configurator/engine';
-import {config,definitions,mcq,open} from '../fixtures/composition';
+import {config,definitions,example,mcq,variant} from '../fixtures/composition';
 import type {Configuration} from '../../lib/configurator/contracts';
 
 const orderId='00000000-0000-4000-8000-0000000000c10';
 afterEach(()=>{vi.unstubAllGlobals();});
-function server(){
- const defs=definitions([mcq,open]);let cfg:Configuration=config([2,10]);let revision=1;
+function server(items=[mcq,example],marks=[2,10]){
+ const defs=definitions(items);let cfg:Configuration=config(marks);let revision=1;
  const view=()=>project(defs,cfg,evaluate(defs,cfg,{paid:true}),{orderId,state:'awaiting_answers',paymentStatus:'paid',revision,submitted:false});
  vi.stubGlobal('fetch',vi.fn(async(input:RequestInfo|URL,options?:RequestInit)=>{
   const url=String(input);
@@ -26,7 +26,7 @@ test('the review shows settled and open marks per category, never the whole ques
  server();render(<ConfigureOrder orderId={orderId} onSubmitted={()=>{}}/>);const user=userEvent.setup();
  await user.click(await screen.findByRole('button',{name:'Marks and cognitive mix'}));
  const mix=screen.getByRole('list',{name:'Cognitive mix for the paper'});
- expect(rowText(mix,'Understand')).toBe('Understand2');expect(rowText(mix,'Remember')).toBe('Remember0–9');expect(rowText(mix,'Not yet classified')).toBe('Not yet classified0–10');
+ expect(rowText(mix,'Understand')).toBe('Understand2');expect(rowText(mix,'Remember')).toBe('Remember0–9');expect(rowText(mix,'Not yet classified')).toBe('Not yet classified0');
  expect(screen.getByText('2 marks settled in a category · 10 still open between categories')).toBeVisible();
  expect(screen.getByText(/highest values of different categories cannot all happen together/)).toBeVisible();
 });
@@ -42,4 +42,17 @@ test('a linked choice narrows the question’s range and explains the included s
  await waitFor(()=>expect(rowText(line(),'Remember')).toBe('Remember2–9'),{timeout:3000});
  expect(dialog.getAllByText('Synthetic: set by your statement choice.')).toHaveLength(2);
  expect(dialog.getByText('3 in the source example')).toBeInTheDocument();
+});
+
+test('an unresolved variant shows each alternative’s own example; choosing one narrows to its example and tasks',async()=>{
+ server([variant],[12]);render(<ConfigureOrder orderId={orderId} onSubmitted={()=>{}}/>);const user=userEvent.setup();
+ await user.click(await screen.findByRole('button',{name:'Edit question 1'}));
+ const dialog=within(screen.getByRole('dialog'));
+ expect(dialog.getByText(/Source example · Full \(4 subquestions, 14 marks\)/)).toBeInTheDocument();
+ expect(dialog.getByText(/Source example · Compressed \(3 subquestions, 9 marks\)/)).toBeInTheDocument();
+ expect(dialog.getByText(/have not yet settled which of its 2 structures \(Full, Compressed\)/)).toBeInTheDocument();
+ await user.click(dialog.getByRole('radio',{name:'compressed'}));
+ await waitFor(()=>expect(dialog.queryByText(/Source example · Full/)).toBeNull(),{timeout:3000});
+ expect(dialog.getByText(/Source example · Compressed \(3 subquestions, 9 marks\)/)).toBeInTheDocument();
+ expect(dialog.getAllByText('Part of the Compressed structure.')).toHaveLength(3);
 });

@@ -11,7 +11,9 @@ import { lineComposition, type LineComposition } from './composition';
  */
 export type RequirementsProfile = Profile;
 /** One subquestion as handed to generation: the same parts, inclusion and categories the teacher was shown. */
-export type PlannedPart = {id:string; label:string; inclusion:'required'|'selected'|'rule-required'|'flexible'; marks:{min:number;max:number}|null; bloom:BloomKey|null; bloomOptions:BloomKey[]; learnerDrawn:boolean};
+export type PlannedPart = {id:string; label:string; inclusion:'required'|'selected'|'rule-required'|'structure-required'|'flexible'; marks:{min:number;max:number}|null; bloom:BloomKey|null; bloomOptions:BloomKey[]; learnerDrawn:boolean;
+  /** The alternative structure this part belongs to, when the source has several. */
+  alternative?:string};
 export type ClassifiedItem = {contract:'configurator-contract-v1'; doc:Classification; profile:Profile|null; fields:QuestionField[]};
 export type ClassifiedResult = {
   feasible:boolean; issues:string[]; outstanding:string[]; attention:Attention[];
@@ -24,12 +26,30 @@ export type ClassifiedResult = {
 };
 
 const record=(x:unknown):x is Record<string,any>=>!!x&&typeof x==='object'&&!Array.isArray(x);
+const span=(r:unknown)=>record(r) && Number.isSafeInteger(r.min) && Number.isSafeInteger(r.max) && 0<=r.min && r.min<=r.max;
+
+/** Version 3: every part belongs to exactly one alternative; effects name known parts. */
+function checkStructure(doc:Classification) {
+  const s=doc.structure as unknown;
+  if(!record(s) || !Array.isArray(s.alternatives) || !s.alternatives.length || !Array.isArray(s.effects)) throw new Error('Unsupported classification structure');
+  const ids=new Set(doc.parts.map(p=>p.id)), seen=new Set<string>();
+  for(const a of s.alternatives) {
+    if(!record(a) || typeof a.id!=='string' || typeof a.label!=='string' || !Array.isArray(a.parts) || !Array.isArray(a.required) || !span(a.additional) || (a.count!==null && !span(a.count))
+      || a.parts.some((p:unknown)=>typeof p!=='string' || !ids.has(p) || seen.has(p)) || a.required.some((p:unknown)=>!a.parts.includes(p))) throw new Error('Unsupported classification structure');
+    a.parts.forEach((p:string)=>seen.add(p));
+  }
+  if(seen.size!==ids.size) throw new Error('Unsupported classification structure');
+  for(const e of s.effects) if(!record(e) || !record(e.when) || !Array.isArray(e.excludeParts) || e.excludeParts.some((p:unknown)=>!ids.has(p as string)) || (e.additional!==null && !span(e.additional)) || typeof e.reason!=='string')
+    throw new Error('Unsupported classification structure');
+}
 const TOP=['schemaVersion','moduleId','kind','itemId','release','title','curriculumId','curriculumRequirementsRef','marks','parts','facets','rules','diagramPolicy','formBinding','provenance','jevChecks','hints','coverage'];
 
 /** Defensive structural checks for what the evaluator relies on, plus binding to the pinned order. */
 export function interpretClassification(payload:unknown, profile:Profile|null, fields:QuestionField[], pinned?:{range:{min:number;max:number}; fixedMarks:number|null; formRevision?:string; kind:string}):ClassifiedItem {
-  if(!record(payload) || (payload.schemaVersion!==1 && payload.schemaVersion!==2) || Object.keys(payload).sort().join()!==[...TOP].sort().join()) throw new Error('Unsupported classification schema');
+  const v3=record(payload) && payload.schemaVersion===3;
+  if(!record(payload) || ![1,2,3].includes(payload.schemaVersion) || Object.keys(payload).sort().join()!==[...TOP,...(v3?['structure']:[])].sort().join()) throw new Error('Unsupported classification schema');
   const doc=payload as Classification;
+  if(v3) checkStructure(doc);
   if(!Array.isArray(doc.parts) || !Array.isArray(doc.facets) || !Array.isArray(doc.rules) || !record(doc.hints) || !record(doc.formBinding) || !record(doc.diagramPolicy)) throw new Error('Unsupported classification shape');
   const marksFacets=doc.facets.filter(f=>f?.binding?.scope==='line-marks');
   if(marksFacets.length!==1 || marksFacets[0].type!=='integer') throw new Error('Classification marks facet required');
@@ -114,18 +134,23 @@ export function evaluateClassified(item:ClassifiedItem, choice:LineChoice, marks
   const excluded=new Map(result.excludedParts.map(p=>[p.part,p]));
   const drawn=new Set(doc.diagramPolicy.learnerDrawnParts);
   const partsFacet=doc.facets.find(f=>f.type==='parts');
+  const hint=(key:string)=>doc.hints[key]??'';
+  const ruleHints=(ids:string[])=>ids.map(r=>hint(doc.rules.find(y=>y.id===r)?.reason??'')).filter(Boolean).join(' ');
+  const alternativeOf=(id:string)=>doc.structure&&doc.structure.alternatives.length>1?doc.structure.alternatives.find(a=>a.parts.includes(id))?.label:undefined;
   const parts:PartView[]=doc.parts.map((p,i)=>{
-    const e=effective.get(p.id), x=excluded.get(p.id);
+    const e=effective.get(p.id), x=excluded.get(p.id), state=composition.parts[p.id], dropped=composition.droppedBy[p.id];
     const options=(BLOOM as readonly string[]).filter(k=>(p.cognitive.bloomCandidates??[]).includes(k)) as BloomKey[];
+    const reason=x?ruleHints(x.ruleIds)||'Ruled out by another choice.':dropped?dropped.map(hint).filter(Boolean).join(' ')||'Left out by another choice.':
+      state==='excluded'?'Not part of the structure your choices set.':
+      e?.inclusion==='rule-required'?ruleHints(structure.ruleRequired[p.id]??[])||'Included because of another choice.':
+      state==='included'&&!e?.inclusion?.match(/^(required|selected)$/)?`Part of the ${alternativeOf(p.id)??'specified'} structure.`:
+      state==='possible'?'The generation skill decides whether to include this part.':undefined;
     return {id:p.id,number:String(i+1),summary:p.summary??p.label,bloom:p.cognitive.bloom,bloomOptions:options,bloomBasis:p.cognitive.bloomBasis??null,bloomUnknownReason:p.cognitive.bloom||options.length?undefined:'Not yet classified',
       band:p.cognitive.curriculumBand,marks:e?.marks??(p.marks.basis==='range'&&p.marks.min!==null&&p.marks.max!==null?{min:p.marks.min,max:p.marks.max}:null),
-      inclusion:p.inclusion==='required'?'required':'optional',included:!!e && e.inclusion!=='flexible',
+      inclusion:p.inclusion==='required'?'required':'optional',included:state==='included',
       locked:p.inclusion==='required' || e?.inclusion==='rule-required' || !!x || !partsFacet || !(partsFacet.domain.parts as string[]).includes(p.id),
-      reason:x?x.ruleIds.map(r=>doc.hints[doc.rules.find(y=>y.id===r)?.reason??'']).filter(Boolean).join(' ')||'Ruled out by another choice.':
-        e?.inclusion==='rule-required'?(structure.ruleRequired[p.id]??[]).map(r=>doc.hints[doc.rules.find(y=>y.id===r)?.reason??'']).filter(Boolean).join(' ')||'Included because of another choice.':
-        e?.inclusion==='flexible'?'The generation skill decides whether to include this part.':undefined,
-      exampleMarks:p.marks.basis==='typical'&&p.marks.min!==null&&p.marks.max!==null?{min:p.marks.min,max:p.marks.max}:null,
-      learnerDrawn:drawn.has(p.id),possible:e?.inclusion==='flexible'};
+      reason,exampleMarks:p.marks.basis==='typical'&&p.marks.min!==null&&p.marks.max!==null?{min:p.marks.min,max:p.marks.max}:null,
+      learnerDrawn:drawn.has(p.id),possible:state==='possible'};
   });
   const facets:FacetView[]=[];const blocked:Record<string,Set<string>>={};
   for(const f of doc.facets) {
@@ -144,8 +169,11 @@ export function evaluateClassified(item:ClassifiedItem, choice:LineChoice, marks
   const lockedStimulus=doc.diagramPolicy.stimulusFacet?result.forcedOptions.find(o=>o.facet===doc.diagramPolicy.stimulusFacet)?.option:undefined;
   const stimulus=doc.diagramPolicy.stimulus==='unspecified'?'unknown':doc.diagramPolicy.stimulus;
   return {feasible,issues,outstanding:opts.paid?result.outstanding.filter(x=>x!==marksFacet):[],attention,composition,parts,facets,blockedFieldOptions:blocked,
-    plannedParts:result.effectiveParts.map(p=>{const d=doc.parts.find(x=>x.id===p.id)!;
-      return {id:p.id,label:d.label,inclusion:p.inclusion as PlannedPart['inclusion'],marks:p.marks,bloom:d.cognitive.bloom,bloomOptions:(BLOOM as readonly string[]).filter(k=>(d.cognitive.bloomCandidates??[]).includes(k)) as BloomKey[],learnerDrawn:drawn.has(p.id)};}),
+    // Generation receives the parts the composition keeps, with the same inclusion the teacher sees.
+    plannedParts:doc.parts.filter(p=>composition.parts[p.id]!=='excluded').map(d=>{const e=effective.get(d.id), alternative=alternativeOf(d.id);
+      const inclusion:PlannedPart['inclusion']=composition.parts[d.id]==='possible'?'flexible':e&&e.inclusion!=='flexible'?e.inclusion as PlannedPart['inclusion']:'structure-required';
+      return {id:d.id,label:d.label,inclusion,marks:e?.marks??(d.marks.basis==='range'&&d.marks.min!==null&&d.marks.max!==null?{min:d.marks.min,max:d.marks.max}:null),bloom:d.cognitive.bloom,
+        bloomOptions:(BLOOM as readonly string[]).filter(k=>(d.cognitive.bloomCandidates??[]).includes(k)) as BloomKey[],learnerDrawn:drawn.has(d.id),...(alternative?{alternative}:{})};}),
     diagram:{stimulus:lockedStimulus??(stimulusAnswer?.kind==='choice'?stimulusAnswer.choiceId:doc.diagramPolicy.stimulus),learnerDrawn:[...doc.diagramPolicy.learnerDrawnParts]},
     diagramView:{stimulus,learnerDrawn:[...doc.diagramPolicy.learnerDrawnParts],locked:lockedStimulus}};
 }

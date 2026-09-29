@@ -4,6 +4,7 @@ import {describe,it,expect} from 'vitest';
 import {evaluate,generationPlan,readDefinitions} from '../../lib/configurator/engine';
 import {evaluateLine} from '../../lib/configurator/contract-v1';
 import {lineComposition} from '../../lib/configurator/composition';
+import {brute} from '../fixtures/composition';
 import {compile} from '../../lib/jev/advisor';
 import type {Configuration} from '../../lib/configurator/contracts';
 // Private content consumption check. The registrations file (from the private
@@ -90,8 +91,8 @@ describe.skipIf(!path)('real classifications (private, content-v1)',()=>{
    }}
   console.log(JSON.stringify({c10FormLinks:links}));
  });
- it('C10: every combination of linked answers keeps a calculable composition at every total',()=>{
-  let checked=0;
+ it('C10: every combination of linked answers is calculable, or a labelled source conflict that never blocks the paper',()=>{
+  let checked=0,conflicts=0;
   for(const r of regs.classifications){const d=definitions(r);const doc=d.lines[0].classification!.doc;const {min,max}=d.lines[0].range;
    const facets=[...new Set(doc.rules.filter(x=>(x.origin as {type:string}).type==='form').map(x=>{const w=x.when as any;return (w.all?w.all[0]:w).facet as string;}))].sort();
    if(!facets.length)continue;
@@ -100,8 +101,58 @@ describe.skipIf(!path)('real classifications (private, content-v1)',()=>{
    for(const combo of combos) for(let m=min;m<=max;m++){
     const answers=Object.fromEntries(facets.flatMap((f,i)=>combo[i]?[[f,{kind:'choice' as const,choiceId:combo[i]!}]]:[]));
     const e=evaluate(d,{schemaVersion:1,targets:{paper:m},lines:{q1:{marks:m,parts:null,facets:{}}},answers:{items:{q1:answers},paper:{}}},{paid:true});
-    expect(e.lines[0].composition!.status).not.toBe('not-calculable');checked++;}
+    const c=e.lines[0].composition!;checked++;
+    if(c.status==='not-calculable'){expect(c.reason).toBe('choices-conflict-with-source');expect(c.known.length).toBeGreaterThan(0);expect(e.lines[0].issues).toEqual([]);conflicts++;}}
   }
-  console.log(JSON.stringify({c10LinkedCombinations:checked}));
+  console.log(JSON.stringify({c10LinkedCombinations:checked,sourceConflicts:conflicts}));
+ });
+ it('C10A: recovered structures equal an independent enumeration, per alternative, never a mixture',()=>{
+  let compared=0;
+  for(const r of regs.classifications){const d=definitions(r);const doc=d.lines[0].classification!.doc;
+   if(!doc.structure || doc.parts.length>8)continue;
+   const selectors=doc.rules.filter(x=>(x.origin as {type:string}).type==='form' && 'facet' in x.when && x.then.some(a=>'excludeParts' in a));
+   for(const answers of [{},...selectors.map(x=>({[(x.when as any).facet]:{kind:'choice' as const,choiceId:(x.when as any).is??(x.when as any).in[0]}}))])
+    for(let m=d.lines[0].range.min;m<=Math.min(d.lines[0].range.max,d.lines[0].range.min+2);m++){
+     const {structure}=evaluateLine(doc,{lineId:'l',identity:{moduleId:doc.moduleId,kind:doc.kind,itemId:doc.itemId,release:doc.release},marks:m,parts:null,answers});
+     const listed=new Set([...structure.included.map(p=>p.id),...structure.flexible]);
+     const c=lineComposition(doc,structure,m);
+     const expected=brute(doc,m,{must:structure.included.map(p=>p.id),out:doc.parts.map(p=>p.id).filter(id=>!listed.has(id)),count:structure.countRules});
+     expect(Object.fromEntries(Object.entries(c.categories).filter(([,v])=>v.max>0).map(([k,v])=>[k,[v.min,v.max]]))).toEqual(expected);compared++;}
+  }
+  console.log(JSON.stringify({c10aEnumerated:compared}));
+ });
+ it('C10A: examples keep their identity; a selected alternative shows only its own example',()=>{
+  let checked=0;
+  for(const r of regs.classifications){const d=definitions(r);const doc=d.lines[0].classification!.doc;const alts=doc.structure?.alternatives??[];
+   if(alts.length<2)continue;const m=d.lines[0].range.min;
+   const open=evaluate(d,{schemaVersion:1,targets:{paper:m},lines:{q1:{marks:m,parts:null,facets:{}}},answers:{items:{q1:{}},paper:{}}},{paid:true}).lines[0].composition!;
+   expect(open.examples.map(x=>x.label)).toEqual(alts.map(a=>a.label));
+   for(const x of open.examples) expect(x.parts).toBe(alts.find(a=>a.label===x.label)!.parts.length);
+   for(const rule of doc.rules.filter(x=>(x.origin as {type:string}).type==='form' && 'facet' in x.when)){
+    // Possible: no required part excluded, and enough rows (plus permitted unlisted ones) remain for its count.
+    const excluded=rule.then.flatMap(a=>'excludeParts' in a?a.excludeParts:[]);
+    const keep=alts.filter(a=>!a.required.some(p=>excluded.includes(p)) && a.parts.filter(p=>!excluded.includes(p)).length+a.additional.max>=(a.count?.min??1));
+    if(keep.length!==1)continue;
+    const w=rule.when as any;const c=evaluate(d,{schemaVersion:1,targets:{paper:m},lines:{q1:{marks:m,parts:null,facets:{}}},answers:{items:{q1:{[w.facet]:{kind:'choice',choiceId:w.is??w.in[0]}}},paper:{}}},{paid:true}).lines[0].composition!;
+    if(c.status==='not-calculable')continue;
+    expect(c.examples.map(x=>x.label)).toEqual([keep[0].label]);expect(c.alternatives).toEqual([keep[0].label]);checked++;
+   }
+  }
+  console.log(JSON.stringify({c10aSelectedExamples:checked}));
+ });
+ it('C10A: a choice that conflicts with the source is kept, never an error, and reported as such',()=>{
+  let conflicts=0,calculable=0;
+  for(const r of regs.classifications){const d=definitions(r);const doc=d.lines[0].classification!.doc;const {min,max}=d.lines[0].range;
+   for(const e of doc.structure?.effects??[]){const w=e.when as any;if(!('facet' in w))continue;
+    for(const option of (w.in??[w.is]) as string[]) for(let m=min;m<=max;m++){
+     const base={schemaVersion:1 as const,targets:{paper:m},lines:{q1:{marks:m,parts:null,facets:{}}},answers:{items:{q1:{}},paper:{}}};
+     const withIt={...base,answers:{items:{q1:{[w.facet]:{kind:'choice' as const,choiceId:option}}},paper:{}}};
+     const a=evaluate(d,base,{paid:true}),b=evaluate(d,withIt,{paid:true});
+     expect(b.lines[0].issues).toEqual(a.lines[0].issues);expect(b.lines[0].attention).toEqual(a.lines[0].attention);
+     const c=b.lines[0].composition!;
+     if(c.status==='not-calculable'){expect(c.reason).toBe('choices-conflict-with-source');conflicts++;} else calculable++;
+    }}
+  }
+  console.log(JSON.stringify({c10aEffectChecks:{conflicts,calculable}}));
  });
 });

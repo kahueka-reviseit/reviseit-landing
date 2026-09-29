@@ -336,7 +336,8 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
   <p id="line-mix-heading" className={styles['card__eyebrow--neutral']}>Bloom’s cognitive mix · this question</p>
   <MixRows rows={line.composition.rows} scale={own.marks??1} pending={line.composition.status==='not-calculable'} label={`Cognitive mix for question ${line.number}`}/>
   <p className={styles['card__note']}>{line.composition.note}</p>
-  {line.composition.example&&<p className={styles['card__note']}>Source example ({line.composition.example.parts} subquestions, {range(line.composition.example.marks)} marks): {line.composition.example.rows.map(r=>`${r.label} ${range(r)}`).join(' · ')}. This is the specification’s own example, not a promise for your paper.</p>}
+  {line.composition.examples.map(x=><p key={x.label} className={styles['card__note']}>Source example{x.label?` · ${x.label}`:''} ({x.parts} subquestions, {range(x.marks)} marks): {x.rows.map(r=>`${r.label} ${range(r)}`).join(' · ')}.</p>)}
+  {line.composition.examples.length>0&&<p className={styles['card__note']}>{line.composition.examples.length>1?'These are the specification’s own alternative examples, shown separately':'This is the specification’s own example'}, not a promise for your paper.</p>}
 </section>}</details>
     </div></PaperPanel>}
   {panel==='review'&&<PaperPanel title="Review your paper" eyebrow={allReady?'Ready to submit':'Your paper'} onClose={closePanel}
@@ -370,7 +371,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
         <p className={styles['paragraph']}><strong>{mixSummary}</strong></p>
         <MixRows rows={view.cognitive} scale={maxBloom} pending={mix.pending>0} label="Cognitive mix for the paper"/>
         {mix.notes.map((n,i)=><p key={i} className={styles['paragraph']}>{n}</p>)}
-        <p className={styles['card__note']}>A range shows every split that the specifications and your choices allow. The highest values of different categories cannot all happen together. Where a specification lists only example subquestions, other subquestions may be written; their marks count as not yet classified. Marks whose level allows two categories stay together, and nothing is spread across categories. A configured question has all its answers; its split can still be a range.</p>
+        <p className={styles['card__note']}>A range shows every split that the specifications and your choices allow. The highest values of different categories cannot all happen together. Specifications give example marks for their subquestions, so the split between them is a range. Where a specification states more subquestions than it lists, the others count as not yet classified; where a question’s structure is not yet chosen, each structure is calculated separately. Marks whose level allows two categories stay together, and nothing is spread across categories. A configured question has all its answers; its split can still be a range.</p>
       </section>
       {view.curriculum.length>0&&<section className={styles['card']} aria-labelledby="curriculum-heading">
         <p id="curriculum-heading" className={styles['card__eyebrow--neutral']}>Curriculum requirements</p>

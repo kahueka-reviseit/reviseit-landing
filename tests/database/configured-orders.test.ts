@@ -259,6 +259,12 @@ test('classifications register only with their exact source binding; mismatches 
  expect(o.snapshot.lines[0].classification).toMatchObject({sha256:hash('1'),requirementsRef:'synthetic-profile@1',sourceBinding:b});
  await registerBound(envelope('b'),hash('2'),b,bundleSources(b));
  expect((await orderRow(orderId)).snapshot.lines[0].classification.sha256).toBe(hash('1'));
+ // C10A (migration 028): version 3 registers and binds new checkouts; an issued order keeps its version; unknown versions stay refused.
+ await refuse(()=>registerBound({...envelope('c'),schemaVersion:4},hash('3'),b,bundleSources(b)),/Invalid classification/);
+ await registerBound({...envelope('c'),schemaVersion:3,structure:{alternatives:[],effects:[]}},hash('3'),b,bundleSources(b));
+ await owner();expect((await db.query<any>("select schema_version from private.catalogue_classifications where sha256=$1",[hash('3')])).rows[0].schema_version).toBe(3);
+ expect((await db.query<any>("select sha256 from private.catalogue_classification_bindings where entry_id='structured:SPEC_01'")).rows[0].sha256).toBe(hash('3'));
+ expect((await orderRow(orderId)).snapshot.lines[0].classification.sha256).toBe(hash('1'));
 });
 test('a classification bound to a superseded bundle fails checkout loudly instead of silently dropping the item',async()=>{
  await publishedRelease();await publisher('select public.register_curriculum_requirements($1,$2,$3)',['synthetic-profile@1',hash('7'),JSON.stringify({profileId:'synthetic-profile',version:1})]);

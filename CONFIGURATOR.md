@@ -59,30 +59,32 @@ Worker registry for a coherent candidate (private, additive): retain its bundles
 `bundles/<private manifest SHA-256>` and add its workflow directory to the `workflows`
 map under its manifest hash. Existing entries stay for issued orders.
 
-## Cognitive composition (C10)
+## Cognitive composition (C10, C10A)
 
 `lib/configurator/composition.ts` computes each line's Bloom and curriculum-band marks from
-supported facts only, replacing the old fallback that put a whole line under "Not yet
-classified" whenever part marks were not source ranges.
+supported facts only. Structure (which subquestions exist) and mark certainty are separate facts.
 
-- **Facts used.** Listed parts and their categories (grouped candidates stay one bucket),
-  inclusion from the classification, the teacher's parts, and active rules (including
-  `origin.type: form` links such as `requireParts`/`excludeParts` on an answer), source mark
-  ranges and rule `partMarks`, the part-count rule and the line's marks.
-- **Open lines.** When any part's marks are only `typical` (the source's own example) or the
-  item has no parts table, the listed parts are one instance: each included part carries at
-  least one mark, and other subquestions may be written; their marks count under
-  `unclassified`. Example marks are reported separately (`example`, `exampleMarks`) and never
-  used as bounds. Lines whose every part has source ranges are closed and equal the producer's
-  `evaluateLine` ranges.
-- **Result.** Per category, the least and greatest marks over every permitted split (exact per
-  category; extremes are not jointly achievable). Status `exact`, `bounded`, `unclassified` or
-  `not-calculable` (marks not set, an answer needing attention, an unreadable definition); the
-  last keeps its known categories and its marks in their own "Not yet calculable" row. Paper
-  rows sum the lines. Curriculum comparisons use the same composition.
-- **Unchanged.** Producer conformance (`evaluateLine`/`evaluatePaper` results), readiness,
-  `cfg01-engine@2`, the database and plan schemas. Plan parts additionally carry `label` and
-  `inclusion`, so generation receives the same parts the teacher was shown.
+- **Structure.** Classification version 3 (migration 028) may carry `structure`: the source's
+  alternative structures (variant tables, exactly one applies), each with its listed parts, stated
+  sub-question count, required parts and `additional` (subquestions it may contain that the source
+  does not list, only where the source says so, for example a stated count above the listed rows);
+  and choice `effects` for source/form disagreements, which exclude parts or bound `additional`
+  without becoming evaluation errors. Versions 1 and 2 have no `structure`: their parts are one
+  closed alternative, and a line without parts is unclassified. Example (typical) marks never make a
+  structure open.
+- **Marks.** Source ranges and rule `partMarks` bound a part; otherwise each included part carries
+  at least one mark. Example marks are reported per alternative (`examples`, `exampleMarks`), never
+  summed across alternatives and never used as bounds.
+- **Result.** Each possible alternative is solved on its own and a category's range is the union
+  over them, never over a mixture of their rows. Status `exact`, `bounded`, `unclassified` or
+  `not-calculable` (marks not set, an answer needing attention, choices that conflict with the
+  source structure, an unreadable definition); not-calculable keeps its known categories, its marks
+  sit in their own "Not yet calculable" row, and readiness is unaffected. Paper rows sum the lines;
+  curriculum comparisons use the same composition.
+- **Generation.** Plan parts are the parts the composition keeps, with `label`, `inclusion`
+  (`structure-required` when the structure or a stated count fixes them) and `alternative`.
+- **Unchanged.** The rule grammar and producer conformance (`evaluateLine`/`evaluatePaper`),
+  readiness, `cfg01-engine@2` and the plan schema.
 
 ## Activation order
 

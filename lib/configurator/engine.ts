@@ -103,9 +103,9 @@ export type Evaluation = {
 };
 
 /** A line without a classification: every mark's category is unknown, and says so. */
-const unclassifiedLine=(marks:number):LineComposition=>({status:'unclassified',reason:null,marks,open:true,known:[],example:null,
+const unclassifiedLine=(marks:number):LineComposition=>({status:'unclassified',reason:null,marks,open:true,known:[],examples:[],alternatives:[],parts:{},droppedBy:{},
   categories:{[UNLISTED]:{min:marks,max:marks}},bands:{[UNLISTED]:{min:marks,max:marks}}});
-const pendingLine=(marks:number,reason:CompositionReason):LineComposition=>({status:'not-calculable',reason,marks,open:true,known:[],example:null,categories:{},bands:{}});
+const pendingLine=(marks:number,reason:CompositionReason):LineComposition=>({status:'not-calculable',reason,marks,open:true,known:[],examples:[],alternatives:[],parts:{},droppedBy:{},categories:{},bands:{}});
 
 export function evaluate(defs:Definitions, cfg:Configuration, opts:{paid:boolean}):Evaluation {
   const issues:string[]=[];
@@ -256,6 +256,7 @@ export function project(defs:Definitions, cfg:Configuration, e:Evaluation, meta:
 
 const PENDING_REASONS:Record<CompositionReason,string>={
   'marks-not-set':'its marks are not set','invalid-configuration':'one of its choices needs attention','no-supported-allocation':'no split of its marks fits its subquestions',
+  'choices-conflict-with-source':'its choices leave fewer or different subquestions than its specification states, so the source cannot say how its marks split',
   'definition-unreadable':'its definition could not be read'};
 const categoryLabel=(k:string)=>k===UNLISTED?'Not yet classified':k.includes('-or-')?groupLabel(k):bloomLabels[k as BloomKey]??k;
 
@@ -272,13 +273,14 @@ function compositionView(c:LineComposition):LineCompositionView {
   for(const k of c.known) if(!rows.some(r=>r.key===k)) rows.push({key:k,label:categoryLabel(k),grouped:k.includes('-or-')||undefined,known:true,min:0,max:0});
   const order=(k:string)=>{const i=(bloomKeys as readonly string[]).indexOf(k);return i>=0?i:k===UNLISTED?99:50;};
   rows.sort((a,b)=>order(a.key)-order(b.key)||(a.key<b.key?-1:1));
+  const alternatives=c.alternatives.length>1?` Your choices have not yet settled which of its ${c.alternatives.length} structures (${c.alternatives.join(', ')}) is used; the ranges cover each structure, never a mixture.`:'';
   const note=c.status==='not-calculable'?`Categories known; marks not yet calculable because ${PENDING_REASONS[c.reason!]}.`:
     c.status==='exact'?'Exact: the source and your choices fix every mark’s category.':
     c.status==='unclassified'?'This question’s subquestions are not yet classified, so its marks have no category yet.':
-    c.open?'The source lists example subquestions. Each one included carries at least one mark. The rest of the split, and any other subquestions, are decided when the question is written.':
-    'The source’s part marks allow more than one split; the ranges show every split they allow.';
-  return {status:c.status,note,open:c.open,rows,
-    example:c.example?{marks:c.example.marks,parts:c.example.parts,rows:Object.entries(c.example.categories).map(([k,m])=>({key:k,label:categoryLabel(k),...m})).sort((a,b)=>order(a.key)-order(b.key))}:null};
+    (c.open?`${c.alternatives.length>1?'At least one of its structures':'The specification'} allows subquestions it does not list; their marks count as not yet classified. `:'The subquestions are set by the specification and your choices. ')+
+    'Each one included carries at least one mark; the source gives example marks, so the split between them is a range.'+alternatives;
+  return {status:c.status,note,open:c.open,rows,alternatives:c.alternatives,
+    examples:c.examples.map(x=>({label:x.label,marks:x.marks,parts:x.parts,rows:Object.entries(x.categories).map(([k,m])=>({key:k,label:categoryLabel(k),...m})).sort((a,b)=>order(a.key)-order(b.key))}))};
 }
 
 /** Descriptive comparison with each marks-based curriculum distribution, from the same composition as the Bloom view. */

@@ -97,8 +97,10 @@ export type LineView = {
 /** One category's marks: exact when min equals max. `known` means a question in play contains this category. */
 export type CognitiveRow = {key:string; label:string; min:number; max:number; grouped?:boolean; known?:boolean};
 export type LineCompositionView = {status:'exact'|'bounded'|'unclassified'|'not-calculable'; note:string; open:boolean; rows:CognitiveRow[];
-  /** The source's own example instance, labelled as an example; never a promise for this paper. */
-  example:{marks:{min:number;max:number}; parts:number; rows:{key:string; label:string; min:number; max:number}[]}|null};
+  /** Alternative structures still possible (labels); more than one means the choice is unresolved. */
+  alternatives:string[];
+  /** Each possible structure's own source example, labelled; never a promise for this paper, never summed. */
+  examples:{label:string; marks:{min:number;max:number}; parts:number; rows:{key:string; label:string; min:number; max:number}[]}[]};
 /** Paper summary: marks settled in a known category, certainly unclassified, still open between categories, or not yet calculable. */
 export type CompositionSummary = {exact:boolean; settled:number; unclassified:number; open:number; pending:number; notes:string[]};
 /** 'apply-or-analyse' -> 'Apply or Analyse' */

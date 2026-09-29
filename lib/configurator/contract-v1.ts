@@ -25,7 +25,17 @@ export type Part = {id:string; label:string; summary:string|null; inclusion:'req
   marks:{basis:'range'|'typical'|'unknown'; min:number|null; max:number|null};
   cognitive:{bloom:typeof BLOOM[number]|null; unknownReason:string|null; curriculumBand:string|null; curriculumBandCandidates:string[]; sourceLabels:unknown;
    bloomBasis?:'source-label'|'profile-single-mapping'|'profile-authorised-fallback'|null; bloomCandidates?:string[]}; locator:unknown};
-export type Classification = {schemaVersion:1|2; moduleId:string; kind:'structured'|'multiple_choice'; itemId:string; release:string; title:string;
+/**
+ * Version 3 adds `structure`: the source's alternative structures (variants), each with its own
+ * listed parts, stated sub-question count, required parts and the number of subquestions it may
+ * contain that the source does not list; plus choice effects the rule grammar cannot carry without
+ * turning a source/form disagreement into an error. Exactly one alternative applies to a line. The
+ * rule grammar and `evaluateLine` are unchanged; only the composition layer reads `structure`.
+ */
+export type Alternative = {id:string; label:string; parts:string[]; count:Range|null; required:string[]; additional:Range; locator:unknown};
+export type ChoiceEffect = {id:string; when:Condition; excludeParts:string[]; additional:Range|null; reason:string; origin:unknown};
+export type Structure = {alternatives:Alternative[]; effects:ChoiceEffect[]};
+export type Classification = {schemaVersion:1|2|3; structure?:Structure; moduleId:string; kind:'structured'|'multiple_choice'; itemId:string; release:string; title:string;
   curriculumId:string; curriculumRequirementsRef:{profileId:string; version:number}; marks:{mode:'fixed'; value:number}|{mode:'range'; min:number; max:number};
   parts:Part[]; facets:Facet[]; rules:Rule[];
   diagramPolicy:{stimulus:'required'|'optional'|'not_applicable'|'unspecified'; stimulusFacet:string|null; learnerDrawnParts:string[]; whenLeftOut:string|null; locators:unknown[]};
@@ -46,7 +56,9 @@ export type LineOutput = {lineId:string; identity:LineInput['identity']; marks:n
 export type Internal = {mandatory:[string,number,number][]; flexible:[string,number,number][]; count:[number,number]; marks:number};
 /** Resolved part structure behind a line result, for the composition layer. Not part of the producer's result. */
 export type LineStructure = {valid:boolean; included:{id:string; inclusion:'required'|'selected'|'rule-required'}[]; flexible:string[];
-  ranges:Record<string,Range|null>; count:[number,number]; countRules:[number,number]|null; ruleRequired:Record<string,string[]>};
+  ranges:Record<string,Range|null>; count:[number,number]; countRules:[number,number]|null; ruleRequired:Record<string,string[]>;
+  /** Resolved answers (explicit and forced) and selected parts, for conditions outside the rule grammar. */
+  values:Record<string,string[]>; selected:string[]};
 
 /** Version 2: an unresolved grouped label is its own bucket, e.g. apply-or-analyse. */
 export function partCategory(p:Part):string {
@@ -118,8 +130,8 @@ function answerError(facet:Facet, answer:Answer):string|null {
 }
 const resolved=(a:Answer|undefined)=>!!a && (a.kind!=='text' || !!a.text.trim());
 
-export function evaluateLine(doc:Classification, line:LineInput, version:1|2=doc.schemaVersion):{result:LineOutput; internal:Internal|null; structure:LineStructure} {
-  const v2=version===2;
+export function evaluateLine(doc:Classification, line:LineInput, version:1|2|3=doc.schemaVersion):{result:LineOutput; internal:Internal|null; structure:LineStructure} {
+  const v2=version>=2;
   const lid=line.lineId;const errors:Issue[]=[],attention:Issue[]=[];
   const facets=new Map(doc.facets.map(f=>[f.id,f]));
   const marksFacet=doc.facets.find(f=>f.binding.scope==='line-marks');
@@ -270,7 +282,8 @@ export function evaluateLine(doc:Classification, line:LineInput, version:1|2=doc
   const ruleCount:[number,number]|null=counts.length?[Math.max(...counts.map(c=>c[0])),Math.min(...counts.map(c=>c[1]))]:null;
   const structure:LineStructure={valid,included:included.map(([id,inclusion])=>({id,inclusion:inclusion as 'required'|'selected'|'rule-required'})),flexible:flexible.map(([id])=>id),
     ranges:Object.fromEntries([...ranges].map(([id,[lo,hi]])=>[id,lo===null||hi===null||lo>hi?null:{min:lo,max:hi}])),
-    count:[cmin,cmax],countRules:ruleCount,ruleRequired:Object.fromEntries([...requiredParts].map(([p,ids])=>[p,sortedSet(ids)]))};
+    count:[cmin,cmax],countRules:ruleCount,ruleRequired:Object.fromEntries([...requiredParts].map(([p,ids])=>[p,sortedSet(ids)])),
+    values:Object.fromEntries([...values].map(([f,o])=>[f,sortedSet(o)])),selected:sortedSet(selected)};
   return {internal,structure,result:{lineId:lid,identity:{...line.identity},marks,valid,complete:valid && !outstanding.length && feasibility!=='infeasible',
     errors:sortIssues(errors),attention:sortIssues(attention),outstanding:sortedSet(outstanding),effectiveParts:effective,
     excludedParts:[...excludedParts.keys()].sort(cmp).map(p=>({part:p,ruleIds:sortedSet(excludedParts.get(p)!)})),
