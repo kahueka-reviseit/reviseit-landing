@@ -103,9 +103,9 @@ export type Evaluation = {
 };
 
 /** A line without a classification: every mark's category is unknown, and says so. */
-const unclassifiedLine=(marks:number):LineComposition=>({status:'unclassified',reason:null,marks,open:true,known:[],examples:[],alternatives:[],parts:{},droppedBy:{},
+const unclassifiedLine=(marks:number):LineComposition=>({status:'unclassified',reason:null,marks,open:true,coverage:'unknown',known:[],examples:[],alternatives:[],parts:{},droppedBy:{},
   categories:{[UNLISTED]:{min:marks,max:marks}},bands:{[UNLISTED]:{min:marks,max:marks}}});
-const pendingLine=(marks:number,reason:CompositionReason):LineComposition=>({status:'not-calculable',reason,marks,open:true,known:[],examples:[],alternatives:[],parts:{},droppedBy:{},categories:{},bands:{}});
+const pendingLine=(marks:number,reason:CompositionReason):LineComposition=>({status:'not-calculable',reason,marks,open:true,coverage:'unknown',known:[],examples:[],alternatives:[],parts:{},droppedBy:{},categories:{},bands:{}});
 
 export function evaluate(defs:Definitions, cfg:Configuration, opts:{paid:boolean}):Evaluation {
   const issues:string[]=[];
@@ -265,6 +265,8 @@ function summary(e:Evaluation, shown:{id:string; number:string}[]):CompositionSu
   // Settled: at least this many marks are in a known category in every permitted split. Unclassified: at least this many are not.
   const settled=[...bloomKeys.map(k=>e.cognitive[k]),...Object.values(e.grouped)].reduce((n,r)=>n+r.min,0), unclassified=e.cognitive.unclassified.min;
   const notes=e.composition.pendingLines.map(p=>`Question ${shown.find(x=>x.id===p.id)?.number??''}: not yet calculable because ${PENDING_REASONS[p.reason]}.`);
+  const unknown=e.lines.filter(l=>l.composition&&l.composition.status!=='not-calculable'&&l.composition.status!=='unclassified'&&l.composition.coverage==='unknown').map(l=>shown.find(x=>x.id===l.id)?.number??'');
+  if(unknown.length) notes.push(`${unknown.length===1?'Question':'Questions'} ${unknown.join(', ')}: ${unknown.length===1?'its definition does':'their definitions do'} not say whether subquestions beyond those listed may be written, so part of ${unknown.length===1?'its':'their'} marks may be not yet classified.`);
   return {exact:e.composition.exact,settled,unclassified,open:counted-settled-unclassified,pending:e.composition.pending,notes};
 }
 
@@ -277,7 +279,8 @@ function compositionView(c:LineComposition):LineCompositionView {
   const note=c.status==='not-calculable'?`Categories known; marks not yet calculable because ${PENDING_REASONS[c.reason!]}.`:
     c.status==='exact'?'Exact: the source and your choices fix every mark’s category.':
     c.status==='unclassified'?'This question’s subquestions are not yet classified, so its marks have no category yet.':
-    (c.open?`${c.alternatives.length>1?'At least one of its structures':'The specification'} allows subquestions it does not list; their marks count as not yet classified. `:'The subquestions are set by the specification and your choices. ')+
+    (c.coverage==='unknown'?'This question’s definition lists its subquestions but does not say whether others may be written, so marks that could fall outside them are shown as not yet classified. ':
+     c.open?`${c.alternatives.length>1?'At least one of its structures':'The specification'} allows subquestions it does not list; their marks count as not yet classified. `:'The subquestions are set by the specification and your choices. ')+
     'Each one included carries at least one mark; the source gives example marks, so the split between them is a range.'+alternatives;
   return {status:c.status,note,open:c.open,rows,alternatives:c.alternatives,
     examples:c.examples.map(x=>({label:x.label,marks:x.marks,parts:x.parts,rows:Object.entries(x.categories).map(([k,m])=>({key:k,label:categoryLabel(k),...m})).sort((a,b)=>order(a.key)-order(b.key))}))};

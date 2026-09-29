@@ -8,8 +8,10 @@ import { holds, partCategory, type Alternative, type Classification, type LineSt
  *   tables (variants) of which exactly one applies. A line may contain subquestions the source does
  *   not list only where the source says so: a stated sub-question count above the listed rows, or a
  *   choice naming an unlisted task (`structure.alternatives[].additional`, choice effects). Example
- *   marks never make a structure open. Version 1 and 2 definitions carry no `structure`: their parts
- *   are one closed alternative.
+ *   marks never make a structure open. Version 1 and 2 definitions carry no `structure`, so they do
+ *   not say whether their listed parts are complete: their coverage is `unknown`, and subquestions
+ *   they do not list may carry marks (never required ones), within any stated part count. Only a
+ *   definition whose every part has source-stated marks (for example multiple choice) is complete.
  * - Marks: a part's marks are bounded when the source states them (basis `range`, rule `partMarks`);
  *   otherwise each included subquestion carries at least one mark. Example marks are reported
  *   separately, per alternative, and never used as bounds.
@@ -27,8 +29,11 @@ export type PartState = 'included'|'possible'|'excluded';
 export type LineComposition = {
   /** exact: every mark's category is fixed; bounded: ranges; unclassified: no category is known for any mark. */
   status:'exact'|'bounded'|'unclassified'|'not-calculable'; reason:CompositionReason|null; marks:number|null;
-  /** Subquestions the source does not list may be written (source-stated). */
+  /** Subquestions the definition does not list may carry marks (source-stated, or coverage unknown). */
   open:boolean;
+  /** complete: the listed structure is confirmed; stated-open: the source allows unlisted subquestions;
+   * unknown: an older definition does not say whether its listed parts are complete. */
+  coverage:'complete'|'stated-open'|'unknown';
   categories:Record<string,Range>; bands:Record<string,Range>;
   /** Categories of listed subquestions still in play, known even when marks cannot be calculated. */
   known:string[];
@@ -83,8 +88,10 @@ export function lineComposition(doc:Classification, structure:LineStructure, mar
   const categoryOf=(id:string)=>{const p=byId.get(id)!;return version>=2?partCategory(p):p.cognitive.bloom??UNLISTED;};
   const bandOf=(id:string)=>byId.get(id)!.cognitive.curriculumBand??UNLISTED;
   // Definitions without a structure: their listed parts are one closed alternative; none listed means none known.
+  // Without a structure, only source-stated marks on every part confirm the listed parts are complete.
+  const legacyComplete=!doc.structure && doc.parts.length>0 && doc.parts.every(p=>p.marks.basis==='range');
   const alternatives:Alternative[]=doc.structure?.alternatives ?? [{id:'listed',label:'',parts:doc.parts.map(p=>p.id),count:null,required:[],
-    additional:doc.parts.length?{min:0,max:0}:{min:0,max:Number.MAX_SAFE_INTEGER},locator:null}];
+    additional:legacyComplete?{min:0,max:0}:{min:0,max:Number.MAX_SAFE_INTEGER},locator:null}];
   const values=new Map(Object.entries(structure.values).map(([f,o])=>[f,new Set(o)]));
   const effects=(doc.structure?.effects??[]).filter(e=>holds(e.when,values,marks,new Set(structure.selected)));
   const dropped=new Set(effects.flatMap(e=>e.excludeParts));
@@ -115,7 +122,8 @@ export function lineComposition(doc:Classification, structure:LineStructure, mar
       parts[p.id]=!homes.length?'excluded':homes.every(c=>c.mustHere.has(p.id)) && homes.length===live.length?'included':'possible';
     }
     return {parts,droppedBy,alternatives:live.map(c=>c.alt.label).filter(Boolean),examples:live.flatMap(c=>exampleOf(c.alt)??[]),
-      known:[...new Set(live.flatMap(c=>c.available.map(categoryOf)))].sort(),open:live.some(c=>c.extra.max>0)};
+      known:[...new Set(live.flatMap(c=>c.available.map(categoryOf)))].sort(),open:live.some(c=>c.extra.max>0),
+      coverage:(!doc.structure&&!legacyComplete?'unknown':live.some(c=>c.extra.max>0)?'stated-open':'complete') as LineComposition['coverage']};
   };
   const live=candidates.filter(c=>c.possible);
   const pending=(reason:CompositionReason,shown=live):LineComposition=>({...describe(shown),marks,status:'not-calculable',reason,categories:{},bands:{}});

@@ -155,4 +155,17 @@ describe.skipIf(!path)('real classifications (private, content-v1)',()=>{
   }
   console.log(JSON.stringify({c10aEffectChecks:{conflicts,calculable}}));
  });
+ it('C10B: definitions without a structure never claim unconfirmed coverage or invent required parts',()=>{
+  const seen:Record<string,number>={};
+  for(const r of regs.classifications){const d=definitions(r);const doc=d.lines[0].classification!.doc;if(doc.structure)continue;const m=d.lines[0].range.min;
+   const cfg={schemaVersion:1 as const,targets:{paper:m},lines:{q1:{marks:m,parts:null,facets:{}}},answers:{items:{q1:{}},paper:{}}};
+   const e=evaluate(d,cfg,{paid:true}),c=e.lines[0].composition!;seen[c.coverage]=(seen[c.coverage]??0)+1;
+   const stated=doc.parts.length>0&&doc.parts.every(p=>p.marks.basis==='range');
+   expect(c.coverage).toBe(stated?'complete':'unknown');
+   if(!stated&&doc.parts.length) expect(c.categories.unclassified?.max??0).toBeGreaterThan(0);
+   if(!stated) expect(c.categories.unclassified?.min??0).toBe(doc.parts.length?0:m);
+   if(e.ready) expect(generationPlan(d,cfg,e,'o',1).plan.lines[0].parts!.some(p=>p.inclusion==='structure-required')).toBe(false);
+  }
+  console.log(JSON.stringify({c10bCoverage:seen}));
+ });
 });

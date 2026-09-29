@@ -27,6 +27,10 @@ export function classification(itemId:string,kind:string,marks:[number,number],p
 }
 // A closed item with example marks: five listed subquestions, stated count 3 to 5, example marks only.
 export const exampleFields=[choice('statements',['one','other','both']),choice('comparison',['yes','no'],false)];
+// Its structure is confirmed (version 3, one listed alternative, nothing unlisted); legacyItem is the same
+// definition as an older version 2 document, which does not say whether its parts are complete.
+const listedOnly=(ids:string[])=>({alternatives:[{id:'listed',label:'',parts:ids,count:null,required:[],additional:{min:0,max:0},locator:null}],effects:[]});
+export const legacyItem=()=>{const d:any=exampleItem();delete d.structure;return {...d,schemaVersion:2};};
 export const exampleItem=()=>classification('EXAMPLE','structured',[8,12],[
  part('p1',{bloom:'remember'},{basis:'typical',min:2,max:2}),part('p2',{bloom:'apply'},{basis:'typical',min:3,max:3},'unspecified','B3'),
  part('p3',{bloom:'remember'},{basis:'typical',min:2,max:2}),part('p4',{bloom:'analyse'},{basis:'typical',min:1,max:1},'unspecified','B4'),
@@ -34,7 +38,7 @@ export const exampleItem=()=>classification('EXAMPLE','structured',[8,12],[
  {...rule('src-count',{always:true},[{partCount:{min:3,max:5}}]),origin:{type:'source',locators:[],heldBecause:null}},
  rule('form-one',{facet:'statements',is:'one'},[{requireParts:['p1']},{excludeParts:['p3']}]),rule('form-other',{facet:'statements',is:'other'},[{requireParts:['p3']},{excludeParts:['p1']}]),
  rule('form-both',{facet:'statements',is:'both'},[{requireParts:['p1','p3']}]),rule('form-compare',{facet:'comparison',is:'yes'},[{requireParts:['p4']}],'hint.compare'),
- rule('form-no-compare',{facet:'comparison',is:'no'},[{excludeParts:['p4']}],'hint.compare')]);
+ rule('form-no-compare',{facet:'comparison',is:'no'},[{excludeParts:['p4']}],'hint.compare')],[],listedOnly(['p1','p2','p3','p4','p5']));
 // A specified item: every part's marks are stated, one part is optional.
 export const closedItem=()=>classification('CLOSED','structured',[6,8],[part('p1',{bloom:'remember'},{basis:'range',min:2,max:2},'required'),
  part('p2',{bloom:'apply'},{basis:'range',min:2,max:4},'required','B3'),part('p3',{bloom:'analyse'},{basis:'range',min:2,max:2},'optional','B4')],[],[],['p3']);
@@ -66,7 +70,7 @@ export function definitions(items:Item[],opts:{badMap?:number}={}){
  const form={schemaVersion:2,revision:hash('d'),items:lines.map(l=>({id:l.id,title:l.title,marks:l.checkoutMarks,fields:l.binding.fields})),paperFields:[]};
  return readDefinitions({schema:'reviseit/configured-authored-inputs@1',module:'synthetic-module',release:'1',formRevision:hash('d'),lines,requirements:{'synthetic-profile@1':{sha256:hash('7'),payload:profile}}},form,hash('9'));
 }
-export const example={doc:exampleItem(),fields:exampleFields,range:[8,12] as [number,number]}, open={doc:openItem(),fields:[],range:[8,12] as [number,number]},
+export const example={doc:exampleItem(),fields:exampleFields,range:[8,12] as [number,number]}, legacy={doc:legacyItem(),fields:exampleFields,range:[8,12] as [number,number]}, open={doc:openItem(),fields:[],range:[8,12] as [number,number]},
  variant={doc:variantItem(),fields:shapeFields,range:[9,18] as [number,number]}, closed={doc:closedItem(),fields:[],range:[6,8] as [number,number]}, mcq={doc:mcqItem(),fields:[],range:[2,2] as [number,number]};
 export const ch=(id:string)=>({kind:'choice' as const,choiceId:id});
 export function config(marks:(number|null)[],over:Partial<Configuration>={}):Configuration{
@@ -75,7 +79,9 @@ export function config(marks:(number|null)[],over:Partial<Configuration>={}):Con
 
 /** Independent check: enumerate every permitted structure and allocation, with none of the calculator's code. */
 export function brute(doc:Classification, marks:number, opts:{must?:string[];out?:string[];count?:[number,number]|null;extra?:{min:number;max:number}|null}={}) {
- const alts=doc.structure?.alternatives??[{id:'listed',label:'',parts:doc.parts.map(p=>p.id),count:null,required:[],additional:{min:0,max:0},locator:null}];
+ // Older definitions: complete only when every part's marks are source-stated; otherwise unlisted parts may carry marks.
+ const complete=doc.parts.length>0&&doc.parts.every(p=>p.marks.basis==='range');
+ const alts=doc.structure?.alternatives??[{id:'listed',label:'',parts:doc.parts.map(p=>p.id),count:null,required:[],additional:{min:0,max:complete?0:marks},locator:null}];
  const cat=(id:string)=>{const p=doc.parts.find(x=>x.id===id)!;return p.cognitive.bloom??(p.cognitive.bloomCandidates??[]).join('-or-');};
  const out:Record<string,[number,number]>={};const seen:Record<string,number>[]=[];
  for(const a of alts){

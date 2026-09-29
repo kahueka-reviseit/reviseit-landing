@@ -4,7 +4,7 @@ import {describe,it,expect} from 'vitest';
 import {evaluate,generationPlan,project} from '../../lib/configurator/engine';
 import {evaluateLine} from '../../lib/configurator/contract-v1';
 import {lineComposition} from '../../lib/configurator/composition';
-import {brute,ch,closed,closedItem,config,definitions,example,exampleItem,mcq,noPartsItem,open,openItem,variant,variantItem} from '../fixtures/composition';
+import {brute,ch,closed,closedItem,config,definitions,example,exampleItem,legacy,legacyItem,mcq,noPartsItem,open,openItem,variant,variantItem} from '../fixtures/composition';
 import type {Classification} from '../../lib/configurator/contract-v1';
 
 const meta={orderId:'o',state:'awaiting_answers',paymentStatus:'paid',revision:1,submitted:false};
@@ -159,11 +159,37 @@ describe('structure: variants, stated counts and genuinely open questions',()=>{
  it('bounds equal an independent enumeration of every permitted structure and allocation',()=>{
   const cases:[Classification,number,{must?:string[];out?:string[]},Record<string,any>][]=[
    [variantItem() as any,9,{},{}],[variantItem() as any,12,{},{}],[variantItem() as any,11,{out:['p1','p2','p3','p4']},{shape:ch('compressed')}],
-   [(definitions([open]).lines[0].classification!.doc),10,{},{}],[exampleItem() as any,10,{},{}],[exampleItem() as any,9,{must:['p1','p3','p4']},{statements:ch('both'),comparison:ch('yes')}]];
+   [(definitions([open]).lines[0].classification!.doc),10,{},{}],[exampleItem() as any,10,{},{}],[exampleItem() as any,9,{must:['p1','p3','p4']},{statements:ch('both'),comparison:ch('yes')}],
+   [legacyItem() as any,10,{},{}],[legacyItem() as any,9,{must:['p1','p3','p4']},{statements:ch('both'),comparison:ch('yes')}],[legacyItem() as any,9,{must:['p1'],out:['p3','p4']},{statements:ch('one'),comparison:ch('no')}]];
   for(const [doc,m,opts,answers] of cases){
-   const withCount={...doc,structure:doc.structure??{alternatives:[{id:'listed',label:'',parts:doc.parts.map(p=>p.id),count:{min:3,max:5},required:[],additional:{min:0,max:0},locator:null}],effects:[]}} as Classification;
    const {structure}=evaluateLine(doc,{lineId:'l',identity:{moduleId:doc.moduleId,kind:doc.kind,itemId:doc.itemId,release:doc.release},marks:m,parts:null,answers});
-   expect(asPairs(lineComposition(doc,structure,m).categories)).toEqual(brute(doc.structure?doc:withCount,m,opts));
+   expect(asPairs(lineComposition(doc,structure,m).categories)).toEqual(brute(doc,m,{...opts,count:structure.countRules}));
   }
+ });
+});
+
+describe('older definitions without a structure (C10B)',()=>{
+ it('do not claim their listed parts are complete: an unresolved allowance, known categories and the example stay visible',()=>{
+  const d=definitions([legacy]);const cfg=config([10],{answers:{items:{q1:{statements:ch('both'),comparison:ch('yes')}},paper:{}}});
+  const e=evaluate(d,cfg,{paid:true});const c=e.lines[0].composition!;
+  expect(c).toMatchObject({coverage:'unknown',open:true,status:'bounded'});
+  // Choices still narrow the listed categories; up to two further subquestions (stated count 3 to 5) may carry marks.
+  expect(e.cognitive).toMatchObject({remember:r(2,9),analyse:r(1,8),unclassified:r(0,7)});
+  expect(c.known).toEqual(['analyse','apply','apply-or-analyse','remember']);expect(c.examples).toHaveLength(1);
+  // The same definition with a confirmed structure is closed.
+  expect(evaluate(definitions([example]),cfg,{paid:true}).lines[0].composition).toMatchObject({coverage:'complete',open:false});
+  const view=project(d,cfg,e,meta);
+  expect(view.lines[0].composition!.note).toMatch(/does not say whether others may be written/);
+  expect(view.composition.notes).toEqual(['Question 1: its definition does not say whether subquestions beyond those listed may be written, so part of its marks may be not yet classified.']);
+ });
+ it('never invent required generation parts, and never claim unlisted parts exist',()=>{
+  const d=definitions([legacy]);const cfg=config([10],{answers:{items:{q1:{statements:ch('both'),comparison:ch('yes')}},paper:{}}});const e=evaluate(d,cfg,{paid:true});
+  expect(e.cognitive.unclassified.min).toBe(0);
+  expect(generationPlan(d,cfg,e,'o',1).plan.lines[0].parts!.map(p=>[p.id,p.inclusion])).toEqual([['p1','rule-required'],['p2','flexible'],['p3','rule-required'],['p4','rule-required'],['p5','flexible']]);
+ });
+ it('keep exact results where every part has source-stated marks, including multiple choice',()=>{
+  const d=definitions([mcq,closed]);const cfg=config([2,6]);cfg.lines.q2.parts=['p3'];const e=evaluate(d,cfg,{paid:true});
+  expect(e.lines.map(l=>[l.composition!.status,l.composition!.coverage])).toEqual([['exact','complete'],['exact','complete']]);
+  expect(e.composition.exact).toBe(true);expect(project(d,cfg,e,meta).composition.notes).toEqual([]);
  });
 });

@@ -69,9 +69,12 @@ supported facts only. Structure (which subquestions exist) and mark certainty ar
   sub-question count, required parts and `additional` (subquestions it may contain that the source
   does not list, only where the source says so, for example a stated count above the listed rows);
   and choice `effects` for source/form disagreements, which exclude parts or bound `additional`
-  without becoming evaluation errors. Versions 1 and 2 have no `structure`: their parts are one
-  closed alternative, and a line without parts is unclassified. Example (typical) marks never make a
-  structure open.
+  without becoming evaluation errors. Example (typical) marks never make a structure open.
+- **Older definitions (C10B).** Versions 1 and 2 have no `structure`, so they do not say whether
+  their listed parts are complete: coverage is `unknown` and subquestions they do not list may carry
+  marks (from zero, within any stated part count, never as required parts), shown under
+  `unclassified` with a paper note. A definition whose every part has source-stated marks (multiple
+  choice, fully specified questions) stays `complete` and exact. A line without parts is unclassified.
 - **Marks.** Source ranges and rule `partMarks` bound a part; otherwise each included part carries
   at least one mark. Example marks are reported per alternative (`examples`, `exampleMarks`), never
   summed across alternatives and never used as bounds.
