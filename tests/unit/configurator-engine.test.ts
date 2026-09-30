@@ -91,7 +91,7 @@ describe('authored decisions after payment',()=>{
   const d=definitions();const cfg=config([10,4,2],16,{answers:paidAnswers()});const e=evaluate(d,cfg,{paid:true});
   expect(submittedAnswers(d,cfg).items.q1.note).toEqual({kind:'omit'});expect(submittedAnswers(d,cfg).paper).toEqual({});
   const {plan}=generationPlan(d,cfg,e,'00000000-0000-4000-8000-000000000001',7);
-  expect(plan).toMatchObject({schema:'reviseit/configured-generation-plan@3',order:['q1','q2','q3'],configurationRevision:7,definitionsSha256:hash('9'),targets:{paper:16}});
+  expect(plan).toMatchObject({schema:'reviseit/configured-generation-plan@5',order:['q1','q2','q3'],configurationRevision:7,definitionsSha256:hash('9'),targets:{paper:16}});
   expect(plan.lines.map(l=>[l.id,l.marks,l.kind])).toEqual([['q1',10,'specification'],['q2',4,'specification'],['q3',2,'multiple-choice']]);
   expect(()=>generationPlan(d,config([8,6,2]),evaluate(d,config([8,6,2]),{paid:true}),'x',1)).toThrow(/not ready/);
  });

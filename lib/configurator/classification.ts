@@ -1,5 +1,6 @@
 import type { Answer, QuestionField } from '../jobs/questionnaire';
 import type { Attention, BloomKey, FacetView, LineChoice, PartView } from './contracts';
+import { bloomOnlyClassification } from './legacy-classification';
 import { evaluateLine, BLOOM, type Classification, type Issue, type LineInput } from './contract-v1';
 import { lineComposition, type LineComposition } from './composition';
 
@@ -41,12 +42,13 @@ function checkStructure(doc:Classification) {
   for(const e of s.effects) if(!record(e) || !record(e.when) || !Array.isArray(e.excludeParts) || e.excludeParts.some((p:unknown)=>!ids.has(p as string)) || (e.additional!==null && !span(e.additional)) || typeof e.reason!=='string')
     throw new Error('Unsupported classification structure');
 }
-const TOP=['schemaVersion','moduleId','kind','itemId','release','title','curriculumId','curriculumRequirementsRef','marks','parts','facets','rules','diagramPolicy','formBinding','provenance','jevChecks','hints','coverage'];
+const TOP=['schemaVersion','moduleId','kind','itemId','release','title','curriculumId','marks','parts','facets','rules','diagramPolicy','formBinding','provenance','jevChecks','hints','coverage'];
 
 /** Defensive structural checks for what the evaluator relies on, plus binding to the pinned order. */
 export function interpretClassification(payload:unknown, fields:QuestionField[], pinned?:{range:{min:number;max:number}; fixedMarks:number|null; formRevision?:string; kind:string}):ClassifiedItem {
-  const v3=record(payload) && payload.schemaVersion===3;
-  if(!record(payload) || ![1,2,3].includes(payload.schemaVersion) || Object.keys(payload).sort().join()!==[...TOP,...(v3?['structure']:[])].sort().join()) throw new Error('Unsupported classification schema');
+  payload=bloomOnlyClassification(payload);
+  const v3=record(payload) && payload.structure!==undefined;
+  if(!record(payload) || payload.schemaVersion!==4 || Object.keys(payload).sort().join()!==[...TOP,...(v3?['structure']:[])].sort().join()) throw new Error('Unsupported classification schema');
   const doc=payload as Classification;
   if(v3) checkStructure(doc);
   if(!Array.isArray(doc.parts) || !Array.isArray(doc.facets) || !Array.isArray(doc.rules) || !record(doc.hints) || !record(doc.formBinding) || !record(doc.diagramPolicy)) throw new Error('Unsupported classification shape');

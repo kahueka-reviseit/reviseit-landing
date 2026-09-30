@@ -83,7 +83,7 @@ function targetBounds(slots:Slot[], target:string, count:[number,number], total:
 
 const intersect=(a:Range,b:Range|null):Range=>b?{min:Math.max(a.min,b.min),max:Math.min(a.max,b.max)}:a;
 
-export function lineComposition(doc:Classification, structure:LineStructure, marks:number|null, version:1|2|3=doc.schemaVersion):LineComposition {
+export function lineComposition(doc:Classification, structure:LineStructure, marks:number|null, version:1|2|3|4=doc.schemaVersion):LineComposition {
   const byId=new Map(doc.parts.map(p=>[p.id,p]));
   const categoryOf=(id:string)=>{const p=byId.get(id)!;return version>=2?partCategory(p):p.cognitive.bloom??UNLISTED;};
   // Definitions without a structure: their listed parts are one closed alternative; none listed means none known.

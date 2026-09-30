@@ -18,7 +18,7 @@ export type LineDefinition = {
   id:string; entryId:string; legacyKind:'specification'|'multiple-choice';
   identity:{moduleId:string; kind:SectionKey; itemId:string; release:string};
   title:string; range:{min:number; max:number}; fixedMarks:number|null; fields:QuestionField[];
-  classification:ClassifiedItem|null; classificationSha256:string|null; requirementsRef:string|null;
+  classification:ClassifiedItem|null; classificationSha256:string|null;
   classificationProblem:string|null; sourceBinding:SourceBinding; outline:CataloguePreview|null;
 };
 /** Exact generation inputs of a line; mirrors private.line_source_binding in migration 021. */
@@ -58,7 +58,7 @@ export function readDefinitions(snapshot:unknown, form:unknown, sha256:string, o
       catch(e) { problem=e instanceof Error?e.message:'Unsupported classification'; }
     }
     return {id:l.id,entryId:l.entryId,legacyKind,identity:l.identity,title:l.title,range:l.range,fixedMarks:typeof l.fixedMarks==='number'?l.fixedMarks:null,
-      fields:item.fields,classification,classificationSha256:l.classification?.sha256??null,requirementsRef:l.classification?.requirementsRef??null,classificationProblem:problem,
+      fields:item.fields,classification,classificationSha256:l.classification?.sha256??null,classificationProblem:problem,
       sourceBinding:binding,outline:cataloguePreview(l.preview)??null};
   });
   return {sha256,module:String(snapshot.module),release:String(snapshot.release),formRevision:form.revision,lines,paperFields:form.paperFields};
@@ -187,9 +187,9 @@ export function submittedAnswers(defs:Definitions, cfg:Configuration):Questionna
 
 export type PlanLine = {teacherBrief?:Configuration['briefs'] extends Record<string,infer B>|undefined?B|null:never; id:string; entryId:string; identity:LineDefinition['identity']; kind:LineDefinition['legacyKind']; marks:number;
   parts:PlannedPart[]|null;
-  facets:Record<string,Answer>; answers:Record<string,Answer>; classificationSha256:string|null; requirementsRef:string|null;
+  facets:Record<string,Answer>; answers:Record<string,Answer>; classificationSha256:string|null;
   diagram:{stimulus:string; learnerDrawn:string[]}|null; sourceBinding:SourceBinding};
-export type GenerationPlan = {schema:'reviseit/configured-generation-plan@3'|'reviseit/configured-generation-plan@4'; order:string[]; orderId:string; module:string; release:string; formRevision:string;
+export type GenerationPlan = {schema:'reviseit/configured-generation-plan@5'; order:string[]; orderId:string; module:string; release:string; formRevision:string;
   configurationRevision:number; definitionsSha256:string; targets:Configuration['targets']; lines:PlanLine[]};
 
 /** Freeze the resolved configuration the worker and skill must consume. Refuses anything not ready. */
@@ -200,9 +200,9 @@ export function generationPlan(defs:Definitions, cfg:Configuration, e:Evaluation
     const r=e.lines[i];
     return {id:def.id,entryId:def.entryId,identity:def.identity,kind:def.legacyKind,marks:r.marks!,
       parts:r.classified?r.classified.plannedParts:null,facets:cfg.lines[def.id].facets,answers:answers.items[def.id],
-      classificationSha256:def.classificationSha256,requirementsRef:def.requirementsRef,diagram:r.classified?.diagram??null,sourceBinding:def.sourceBinding,...(cfg.briefs?{teacherBrief:cfg.briefs[def.id]??null}:{})};
+      classificationSha256:def.classificationSha256,diagram:r.classified?.diagram??null,sourceBinding:def.sourceBinding,teacherBrief:cfg.briefs?.[def.id]??null};
   });
-  return {plan:{schema:cfg.briefs?'reviseit/configured-generation-plan@4':'reviseit/configured-generation-plan@3',order:lineOrder(defs,cfg),orderId,module:defs.module,release:defs.release,formRevision:defs.formRevision,
+  return {plan:{schema:'reviseit/configured-generation-plan@5',order:lineOrder(defs,cfg),orderId,module:defs.module,release:defs.release,formRevision:defs.formRevision,
     configurationRevision:revision,definitionsSha256:defs.sha256,targets:cfg.targets,lines},answers};
 }
 

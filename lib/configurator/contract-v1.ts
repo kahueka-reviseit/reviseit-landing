@@ -1,8 +1,8 @@
 import type { Answer } from '../jobs/questionnaire';
 
 /**
- * Server evaluator for configurator contract version 1 (the producer's closed
- * rule grammar). It must return the producer's normalised result for every
+ * Server evaluator for the Bloom-only classification contract (the producer's closed
+ * rule grammar). It preserves the producer's line result for every
  * conformance fixture. There is no expression language: conditions and actions
  * are the fixed shapes below, with no negation, so the forced-option fixpoint
  * is unique and rule order cannot change a result.
@@ -23,8 +23,8 @@ export type Facet = {id:string; type:'integer'|'choice'|'text'|'parts'; stage:'p
   domain:any};
 export type Part = {id:string; label:string; summary:string|null; inclusion:'required'|'optional'|'unspecified';
   marks:{basis:'range'|'typical'|'unknown'; min:number|null; max:number|null};
-  cognitive:{bloom:typeof BLOOM[number]|null; unknownReason:string|null; curriculumBand:string|null; curriculumBandCandidates:string[]; sourceLabels:unknown;
-   bloomBasis?:'source-label'|'profile-single-mapping'|'profile-authorised-fallback'|null; bloomCandidates?:string[]}; locator:unknown};
+  cognitive:{bloom:typeof BLOOM[number]|null; unknownReason:string|null; sourceLabels?:unknown;
+   bloomBasis?:'source-label'|'source-conversion'|'owner-approved-conversion'|null; bloomCandidates?:string[]}; locator:unknown};
 /**
  * Version 3 adds `structure`: the source's alternative structures (variants), each with its own
  * listed parts, stated sub-question count, required parts and the number of subquestions it may
@@ -35,16 +35,14 @@ export type Part = {id:string; label:string; summary:string|null; inclusion:'req
 export type Alternative = {id:string; label:string; parts:string[]; count:Range|null; required:string[]; additional:Range; locator:unknown};
 export type ChoiceEffect = {id:string; when:Condition; excludeParts:string[]; additional:Range|null; reason:string; origin:unknown};
 export type Structure = {alternatives:Alternative[]; effects:ChoiceEffect[]};
-export type Classification = {schemaVersion:1|2|3; structure?:Structure; moduleId:string; kind:'structured'|'multiple_choice'; itemId:string; release:string; title:string;
-  curriculumId:string; curriculumRequirementsRef:{profileId:string; version:number}; marks:{mode:'fixed'; value:number}|{mode:'range'; min:number; max:number};
+export type Classification = {schemaVersion:1|2|3|4; structure?:Structure; moduleId:string; kind:'structured'|'multiple_choice'; itemId:string; release:string; title:string;
+  curriculumId:string; marks:{mode:'fixed'; value:number}|{mode:'range'; min:number; max:number};
   parts:Part[]; facets:Facet[]; rules:Rule[];
   diagramPolicy:{stimulus:'required'|'optional'|'not_applicable'|'unspecified'; stimulusFacet:string|null; learnerDrawnParts:string[]; whenLeftOut:string|null; locators:unknown[]};
   formBinding:{status:'bound'|'explicit-no-input'|'no-form'; itemForm:null|{formRevision:string; privateKind:string; fieldCount:number}; fieldMap:{facetId:string; fieldId:string}[]; sharedForms:unknown[]};
   provenance:unknown; jevChecks:JevCheck[]; hints:Record<string,string>; coverage:{status:string; gaps:unknown[]}};
 export type JevCheck = {id:string; type:'noul'|'choice'; activation:'shadow'; stage:'pre'|'post'; fields:string[]; instructions:string; criteria:string[]; hint:string;
   flagAbove?:number; suggestAbove?:number; target?:string; options?:string[]};
-export type Profile = {profileId:string; version:number; curriculumId:string; bands:{id:string; label?:string}[];
-  distributions:{id:string; taxonomy:'bloom'|'curriculum-band'|'knowledge-area'; basis:'marks'|'item-count'; targets:{key:string; percent:number|null}[]; [k:string]:unknown}[]; [k:string]:unknown};
 
 export type Issue = {code:string; ruleIds:string[]; facet:string|null; part:string|null; option:string|null; lineId:string|null; reasons:string[]};
 export type LineInput = {lineId:string; identity:{moduleId:string; kind:string; itemId:string; release:string}; marks:number|null; parts:string[]|null; answers:Record<string,Answer>};
@@ -130,7 +128,7 @@ function answerError(facet:Facet, answer:Answer):string|null {
 }
 const resolved=(a:Answer|undefined)=>!!a && (a.kind!=='text' || !!a.text.trim());
 
-export function evaluateLine(doc:Classification, line:LineInput, version:1|2|3=doc.schemaVersion):{result:LineOutput; internal:Internal|null; structure:LineStructure} {
+export function evaluateLine(doc:Classification, line:LineInput, version:1|2|3|4=doc.schemaVersion):{result:LineOutput; internal:Internal|null; structure:LineStructure} {
   const v2=version>=2;
   const lid=line.lineId;const errors:Issue[]=[],attention:Issue[]=[];
   const facets=new Map(doc.facets.map(f=>[f.id,f]));
@@ -288,73 +286,4 @@ export function evaluateLine(doc:Classification, line:LineInput, version:1|2|3=d
     errors:sortIssues(errors),attention:sortIssues(attention),outstanding:sortedSet(outstanding),effectiveParts:effective,
     excludedParts:[...excludedParts.keys()].sort(cmp).map(p=>({part:p,ruleIds:sortedSet(excludedParts.get(p)!)})),
     excludedOptions:effects(excludedOpts),forcedOptions:effects(forced),preferredOptions:effects(preferred),feasibility,cognitive}};
-}
-
-export function bandRanges(doc:Classification, internal:Internal):Record<string,[number,number]> {
-  const bandOf=Object.fromEntries(doc.parts.map(p=>[p.id,p.cognitive.curriculumBand??'unclassified']));
-  const keys=sortedSet(Object.values(bandOf));
-  return allocationBounds(internal.mandatory,internal.flexible,internal.count,internal.marks,bandOf,keys)??{};
-}
-
-export type PaperInput = {schemaVersion:1|2; targetMarks:number|null; comparison:null|{profile:{profileId:string;version:number}; distributionId:string}; lines:LineInput[]};
-const identityKey=(i:LineInput['identity'])=>[i.moduleId,i.kind,i.itemId,i.release].join('\u0000');
-
-/** The producer's paper-level result: every mark attributed exactly once; comparison is descriptive. */
-export function evaluatePaper(config:PaperInput, classifications:Classification[], profiles:Profile[]=[]) {
-  const v2=config.schemaVersion===2;
-  const index=new Map(classifications.map(c=>[identityKey({moduleId:c.moduleId,kind:c.kind,itemId:c.itemId,release:c.release}),c]));
-  const paperErrors:Issue[]=[];const ids=config.lines.map(l=>l.lineId);
-  for(const dup of sortedSet(ids.filter((x,i)=>ids.indexOf(x)!==i))) paperErrors.push(issue('duplicate-line',{lineId:dup}));
-  const lines:LineOutput[]=[];const docs=new Map<string,Classification>();const internal=new Map<string,Internal|null>();
-  for(const line of config.lines) {
-    const doc=index.get(identityKey(line.identity));
-    if(!doc) {
-      lines.push({lineId:line.lineId,identity:{...line.identity},marks:line.marks,valid:false,complete:false,errors:[issue('unknown-identity',{lineId:line.lineId})],attention:[],outstanding:[],
-        effectiveParts:[],excludedParts:[],excludedOptions:[],forcedOptions:[],preferredOptions:[],feasibility:'not-evaluated',
-        cognitive:v2?{basis:'marks',determinable:false,ranges:null,groupedRanges:null,reason:'invalid-configuration'}:{basis:'marks',determinable:false,ranges:null,reason:'invalid-configuration'}});
-      continue;
-    }
-    const r=evaluateLine(doc,line,v2?2:1);internal.set(line.lineId,r.internal);docs.set(line.lineId,doc);lines.push(r.result);
-  }
-  const allocated=config.lines.reduce((n,l)=>n+(l.marks??0),0);const target=config.targetMarks;
-  const difference=target===null?null:allocated-target;const balanced=target===null?null:difference===0;
-  const scopes=['paper-logistics',...(config.lines.some(l=>l.identity.kind==='multiple_choice')?['multiple-choice-block']:[])];
-  const totals=Object.fromEntries(CATEGORIES.map(k=>[k,[0,0]])) as Record<Category,[number,number]>;const undetermined:string[]=[];
-  const groupedTotals=new Map<string,[number,number]>();
-  for(const l of lines) {
-    if(l.cognitive.determinable) {
-      for(const k of CATEGORIES){totals[k][0]+=l.cognitive.ranges![k].min;totals[k][1]+=l.cognitive.ranges![k].max;}
-      for(const [g,r] of Object.entries(l.cognitive.groupedRanges??{})){const a=groupedTotals.get(g)??[0,0];groupedTotals.set(g,[a[0]+r.min,a[1]+r.max]);}
-    }
-    else {undetermined.push(l.lineId);totals.unclassified[0]+=l.marks??0;totals.unclassified[1]+=l.marks??0;}
-  }
-  const cognitive:Record<string,unknown>={basis:'marks',determinable:!undetermined.length,ranges:Object.fromEntries(CATEGORIES.map(k=>[k,{min:totals[k][0],max:totals[k][1]}])),undeterminedLines:sortedSet(undetermined)};
-  if(v2) cognitive.groupedRanges=Object.fromEntries([...groupedTotals.keys()].sort(cmp).map(g=>[g,{min:groupedTotals.get(g)![0],max:groupedTotals.get(g)![1]}]));
-  let comparison:any=null;
-  if(config.comparison!==null) {
-    const ref=config.comparison;
-    const profile=profiles.find(p=>p.profileId===ref.profile.profileId && p.version===ref.profile.version);
-    const dist=profile?.distributions.find(d=>d.id===ref.distributionId);
-    if(!dist) paperErrors.push(issue('unknown-comparison-reference'));
-    else {
-      comparison={profile:ref.profile,distributionId:dist.id,taxonomy:dist.taxonomy,byKey:[]};
-      if(dist.basis!=='marks') comparison.status='unsupported-basis';
-      else if(dist.taxonomy==='knowledge-area') comparison.status='unsupported-taxonomy';
-      else {
-        let agg=new Map<string,[number,number]>();let complete=!undetermined.length;
-        if(dist.taxonomy==='bloom'){agg=new Map(Object.entries(totals) as [string,[number,number]][]);if(v2)complete=complete&&![...groupedTotals.values()].some(v=>v[1]>0);}
-        else {
-          for(const l of lines) { if(!docs.has(l.lineId)||!l.cognitive.determinable) continue;
-            for(const [key,[lo,hi]] of Object.entries(bandRanges(docs.get(l.lineId)!,internal.get(l.lineId)!))){const a=agg.get(key)??[0,0];agg.set(key,[a[0]+lo,a[1]+hi]);} }
-          for(const l of lines) if(undetermined.includes(l.lineId)){const a=agg.get('unclassified')??[0,0];agg.set('unclassified',[a[0]+(l.marks??0),a[1]+(l.marks??0)]);}
-        }
-        const unclassified=agg.get('unclassified')??[0,0];
-        comparison.status=complete && unclassified[1]===0?'described':'insufficient-classification';
-        for(const t of dist.targets){const a=agg.get(t.key);comparison.byKey.push({key:t.key,targetPercent:t.percent,actualMarks:a===undefined?null:{min:a[0],max:a[1]}});}
-      }
-    }
-  }
-  const valid=!paperErrors.length && lines.every(l=>l.valid);
-  return {schemaVersion:v2?2:1,valid,complete:valid && lines.every(l=>l.complete) && balanced!==false,errors:sortIssues(paperErrors),lines,
-    allocatedMarks:allocated,targetMarks:target,marksDifference:difference,marksBalanced:balanced,sharedScopes:scopes,cognitive,comparison};
 }

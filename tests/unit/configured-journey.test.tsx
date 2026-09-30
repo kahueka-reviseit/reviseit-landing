@@ -203,7 +203,7 @@ test('a repeated multiple-choice type and reordering survive checkout, payment, 
  await user.click(screen.getByRole('button',{name:'Submit for generation →'}));await waitFor(()=>expect(submitted).toHaveBeenCalled());
  const done=await row(orderId);
  expect(done.state).toBe('queued');
- expect(done.plan.schema).toBe('reviseit/configured-generation-plan@3');expect(done.plan.order).toEqual(['q1','q2','q4','q3']);
+ expect(done.plan.schema).toBe('reviseit/configured-generation-plan@5');expect(done.plan.order).toEqual(['q1','q2','q4','q3']);
  expect(done.plan.lines.map((l:any)=>[l.id,l.entryId,l.marks])).toEqual([['q1','structured:SPEC_02',6],['q2','structured:SPEC_01',8],['q3','mcq:MCQ_01',2],['q4','mcq:MCQ_01',2]]);
  expect(done.answers.items.q1.setting).toEqual({kind:'choice',choiceId:'blue'});expect(done.answers.items.q2.setting).toEqual({kind:'choice',choiceId:'red'});
  expect(done.plan.lines.every((l:any)=>l.sourceBinding?.privateManifestSha256===hash('c'))).toBe(true);

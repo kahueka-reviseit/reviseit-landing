@@ -76,7 +76,7 @@ export type ConfiguredCheckoutRequest = {requestKey:string; moduleId:string; sel
 // ---------------------------------------------------------------- projection
 export type OptionView = {id:string; label:string; disabled:boolean; reason?:string; preferred?:boolean};
 export type FacetView = {id:string; label:string; hint:string; type:'choice'; required:boolean; allowAutomatic:boolean; options:OptionView[]; value:Answer|null; forced?:string; reason?:string};
-export type PartView = {id:string; number:string; summary:string; bloom:BloomKey|null; bloomOptions:BloomKey[]; bloomBasis:'source-label'|'profile-single-mapping'|'profile-authorised-fallback'|null; bloomUnknownReason?:string; marks:{min:number;max:number}|null;
+export type PartView = {id:string; number:string; summary:string; bloom:BloomKey|null; bloomOptions:BloomKey[]; bloomBasis:'source-label'|'source-conversion'|'owner-approved-conversion'|null; bloomUnknownReason?:string; marks:{min:number;max:number}|null;
   /** Marks this part carries in the source's own example, when the source gives only an example. Never a bound. */
   exampleMarks:{min:number;max:number}|null;
   inclusion:'required'|'optional'; included:boolean; locked:boolean; reason?:string; learnerDrawn:boolean;

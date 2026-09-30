@@ -1,6 +1,7 @@
 // @vitest-environment node
 import {PGlite} from '@electric-sql/pglite';
 import {readFileSync,readdirSync} from 'node:fs';
+import {bloomOnlyClassification} from '../../lib/configurator/legacy-classification';
 import {describe,beforeAll,afterAll,it,expect} from 'vitest';
 // Private CFG01A check. The registration payloads come from the private adapter and never
 // enter this repository; without both environment variables this suite is skipped. It
@@ -21,10 +22,9 @@ describe.skipIf(!current||!old)('real bound registration (private, disposable in
    await publisher('select public.register_catalogue_authored_form($1)',[JSON.stringify(r)]);
    await publisher('select public.register_catalogue_execution($1,$2,$3,$4)',[c.module,c.release,r.manifestSha256,c.binding?.workflowManifestSha256??c.workflowManifestSha256]);
   }
-  for(const p of regs.profiles) await publisher('select public.register_curriculum_requirements($1,$2,$3)',[p.ref,p.sha256,JSON.stringify(p.profile)]);
  }
- const register=(c:any,binding:any)=>publisher('select public.register_catalogue_classification_bound($1,$2,$3,$4,$5,$6,$7,$8,$9)',
-  [c.module,c.release,c.entryId,c.sha256,JSON.stringify(c.envelope),c.requirementsSha256,JSON.stringify(binding),JSON.stringify(c.bundleSources),c.catalogueContentDigest]);
+ const register=(c:any,binding:any)=>publisher('select public.register_bloom_classification($1,$2,$3,$4,$5,$6,$7,$8)',
+  [c.module,c.release,c.entryId,c.sha256,JSON.stringify(bloomOnlyClassification(c.envelope)),JSON.stringify(binding),JSON.stringify(c.bundleSources),c.catalogueContentDigest]);
  const bindingOf=(r:any,w:string)=>({schema:'reviseit/cfg-source-binding@1',moduleId:r.module,release:r.release,entryId:r.entryId,privateManifestSha256:r.manifestSha256,privateBundleDigest:r.bundleDigest,formRevision:r.formRevision,workflowManifestSha256:w,sources:r.sources});
  beforeAll(async()=>{
   db=new PGlite();await db.exec(`create role anon nologin;create role authenticated nologin;create role service_role nologin;create schema auth;
@@ -47,7 +47,7 @@ describe.skipIf(!current||!old)('real bound registration (private, disposable in
   const outcomes:string[]=[];
   for(const c of refused){
    await db.exec('begin;set local role reviseit_catalogue_publisher');
-   try{await db.query('select public.register_catalogue_classification_bound($1,$2,$3,$4,$5,$6,$7,$8,$9)',[c.module,c.release,c.entryId,c.sha256,JSON.stringify(c.envelope),c.requirementsSha256,
+   try{await db.query('select public.register_bloom_classification($1,$2,$3,$4,$5,$6,$7,$8)',[c.module,c.release,c.entryId,c.sha256,JSON.stringify(bloomOnlyClassification(c.envelope)),
      JSON.stringify(bindingOf(c.registration,c.workflowManifestSha256)),JSON.stringify(c.bundleSources),c.catalogueContentDigest]);outcomes.push('accepted:'+c.entryId);}
    catch(e){outcomes.push((e as Error).message);}
    await db.exec('rollback');

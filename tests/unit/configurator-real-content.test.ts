@@ -13,14 +13,13 @@ import type {Configuration} from '../../lib/configurator/contracts';
 const path=process.env.CONFIGURATOR_CONTENT_REGISTRATIONS||'';
 describe.skipIf(!path)('real classifications (private, content-v1)',()=>{
  const regs=path?JSON.parse(readFileSync(path,'utf8')):{classifications:[],profiles:[]};
- const profiles=Object.fromEntries(regs.profiles.map((p:any)=>[p.ref,{sha256:p.sha256,payload:p.profile}]));
  const definitions=(r:any)=>{
-  const mcq=r.kind==='multiple-choice';const ref=`${r.envelope.curriculumRequirementsRef.profileId}@${r.envelope.curriculumRequirementsRef.version}`;
+  const mcq=r.kind==='multiple-choice';const ref=r.envelope.curriculumRequirementsRef?`${r.envelope.curriculumRequirementsRef.profileId}@${r.envelope.curriculumRequirementsRef.version}`:null;
   const line={id:'q1',entryId:r.entryId,kind:r.kind,identity:{moduleId:r.module,kind:mcq?'multiple_choice':'structured',itemId:r.envelope.itemId,release:r.release},title:'x',
    range:mcq?{min:2,max:2}:r.catalogueMarks,fixedMarks:mcq?2:null,checkoutMarks:mcq?2:r.catalogueMarks.min,binding:r.registration??{formRevision:r.formRevision,fields:r.fields},
    classification:{sha256:r.sha256,requirementsRef:ref,payload:r.envelope,sourceBinding:r.binding}};
   // Bound payloads (CFG01A) also exercise the runtime source-binding check.
-  return readDefinitions({schema:'reviseit/configured-authored-inputs@1',module:r.module,release:r.release,formRevision:'f'.repeat(64),lines:[line],requirements:{[ref]:profiles[ref]},
+  return readDefinitions({schema:'reviseit/configured-authored-inputs@1',module:r.module,release:r.release,formRevision:'f'.repeat(64),lines:[line],
    ...(r.binding?{execution:{workflowManifestSha256:r.binding.workflowManifestSha256}}:{})},
    {schemaVersion:2,revision:'f'.repeat(64),items:[{id:'q1',title:'x',marks:line.checkoutMarks,fields:r.fields}],paperFields:[]},'e'.repeat(64));
  };

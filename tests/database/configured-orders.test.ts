@@ -230,16 +230,16 @@ test('an existing authored order keeps its claim payload for workers with or wit
 
 const binding=async(entry='structured:SPEC_01')=>{await owner();const f=(await db.query<any>('select payload from private.catalogue_authored_forms where entry_id=$1',[entry])).rows[0].payload;return sourceBinding(f,hash('8'));};
 const bundleSources=(b:any)=>b.sources.map((s:any)=>({...s,originalPath:'our content/synthetic-module/data/'+s.path}));
-const envelope=(tag:string,sources?:any[])=>({schemaVersion:2,moduleId:'synthetic-module',kind:'structured',itemId:'SPEC_01',release:'1',curriculumId:'synthetic',curriculumRequirementsRef:{profileId:'synthetic-profile',version:1},
+const envelope=(tag:string,sources?:any[])=>({schemaVersion:4,parts:[],moduleId:'synthetic-module',kind:'structured',itemId:'SPEC_01',release:'1',curriculumId:'synthetic',
  formBinding:{itemForm:{formRevision:hash('a')}},provenance:{sources:sources??[{role:'specification',path:'our content/synthetic-module/data/sources/synthetic.md',sha256:hash('b')}]},tag});
-const registerBound=(env:object,sha:string,b:object,bs:object,digest='synthetic-digest')=>publisher('select public.register_catalogue_classification_bound($1,$2,$3,$4,$5,$6,$7,$8,$9)',['synthetic-module','1','structured:SPEC_01',sha,JSON.stringify(env),hash('7'),JSON.stringify(b),JSON.stringify(bs),digest]);
+const registerBound=(env:object,sha:string,b:object,bs:object,digest='synthetic-digest')=>publisher('select public.register_bloom_classification($1,$2,$3,$4,$5,$6,$7,$8)',['synthetic-module','1','structured:SPEC_01',sha,JSON.stringify(env),JSON.stringify(b),JSON.stringify(bs),digest]);
 async function publishedRelease(){await owner();await db.query("insert into private.catalogue_published_releases(module_id,release,payload) values('synthetic-module','1','{\"contentDigest\":\"synthetic-digest\"}') on conflict do nothing");}
 test('classifications register only with their exact source binding; mismatches fail and issued orders never change',async()=>{
- await publishedRelease();await publisher('select public.register_curriculum_requirements($1,$2,$3)',['synthetic-profile@1',hash('7'),JSON.stringify({profileId:'synthetic-profile',version:1})]);
+ await publishedRelease();
  const b=await binding();
  // The unbound version-1 registration is withdrawn from the publisher.
- await refuse(()=>publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,$6)',['synthetic-module','1','structured:SPEC_01',hash('1'),JSON.stringify(envelope('a')),hash('7')]),/permission denied/);
- await service();await refuse(()=>db.query('select public.register_catalogue_classification_bound($1,$2,$3,$4,$5,$6,$7,$8,$9)',['synthetic-module','1','structured:SPEC_01',hash('1'),'{}',hash('7'),'{}','[]','x']),/permission denied/);
+ await refuse(()=>publisher('select public.register_catalogue_classification($1,$2,$3,$4,$5,$6)',['synthetic-module','1','structured:SPEC_01',hash('1'),JSON.stringify(envelope('a')),hash('7')]),/does not exist/);
+ await service();await refuse(()=>db.query('select public.register_bloom_classification($1,$2,$3,$4,$5,$6,$7,$8)',['synthetic-module','1','structured:SPEC_01',hash('1'),'{}','{}','[]','x']),/permission denied/);
  // Changed source bytes with an unchanged form revision: refused.
  await refuse(()=>registerBound(envelope('a',[{role:'specification',path:'our content/synthetic-module/data/sources/synthetic.md',sha256:hash('6')}]),hash('1'),b,bundleSources(b)),/source version mismatch/);
  // A missing task dependency, an extra one, a cross-module path, another bundle, another workflow, another catalogue release: all refused.
@@ -256,18 +256,18 @@ test('classifications register only with their exact source binding; mismatches 
  await refuse(()=>registerBound(envelope('changed'),hash('1'),b,bundleSources(b)),/immutable/);
  await asUser(teacher);expect((await db.query<any>("select orderable from public.teacher_catalogue_summaries where entry_id='structured:SPEC_01'")).rows[0].orderable).toBe(true);
  const orderId=await paidOrder();const o=await orderRow(orderId);
- expect(o.snapshot.lines[0].classification).toMatchObject({sha256:hash('1'),requirementsRef:'synthetic-profile@1',sourceBinding:b});
+ expect(o.snapshot.lines[0].classification).toMatchObject({sha256:hash('1'),sourceBinding:b});
  await registerBound(envelope('b'),hash('2'),b,bundleSources(b));
  expect((await orderRow(orderId)).snapshot.lines[0].classification.sha256).toBe(hash('1'));
- // C10A (migration 028): version 3 registers and binds new checkouts; an issued order keeps its version; unknown versions stay refused.
- await refuse(()=>registerBound({...envelope('c'),schemaVersion:4},hash('3'),b,bundleSources(b)),/Invalid classification/);
- await registerBound({...envelope('c'),schemaVersion:3,structure:{alternatives:[],effects:[]}},hash('3'),b,bundleSources(b));
- await owner();expect((await db.query<any>("select schema_version from private.catalogue_classifications where sha256=$1",[hash('3')])).rows[0].schema_version).toBe(3);
+ // Retired versions cannot register; version 4 binds new checkouts without changing issued orders.
+ await refuse(()=>registerBound({...envelope('c'),schemaVersion:99},hash('3'),b,bundleSources(b)),/Invalid classification/);
+ await registerBound({...envelope('c'),schemaVersion:4,structure:{alternatives:[],effects:[]}},hash('3'),b,bundleSources(b));
+ await owner();expect((await db.query<any>("select schema_version from private.catalogue_classifications where sha256=$1",[hash('3')])).rows[0].schema_version).toBe(4);
  expect((await db.query<any>("select sha256 from private.catalogue_classification_bindings where entry_id='structured:SPEC_01'")).rows[0].sha256).toBe(hash('3'));
  expect((await orderRow(orderId)).snapshot.lines[0].classification.sha256).toBe(hash('1'));
 });
 test('a classification bound to a superseded bundle fails checkout loudly instead of silently dropping the item',async()=>{
- await publishedRelease();await publisher('select public.register_curriculum_requirements($1,$2,$3)',['synthetic-profile@1',hash('7'),JSON.stringify({profileId:'synthetic-profile',version:1})]);
+ await publishedRelease();
  const b=await binding();await registerBound(envelope('a'),hash('1'),b,bundleSources(b));
  // Simulate a later bundle for this entry: the current form binding moves, the classification still describes the old bytes.
  await owner();await db.exec("alter table private.catalogue_form_bindings disable trigger all");
@@ -378,4 +378,24 @@ test('a changed paragraph cannot be submitted with a stale interpretation',async
  await save(orderId,cfg,1,true);const cur=await read(orderId),plan=planFor(cur,orderId);
  const next={...plan,schema:'reviseit/configured-generation-plan@4',lines:plan.lines.map((l:any)=>({...l,teacherBrief:l.id==='q1'?cfg.briefs.q1:null}))};
  await service();await refuse(()=>one('select public.submit_configured_paper_v4($1,$2,$3,$4,$5,$6,$7) as r',[orderId,teacher,submission,cur.revision,JSON.stringify({...answersFor(cur),paper:{}}),JSON.stringify(next),JSON.stringify({...evaluation(cur,true),engine:'cfg01-engine@2'})]),/Invalid generation plan/);
+});
+
+test('Bloom-only plans preserve paragraphs and source bindings; only capable workers claim them',async()=>{
+ const orderId=await paidOrder(),cfg={...configured(),briefs:{q1:{text:'Use a blue setting. Keep my words.',interpretedText:'Use a blue setting. Keep my words.',suggestions:{setting:chosen},resolutions:{}},q3:{text:'No hints in this question.',interpretedText:'No hints in this question.',suggestions:{},resolutions:{}}}};
+ await save(orderId,cfg,1,true);const cur=await read(orderId);
+ expect(cur.configuration.briefs).toEqual(cfg.briefs);
+ await refuse(()=>save(orderId,{...cfg,briefs:{...cfg.briefs,unknown:cfg.briefs.q1}},2,true),/Invalid configuration/);
+ await refuse(()=>save(orderId,{...cfg,briefs:{q1:{...cfg.briefs.q1,resolutions:{missing:'choice'}}}},2,true),/Invalid configuration/);
+ await refuse(()=>save(orderId,cfg,1,true),/Configuration changed/);
+ const answers={...answersFor(cur),paper:{}};
+ const plan={...planFor(cur,orderId),schema:'reviseit/configured-generation-plan@5',lines:planFor(cur,orderId).lines.map(({requirementsRef,...l}:any)=>({...l,teacherBrief:(cfg.briefs as any)[l.id]??null}))};
+ const call=(p:any=plan)=>one('select public.submit_configured_paper_v5($1,$2,$3,$4,$5,$6,$7) as r',[orderId,teacher,submission,cur.revision,JSON.stringify(answers),JSON.stringify(p),JSON.stringify({...evaluation(cur,true),engine:'cfg01-engine@2'})]);
+ const corrupt=structuredClone(plan);corrupt.lines[0].teacherBrief.text='Silently changed';
+ await service();await refuse(()=>call(corrupt),/Invalid generation plan/);
+ const retired=structuredClone(plan);retired.lines[0].requirementsRef=null;await refuse(()=>call(retired),/Invalid generation plan/);
+ const wrongSource=structuredClone(plan);wrongSource.lines[0].sourceBinding.formRevision=hash('f');await refuse(()=>call(wrongSource),/Invalid generation plan/);
+ expect(await call()).toBe(orderId);expect(await call()).toBe(orderId);
+ expect(await claim(['configured-plan@1','configured-plan@2','configured-plan@3','configured-plan@4'])).toBeNull();
+ const job=await claim(['configured-plan@5']);expect(job.configurationPlan).toEqual(plan);expect(job.answers.paper).toEqual({});
+ expect((await read(orderId)).configuration).toEqual(cur.configuration);
 });
