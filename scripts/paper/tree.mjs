@@ -18,12 +18,17 @@ export function parseSummary(summary) {
 export const walk=(node,visit,parent=null)=>{visit(node,parent);node.children.forEach(child=>walk(child,visit,node));};
 
 /**
- * Paper describes an auto-width text either as `white-space: pre` alone or with an added
- * `width: max-content`, depending on how the layer was created. Both render identically and
- * the width cannot be removed, so it is not treated as a difference.
+ * Paper describes an auto-width (non-wrapping) text in three ways depending on how the layer was
+ * made: `white-space: pre`, `pre` with `width: max-content`, or `pre-wrap` with `width: max-content`.
+ * All three render identically and Paper rewrites one into another, so they read as `pre`.
  */
 function normalise(node,styles) {
-  if(node.type==='Text'&&styles.whiteSpace==='pre'&&styles.width==='max-content'){const {width,...rest}=styles;return rest;}
+  if(node.type==='Text'&&styles.width==='max-content'&&(styles.whiteSpace==='pre'||styles.whiteSpace==='pre-wrap')){const {width,...rest}=styles;styles={...rest,whiteSpace:'pre'};}
+  // Paper also folds equal block and inline padding into the shorthand; read it back as the two parts.
+  if(styles.padding!==undefined&&styles.paddingBlock===undefined&&styles.paddingInline===undefined){
+    const parts=String(styles.padding).trim().split(/\s+(?![^(]*\))/);
+    if(parts.length<=2){const {padding,...rest}=styles;styles={...rest,paddingBlock:parts[0],paddingInline:parts[1]??parts[0]};}
+  }
   return styles;
 }
 

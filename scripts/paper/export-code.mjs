@@ -5,6 +5,7 @@ import {connectPaper} from './client.mjs';
 import {emptyLock,isClean,lockPath,readJson,registryPath,summarise,survey,writeJson} from './engine.mjs';
 import {hashOf} from './sync-core.mjs';
 import {walk} from './tree.mjs';
+import {matches} from './sync-core.mjs';
 
 /**
  * Paper to application code. Run by hand (`npm run paper:pull`) after Paper is in sync.
@@ -38,11 +39,14 @@ export function tokensCss(tokens){
 /** Custom properties for every visual value of every named master layer, and for each variant's differences. */
 export function componentValues(id,spec,tree){
   const values={};
-  walk(tree,node=>{
-    if(node!==tree&&!node.name.startsWith(spec.block))return;// nested components belong to their own master
+  const visit=node=>{
+    // Nested components (for example a tag inside an outline row) belong to their own master.
+    if(node!==tree&&matches(node.name,spec.nested??[]))return;
+    node.children.forEach(visit);
     const layer=node===tree?spec.block:node.name;
     for(const [prop,value] of Object.entries(node.styles))if(exported.test(prop)&&measurable(value)&&!(spec.overridable?.[layer]??[]).includes(prop))values[`--pc-${layer}-${kebab(prop)}`]=String(value);
-  });
+  };
+  visit(tree);
   for(const [variant,definition] of Object.entries(spec.variants??{}))
     for(const [layer,styles] of Object.entries(definition.styles??{}))
       for(const [prop,value] of Object.entries(styles))if(exported.test(prop))values[`--pc-${layer}--${variant}-${kebab(prop)}`]=value===null?'initial':String(value);
