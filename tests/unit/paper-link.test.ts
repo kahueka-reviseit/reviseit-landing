@@ -77,6 +77,16 @@ describe('one master, every registered instance',()=>{
     expect(isClean(await survey(paper,registry,lock))).toBe(true);
   });
 
+  it('settles a layout style that Paper adds to a newly inserted layer',async()=>{
+    paper.quirks.moveAddsWidth=true;
+    await paper.json('write_html',{fileId:'ds',targetNodeId:id('ds','card',0),mode:'insert-children',html:'<div layer-name="card__marker" style="font-size:13px">Hint</div>'});
+    paper.quirks.moveAddsWidth=false;await paper.json('move_nodes',{fileId:'ds',moves:[{nodeId:id('ds','card__marker',0),parentId:id('ds','card',0),index:0}]});paper.quirks.moveAddsWidth=true;
+    const report=await sync({});
+    expect(report.refused).toEqual([]);expect(report.applied).toHaveLength(3);
+    expect(paper.node('web','card__marker',0).styles).toEqual({fontSize:'13px'});
+    expect(isClean(await survey(paper,registry,lock))).toBe(true);
+  });
+
   it('changes nothing on a second run with no new input',async()=>{
     paper.edit('ds','card',{gap:'24px'});await sync({});
     const writes=paper.calls.length,again=await sync({});

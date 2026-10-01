@@ -48,6 +48,8 @@ else if(['status','plan','apply','restore'].includes(command)){
   try{
     if(command==='status'){const result=await survey(paper,registry,lock);print(result);
       if(flag('out'))writeJson(flag('out'),toPlan(result,registry));
+      // Fingerprint of what each instance owns (slot text, images, declared overrides), to compare before and after a change.
+      if(flag('content'))writeJson(flag('content'),Object.fromEntries(result.instances.map(i=>[i.id,{master:i.master,where:i.where,contentHash:i.contentHash,content:i.content}])));
       process.exitCode=isClean(result)?0:1;if(isClean(result))console.log('Every registered instance equals its master and the mirrored tokens equal their owner.');}
     if(command==='plan'){const result=await survey(paper,registry,lock,{accept:list('accept-master')});print(result);
       const out=flag('out')??path.join(journalDir,'plan.json');writeJson(out,toPlan(result,registry));console.log(`Preview written to ${out}`);}

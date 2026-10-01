@@ -168,7 +168,13 @@ export async function applyPlan(paper,registry,lock,plan,{adopt=[],accept=[],jou
       journal.instances.push(entry);
     }
     // Read back: the instance must now equal its master, and its own content must be untouched.
-    const after=(await survey(paper,registry,{...lock,instances:{...lock.instances,[current.id]:undefined}},{scan:false,tokens:false,only:[current.id],preloaded:fresh.trees})).instances[0];
+    const reread=async()=>(await survey(paper,registry,{...lock,instances:{...lock.instances,[current.id]:undefined}},{scan:false,tokens:false,only:[current.id],preloaded:fresh.trees})).instances[0];
+    let after=await reread();
+    // Paper may add a layout style (for example a width) to a layer it has just inserted or moved. Settle those once.
+    if(after.ops.length&&!after.drift.length&&after.ops.every(o=>o.op==='style')&&current.ops.some(o=>o.op==='insert'||o.op==='order')){
+      await paper.json('update_styles',{fileId:id,updates:after.ops.map(o=>({nodeIds:[o.nodeId],styles:o.set}))});
+      entry.settled=after.ops.map(o=>({key:o.key,set:o.set}));after=await reread();
+    }
     if(after.ops.length||after.drift.length){report.refused.push({id:current.id,reason:'did-not-converge',remaining:after.ops,drift:after.drift});continue;}
     // Everything the instance owned before must be exactly as it was; a newly inserted layer may bring new slots.
     const removed=current.ops.filter(o=>o.op==='remove').map(o=>o.key);

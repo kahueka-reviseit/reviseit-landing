@@ -17,6 +17,16 @@ export function parseSummary(summary) {
 }
 export const walk=(node,visit,parent=null)=>{visit(node,parent);node.children.forEach(child=>walk(child,visit,node));};
 
+/**
+ * Paper describes an auto-width text either as `white-space: pre` alone or with an added
+ * `width: max-content`, depending on how the layer was created. Both render identically and
+ * the width cannot be removed, so it is not treated as a difference.
+ */
+function normalise(node,styles) {
+  if(node.type==='Text'&&styles.whiteSpace==='pre'&&styles.width==='max-content'){const {width,...rest}=styles;return rest;}
+  return styles;
+}
+
 export async function readTree(paper,fileId,nodeId) {
   const {summary}=await paper.json('get_tree_summary',{fileId,nodeId,depth:10});
   const tree=parseSummary(summary);if(!tree)throw new Error(`Paper node ${nodeId} was not found in ${fileId}`);
@@ -24,7 +34,7 @@ export async function readTree(paper,fileId,nodeId) {
   for(let i=0;i<nodes.length;i+=40){
     const batch=nodes.slice(i,i+40);
     const {styles}=await paper.json('get_computed_styles',{fileId,nodeIds:batch.map(n=>n.id)});
-    for(const n of batch)n.styles=styles[n.id]??{};
+    for(const n of batch)n.styles=normalise(n,styles[n.id]??{});
   }
   for(const n of nodes)if(n.type==='Text')n.text=(await paper.json('get_node_info',{fileId,nodeId:n.id})).textContent??'';
   return tree;

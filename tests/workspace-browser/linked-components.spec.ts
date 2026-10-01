@@ -32,13 +32,13 @@ test('the Bloomâ€™s tag is one definition in the catalogue and in the paid edito
   await expect(tag).toHaveCSS('background-color',rgb(await value(page,'--pc-tag-background-color')));
   await expect(tag).toHaveCSS('font-size',await value(page,'--pc-tag__label-font-size'));
   await expect(tag).toHaveCSS('padding-top',await value(page,'--pc-tag-padding-block'));
-  measured[area]={radius:await css(tag,'border-radius'),background:await css(tag,'background-color'),fontSize:await css(tag,'font-size'),paddingTop:await css(tag,'padding-top'),paddingLeft:await css(tag,'padding-left'),width:await css(tag,'width')};
+  measured[area]={radius:await css(tag,'border-radius'),background:await css(tag,'background-color'),fontSize:await css(tag,'font-size'),paddingTop:await css(tag,'padding-top'),paddingLeft:await css(tag,'padding-left'),width:await css(tag,'width'),letterSpacing:await css(tag,'letter-spacing'),whiteSpace:await css(tag,'white-space')};
   // Change the component value once, then the token it is bound to: this use follows both.
   await set(page,'--pc-tag-border-radius','11px');await expect(tag).toHaveCSS('border-radius','11px');
   await set(page,'--color-sage-700','#102030');await expect(tag).toHaveCSS('background-color','rgb(16, 32, 48)');
  }
  const [catalogue,editor]=[measured['catalogue detail'],measured['paid question editor']];
- for(const property of ['radius','background','fontSize','paddingTop'])expect(catalogue[property]).toBe(editor[property]);
+ for(const property of ['radius','background','fontSize','paddingTop','letterSpacing','whiteSpace'])expect(catalogue[property]).toBe(editor[property]);
  // The declared context variant: a fixed column inside an outline row. Everything else is shared.
  expect(editor.width).toBe(await value(page,'--pc-tag--column-width'));expect(editor.paddingLeft).toBe(await value(page,'--pc-tag--column-padding-inline'));
  expect(catalogue.paddingLeft).toBe(await value(page,'--pc-tag-padding-inline'));
@@ -51,13 +51,14 @@ test('the notice and status marker are one definition across My papers, a paperâ
   ['paper page, stopped','/screens.html?screen=order&state=held',p=>p.getByRole('alert').filter({hasText:'needs our attention'})],
   ['paid configuration, awaiting payment','/configurator.html?paid=0',p=>p.getByRole('status').filter({hasText:/payment/i}).first()],
  ];
- const measured:Record<string,Record<string,string>>={};
+ const measured:Record<string,Record<string,string>>={},tones:Record<string,Record<string,string>>={};
  for(const [name,url,find] of places){
   await page.goto(url);const notice=find(page);await expect(notice).toBeVisible();
   await expect(notice).toHaveCSS('padding-top',await value(page,'--pc-notice-padding-block'));
   await expect(notice).toHaveCSS('border-left-width',await value(page,'--pc-notice-border-left-width'));
   await expect(notice).toHaveCSS('border-top-left-radius',await value(page,'--pc-notice-border-radius'));
   measured[name]={paddingTop:await css(notice,'padding-top'),radius:await css(notice,'border-top-left-radius'),borderLeft:await css(notice,'border-left-width')};
+  tones[name]={background:await css(notice,'background-color'),borderLeftColor:await css(notice,'border-left-color')};
   await set(page,'--pc-notice-padding-block','31px');await expect(notice).toHaveCSS('padding-top','31px');
   // A notice is persistent task feedback: it never offers a dismiss control.
   await expect(notice.getByRole('button',{name:/dismiss|close|hide/i})).toHaveCount(0);
@@ -71,7 +72,7 @@ test('the notice and status marker are one definition across My papers, a paperâ
   await set(page,'--color-status-done','#0A0B0C');await expect(dot).toHaveCSS('background-color','rgb(10, 11, 12)');
  }
  expect(dots['My papers list']).toBe(dots['paper page facts']);
- save('notice-status',info.project.name,{notices:measured,statusDots:dots});
+ save('notice-status',info.project.name,{notices:measured,tones,statusDots:dots});
 });
 
 test('question context spacing comes from the master and holds at desktop and phone widths',async({page},info)=>{

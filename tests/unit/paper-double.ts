@@ -11,6 +11,8 @@ export function paperDouble() {
   let serial=0;const files=new Map<string,{name:string;pages:Map<string,{name:string;root:Node}>;tokens:Token[]}>();
   const index=new Map<string,Map<string,Node>>();
   const calls:{tool:string;args:any}[]=[];
+  /** Paper sometimes adds a layout style to a layer it moves; tests can switch that behaviour on. */
+  const quirks={moveAddsWidth:false};
   const register=(file:string,node:Node)=>{index.get(file)!.set(node.id,node);node.children.forEach(c=>{c.parent=node;register(file,c);});};
   const find=(file:string,id:string)=>{const node=index.get(file)?.get(id);if(!node)throw new Error(`Node ${id} not found`);return node;};
   function parse(html:string):Node[] {
@@ -40,14 +42,15 @@ export function paperDouble() {
     delete_nodes:a=>{for(const id of a.nodeIds){const node=find(a.fileId,id);node.parent!.children=node.parent!.children.filter(c=>c!==node);const drop=(n:Node)=>{index.get(a.fileId)!.delete(n.id);n.children.forEach(drop);};drop(node);}return {deletedNodeIds:a.nodeIds};},
     move_nodes:a=>{for(const m of a.moves){const node=find(a.fileId,m.nodeId);node.parent!.children=node.parent!.children.filter(c=>c!==node);
       if(m.after){const sibling=find(a.fileId,m.after),list=sibling.parent!.children;list.splice(list.indexOf(sibling)+1,0,node);node.parent=sibling.parent;}
-      else{const parent=find(a.fileId,m.parentId);parent.children.splice(m.index??parent.children.length,0,node);node.parent=parent;}}return {};},
+      else{const parent=find(a.fileId,m.parentId);parent.children.splice(m.index??parent.children.length,0,node);node.parent=parent;}
+      if(quirks.moveAddsWidth&&node.type==='Text')node.styles.width='max-content';}return {};},
     get_tokens:a=>({tokens:files.get(a.fileId)!.tokens.filter(t=>!a.namePattern||t.name===a.namePattern).map(t=>({...t}))}),
     create_tokens:a=>{files.get(a.fileId)!.tokens.push(...a.tokens.map((t:Token)=>({...t})));return {};},
     set_tokens:a=>{const file=files.get(a.fileId)!;for(const t of a.tokens){if(t.delete)file.tokens=file.tokens.filter(x=>x.name!==t.name);else file.tokens.find(x=>x.name===t.name)!.value=t.value;}return {};},
     finish_working_on_nodes:()=>({}),
   };
   return {
-    calls,
+    calls,quirks,
     json:async(tool:string,args:any)=>{calls.push({tool,args});if(!tools[tool])throw new Error(`The double has no tool ${tool}`);return tools[tool](args);},
     tokenHash:async(fileId:string)=>JSON.stringify(files.get(fileId)!.tokens).length.toString(16),
     close(){},
