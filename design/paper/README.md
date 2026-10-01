@@ -1,5 +1,7 @@
 # Paper alignment
 
+> **Read the section "Linked components (C15)" first.** It replaces the manual steps under "Maintaining the link" for tokens and for every family that has a master. The older sections record how each earlier screen was aligned.
+
 Source: **Revise It Website**, Paper file `01M36MRM9HCJ4T87N081XDT4MX`, re-read on 28 September 2026 for the C08 renewal. Token export hash: `b9f678ac` (Design System file `01M39C8ME02J6YMB2BGFQFE1V4`, hash `9065ba3a`, uses the same names and values).
 
 ## Border and font migration (C08)
@@ -37,3 +39,50 @@ Browser coverage: `tests/workspace-browser/paper-alignment.spec.ts` compares rep
 ## Renewed experience (C08)
 
 `experience.json` records the Paper artboards and representative nodes behind `app/(accounts)/experience.module.css`, which carries the shell, notices, status markers, My papers, the paper page, account access, school formatting and the staff workspace. It also lists the deliberate differences where the application shows only data the server actually provides. `accounts.module.css` and `account-nav.tsx` were deleted; `tests/preview/screens.html` renders My papers and the paper page with synthetic orders, and `tests/workspace-browser/experience.spec.ts` checks them at desktop and phone widths.
+
+## Linked components (C15)
+
+Paper 0.5.14 has one native link: a token bound to a node updates that node when the token changes, inside the same file. It has no master and instance link (a duplicate or a clone is a detached copy) and tokens are not shared between files. Everything else here is **synchronisation**: an explicit command with a preview, never automatic inheritance.
+
+### Who owns what
+
+| Property | Owner | How it reaches its uses |
+| --- | --- | --- |
+| Token values | Design System file in Paper | Native inside that file. `paper:apply` mirrors them into the Website file. `paper:pull` exports them to `app/paper-tokens.css` and the email colour block. |
+| Component layers, spacing, type, colour bindings | The master frame on the Design System page "5 Linked components · masters (C15)" | `paper:apply` updates every registered instance in both files. `paper:pull` exports each visual value to `app/paper-components.css`. |
+| Variants (tone, density, collapsed, narrow) | `design/paper/components.json` | Same two commands. |
+| Behaviour, markup, accessibility, typed inputs | The shared module under `app/(accounts)/system/` | Ordinary imports. |
+| Content and state | Each instance | Never synchronised. In Paper: slot text, images, declared overridable properties. In the application: props. |
+
+Nothing flows from code to Paper, and no Paper edit deploys anything.
+
+### Commands
+
+```sh
+npm run paper:status                      # compare Paper with the registry; exit 1 on any difference
+npm run paper:plan -- --out plan.json     # write the preview
+npm run paper:apply -- --plan plan.json   # apply it; refused per instance if Paper changed since the preview
+npm run paper:pull                        # export tokens and master values to code (only when status is clean)
+npm run paper:pull -- --check             # report whether code is behind Paper, write nothing
+npm run paper:restore -- --journal <file> # undo one application
+npm run check:paper                       # offline: single definitions, generated files, lock (no Paper needed)
+```
+
+Paper must be running with both files open. `apply` takes `--adopt <id,…|all>` for the first synchronisation of an instance and `--accept-master <id,…>` to overwrite a reported manual edit with the master. Previews and journals are written to `.paper-link/journal` (ignored by Git) or to `PAPER_LINK_JOURNAL`.
+
+### What is protected
+
+- **Unrecognised edits.** The lock (`link-lock.json`) keeps one hash per synchronised layer. A layer that differs from both its master and its last synchronised state was edited by hand: it is reported as drift and never overwritten without `--accept-master`.
+- **Stale previews.** `apply` reads Paper again. An instance or master that changed after the preview is refused.
+- **Missed and detached instances.** `status` searches every active page for frames named like a registered component. An unregistered one, or a registered node that no longer exists, fails the check. Every page must be classified as active, illustration or historical.
+- **Hand-edited generated files.** `paper-tokens.css` and `paper-components.css` carry a hash of their own content. `check:paper` fails on a hand edit and `paper:pull` refuses to overwrite one without `--force`.
+- **Private copies in code.** `check:paper` fails when a stylesheet outside the owner redefines a shared block, when an import site is missing from the registry, or when a stylesheet reads a value no master exports. Deliberate exceptions are listed in the registry with a reason.
+
+### Adding a component or an instance
+
+1. Draw or duplicate the master on the masters page, with `block__element` layer names. Name every layer; names are the addresses.
+2. Add it under `masters` in `components.json`: `slots` (text each instance owns), `overridable` (properties each instance owns), `repeat`, `variants`, and its `instances` by file and node identifier.
+3. `npm run paper:plan`, read the preview, then `npm run paper:apply -- --plan … --adopt <id>`.
+4. `npm run paper:pull`, use the new `--pc-*` values in the one shared stylesheet, and add the family's `code` entry.
+
+Exploratory masters (`"export": false`) are synchronised in Paper but not exported to code.
