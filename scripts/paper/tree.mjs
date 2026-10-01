@@ -27,10 +27,17 @@ function normalise(node,styles) {
   return styles;
 }
 
+/**
+ * Confirmed absence: Paper answered and the layer is not on the canvas. Any other error from a
+ * read means the answer is unknown, and callers must not treat it as absence.
+ */
+export class NodeMissing extends Error {}
+
 export async function readTree(paper,fileId,nodeId) {
   // Paper keeps a deleted layer readable but detached (no parent), so a successful read is not proof that it exists.
   const info=await paper.json('get_node_info',{fileId,nodeId});
-  if(!info?.parentId)throw new Error(`Paper node ${nodeId} in ${fileId} is not on the canvas (deleted or detached)`);
+  if(info&&!info.parentId)throw new NodeMissing(`Paper node ${nodeId} in ${fileId} is not on the canvas (deleted or detached)`);
+  if(!info)throw new Error(`Paper returned nothing for node ${nodeId} in ${fileId}`);
   const {summary}=await paper.json('get_tree_summary',{fileId,nodeId,depth:10});
   const tree=parseSummary(summary);if(!tree)throw new Error(`Paper node ${nodeId} was not found in ${fileId}`);
   const nodes=[];walk(tree,n=>nodes.push(n));

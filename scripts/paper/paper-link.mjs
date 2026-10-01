@@ -27,7 +27,7 @@ const journalDir=flag('journal-dir')??process.env.PAPER_LINK_JOURNAL??path.join(
 
 function print(result) {
   const s=summarise(result);
-  console.log(`Paper link: ${s.masters} masters, ${s.instances} instances; ${s.inSync} in sync, ${s.pending} awaiting a master change, ${s.unadopted+s.unrecorded} not yet adopted, ${s.drift} with unrecognised edits, ${s.detached} detached; ${s.tokenOperations} token operations, ${s.tokenDrift} token conflicts; ${s.unregistered} unregistered component layers.`);
+  console.log(`Paper link: ${s.masters} masters, ${s.instances} instances; ${s.inSync} in sync, ${s.pending} awaiting a master change, ${s.unadopted+s.unrecorded} not yet adopted, ${s.drift} with unrecognised edits, ${s.detached} detached, ${s.unreadable} unreadable; ${s.tokenOperations} token operations, ${s.tokenDrift} token conflicts; ${s.unregistered} unregistered component layers.`);
   for(const p of result.problems)console.log(`  problem: ${p}`);
   for(const t of result.tokens){
     for(const o of t.ops)console.log(`  ${t.id}: ${o.op} ${o.name??o.token.name} ${o.from!==undefined?`${o.from} -> `:''}${o.value??o.token?.value??''}`);
@@ -71,8 +71,9 @@ else if(['status','plan','apply','restore','recover'].includes(command)){
     if(command==='restore'||command==='recover'){const target=flag('journal'),journal=readJson(target);if(!journal)throw new Error('restore needs --journal <file>');
       const report=await restoreJournal(paper,registry,lock,journal,{save:j=>writeJson(target,j)});writeJson(lockPath(root),lock);
       const count=k=>report.outcomes.filter(o=>o.outcome===k).length;
-      console.log(`Restored ${report.restored.join(', ')||'nothing'}. Reverted ${count('reverted')}, never landed ${count('not-applied')}, never sent ${count('never-sent')}, left for review ${count('conflict')}.`);
+      console.log(`Restored ${report.restored.join(', ')||'nothing'}. Reverted ${count('reverted')}, never landed ${count('not-applied')}, never sent ${count('never-sent')}, left for review ${count('conflict')}, unknown ${count('uncertain')}.`);
       for(const c of report.conflicts)console.log(`  left for review: ${c.item} ${c.key}: ${c.detail}`);
-      for(const n of report.notes)console.log(`  note: ${n}`);process.exitCode=report.conflicts.length?1:0;}
+      for(const u of report.uncertain)console.log(`  unknown, run restore again: ${u.item} ${u.key}: ${u.detail}`);
+      for(const n of report.notes)console.log(`  note: ${n}`);process.exitCode=report.conflicts.length||report.uncertain.length?1:0;}
   }finally{paper.close();}
 }else{console.log(fs.readFileSync(fileURLToPath(import.meta.url),'utf8').split('\n').slice(9,19).map(l=>l.replace(/^ \* ?/,'')).join('\n'));process.exitCode=command?1:0;}

@@ -72,8 +72,10 @@ describe('R1: an interrupted application leaves a recoverable record',()=>{
     const recovery=await restore(report.journal);
     expect(recovery.outcomes.map((o:any)=>o.outcome)).toEqual(['not-applied','reverted']);
     expect(node('web','card',0).styles.gap).toBe('16px');
-    const again=await restore(report.journal);
-    expect(again.outcomes).toEqual([{item:expect.any(String),op:'text',key:'@root/card__label',outcome:'not-applied'}]);
+    // C15B: settled operations are not revisited, so a second run reads and writes nothing.
+    const calls=paper.calls.length,again=await restore(report.journal);
+    expect(again.outcomes).toEqual([]);
+    expect(paper.calls.slice(calls).filter(c=>!c.tool.startsWith('get_'))).toEqual([]);
     expect(isClean(await survey(paper,registry,lock,{scan:false}))).toBe(false);// the master change is still waiting, as it should
   });
 

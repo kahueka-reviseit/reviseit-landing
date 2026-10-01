@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import {parseSummary,readTree,toHtml,walk} from './tree.mjs';
+import {NodeMissing,parseSummary,readTree,toHtml,walk} from './tree.mjs';
 import {hashOf,masterHash,matches,planInstance,planTokens,shape,stable,validateMaster} from './sync-core.mjs';
 
 /**
@@ -55,7 +55,11 @@ export async function survey(paper,registry,lock=emptyLock(),{accept=[],acceptRe
       const key=instanceId(entry);if(only&&!only.includes(key))continue;
       const known=lock.instances[key];
       let tree;try{tree=await readTree(paper,fileId(registry,entry.file),entry.node);}
-      catch{result.instances.push({id:key,master:id,file:entry.file,node:entry.node,status:'detached',ops:[],drift:[{kind:'detached',key:'@root',detail:'the registered Paper node no longer exists'}]});continue;}
+      catch(error){
+        // Only a confirmed absence is "detached"; a failed read is reported as unreadable, never as either state.
+        if(error instanceof NodeMissing)result.instances.push({id:key,master:id,file:entry.file,node:entry.node,status:'detached',ops:[],drift:[{kind:'detached',key:'@root',detail:'the registered Paper node no longer exists'}]});
+        else result.instances.push({id:key,master:id,file:entry.file,node:entry.node,status:'unreadable',ops:[],drift:[{kind:'unreadable',key:'@root',detail:String(error?.message??error)}]});
+        continue;}
       const plan=planInstance({master:masters[id].tree,instance:tree,spec,entry,base:accept.includes(key)?undefined:known?.state,baseContent:known?.content,allowRemoval:acceptRemoval.includes(key),resolveNested});
       const status=plan.drift.length?'drift':!known?(plan.ops.length?'unadopted':'unrecorded'):plan.ops.length?'pending':stable(plan.state)===stable(known.state)&&known.masterHash===result.masters[id].hash?'in-sync':'unrecorded';
       result.instances.push({id:key,master:id,file:entry.file,node:entry.node,where:entry.where,variant:entry.variant,status,ops:plan.ops,drift:plan.drift,state:plan.state,
@@ -107,9 +111,9 @@ export function summarise(result) {
   const count=status=>result.instances.filter(i=>i.status===status).length;
   const tokenOps=result.tokens.reduce((n,t)=>n+t.ops.length,0),tokenDrift=result.tokens.reduce((n,t)=>n+t.drift.length,0);
   return {masters:Object.keys(result.masters).length,instances:result.instances.length,inSync:count('in-sync'),pending:count('pending'),unadopted:count('unadopted'),unrecorded:count('unrecorded'),
-    drift:count('drift'),detached:count('detached'),operations:result.instances.reduce((n,i)=>n+i.ops.length,0)+tokenOps,tokenOperations:tokenOps,tokenDrift,unregistered:result.unregistered.length,problems:result.problems.length};
+    drift:count('drift'),detached:count('detached'),unreadable:count('unreadable'),operations:result.instances.reduce((n,i)=>n+i.ops.length,0)+tokenOps,tokenOperations:tokenOps,tokenDrift,unregistered:result.unregistered.length,problems:result.problems.length};
 }
-export const isClean=result=>{const s=summarise(result);return !s.pending&&!s.unadopted&&!s.unrecorded&&!s.drift&&!s.detached&&!s.operations&&!s.tokenDrift&&!s.unregistered&&!s.problems;};
+export const isClean=result=>{const s=summarise(result);return !s.pending&&!s.unadopted&&!s.unrecorded&&!s.drift&&!s.detached&&!s.unreadable&&!s.operations&&!s.tokenDrift&&!s.unregistered&&!s.problems;};
 
 /** The reviewable preview: what would change, and the fingerprints that must still hold when it is applied. */
 export function toPlan(result,registry) {
@@ -232,98 +236,172 @@ export async function applyPlan(paper,registry,lock,plan,{adopt=[],accept=[],acc
   return report;
 }
 
+/** A recovery read or write whose result is unknown. Recovery of that item stops and stays open. */
+export class RecoveryUncertain extends Error {}
+const settled=['reverted','not-applied','never-sent'];
+
 /**
  * Undoes one application, interrupted or complete, by looking at Paper first. A recorded
  * change is put back only where Paper still shows the value that application wrote. Where
- * Paper shows the earlier value, the change never landed and nothing is done. Anything else
- * was changed by someone since: it is left alone and reported. Operations are undone in
- * reverse order; running it again does nothing more.
+ * Paper shows the earlier value, the change never landed (or this recovery already undid it).
+ * Anything else was changed by someone since: it is left alone and reported.
+ *
+ * Recovery is held to the same standard as applying (C15B):
+ * - A read that fails is not absence. Only Paper's confirmed "not on the canvas" counts as
+ *   gone; any other failure marks the operation uncertain and stops recovery of that item.
+ * - Every recovery write is journalled before it is sent (`undo.<step>.status: sent`), then
+ *   acknowledged. A failed call marks it uncertain and stops recovery of that item.
+ * - A recreated layer is recorded with the parent's children as they were before the write, so
+ *   a retry after a lost reply finds the layer it already made instead of making another.
+ * - The journal is "recovered" only when every operation is settled; otherwise it stays
+ *   "recovery-incomplete" and can be run again safely.
  */
 export async function restoreJournal(paper,registry,lock,journal,{save=()=>{},now=()=>new Date().toISOString()}={}) {
-  const report={restored:[],conflicts:[],notes:[],outcomes:[]};
-  const record=(item,o,outcome,detail)=>{o.recovery=outcome;if(detail)o.recoveryDetail=detail;report.outcomes.push({item,op:o.op,key:o.key??o.name??o.token?.name,outcome,...(detail?{detail}:{})});
-    if(outcome==='conflict')report.conflicts.push({item,key:o.key??o.name??o.token?.name,detail});save(journal);};
-  const exists=async(fileKey,nodeId)=>{try{return await readTree(paper,fileId(registry,fileKey),nodeId);}catch{return null;}};
+  const report={restored:[],conflicts:[],uncertain:[],notes:[],outcomes:[]};
+  const persist=()=>save(journal);
+  const keyOf=o=>o.key??o.name??o.token?.name;
+  const record=(item,o,outcome,detail)=>{
+    o.recovery=outcome;if(detail)o.recoveryDetail=detail;else delete o.recoveryDetail;
+    report.outcomes.push({item,op:o.op,key:keyOf(o),outcome,...(detail?{detail}:{})});
+    if(outcome==='conflict')report.conflicts.push({item,key:keyOf(o),detail});
+    if(outcome==='uncertain')report.uncertain.push({item,key:keyOf(o),detail});
+    persist();
+  };
+  const look=async(fileKey,nodeId)=>{
+    try{return {present:true,tree:await readTree(paper,fileId(registry,fileKey),nodeId)};}
+    catch(error){if(error instanceof NodeMissing)return {present:false};throw new RecoveryUncertain(`could not read ${nodeId}: ${error?.message??error}`);}
+  };
+  const readTokens=async id=>{
+    try{return new Map((await paper.json('get_tokens',{fileId:id,format:'json'})).tokens.map(t=>[t.name,t]));}
+    catch(error){throw new RecoveryUncertain(`could not read tokens: ${error?.message??error}`);}
+  };
+  const write=async(o,step,call,evidence={})=>{
+    o.undo={...(o.undo??{}),[step]:{...evidence,status:'sent',at:now()}};persist();
+    try{const result=await call();o.undo[step].status='acknowledged';persist();return result;}
+    catch(error){o.undo[step].status='uncertain';o.undo[step].error=String(error?.message??error);persist();
+      throw new RecoveryUncertain(`Paper did not confirm ${step} for ${keyOf(o)}: ${o.undo[step].error}`);}
+  };
+  const sent=(o,step)=>!!o.undo?.[step];
+  const same=(a,b)=>stable(shape(a))===stable(shape(b));
+  const finish=(entry,item,lockKey,lockBefore,into)=>{
+    if(entry.ops.every(o=>settled.includes(o.recovery))){
+      const state=lockBefore[lockKey];if(state===null||state===undefined)delete into[lockKey];else into[lockKey]=state;report.restored.push(item);}
+  };
+
   for(const entry of journal.tokens){
     const item=`tokens:${entry.file}`,id=fileId(registry,entry.file);
     for(const o of [...entry.ops].reverse()){
-      if(o.recovery==='reverted')continue;
+      if(settled.includes(o.recovery))continue;
       if(o.status==='pending'){record(item,o,'never-sent');continue;}
-      const tokens=new Map((await paper.json('get_tokens',{fileId:id,format:'json'})).tokens.map(t=>[t.name,t]));
-      if(o.op==='token-set'){const cur=tokens.get(o.name)?.value;
-        if(cur===o.value){await paper.json('set_tokens',{fileId:id,tokens:[{name:o.name,value:o.from}]});record(item,o,'reverted');}
-        else if(cur===o.from)record(item,o,'not-applied');
-        else record(item,o,'conflict',`${o.name} is now ${cur??'absent'}; this application set ${o.value} over ${o.from}`);}
-      if(o.op==='token-create'){const cur=tokens.get(o.token.name);
-        if(!cur)record(item,o,'not-applied');
-        else if(cur.value===o.token.value){await paper.json('set_tokens',{fileId:id,tokens:[{name:o.token.name,delete:true}]});record(item,o,'reverted');}
-        else record(item,o,'conflict',`${o.token.name} was created as ${o.token.value} and is now ${cur.value}`);}
-      if(o.op==='token-delete'){const cur=tokens.get(o.name);
-        if(!cur){await paper.json('create_tokens',{fileId:id,tokens:[{type:o.type??'color',name:o.name,value:o.from}]});record(item,o,'reverted');}
-        else if(cur.value===o.from)record(item,o,'not-applied');
-        else record(item,o,'conflict',`${o.name} was deleted by this application and now exists again as ${cur.value}`);}
+      try{
+        const tokens=await readTokens(id);
+        if(o.op==='token-set'){const cur=tokens.get(o.name)?.value;
+          if(cur===o.value){await write(o,'restore',()=>paper.json('set_tokens',{fileId:id,tokens:[{name:o.name,value:o.from}]}));record(item,o,'reverted');}
+          else if(cur===o.from)record(item,o,sent(o,'restore')?'reverted':'not-applied');
+          else record(item,o,'conflict',`${o.name} is now ${cur??'absent'}; this application set ${o.value} over ${o.from}`);}
+        if(o.op==='token-create'){const cur=tokens.get(o.token.name);
+          if(!cur)record(item,o,sent(o,'delete')?'reverted':'not-applied');
+          else if(cur.value===o.token.value){await write(o,'delete',()=>paper.json('set_tokens',{fileId:id,tokens:[{name:o.token.name,delete:true}]}));record(item,o,'reverted');}
+          else record(item,o,'conflict',`${o.token.name} was created as ${o.token.value} and is now ${cur.value}`);}
+        if(o.op==='token-delete'){const cur=tokens.get(o.name);
+          if(!cur){await write(o,'create',()=>paper.json('create_tokens',{fileId:id,tokens:[{type:o.type??'color',name:o.name,value:o.from}]}));record(item,o,'reverted');}
+          else if(cur.value===o.from)record(item,o,sent(o,'create')?'reverted':'not-applied');
+          else record(item,o,'conflict',`${o.name} was deleted by this application and now exists again as ${cur.value}`);}
+      }catch(error){if(!(error instanceof RecoveryUncertain))throw error;record(item,o,'uncertain',error.message);break;}
     }
-    if(!entry.ops.some(o=>o.recovery==='conflict')){const state=journal.lockBefore.tokens[entry.file];if(state===null||state===undefined)delete lock.tokens[entry.file];else lock.tokens[entry.file]=state;report.restored.push(item);}
+    finish(entry,item,entry.file,journal.lockBefore.tokens,lock.tokens);
   }
+
   for(const entry of journal.instances){
-    const id=fileId(registry,entry.file),beforeIds=new Set();walk(entry.before,n=>beforeIds.add(n.id));
+    const beforeIds=new Set();walk(entry.before,n=>beforeIds.add(n.id));
+    const fid=fileId(registry,entry.file);
     for(const o of [...entry.ops].reverse()){
-      if(o.recovery==='reverted')continue;
+      if(settled.includes(o.recovery))continue;
       if(o.status==='pending'){record(entry.id,o,'never-sent');continue;}
-      if(o.op==='style'){
-        const node=await exists(entry.file,o.nodeId);
-        if(!node){record(entry.id,o,'conflict','the layer no longer exists');continue;}
-        const back={},clash=[];let landed=false;
-        for(const [p,v] of Object.entries(o.set)){
-          const target=v===''?undefined:v,before=o.from[p]??undefined,cur=node.styles[p];
-          if(cur===target){back[p]=before??'';landed=true;}else if(cur!==before)clash.push(`${p} is ${cur??'unset'}`);
+      try{
+        if(o.op==='style'){
+          const node=await look(entry.file,o.nodeId);
+          if(!node.present){record(entry.id,o,'conflict','the layer no longer exists');continue;}
+          const back={},clash=[];
+          for(const [p,v] of Object.entries(o.set)){
+            const target=v===''?undefined:v,before=o.from[p]??undefined,cur=node.tree.styles[p];
+            if(cur===target&&target!==before)back[p]=before??'';else if(cur!==before)clash.push(`${p} is ${cur??'unset'}`);
+          }
+          if(clash.length){record(entry.id,o,'conflict',`changed since this application: ${clash.join(', ')}`);continue;}
+          if(Object.keys(back).length){await write(o,'restore',()=>paper.json('update_styles',{fileId:fid,updates:[{nodeIds:[o.nodeId],styles:back}]}));record(entry.id,o,'reverted');}
+          else record(entry.id,o,sent(o,'restore')?'reverted':'not-applied');
         }
-        if(clash.length){record(entry.id,o,'conflict',`changed since this application: ${clash.join(', ')}`);continue;}
-        if(landed){await paper.json('update_styles',{fileId:id,updates:[{nodeIds:[o.nodeId],styles:back}]});record(entry.id,o,'reverted');}else record(entry.id,o,'not-applied');
-      }
-      if(o.op==='text'){
-        const node=await exists(entry.file,o.nodeId);
-        if(!node)record(entry.id,o,'conflict','the layer no longer exists');
-        else if(node.text===o.text){await paper.json('set_text_content',{fileId:id,updates:[{nodeId:o.nodeId,textContent:o.from}]});record(entry.id,o,'reverted');}
-        else if(node.text===o.from)record(entry.id,o,'not-applied');
-        else record(entry.id,o,'conflict',`text is now "${node.text}"`);
-      }
-      if(o.op==='insert'){
-        let created=o.created?await exists(entry.file,o.created):null;
-        if(!o.created){
-          // The write was not confirmed, so its identifier is unknown: look for a layer of that name that was not there before.
-          const parent=await exists(entry.file,o.parentId),name=o.key.split('/').pop();
-          const candidates=(parent?.children??[]).filter(c=>c.name===name&&!beforeIds.has(c.id));
-          if(candidates.length>1){record(entry.id,o,'conflict',`${candidates.length} new layers named "${name}"; remove the right one by hand`);continue;}
-          created=candidates[0]?await exists(entry.file,candidates[0].id):null;
+        if(o.op==='text'){
+          const node=await look(entry.file,o.nodeId);
+          if(!node.present)record(entry.id,o,'conflict','the layer no longer exists');
+          else if(node.tree.text===o.text&&o.text!==o.from){await write(o,'restore',()=>paper.json('set_text_content',{fileId:fid,updates:[{nodeId:o.nodeId,textContent:o.from}]}));record(entry.id,o,'reverted');}
+          else if(node.tree.text===o.from)record(entry.id,o,sent(o,'restore')?'reverted':'not-applied');
+          else record(entry.id,o,'conflict',`text is now "${node.tree.text}"`);
         }
-        if(!created)record(entry.id,o,'not-applied');
-        // Paper may store the same styles in another order, so compare structure, not markup text.
-        else if(o.tree?stable(shape(created))===stable(o.tree):toHtml(created)===o.html){await paper.json('delete_nodes',{fileId:id,nodeIds:[created.id]});record(entry.id,o,'reverted');}
-        else record(entry.id,o,'conflict','the inserted layer was edited after this application; left in place');
-      }
-      if(o.op==='remove'){
-        if(await exists(entry.file,o.nodeId)){record(entry.id,o,'not-applied');continue;}
-        let node,parent,previous;walk(entry.before,(n,p)=>{if(n.id===o.nodeId){node=n;parent=p;}});
-        if(!parent||!await exists(entry.file,parent.id)){record(entry.id,o,'conflict','its parent layer no longer exists');continue;}
-        const index=parent.children.findIndex(c=>c.id===o.nodeId);previous=parent.children[index-1];
-        const made=await paper.json('write_html',{fileId:id,targetNodeId:parent.id,mode:'insert-children',html:toHtml(node)});
-        o.recreated=made.createdNodes[0].id;
-        await paper.json('move_nodes',{fileId:id,moves:[previous&&await exists(entry.file,previous.id)?{nodeId:o.recreated,after:previous.id}:{nodeId:o.recreated,parentId:parent.id,index:0}]});
-        record(entry.id,o,'reverted');report.notes.push(`${entry.id}: layer "${node.name}" was recreated with a new identifier ${o.recreated}`);
-      }
-      if(o.op==='order'){
-        const parent=await exists(entry.file,o.parentId);
-        if(!parent){record(entry.id,o,'conflict','the parent layer no longer exists');continue;}
-        const ids=parent.children.map(c=>c.id).filter(c=>o.order.includes(c));
-        if(ids.join()===o.order.join()){for(let i=1;i<o.from.length;i++)await paper.json('move_nodes',{fileId:id,moves:[{nodeId:o.from[i],after:o.from[i-1]}]});record(entry.id,o,'reverted');}
-        else if(ids.join()===o.from.join())record(entry.id,o,'not-applied');
-        else record(entry.id,o,'conflict','the layer order has changed since this application');
-      }
+        if(o.op==='insert'){
+          if(!o.created){
+            // The write was not confirmed, so its identifier is unknown: look for a layer of that name that was not there before.
+            const parent=await look(entry.file,o.parentId),name=o.key.split('/').pop();
+            if(!parent.present){record(entry.id,o,'conflict','its parent layer no longer exists');continue;}
+            const candidates=parent.tree.children.filter(c=>c.name===name&&!beforeIds.has(c.id));
+            if(candidates.length>1){record(entry.id,o,'conflict',`${candidates.length} new layers named "${name}"; remove the right one by hand`);continue;}
+            if(!candidates.length){record(entry.id,o,'not-applied');continue;}
+            o.created=candidates[0].id;o.createdFoundBy='name after a lost reply';persist();
+          }
+          const created=await look(entry.file,o.created);
+          if(!created.present)record(entry.id,o,sent(o,'delete')?'reverted':'not-applied');
+          // Paper may store the same styles in another order, so compare structure, not markup text.
+          else if(o.tree?stable(shape(created.tree))===stable(o.tree):toHtml(created.tree)===o.html){
+            await write(o,'delete',()=>paper.json('delete_nodes',{fileId:fid,nodeIds:[o.created]}));record(entry.id,o,'reverted');}
+          else record(entry.id,o,'conflict','the inserted layer was edited after this application; left in place');
+        }
+        if(o.op==='remove'){
+          let node,parent;walk(entry.before,(n,p)=>{if(n.id===o.nodeId){node=n;parent=p;}});
+          const original=await look(entry.file,o.nodeId);
+          if(original.present){record(entry.id,o,'not-applied');continue;}
+          const parentNow=await look(entry.file,parent.id);
+          if(!parentNow.present){record(entry.id,o,'conflict','its parent layer no longer exists');continue;}
+          if(!o.recreated&&sent(o,'recreate')){
+            // A recreation was sent but its reply was lost: find what it made before making anything again.
+            const made=parentNow.tree.children.filter(c=>c.name===node.name&&!o.undo.recreate.childrenBefore.includes(c.id));
+            if(made.length>1){record(entry.id,o,'conflict',`${made.length} recreated layers named "${node.name}"; keep one by hand`);continue;}
+            if(made.length===1){const found=await look(entry.file,made[0].id);
+              if(!found.present||!same(found.tree,node)){record(entry.id,o,'conflict','a layer of that name appeared that does not match the removed one');continue;}
+              o.recreated=made[0].id;o.recreatedFoundBy='name after a lost reply';persist();}
+          }
+          if(o.recreated){
+            const again=await look(entry.file,o.recreated);
+            if(!again.present){record(entry.id,o,'conflict','the recreated layer was removed again after recovery made it');continue;}
+          }else{
+            const result=await write(o,'recreate',()=>paper.json('write_html',{fileId:fid,targetNodeId:parent.id,mode:'insert-children',html:toHtml(node)}),
+              {childrenBefore:parentNow.tree.children.map(c=>c.id)});
+            o.recreated=result.createdNodes[0].id;persist();
+          }
+          // Put it back where it was: after its former previous sibling if that is still there, otherwise first.
+          const index=parent.children.findIndex(c=>c.id===o.nodeId),previous=parent.children[index-1];
+          const anchor=previous&&(await look(entry.file,previous.id)).present?previous.id:null;
+          const siblings=(await look(entry.file,parent.id)).tree.children.map(c=>c.id),at=siblings.indexOf(o.recreated);
+          const placed=anchor?siblings[at-1]===anchor:at===0;
+          if(!placed)await write(o,'place',()=>paper.json('move_nodes',{fileId:fid,moves:[anchor?{nodeId:o.recreated,after:anchor}:{nodeId:o.recreated,parentId:parent.id,index:0}]}));
+          record(entry.id,o,'reverted');report.notes.push(`${entry.id}: layer "${node.name}" was recreated with a new identifier ${o.recreated}`);
+        }
+        if(o.op==='order'){
+          const parent=await look(entry.file,o.parentId);
+          if(!parent.present){record(entry.id,o,'conflict','the parent layer no longer exists');continue;}
+          const ids=parent.tree.children.map(c=>c.id).filter(c=>o.order.includes(c));
+          const sameSet=ids.length===o.from.length&&o.from.every(c=>ids.includes(c));
+          const moveBack=()=>write(o,'reorder',async()=>{for(let i=1;i<o.from.length;i++)await paper.json('move_nodes',{fileId:fid,moves:[{nodeId:o.from[i],after:o.from[i-1]}]});});
+          if(ids.join()===o.from.join())record(entry.id,o,sent(o,'reorder')?'reverted':'not-applied');
+          // A partly finished move back, after a lost reply, is completed rather than called a conflict.
+          else if(ids.join()===o.order.join()||(sent(o,'reorder')&&sameSet)){await moveBack();record(entry.id,o,'reverted');}
+          else record(entry.id,o,'conflict','the layer order has changed since this application');
+        }
+      }catch(error){if(!(error instanceof RecoveryUncertain))throw error;record(entry.id,o,'uncertain',error.message);break;}
     }
-    if(!entry.ops.some(o=>o.recovery==='conflict')){const state=journal.lockBefore.instances[entry.id];if(state===null||state===undefined)delete lock.instances[entry.id];else lock.instances[entry.id]=state;report.restored.push(entry.id);}
+    finish(entry,entry.id,entry.id,journal.lockBefore.instances,lock.instances);
   }
   journal.recovery={at:now(),outcomes:report.outcomes};
-  journal.meta.status=report.conflicts.length?'recovery-incomplete':'recovered';save(journal);
+  journal.meta.status=report.conflicts.length||report.uncertain.length||[...journal.tokens,...journal.instances].some(e=>e.ops.some(o=>!settled.includes(o.recovery)))?'recovery-incomplete':'recovered';
+  persist();
   return report;
 }
