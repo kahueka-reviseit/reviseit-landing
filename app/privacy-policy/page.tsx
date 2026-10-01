@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { marked } from 'marked';
-import Link from 'next/link';
 import styles from './privacy-policy.module.css';
+import nav from '../(accounts)/system/navigation.module.css';
+import { SiteHeader } from '../(accounts)/system/navigation';
 
 export const metadata = {
   title: 'Privacy Policy — Revise It',
@@ -16,12 +17,7 @@ export default function PrivacyPolicyPage() {
 
   return (
     <div className={styles['privacy-policy']}>
-      <div className="sage-bar" />
-      <nav className={styles['site-nav']}>
-        <Link href="/" className={styles['site-nav__brand']}>
-          <span className={styles['site-nav__wordmark']}>Revise It</span>
-        </Link>
-      </nav>
+      <SiteHeader variant="inverse" label="Site" brandHref="/" />
       <main className={styles['page-body']}>
         <div className={styles['page-body__container']}>
           <article

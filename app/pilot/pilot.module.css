@@ -6,36 +6,6 @@
 }
 
 /* ─── Nav ────────────────────────────────────────────────────── */
-.site-nav {
-  padding: 16px 24px;
-  background: var(--color-navy);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.site-nav__brand {
-  display: inline-flex;
-  text-decoration: none;
-}
-
-.site-nav__wordmark {
-  color: var(--color-white);
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 24px;
-  line-height: 30px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-.site-nav__back {
-  font-family: var(--font-body), sans-serif;
-  font-size: 0.85rem;
-  color: var(--color-sage-light);
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-.site-nav__back:hover { color: var(--color-white); }
 
 /* ─── Hero ───────────────────────────────────────────────────── */
 .hero {

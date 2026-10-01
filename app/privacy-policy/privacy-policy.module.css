@@ -6,26 +6,6 @@
 }
 
 /* ─── Nav ────────────────────────────────────────────────────── */
-.site-nav {
-  padding: 16px 24px;
-  background: var(--color-navy);
-  display: flex;
-  align-items: center;
-}
-
-.site-nav__brand {
-  display: inline-flex;
-  text-decoration: none;
-}
-
-.site-nav__wordmark {
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 24px;
-  line-height: 30px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: var(--color-white);
-}
 
 
 /* ─── Main ───────────────────────────────────────────────────── */

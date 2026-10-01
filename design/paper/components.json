@@ -1271,24 +1271,66 @@
   "K11": {
    "title": "Navigation",
    "masters": [],
-   "code": null,
-   "paperToCode": "tokens only",
+   "code": {
+    "definition": "app/(accounts)/system/navigation.tsx",
+    "stylesheet": "app/(accounts)/system/navigation.module.css",
+    "blocks": [
+     "site-header",
+     "site-nav",
+     "nav-menu"
+    ],
+    "importSites": [
+     "app/(accounts)/shell.tsx",
+     "app/(accounts)/staff-header.tsx",
+     "app/page.tsx",
+     "app/pilot/page.tsx",
+     "app/privacy-policy/page.tsx"
+    ],
+    "variants": {
+     "account": "signed-in teacher and signed-out account pages (Website page 2)",
+     "public": "home page: links centred, sign-in at the end (page 1)",
+     "inverse": "pilot and privacy pages on navy (page 1)"
+    },
+    "inputs": {
+     "label, brandHref, children": "each audience supplies its own destinations, current place and action"
+    },
+    "instanceOwned": [
+     "destinations",
+     "current place",
+     "action"
+    ]
+   },
    "paper": {
-    "status": "inventoried, not linked",
-    "uses": "40 site-nav frames and 7 staff headers across pages 1 to 7",
-    "reason": "Each header shows a different current place and audience; a master with a current-place variant is the next family to link."
+    "status": "inventoried, not yet a synchronised master",
+    "uses": "40 site-nav and 7 staff-header frames across pages 1 to 7"
    },
    "exceptions": [
     {
-     "what": "Three audiences",
+     "what": "Staff header",
      "where": [
-      "app/(accounts)/shell.tsx",
-      "app/(accounts)/staff-header.tsx",
-      "app/page.tsx",
-      "app/pilot/page.tsx",
-      "app/privacy-policy/page.tsx"
+      "app/(accounts)/staff-header.tsx"
      ],
-     "reason": "Teacher, signed-out and staff headers keep their own destinations and permissions. They share the menu mechanics (useMenu and MenuButton from shell.tsx) and the nav-menu style block. The public marketing pages predate the account system and share only tokens and the wordmark."
+     "reason": "Navy staff bar with queue counts, the reviewer name, sign-out and a record back link (Website page 3). It shares the menu mechanics and phone menu from system/navigation, not the bar."
+    }
+   ],
+   "differences": [
+    {
+     "property": "wordmark tracking",
+     "paper": "-0.01em on the public pages",
+     "application": "now -0.01em on account pages too",
+     "decision": "C16: one wordmark"
+    },
+    {
+     "property": "pilot back link",
+     "paper": "14/18 at 60 percent white",
+     "application": "was 0.85rem in --color-sage-light; now 14/18 in --color-on-inverse-muted (the same sage-light), white on hover",
+     "decision": "C16"
+    },
+    {
+     "property": "public home bar",
+     "paper": "--color-off-white with a --color-light-gray rule",
+     "application": "same values through --color-background and --color-surface-muted",
+     "decision": "no visible change"
     }
    ]
   },

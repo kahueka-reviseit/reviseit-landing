@@ -6,91 +6,9 @@
 }
 
 /* ─── Logo ──────────────────────────────────────────────────── */
-.site-nav__brand {
-  display: inline-flex;
-  text-decoration: none;
-}
-
-.site-nav__wordmark {
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 24px;
-  line-height: 30px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: var(--color-dark-text);
-  color: var(--dark-text);
-}
 
 
 /* ─── Nav ───────────────────────────────────────────────────── */
-.site-nav {
-  background: var(--color-off-white);
-  background: var(--off-white);
-  border-bottom: 1px solid var(--color-light-gray);
-  border-bottom: 1px solid var(--light-gray);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.site-nav__inner {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  height: 60px;
-}
-
-.site-nav__links {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--font-body), sans-serif;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-mid-text);
-  color: var(--mid-text);
-  text-align: center;
-}
-
-.site-nav__link {
-  color: var(--color-mid-text);
-  color: var(--mid-text);
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-
-.site-nav__link:hover {
-  color: var(--color-dark-text);
-  color: var(--dark-text);
-}
-
-.site-nav__separator {
-  color: var(--color-light-gray);
-  color: var(--light-gray);
-  user-select: none;
-}
-
-.site-nav__actions {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.site-nav__action {
-  font-family: var(--font-body), sans-serif;
-  font-size: 14px;
-  line-height: 18px;
-  font-weight: 600;
-  color: var(--color-action-strong);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-}
-
-.site-nav__action:hover {
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
 
 /* ─── Hero ──────────────────────────────────────────────────── */
 .hero {
@@ -1107,15 +1025,6 @@
 }
 
 /* ─── Responsive ────────────────────────────────────────────── */
-@media (max-width: 720px) {
-  .site-nav__inner {
-    grid-template-columns: 1fr auto;
-  }
-
-  .site-nav__links {
-    display: none;
-  }
-}
 
 @media (max-width: 860px) {
   .home-page__success-grid {

@@ -3,6 +3,8 @@ import CountdownTimer from '../components/CountdownTimer/CountdownTimer';
 import CompareModule from './CompareModule';
 import styles from './pilot.module.css';
 import { button } from '../(accounts)/system/button';
+import nav from '../(accounts)/system/navigation.module.css';
+import { SiteHeader } from '../(accounts)/system/navigation';
 
 export const metadata = {
   title: '2026 Pilot Programme — Revise It',
@@ -13,17 +15,12 @@ export const metadata = {
 export default function PilotPage() {
   return (
     <div className={styles['pilot']}>
-      <div className="sage-bar" />
-
-      {/* Nav */}
-      <nav className={styles['site-nav']}>
-        <Link href="/" className={styles['site-nav__brand']}>
-          <span className={styles['site-nav__wordmark']}>Revise It</span>
-        </Link>
-        <Link href="/" className={styles['site-nav__back']}>
+      {/* Stripe and navigation: the shared site header, inverse variant */}
+      <SiteHeader variant="inverse" label="Site" brandHref="/">
+        <Link href="/" className={nav['site-nav__back']}>
           &larr; Back to home
         </Link>
-      </nav>
+      </SiteHeader>
 
       {/* Hero */}
       <section className={styles['hero']}>

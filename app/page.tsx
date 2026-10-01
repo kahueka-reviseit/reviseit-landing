@@ -7,35 +7,27 @@ import RealityShowcase from './components/RealityShowcase/RealityShowcase';
 import TrackedCTA from './components/TrackedCTA/TrackedCTA';
 import Footer from './components/Footer/Footer';
 import { button } from './(accounts)/system/button';
+import nav from './(accounts)/system/navigation.module.css';
+import { SiteHeader } from './(accounts)/system/navigation';
 
 export default function Home() {
   return (
     <div className={styles['home-page']}>
-      {/* Top sage bar */}
-      <div className="sage-bar" />
-
-      {/* Nav */}
-      <nav className={styles['site-nav']}>
-        <div className="container">
-          <div className={styles['site-nav__inner']}>
-            <span className={styles['site-nav__brand']}>
-              <span className={styles['site-nav__wordmark']}>Revise It</span>
-            </span>
-            <div className={styles['site-nav__links']}>
-              <a href="#how-it-works" className={styles['site-nav__link']}>How it works</a>
-              <span className={styles['site-nav__separator']}>·</span>
-              <a href="#catalogue" className={styles['site-nav__link']}>Catalogue</a>
-              <span className={styles['site-nav__separator']}>·</span>
-              <a href="/pilot" className={styles['site-nav__link']}>Pilot Programme</a>
-            </div>
-            <div className={styles['site-nav__actions']}>
-              <a href="/login" className={styles['site-nav__action']}>
-                Sign in
-              </a>
-            </div>
-          </div>
+      {/* Stripe and navigation: the shared site header, public variant */}
+      <SiteHeader variant="public" label="Site">
+        <div className={nav['site-nav__links']}>
+          <a href="#how-it-works" className={nav['site-nav__link']}>How it works</a>
+          <span className={nav['site-nav__separator']}>·</span>
+          <a href="#catalogue" className={nav['site-nav__link']}>Catalogue</a>
+          <span className={nav['site-nav__separator']}>·</span>
+          <a href="/pilot" className={nav['site-nav__link']}>Pilot Programme</a>
         </div>
-      </nav>
+        <div className={nav['site-nav__end']}>
+          <a href="/login" className={nav['site-nav__action']}>
+            Sign in
+          </a>
+        </div>
+      </SiteHeader>
 
       {/* Hero */}
       <section className={styles['hero']}>
