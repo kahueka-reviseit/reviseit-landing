@@ -7,6 +7,7 @@ import type { PaperModel } from './model';
 import { journey } from './builder';
 import { Icon, Stages } from './ui';
 import { button } from '../../system/button';
+import fields from '../../system/field.module.css';
 
 function counts(paper:PaperModel) {
   const e=paper.data.entries, structured=e.filter(x=>kindOf(x)==='structured');
@@ -96,15 +97,15 @@ export function ShapeView({paper,status}:{paper:PaperModel;status:ReactNode}) {
         <p className={styles['eyebrow--positive']}>Step 1 of 5</p>
         <h1>What shape is this paper?</h1>
         <p className={styles['card__lead']}>Set the totals first. The catalogue and the paper builder then show how each question fits. You can change them at any time before you submit.</p>
-        <label className={styles['form-field']}>Total marks<span className={styles['number-input']}><input type="number" inputMode="numeric" min={1} max={3000} value={total} onChange={e=>setTotal(e.target.value)} placeholder="For example 150"/><span>marks</span></span></label>
-        <fieldset className={styles['form-field']}><legend>Split between question types</legend>
-          <p className={styles['form-field__hint']}>Multiple-choice questions are worth 2 marks each. Enter 0 for a structured-only paper, or leave the field blank to set only the paper total.</p>
+        <label className={fields['field--prominent']}>Total marks<span className={fields['field__number']}><input type="number" inputMode="numeric" min={1} max={3000} value={total} onChange={e=>setTotal(e.target.value)} placeholder="For example 150"/><span>marks</span></span></label>
+        <fieldset className={fields['field--prominent']}><legend>Split between question types</legend>
+          <p className={fields['field__hint--prominent']}>Multiple-choice questions are worth 2 marks each. Enter 0 for a structured-only paper, or leave the field blank to set only the paper total.</p>
           {validTotal&&<input className={styles['split-slider']} type="range" min={0} max={sliderMax} step={2} value={Math.min(m,sliderMax)} aria-label="Multiple-choice marks slider" style={{'--pct':`${sliderMax?Math.min(100,m/sliderMax*100):0}%`} as CSSProperties} onChange={e=>setMc(e.target.value)}/>}
           <div className={styles['split-slider__legend']}><span className={styles['eyebrow--multiple-choice']}>Multiple choice</span><span className={styles['eyebrow--structured']}>Structured</span></div>
           <div className={styles['form__row']}>
-            <label className={styles['number-input--multiple-choice']}>Multiple-choice marks<input type="number" inputMode="numeric" min={0} step={2} value={mc} onChange={e=>setMc(e.target.value)} placeholder="0"/></label>
-            <p className={styles['number-input--readonly']}><span>Multiple-choice questions</span><output>{questions} {questions===1?'question':'questions'}</output></p>
-            <label className={styles['number-input--structured']}>Structured marks<input type="number" inputMode="numeric" min={0} value={structuredMarks ?? ''} disabled={!validTotal} onChange={e=>{const s=Number(e.target.value);if(Number.isInteger(s)&&validTotal)setMc(String(Math.max(0,t-s)));}}/></label>
+            <label className={fields['field__number--multiple-choice']}>Multiple-choice marks<input type="number" inputMode="numeric" min={0} step={2} value={mc} onChange={e=>setMc(e.target.value)} placeholder="0"/></label>
+            <p className={fields['field__number--readonly']}><span>Multiple-choice questions</span><output>{questions} {questions===1?'question':'questions'}</output></p>
+            <label className={fields['field__number--structured']}>Structured marks<input type="number" inputMode="numeric" min={0} value={structuredMarks ?? ''} disabled={!validTotal} onChange={e=>{const s=Number(e.target.value);if(Number.isInteger(s)&&validTotal)setMc(String(Math.max(0,t-s)));}}/></label>
           </div>
         </fieldset>
         {problems.map(p=><Notice key={p} as="p" tone="caution" role="alert">{p}</Notice>)}

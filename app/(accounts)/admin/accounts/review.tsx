@@ -8,6 +8,7 @@ import { registerDepartment, reviewAccount } from '../../actions';
 import ui from '../../experience.module.css';
 import { Notice } from '../../system/notice';
 import { button } from '../../system/button';
+import fields from '../../system/field.module.css';
 
 /**
  * Review panel (Paper S3, S4, S6, S8p). No decision is preselected: the reviewer must
@@ -53,12 +54,12 @@ export function ReviewPanel({account,departments,closeHref,nextHref,statusLabel}
             <label key={value} className={ui['segmented-control__option']}><input className={ui['segmented-control__input']} type="radio" name="decision" value={value} required checked={decision === value} disabled={value === 'approved' && !confirmed} onChange={() => setDecision(value)}/><span className={ui['segmented-control__radio']} aria-hidden="true"/>{label}</label>)}
         </div></fieldset>
         {!confirmed && <p id={`${id}-approve`} className={ui['aside-card__note']}>Approve is unavailable: the teacher has not confirmed their email yet.</p>}
-        <div className={ui['field']}><label className={ui['field__label']} htmlFor={`${id}-department`}>Verified school and department</label>
-          <select id={`${id}-department`} name="department_id" className={ui['field__select--staff']} defaultValue={account.department_id || ''} aria-describedby={`${id}-department-hint`}>
+        <div className={fields['field']}><label className={fields['field__label']} htmlFor={`${id}-department`}>Verified school and department</label>
+          <select id={`${id}-department`} name="department_id" className={fields['field__select--staff']} defaultValue={account.department_id || ''} aria-describedby={`${id}-department-hint`}>
             <option value="">Required for approval</option>{departments.map(d => <option key={d.id} value={d.id}>{d.label}</option>)}</select>
-          <p id={`${id}-department-hint`} className={ui['field__hint--staff']}>Required to approve. Not listed? Add a verified school department first.</p></div>
-        <div className={ui['field']}><label className={ui['field__label']} htmlFor={`${id}-note`}>Evidence or reason</label>
-          <textarea id={`${id}-note`} name="note" className={ui['field__textarea']} required minLength={3} maxLength={2000} placeholder="Required for every decision"/></div>
+          <p id={`${id}-department-hint`} className={fields['field__hint--staff']}>Required to approve. Not listed? Add a verified school department first.</p></div>
+        <div className={fields['field']}><label className={fields['field__label']} htmlFor={`${id}-note`}>Evidence or reason</label>
+          <textarea id={`${id}-note`} name="note" className={fields['field__textarea']} required minLength={3} maxLength={2000} placeholder="Required for every decision"/></div>
       </div>
       <div className={ui['record-panel__footer']}><p className={ui['record-panel__footnote']}>Recorded with your name and the time</p><Submit label="Save decision" pending="Saving…" variant="compact"/></div>
     </form>}

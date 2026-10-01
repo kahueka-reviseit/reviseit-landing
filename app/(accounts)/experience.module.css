@@ -225,26 +225,6 @@
 .form { display:flex; flex-direction:column; gap:20px; margin:0; }
 .form__row { display:flex; gap:16px; }
 .form__row > * { flex:1 1 0%; min-width:0; }
-.field { display:flex; flex-direction:column; gap:6px; }
-.field--narrow { width:180px; flex:0 0 180px; display:flex; flex-direction:column; gap:6px; }
-.field__label-row { display:flex; justify-content:space-between; align-items:baseline; gap:12px; }
-.field__label-row .link { font-size:14px; line-height:18px; }
-.field__label { font-size:14px; line-height:18px; font-weight:600; color:var(--color-text); }
-.field__input { width:100%; min-width:0; height:46px; padding:0 14px; border:1px solid var(--color-border-strong); border-radius:8px; background:var(--color-surface); font:400 15px/20px var(--font-body),sans-serif; color:var(--color-text); }
-.field__input--invalid { width:100%; min-width:0; height:46px; padding:0 13px; border:2px solid var(--color-warning); border-radius:8px; background:var(--color-surface); font:400 15px/20px var(--font-body),sans-serif; color:var(--color-text); }
-.field__textarea { width:100%; min-width:0; min-height:88px; padding:10px 14px; border:1px solid var(--color-border-strong); border-radius:8px; background:var(--color-surface); font:400 14px/20px var(--font-body),sans-serif; color:var(--color-text); resize:vertical; }
-.field__select { width:100%; min-width:0; height:46px; padding:0 36px 0 14px; border:1px solid var(--color-border-strong); border-radius:8px; background:var(--color-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%234A4A4A' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center; appearance:none; font:400 15px/20px var(--font-body),sans-serif; color:var(--color-text); }
-.field__input:focus-visible, .field__input--invalid:focus-visible, .field__textarea:focus-visible, .field__select:focus-visible { outline:3px solid var(--color-focus-ring); outline-offset:1px; }
-.field__password { position:relative; display:flex; }
-.field__password .field__input, .field__password .field__input--invalid { padding-right:72px; }
-.field__toggle { position:absolute; right:6px; top:50%; transform:translateY(-50%); height:36px; padding:0 10px; border:0; background:none; font:600 13px/16px var(--font-body),sans-serif; color:var(--color-action-strong); cursor:pointer; }
-.field__select--staff { width:100%; min-width:0; height:44px; padding:0 36px 0 14px; border:1px solid var(--color-border-strong); border-radius:8px; background:var(--color-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%234A4A4A' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center; appearance:none; font:400 14px/18px var(--font-body),sans-serif; color:var(--color-text); }
-.field__select--staff:focus-visible { outline:3px solid var(--color-focus-ring); outline-offset:1px; }
-.field__hint { margin:0; font-size:13px; line-height:18px; color:var(--color-text-muted); }
-.field__hint--staff { margin:0; font-size:12px; line-height:17px; color:var(--color-text-muted); }
-.field__error { display:flex; gap:6px; margin:0; font-size:13px; line-height:18px; color:var(--color-warning-text); }
-.field__check { display:flex; align-items:center; gap:12px; font-size:15px; line-height:20px; color:var(--color-text); }
-.field__check input { width:22px; height:22px; accent-color:var(--color-action-strong); }
 .disclosure { border:1px solid var(--color-border); border-radius:10px; background:var(--color-surface); }
 .disclosure__summary { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:48px; padding:0 14px; font-size:14px; line-height:18px; font-weight:600; color:var(--color-text); cursor:pointer; list-style:none; }
 .disclosure__summary::-webkit-details-marker { display:none; }
@@ -455,8 +435,6 @@
   .auth-steps { display:none; }
   .form-card, .form-card--staff { width:100%; padding:24px 20px; }
   .form__row { flex-direction:column; }
-  .field--narrow { width:auto; flex:1 1 auto; }
-  .field__input, .field__input--invalid, .field__select { height:48px; font-size:16px; }
   .access-status { padding:20px; }
   .access-path { flex-direction:column; gap:12px; padding:16px 0; }
   .access-path__step, .access-path__step:last-child { flex-direction:row; align-items:center; flex:0 0 auto; }

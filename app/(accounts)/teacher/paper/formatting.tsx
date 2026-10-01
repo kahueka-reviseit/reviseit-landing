@@ -6,6 +6,7 @@ import ui from '../../experience.module.css';
 import { Notice } from '../../system/notice';
 import type { PaperModel } from './model';
 import { button } from '../../system/button';
+import fields from '../../system/field.module.css';
 
 /**
  * School formatting (Paper F1, F1p). The controls are exactly the existing ones and
@@ -35,14 +36,14 @@ export default function FormattingView({paper,preferences,setPreferences,dirty,s
         <fieldset disabled={busy} className={ui['formatting__fields']}>
           <div className={ui['formatting__section-head']}><legend className={ui['formatting__legend']}>Page and text</legend><p className={ui['formatting__fixed']}>Page size: A4 portrait (fixed)</p></div>
           <div className={ui['form__row']}>
-            <label className={ui['field']}><span className={ui['field__label']}>Font</span><select className={ui['field__select']} value={preferences.font} onChange={e=>setPreferences({...preferences,font:e.target.value as Formatting['font']})}><option>Arial</option><option>Times New Roman</option></select></label>
-            <label className={ui['field--narrow']}><span className={ui['field__label']}>Text size</span><select className={ui['field__select']} value={preferences.fontSize} onChange={e=>setPreferences({...preferences,fontSize:Number(e.target.value) as 11|12})}><option value={11}>11 point</option><option value={12}>12 point</option></select></label>
+            <label className={fields['field']}><span className={fields['field__label']}>Font</span><select className={fields['field__select']} value={preferences.font} onChange={e=>setPreferences({...preferences,font:e.target.value as Formatting['font']})}><option>Arial</option><option>Times New Roman</option></select></label>
+            <label className={fields['field--narrow']}><span className={fields['field__label']}>Text size</span><select className={fields['field__select']} value={preferences.fontSize} onChange={e=>setPreferences({...preferences,fontSize:Number(e.target.value) as 11|12})}><option value={11}>11 point</option><option value={12}>12 point</option></select></label>
           </div>
           <fieldset className={ui['formatting__spacing']}><legend className={ui['formatting__spacing-label']}>Spacing</legend>
             <div className={ui['segmented-control--form']}>{([['normal','Standard'],['relaxed','More space']] as const).map(([value,label])=><label key={value} className={ui['segmented-control__option']}><input className={ui['segmented-control__input']} type="radio" name="spacing" value={value} checked={preferences.spacing===value} onChange={()=>setPreferences({...preferences,spacing:value})}/>{label}</label>)}</div></fieldset>
-          <div className={ui['field']}><label className={ui['field__label']} htmlFor="school-heading">School heading</label><input id="school-heading" className={ui['field__input']} value={preferences.header} maxLength={160} placeholder={data.schoolName} aria-describedby="heading-hint" onChange={e=>setPreferences({...preferences,header:e.target.value})}/>
-            <p id="heading-hint" className={ui['field__hint']}>Printed at the top of each paper. Leave blank to use your school’s name. Up to 160 characters.</p></div>
-          <label className={ui['field__check']}><input type="checkbox" checked={preferences.answerLines} onChange={e=>setPreferences({...preferences,answerLines:e.target.checked})}/> Include answer lines for written responses</label>
+          <div className={fields['field']}><label className={fields['field__label']} htmlFor="school-heading">School heading</label><input id="school-heading" className={fields['field__input']} value={preferences.header} maxLength={160} placeholder={data.schoolName} aria-describedby="heading-hint" onChange={e=>setPreferences({...preferences,header:e.target.value})}/>
+            <p id="heading-hint" className={fields['field__hint']}>Printed at the top of each paper. Leave blank to use your school’s name. Up to 160 characters.</p></div>
+          <label className={fields['field__check']}><input type="checkbox" checked={preferences.answerLines} onChange={e=>setPreferences({...preferences,answerLines:e.target.checked})}/> Include answer lines for written responses</label>
         </fieldset>
         <div className={ui['formatting__actions']}>
           <button type="button" className={button('text')} onClick={()=>paper.go('home')}>← Back to {name}</button>
@@ -54,7 +55,7 @@ export default function FormattingView({paper,preferences,setPreferences,dirty,s
         <div className={ui['formatting__preview-body']}>
           <p className={ui['formatting__section-label']}>Illustrative layout</p>
           <div className={styles['paper-preview__page']} style={{fontFamily:preferences.font,fontSize:preferences.fontSize+2,lineHeight:preferences.spacing==='relaxed'?2:1.5}}><strong>{preferences.header || data.schoolName}</strong><hr/><p>PHYSICAL SCIENCES</p><p>Question 1</p><p>This sample shows your text and spacing preferences.</p>{preferences.answerLines && <div className={styles['paper-preview__answer-lines']} aria-label="Sample learner answer lines"><hr/><hr/><hr/></div>}<small>Page 1</small></div>
-          <p className={ui['field__hint']}>Updates as you change settings. This is a layout illustration, not a generated paper.</p>
+          <p className={fields['field__hint']}>Updates as you change settings. This is a layout illustration, not a generated paper.</p>
         </div>
       </section>
     </div>

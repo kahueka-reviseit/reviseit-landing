@@ -14,6 +14,7 @@ import ConfigureOrder from './configure';
 import paper from './configure.module.css';
 import SubmittedSummary,{paperMeta} from './submitted-summary';
 import { button } from '../../../system/button';
+import fields from '../../../system/field.module.css';
 
 /**
  * One paper's page (Paper M2 to M4). Before submission a configured paper opens the
@@ -114,7 +115,7 @@ export default function OrderView({initial,catalogue={},curriculum,completionEma
       </li>;})}</ol></section>}
      {legacyForm&&<form onSubmit={submit} className={ui['form-card--inline']}>
       <h2 className={ui['form-card__title']}>Your answers</h2>
-      {isQuestionnaire(order.form)&&grouped?<QuestionnaireFields form={order.form} answers={grouped} onChange={value=>{setGrouped(value);setFieldError(null);setError('');}} fieldError={fieldError} disabled={busy}/>:Array.isArray(order.form)?order.form.map(q=><div key={q.id} className={ui['field']}><label className={ui['field__label']} htmlFor={'answer-'+q.id}>{q.label}</label><select className={ui['field__select']} id={'answer-'+q.id} required value={answers[q.id]||''} onChange={e=>setAnswers({...answers,[q.id]:e.target.value})}><option value="" disabled>Choose an answer</option>{q.options.map(o=><option key={o}>{o}</option>)}</select></div>):null}
+      {isQuestionnaire(order.form)&&grouped?<QuestionnaireFields form={order.form} answers={grouped} onChange={value=>{setGrouped(value);setFieldError(null);setError('');}} fieldError={fieldError} disabled={busy}/>:Array.isArray(order.form)?order.form.map(q=><div key={q.id} className={fields['field']}><label className={fields['field__label']} htmlFor={'answer-'+q.id}>{q.label}</label><select className={fields['field__select']} id={'answer-'+q.id} required value={answers[q.id]||''} onChange={e=>setAnswers({...answers,[q.id]:e.target.value})}><option value="" disabled>Choose an answer</option>{q.options.map(o=><option key={o}>{o}</option>)}</select></div>):null}
       <p className={ui['form-card__note']}>Check your answers before submitting. They are fixed for this request once submitted.</p>
       <div><button className={button('primary')} disabled={busy||!key}>{busy?'Submitting…':'Submit answers'}</button></div></form>}
      {showSummary&&<SubmittedSummary view={view} state={summary.state}/>}

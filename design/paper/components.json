@@ -896,10 +896,9 @@
    "masters": [],
    "code": {
     "definition": "app/(accounts)/forms.tsx",
-    "stylesheet": "app/(accounts)/experience.module.css",
+    "stylesheet": "app/(accounts)/system/field.module.css",
     "blocks": [
-     "field",
-     "disclosure"
+     "field"
     ],
     "importSites": [
      "app/(accounts)/account/details.tsx",
@@ -914,7 +913,12 @@
     "variants": {
      "TextField": "labelled input with error and hint",
      "EmailField / PasswordField / SchoolFields": "fixed account fields",
-     "Disclosure": "collapsible secondary form"
+     "Disclosure": "collapsible secondary form",
+     "field--narrow": "department and similar short fields",
+     "field--prominent": "builder paper shape: 16 pixel labels",
+     "field__number": "number with a unit; multiple-choice and structured accents; read-only output",
+     "field__label--secondary and field__textarea--answer / --writing": "paid question editor, kept exactly as they are until C14 redesigns the editor",
+     "field__select--staff, field__hint--staff": "denser staff review"
     },
     "inputs": {
      "label, name, error, hint": "supplied by the form; the server reply decides which field is invalid"
@@ -931,20 +935,6 @@
    },
    "exceptions": [
     {
-     "what": "School formatting selects and checkbox",
-     "where": [
-      "app/(accounts)/teacher/paper/formatting.tsx"
-     ],
-     "reason": "Select and checkbox controls that TextField does not offer. They use the same field classes from the same stylesheet, so the visual definition is shared; the markup is local."
-    },
-    {
-     "what": "Staff review select and textarea",
-     "where": [
-      "app/(accounts)/admin/accounts/review.tsx"
-     ],
-     "reason": "Same: shared field classes, local select and textarea markup with staff-specific hints."
-    },
-    {
      "what": "Question answer controls",
      "where": [
       "app/(accounts)/teacher/orders/[id]/configure.tsx"
@@ -957,6 +947,28 @@
       "lib/jobs/questionnaire-fields.tsx"
      ],
      "reason": "Adapter for orders created before the per-question configuration. Kept so existing orders still render; not extended."
+    }
+   ],
+   "directUsers": [
+    "app/(accounts)/account/details.tsx",
+    "app/(accounts)/admin/accounts/review.tsx",
+    "app/(accounts)/teacher/orders/[id]/configure.tsx",
+    "app/(accounts)/teacher/orders/[id]/view.tsx",
+    "app/(accounts)/teacher/paper/formatting.tsx",
+    "app/(accounts)/teacher/paper/home.tsx"
+   ],
+   "differences": [
+    {
+     "property": "builder paper shape hint",
+     "paper": "drawn on page 5",
+     "application": "values unchanged; now owned by the field stylesheet",
+     "decision": "no visible change"
+    },
+    {
+     "property": "label link in a field row",
+     "paper": "-",
+     "application": "the 14 pixel rule now targets the link element rather than a class from another stylesheet",
+     "decision": "no visible change"
     }
    ]
   },

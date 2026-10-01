@@ -1,0 +1,46 @@
+/* Fields (family K02). The one definition of labelled inputs, selects, text areas, checks and number
+   inputs; account forms render them through forms.tsx, other screens use these classes directly.
+   Explicit variants: narrow, prominent (builder paper shape), staff (denser staff review), secondary label,
+   answer and writing text areas (paid question editor, kept as they are until C14 redesigns it). */
+
+.field { display:flex; flex-direction:column; gap:6px; }
+.field--narrow { width:180px; flex:0 0 180px; display:flex; flex-direction:column; gap:6px; }
+.field__label-row { display:flex; justify-content:space-between; align-items:baseline; gap:12px; }
+.field__label-row a { font-size:14px; line-height:18px; }
+.field__label { font-size:14px; line-height:18px; font-weight:600; color:var(--color-text); }
+.field__input { width:100%; min-width:0; height:46px; padding:0 14px; border:1px solid var(--color-border-strong); border-radius:8px; background:var(--color-surface); font:400 15px/20px var(--font-body),sans-serif; color:var(--color-text); }
+.field__input--invalid { width:100%; min-width:0; height:46px; padding:0 13px; border:2px solid var(--color-warning); border-radius:8px; background:var(--color-surface); font:400 15px/20px var(--font-body),sans-serif; color:var(--color-text); }
+.field__textarea { width:100%; min-width:0; min-height:88px; padding:10px 14px; border:1px solid var(--color-border-strong); border-radius:8px; background:var(--color-surface); font:400 14px/20px var(--font-body),sans-serif; color:var(--color-text); resize:vertical; }
+.field__select { width:100%; min-width:0; height:46px; padding:0 36px 0 14px; border:1px solid var(--color-border-strong); border-radius:8px; background:var(--color-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%234A4A4A' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center; appearance:none; font:400 15px/20px var(--font-body),sans-serif; color:var(--color-text); }
+.field__input:focus-visible, .field__input--invalid:focus-visible, .field__textarea:focus-visible, .field__select:focus-visible { outline:3px solid var(--color-focus-ring); outline-offset:1px; }
+.field__password { position:relative; display:flex; }
+.field__password .field__input, .field__password .field__input--invalid { padding-right:72px; }
+.field__toggle { position:absolute; right:6px; top:50%; transform:translateY(-50%); height:36px; padding:0 10px; border:0; background:none; font:600 13px/16px var(--font-body),sans-serif; color:var(--color-action-strong); cursor:pointer; }
+.field__select--staff { width:100%; min-width:0; height:44px; padding:0 36px 0 14px; border:1px solid var(--color-border-strong); border-radius:8px; background:var(--color-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%234A4A4A' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center; appearance:none; font:400 14px/18px var(--font-body),sans-serif; color:var(--color-text); }
+.field__select--staff:focus-visible { outline:3px solid var(--color-focus-ring); outline-offset:1px; }
+.field__hint { margin:0; font-size:13px; line-height:18px; color:var(--color-text-muted); }
+.field__hint--staff { margin:0; font-size:12px; line-height:17px; color:var(--color-text-muted); }
+.field__error { display:flex; gap:6px; margin:0; font-size:13px; line-height:18px; color:var(--color-warning-text); }
+.field__check { display:flex; align-items:center; gap:12px; font-size:15px; line-height:20px; color:var(--color-text); }
+.field__check input { width:22px; height:22px; accent-color:var(--color-action-strong); }
+@media (max-width:640px) {
+  .field--narrow { width:auto; flex:1 1 auto; }
+  .field__input, .field__input--invalid, .field__select { height:48px; font-size:16px; } }
+
+/* Builder paper shape (Website page 5, A3 and A4): a larger label, and numbers with a unit. */
+.field--prominent { display:grid; gap:8px; min-width:0; margin:0; padding:0; border:0; font-size:16px; font-weight:600; }
+.field--prominent legend { margin-bottom:6px; font-weight:600; }
+.field__hint--prominent { margin:0; font-size:14px; font-weight:400; color:var(--color-text-muted); }
+.field__number { display:flex; align-items:center; width:220px; padding:0 16px; border:1px solid var(--color-border-strong); border-radius:8px; background:var(--color-surface); font-weight:400; color:var(--color-text-subtle); }
+.field__number input { flex:1; min-width:0; padding:13px 0; border:0; background:transparent; font-size:16px; color:var(--color-text); }
+.field__number--multiple-choice, .field__number--structured, .field__number--readonly { display:grid; gap:6px; margin:0; font-size:14px; font-weight:400; color:var(--color-text-muted); }
+.field__number--multiple-choice input { border-left:3px solid var(--color-multiple-choice); }
+.field__number--structured input { border-left:3px solid var(--color-structured); }
+.field__number--readonly output { padding:12px 16px; border:1px solid var(--color-border); border-radius:4px; background:var(--color-background); font-size:16px; color:var(--color-text); }
+
+/* Paid question editor (Website page 7). */
+.field__label--secondary { font-size:14px; color:var(--color-text-muted); }
+.field__textarea--answer { width:100%; min-height:150px; padding:12px 14px; border:1px solid var(--color-border); border-radius:8px; font:inherit; }
+.field__textarea--writing { width:100%; min-height:164px; padding:16px; border:1px solid var(--color-border-strong); border-radius:8px; font:inherit; font-size:16px; line-height:23px; }
+
+@media(max-width:720px) { .field__number { width:100%; } }

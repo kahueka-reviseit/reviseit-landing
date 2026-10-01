@@ -13,6 +13,7 @@ import {Status} from '../../../system/status';
 import type {QuestionContext as Catalogue} from '../../../../../lib/workspace/contracts';
 import {emptyBrief,briefConflicts,briefPrompts} from '../../../../../lib/configurator/brief';
 import { button } from '../../../system/button';
+import fields from '../../../system/field.module.css';
 
 /**
  * Configured order (Paper C5, C6 and C3a): marks, parts and authored details stay
@@ -73,8 +74,8 @@ function Chips({name,field,facet,value,onChange,disabled,attention}:{name:string
       {!field.required&&radio('omit','No preference',{dashed:true})}
       {value&&!field.required&&<button type="button" className={styles['link']} disabled={disabled} onClick={()=>onChange(null)}>Leave blank</button>}
     </div>
-    {writing&&<><label className={styles['text-field__label']} htmlFor={`${id}-text`}>Your answer for {field.label}</label>
-      <textarea id={`${id}-text`} className={styles['text-input']} value={value.kind==='text'?value.text:''} disabled={disabled} maxLength={field.type==='text'?field.maxLength:2000} onChange={e=>onChange({kind:'text',text:e.target.value})}/></>}
+    {writing&&<><label className={fields['field__label--secondary']} htmlFor={`${id}-text`}>Your answer for {field.label}</label>
+      <textarea id={`${id}-text`} className={fields['field__textarea--answer']} value={value.kind==='text'?value.text:''} disabled={disabled} maxLength={field.type==='text'?field.maxLength:2000} onChange={e=>onChange({kind:'text',text:e.target.value})}/></>}
     {facet?.forced&&<InlineNotice tone="required" id={`${id}-reason`}>Required by your other choices: {facet.options.find(o=>o.id===facet.forced)?.label}. {facet.reason}</InlineNotice>}
     {options.some(o=>o.view?.disabled)&&<ul className={styles['paragraph']}>{options.filter(o=>o.view?.disabled).map(o=><li key={o.id}>{o.label}: {o.view?.reason}</li>)}</ul>}
     {attention&&<InlineNotice tone="problem" role="alert" id={`${id}-attention`}>{attention.message}</InlineNotice>}
@@ -253,8 +254,8 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
         <p className={styles['paragraph']}>Start with what matters to you. We’ll show you any choices still to make.</p>
         {prompts.length>0&&<div className={styles['question-brief__prompts']}><p id="brief-prompts-label" className={styles['question-brief__prompts-label']}>For this question, you could describe</p>
           <ul id="brief-prompts" aria-labelledby="brief-prompts-label" className={styles['question-brief__prompts-list']}>{prompts.map(p=><li key={p}>{p}</li>)}</ul></div>}
-        <label className={styles['text-field__label']} htmlFor="teacher-brief">Your brief</label>
-        <textarea id="teacher-brief" aria-describedby={prompts.length?'brief-prompts':undefined} className={styles['text-input']} value={brief?.text??''} maxLength={4000} disabled={!editable}
+        <label className={fields['field__label--secondary']} htmlFor="teacher-brief">Your brief</label>
+        <textarea id="teacher-brief" aria-describedby={prompts.length?'brief-prompts':undefined} className={fields['field__textarea--writing']} value={brief?.text??''} maxLength={4000} disabled={!editable}
           placeholder="For example: the setting you want, what learners are given and what they should work out…"
           onChange={e=>{const text=e.target.value;setBriefError('');update(c=>{c.briefs??={};c.briefs[line.id]??=emptyBrief();c.briefs[line.id].text=text;return c;});}}/>
         <div className={styles['question-order-controls']}><span className={styles['paragraph']}>Your words stay with this question.</span>
