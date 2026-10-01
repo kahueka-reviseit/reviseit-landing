@@ -3,6 +3,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import ts from 'typescript';
 import postcss from 'postcss';
+import {checkLinks} from './paper/check-links.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const snapshot=JSON.parse(fs.readFileSync(path.join(root,'design/paper/snapshot.json'),'utf8'));
@@ -43,5 +44,6 @@ for(const file of [...files,...walk(path.join(root,'tests'))].filter(f=>/\.tsx?$
 const declarations={};
 postcss.parse(fs.readFileSync(path.join(root,'app/paper-tokens.css'),'utf8')).walkDecls(d=>{declarations[d.prop]=d.value.replace(/^"|"$/g,'');});
 for(const token of snapshot.tokens)if(declarations[token.name]!==token.value)failures.push(`Paper token differs: ${token.name}`);
+const links=checkLinks(root);failures.push(...links.failures);
 if(failures.length){console.error(failures.join('\n'));process.exitCode=1;}
-else console.log(`${classes.size} stylesheet modules use BEM; ${references} static component references resolve; ${snapshot.tokens.length} tokens match the recorded Paper export.`);
+else console.log(`${links.summary}.\n`+`${classes.size} stylesheet modules use BEM; ${references} static component references resolve; ${snapshot.tokens.length} tokens match the recorded Paper export.`);

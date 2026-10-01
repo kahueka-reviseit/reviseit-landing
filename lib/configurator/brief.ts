@@ -1,4 +1,4 @@
-import type { Answer } from '../jobs/questionnaire';
+import type { Answer, QuestionField } from '../jobs/questionnaire';
 import type { Configuration, TeacherBrief } from './contracts';
 
 export const emptyBrief = (text=''):TeacherBrief => ({text,interpretedText:null,suggestions:{},resolutions:{}});
@@ -20,4 +20,12 @@ export function applyInterpretation(cfg:Configuration,lineId:string,suggestions:
     if(unchanged&&sameAnswer(previous[id],a)&&oldResolutions[id])brief.resolutions[id]=oldResolutions[id];
   }
   return next;
+}
+
+/**
+ * Up to four of the item's own authored questions, required ones first, as starting
+ * points for the brief. They are reminders only; the fields and their rules are unchanged.
+ */
+export function briefPrompts(fields:QuestionField[]):string[] {
+  return [...fields.filter(f=>f.required),...fields.filter(f=>!f.required)].map(f=>f.label.trim()).filter(Boolean).slice(0,4);
 }

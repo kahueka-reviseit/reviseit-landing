@@ -1,0 +1,14 @@
+/* Bloom's category label (Paper K08). The one definition; screens import BloomTag or bloomTone from ./tag.
+   Every --pc-* value is exported from the Paper master by `npm run paper:pull` (app/paper-components.css). */
+.tag { display:inline-block; font:var(--pc-tag__label-font-weight) var(--pc-tag__label-font-size)/var(--pc-tag__label-line-height) var(--font-body),sans-serif; padding:var(--pc-tag-padding-block) var(--pc-tag-padding-inline); border-radius:var(--pc-tag-border-radius); white-space:nowrap; }
+.tag--remember { background:var(--pc-tag-background-color); color:var(--pc-tag__label-color); }
+.tag--understand { background:var(--pc-tag--understand-background-color); color:var(--pc-tag__label-color); }
+.tag--apply { background:var(--pc-tag--apply-background-color); color:var(--pc-tag__label--apply-color); }
+.tag--analyse { background:var(--pc-tag--analyse-background-color); color:var(--pc-tag__label-color); }
+.tag--evaluate { background:var(--pc-tag--evaluate-background-color); color:var(--pc-tag__label-color); }
+/* Registered exception (design/paper/components.json): the deployed colour differs from the Paper token
+   --color-bloom-create and is kept until Kahueka decides which one is right. */
+.tag--create { background:#735B79; color:var(--pc-tag__label-color); }
+/* Application-only states: Paper has no master for a missing or two-way category. */
+.tag--unclassified { background:#E4E0D8; color:var(--color-dark-text); }
+.tag--grouped { background:repeating-linear-gradient(135deg,var(--color-gold) 0 6px,var(--color-slate-blue) 6px 12px); color:var(--color-white); }

@@ -6,6 +6,7 @@ import { useFormState } from 'react-dom';
 import { Submit, TextField } from '../../forms';
 import { registerDepartment, reviewAccount } from '../../actions';
 import ui from '../../experience.module.css';
+import { Notice } from '../../system/notice';
 
 /**
  * Review panel (Paper S3, S4, S6, S8p). No decision is preselected: the reviewer must
@@ -31,14 +32,14 @@ export function ReviewPanel({account,departments,closeHref,nextHref,statusLabel}
       <Link className={ui['record-panel__close']} href={closeHref} scroll={false} aria-label="Close review panel"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2 2 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></Link>
     </div>
     {state.success ? <div className={ui['record-panel__body']}>
-      <div ref={notice} tabIndex={-1} className={ui['notice--success']} role="status"><p className={ui['notice__title--compact']}>{state.title} · {account.full_name}</p><p className={ui['notice__body']}>{state.message} The queue has been refreshed.</p></div>
+      <Notice focusRef={notice} tabIndex={-1} tone="success" role="status" title={<>{state.title} · {account.full_name}</>}>{state.message} The queue has been refreshed.</Notice>
       <div className={ui['record-panel__actions']}>{nextHref ? <Link className={ui['button--primary']} href={nextHref} scroll={false}>Next account needing a decision</Link> : <p className={ui['record-panel__footnote']}>No other account in this list needs a decision.</p>}
         <Link className={ui['button--text']} href={closeHref} scroll={false}>Back to school accounts</Link></div>
     </div> :
     <form action={action} className={ui['record-panel__form']}>
       <input type="hidden" name="user_id" value={account.user_id}/><input type="hidden" name="revision" value={account.revision}/>
       <div className={ui['record-panel__body']}>
-        {state.message && <div ref={notice} tabIndex={-1} className={ui['notice--problem']} role="alert"><p className={ui['notice__title--compact']}>{state.title ?? 'The decision was not saved'}</p><p className={ui['notice__body']}>{state.message}</p></div>}
+        {state.message && <Notice focusRef={notice} tabIndex={-1} tone="problem" role="alert" title={state.title ?? 'The decision was not saved'}>{state.message}</Notice>}
         <dl className={ui['record-panel__facts']}>
           <div className={ui['record-panel__fact']}><dt className={ui['record-panel__fact-key']}>School given</dt><dd className={ui['record-panel__fact-value']}>{account.requested_school}</dd></div>
           <div className={ui['record-panel__fact']}><dt className={ui['record-panel__fact-key']}>Department given</dt><dd className={ui['record-panel__fact-value']}>{account.requested_department}</dd></div>
@@ -72,7 +73,7 @@ export function AddDepartment({open}:{open:boolean}) {
     <div className={ui['aside-card__header']}><h2 className={ui['aside-card__heading']}>Add a verified school department</h2>
       <button type="button" className={ui['record-panel__close']} aria-label="Close" onClick={() => setShown(false)}><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2 2 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></button></div>
     <form action={action} className={ui['form']}>
-      {state.message && <div className={state.success ? ui['notice--success'] : ui['notice--problem']} role={state.success ? 'status' : 'alert'}><p className={ui['notice__body']}>{state.message}</p></div>}
+      {state.message && <Notice tone={state.success ? 'success' : 'problem'} role={state.success ? 'status' : 'alert'}>{state.message}</Notice>}
       <TextField label="Full school name" name="school" required minLength={2} maxLength={160}/>
       <TextField label="School identifier" name="slug" required maxLength={160} pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="full-canonical-school-name" hint="The full school name, slugified. Never initials."/>
       <TextField label="Department" name="department" required minLength={2} maxLength={160}/>

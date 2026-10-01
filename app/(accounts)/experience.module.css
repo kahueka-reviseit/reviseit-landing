@@ -99,33 +99,7 @@
 .link { color:var(--color-action-strong); font-weight:600; text-decoration:none; }
 .link:hover { text-decoration:underline; }
 
-/* ---------------------------------------------------------------- notice and status */
-.notice--progress, .notice--caution, .notice--success, .notice--neutral, .notice--problem {
-  display:flex; flex-direction:column; gap:4px; margin:0; padding:18px 20px; border-radius:10px; border-left:3px solid; }
-.notice--progress { background:var(--color-structured-tint-subtle); border-left-color:var(--color-status-progress); }
-.notice--caution { background:var(--color-caution-tint); border-left-color:var(--color-status-attention); }
-.notice--success { background:var(--color-action-tint-subtle); border-left-color:var(--color-status-done); }
-.notice--neutral { background:var(--color-surface-muted); border-left-color:var(--color-border-strong); }
-.notice--problem { background:var(--color-warning-tint); border-left-color:var(--color-status-problem); }
-.notice__title { margin:0; font-size:17px; line-height:22px; font-weight:600; color:var(--color-text); }
-.notice__title--compact { margin:0; font-size:15px; line-height:20px; font-weight:600; color:var(--color-text); }
-.notice__body { margin:0; font-size:14px; line-height:21px; color:var(--color-text-muted); }
-.notice__actions { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:12px; }
-.notice-stack { display:flex; flex-direction:column; gap:12px; }
-
-.status { display:inline-flex; align-items:center; gap:8px; }
-.status__dot--done, .status__dot--progress, .status__dot--attention, .status__dot--problem, .status__dot--closed { width:8px; height:8px; flex-shrink:0; border-radius:999px; }
-.status__dot--done { background:var(--color-status-done); }
-.status__dot--progress { background:var(--color-status-progress); }
-.status__dot--attention { background:var(--color-status-attention); }
-.status__dot--problem { background:var(--color-status-problem); }
-.status__dot--closed { border:1.5px solid var(--color-text-subtle); }
-.status__label--done, .status__label--progress, .status__label--attention, .status__label--problem, .status__label--closed { font-size:14px; line-height:18px; font-weight:600; }
-.status__label--done { color:var(--color-action-strong); }
-.status__label--progress { color:var(--color-structured); }
-.status__label--attention { color:var(--color-caution-text); }
-.status__label--problem { color:var(--color-warning-text); }
-.status__label--closed { color:var(--color-text-muted); }
+/* Notices and status markers are shared components: see system/notice and system/status. */
 
 /* ---------------------------------------------------------------- My papers (M1, M1p) */
 .paper-list { display:flex; flex-direction:column; border:1px solid var(--color-border); border-radius:12px; background:var(--color-surface); overflow:clip; }
@@ -311,7 +285,6 @@
 /* ---------------------------------------------------------------- My account (T3, T4) */
 .access-status { flex:1 1 0%; min-width:0; display:flex; flex-direction:column; gap:24px; padding:32px; border:1px solid var(--color-border); border-radius:14px; background:var(--color-surface); }
 .access-status__heading { display:flex; flex-direction:column; gap:6px; }
-.access-status__marker { display:inline-flex; align-items:center; gap:8px; margin:0; font-size:14px; line-height:18px; font-weight:600; }
 .access-status__title { margin:0; font-family:var(--font-display),Georgia,serif; font-size:28px; line-height:34px; font-weight:700; color:var(--color-text); }
 .access-status__body { margin:0; font-size:15px; line-height:22px; color:var(--color-text-muted); }
 .access-path { display:flex; margin:0; padding:20px 0; list-style:none; border-top:1px solid var(--color-border); border-bottom:1px solid var(--color-border); }

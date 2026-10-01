@@ -1,0 +1,1304 @@
+{
+ "meta": {
+  "last_updated": "2026-10-01",
+  "purpose": "Registry of shared components across the two Paper files and the application. Paper 0.5.14 links tokens natively inside one file only; every other link listed here is explicit synchronisation run by scripts/paper/paper-link.mjs.",
+  "paperVersion": "0.5.14"
+ },
+ "files": {
+  "design-system": {
+   "id": "01M39C8ME02J6YMB2BGFQFE1V4",
+   "name": "Revise It Design System",
+   "pages": {
+    "p-1-0": {
+     "status": "active",
+     "role": "foundations"
+    },
+    "p-2-0": {
+     "status": "active",
+     "role": "component reference boards"
+    },
+    "p-3-0": {
+     "status": "active",
+     "role": "pattern reference boards"
+    },
+    "p-4-0": {
+     "status": "active",
+     "role": "component contracts (exploratory)"
+    },
+    "p-5-0": {
+     "status": "active",
+     "role": "masters: the one definition of each linked component"
+    }
+   }
+  },
+  "website": {
+   "id": "01M36MRM9HCJ4T87N081XDT4MX",
+   "name": "Revise It Website",
+   "pages": {
+    "p-9-0": {
+     "status": "historical",
+     "role": "superseded journey map; both artboards are marked (deletable)"
+    },
+    "p-D-0": {
+     "status": "active",
+     "role": "email journey"
+    },
+    "p-2-0": {
+     "status": "active",
+     "role": "public website"
+    },
+    "p-E-0": {
+     "status": "illustration",
+     "role": "system ontology slides"
+    },
+    "p-F-0": {
+     "status": "illustration",
+     "role": "ontology-builder review slides"
+    },
+    "p-A-0": {
+     "status": "active",
+     "role": "teacher account, access and school formatting"
+    },
+    "p-B-0": {
+     "status": "active",
+     "role": "staff workspace"
+    },
+    "p-C-0": {
+     "status": "active",
+     "role": "My papers, payment, progress and delivery"
+    },
+    "p-6-0": {
+     "status": "active",
+     "role": "catalogue and paper builder"
+    },
+    "p-7-0": {
+     "status": "illustration",
+     "role": "technical feasibility slides"
+    },
+    "p-8-0": {
+     "status": "active",
+     "role": "paper table and question editor"
+    },
+    "p-I-0": {
+     "status": "active",
+     "role": "responsive screen patterns (exploratory)"
+    },
+    "p-H-0": {
+     "status": "illustration",
+     "role": "journey diagrams with miniature screen previews"
+    },
+    "p-G-0": {
+     "status": "illustration",
+     "role": "platform map and screen directory"
+    }
+   }
+  }
+ },
+ "tokens": {
+  "owner": "design-system",
+  "mirrors": [
+   "website"
+  ],
+  "legacyAliases": {
+   "--color-off-white": "var(--color-bone-100)",
+   "--color-light-gray": "var(--color-bone-200)",
+   "--color-dark-text": "var(--color-ink-800)",
+   "--color-mid-text": "var(--color-ink-600)",
+   "--color-med-gray": "var(--color-ink-400)",
+   "--color-navy": "var(--color-navy-900)",
+   "--color-sage": "var(--color-sage-500)",
+   "--color-sage-dark": "var(--color-sage-700)",
+   "--color-sage-light": "var(--color-sage-300)",
+   "--color-terracotta": "var(--color-terracotta-500)",
+   "--color-gold": "var(--color-gold-400)",
+   "--color-slate-blue": "var(--color-slate-600)"
+  },
+  "email": {
+   "canvas": "--color-background",
+   "card": "--color-surface",
+   "border": "--color-border",
+   "rule": "--color-action",
+   "text": "--color-text",
+   "muted": "--color-text-muted",
+   "action": "--color-action-strong",
+   "onAction": "--color-on-inverse",
+   "done": "--color-status-done",
+   "problem": "--color-status-problem",
+   "problemText": "--color-warning-text",
+   "problemTint": "--color-warning-tint",
+   "account": "--color-structured",
+   "factsTint": "--color-action-tint-subtle",
+   "factsRule": "--color-action-track",
+   "fallbackTint": "--color-surface-muted"
+  }
+ },
+ "nested": {
+  "tag--*": "tag"
+ },
+ "masters": {
+  "tag": {
+   "family": "K08",
+   "file": "design-system",
+   "node": "2XS-0",
+   "block": "tag",
+   "scan": [
+    "tag--remember",
+    "tag--understand",
+    "tag--apply",
+    "tag--analyse",
+    "tag--evaluate",
+    "tag--create"
+   ],
+   "slots": [
+    "tag__label"
+   ],
+   "overridable": {
+    "tag": [
+     "alignSelf"
+    ]
+   },
+   "variants": {
+    "remember": {},
+    "understand": {
+     "styles": {
+      "tag": {
+       "backgroundColor": "var(--color-bloom-understand)"
+      }
+     }
+    },
+    "apply": {
+     "styles": {
+      "tag": {
+       "backgroundColor": "var(--color-bloom-apply)"
+      },
+      "tag__label": {
+       "color": "var(--color-inverse)"
+      }
+     }
+    },
+    "analyse": {
+     "styles": {
+      "tag": {
+       "backgroundColor": "var(--color-bloom-analyse)"
+      }
+     }
+    },
+    "evaluate": {
+     "styles": {
+      "tag": {
+       "backgroundColor": "var(--color-bloom-evaluate)"
+      }
+     }
+    },
+    "create": {
+     "styles": {
+      "tag": {
+       "backgroundColor": "var(--color-bloom-create)"
+      }
+     }
+    },
+    "column": {
+     "styles": {
+      "tag": {
+       "width": "78px",
+       "flexShrink": "0",
+       "paddingInline": "5px"
+      }
+     }
+    }
+   },
+   "instances": [
+    {
+     "file": "website",
+     "node": "4FP-0",
+     "where": "C2 Configure a structured question",
+     "variant": "remember"
+    },
+    {
+     "file": "website",
+     "node": "4J9-0",
+     "where": "C2 Configure a structured question",
+     "variant": "apply"
+    },
+    {
+     "file": "website",
+     "node": "4JJ-0",
+     "where": "C2 Configure a structured question",
+     "variant": "apply"
+    },
+    {
+     "file": "website",
+     "node": "4JT-0",
+     "where": "C2 Configure a structured question",
+     "variant": "apply"
+    },
+    {
+     "file": "website",
+     "node": "4K3-0",
+     "where": "C2 Configure a structured question",
+     "variant": "apply"
+    },
+    {
+     "file": "website",
+     "node": "4KD-0",
+     "where": "C2 Configure a structured question",
+     "variant": "analyse"
+    },
+    {
+     "file": "website",
+     "node": "6LQ-0",
+     "where": "B4 Question detail page",
+     "variant": "remember"
+    },
+    {
+     "file": "website",
+     "node": "6LY-0",
+     "where": "B4 Question detail page",
+     "variant": "apply"
+    },
+    {
+     "file": "website",
+     "node": "6M6-0",
+     "where": "B4 Question detail page",
+     "variant": "apply"
+    },
+    {
+     "file": "website",
+     "node": "6ME-0",
+     "where": "B4 Question detail page",
+     "variant": "apply"
+    },
+    {
+     "file": "website",
+     "node": "6MM-0",
+     "where": "B4 Question detail page",
+     "variant": "apply"
+    },
+    {
+     "file": "website",
+     "node": "6MU-0",
+     "where": "B4 Question detail page",
+     "variant": "analyse"
+    }
+   ]
+  },
+  "question-context": {
+   "family": "K01",
+   "file": "design-system",
+   "node": "2Y3-0",
+   "block": "question-context",
+   "slots": [
+    "question-context__topic",
+    "question-context__summary",
+    "question-context__marks",
+    "question-context__range",
+    "question-context__parts",
+    "question-context__outline-label",
+    "question-context__chevron",
+    "question-context__outline-caption",
+    "question-context__part-number",
+    "question-context__part-summary"
+   ],
+   "overridable": {
+    "question-context": [
+     "width",
+     "flexGrow",
+     "flexBasis",
+     "flexShrink",
+     "alignSelf"
+    ],
+    "question-context__diagram": [
+     "backgroundImage"
+    ]
+   },
+   "repeat": [
+    "question-context__outline-row"
+   ],
+   "nested": [
+    "tag--*"
+   ],
+   "variants": {
+    "collapsed": {
+     "omit": [
+      "question-context__outline"
+     ]
+    },
+    "expanded": {},
+    "narrow": {
+     "styles": {
+      "question-context": {
+       "paddingInline": "var(--spacing-5)"
+      }
+     }
+    }
+   },
+   "instances": [
+    {
+     "file": "website",
+     "node": "A22-0",
+     "where": "D9 Context before writing",
+     "variant": "collapsed"
+    },
+    {
+     "file": "website",
+     "node": "A3R-0",
+     "where": "D10 Context expanded",
+     "variant": "expanded"
+    },
+    {
+     "file": "website",
+     "node": "AG2-0",
+     "where": "D11 Phone, context before writing",
+     "variant": [
+      "collapsed",
+      "narrow"
+     ]
+    },
+    {
+     "file": "design-system",
+     "node": "2K6-0",
+     "where": "Components 10: question editor, context and paragraph",
+     "variant": "collapsed"
+    }
+   ],
+   "nestedVariants": {
+    "tag--*": [
+     "column"
+    ]
+   }
+  },
+  "question-context-card": {
+   "family": "K01",
+   "file": "design-system",
+   "node": "2YY-0",
+   "block": "question-context-card",
+   "status": "exploratory",
+   "slots": [
+    "question-context-card__label",
+    "question-context-card__title",
+    "question-context-card__meta",
+    "question-context-card__summary",
+    "question-context-card__note",
+    "question-context-card__action-label"
+   ],
+   "overridable": {
+    "question-context-card": [
+     "width",
+     "flexGrow",
+     "flexBasis",
+     "flexShrink"
+    ],
+    "question-context-card__image": [
+     "backgroundImage"
+    ]
+   },
+   "instances": [
+    {
+     "file": "website",
+     "node": "F23-0",
+     "where": "P01 Question context, four compositions: catalogue"
+    },
+    {
+     "file": "website",
+     "node": "F2G-0",
+     "where": "P01 Question context, four compositions: question detail"
+    },
+    {
+     "file": "website",
+     "node": "F2T-0",
+     "where": "P01 Question context, four compositions: while configuring"
+    },
+    {
+     "file": "website",
+     "node": "F36-0",
+     "where": "P01 Question context, four compositions: after submission (read-only)"
+    }
+   ],
+   "export": false
+  },
+  "hint": {
+   "family": "K03",
+   "file": "design-system",
+   "node": "2ZY-0",
+   "block": "hint",
+   "status": "exploratory",
+   "export": false,
+   "slots": [
+    "hint__body"
+   ],
+   "overridable": {
+    "hint": [
+     "width",
+     "flexGrow",
+     "flexBasis",
+     "flexShrink",
+     "alignSelf"
+    ]
+   },
+   "variants": {
+    "visible": {},
+    "dismissed": {
+     "omit": [
+      "hint__content"
+     ],
+     "text": {
+      "hint__action": "Show writing hint"
+     }
+    }
+   },
+   "instances": [
+    {
+     "file": "website",
+     "node": "F57-0",
+     "where": "P02 Form composition, wide container",
+     "variant": "visible"
+    },
+    {
+     "file": "website",
+     "node": "F6F-0",
+     "where": "P02 Form composition, narrow container",
+     "variant": "visible"
+    },
+    {
+     "file": "design-system",
+     "node": "303-0",
+     "where": "K03 to K04 state gallery: visible",
+     "variant": "visible"
+    },
+    {
+     "file": "design-system",
+     "node": "305-0",
+     "where": "K03 to K04 state gallery: dismissed",
+     "variant": "dismissed"
+    },
+    {
+     "file": "design-system",
+     "node": "307-0",
+     "where": "K03 to K04 state gallery: reopened",
+     "variant": "visible"
+    }
+   ]
+  },
+  "notice": {
+   "family": "K04",
+   "file": "design-system",
+   "node": "30T-0",
+   "block": "notice",
+   "scan": [
+    "notice--progress",
+    "notice--caution",
+    "notice--success",
+    "notice--neutral",
+    "notice--problem"
+   ],
+   "slots": [
+    "notice__title",
+    "notice__body"
+   ],
+   "overridable": {
+    "notice": [
+     "width",
+     "flexGrow",
+     "flexBasis",
+     "flexShrink",
+     "alignSelf"
+    ]
+   },
+   "variants": {
+    "neutral": {},
+    "progress": {
+     "styles": {
+      "notice": {
+       "backgroundColor": "var(--color-structured-tint-subtle)",
+       "borderLeftColor": "var(--color-status-progress)"
+      }
+     }
+    },
+    "caution": {
+     "styles": {
+      "notice": {
+       "backgroundColor": "var(--color-caution-tint)",
+       "borderLeftColor": "var(--color-status-attention)"
+      }
+     }
+    },
+    "success": {
+     "styles": {
+      "notice": {
+       "backgroundColor": "var(--color-action-tint-subtle)",
+       "borderLeftColor": "var(--color-status-done)"
+      }
+     }
+    },
+    "problem": {
+     "styles": {
+      "notice": {
+       "backgroundColor": "var(--color-warning-tint)",
+       "borderLeftColor": "var(--color-status-problem)"
+      }
+     }
+    },
+    "compact": {
+     "styles": {
+      "notice": {
+       "paddingBlock": "var(--spacing-3-5)",
+       "paddingInline": "var(--spacing-4)",
+       "gap": "var(--spacing-1)"
+      },
+      "notice__title": {
+       "fontSize": "var(--text-base)",
+       "lineHeight": "var(--leading-base)"
+      },
+      "notice__body": {
+       "lineHeight": "var(--leading-base)"
+      }
+     }
+    },
+    "small": {
+     "styles": {
+      "notice": {
+       "paddingBlock": "var(--spacing-3-5)",
+       "paddingInline": "var(--spacing-4)",
+       "gap": "var(--spacing-1)"
+      },
+      "notice__title": {
+       "fontSize": "var(--text-md)",
+       "lineHeight": "var(--leading-sm)"
+      },
+      "notice__body": {
+       "fontSize": "var(--text-sm)",
+       "lineHeight": "var(--leading-prose-sm)"
+      }
+     }
+    }
+   },
+   "instances": [
+    {
+     "file": "website",
+     "node": "B6T-0",
+     "where": "T2 Sign in state sheet",
+     "variant": [
+      "problem",
+      "compact"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "B7Q-0",
+     "where": "T2 Sign in state sheet",
+     "variant": [
+      "caution",
+      "compact"
+     ],
+     "omit": [
+      "notice__title"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "B8R-0",
+     "where": "T2 Sign in state sheet",
+     "variant": [
+      "success",
+      "compact"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "C0O-0",
+     "where": "F1 School formatting",
+     "variant": [
+      "progress",
+      "compact"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "C2C-0",
+     "where": "F1 School formatting, feedback states",
+     "variant": [
+      "success",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "C2F-0",
+     "where": "F1 School formatting, feedback states",
+     "variant": [
+      "caution",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "C2I-0",
+     "where": "F1 School formatting, feedback states",
+     "variant": [
+      "problem",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "C4E-0",
+     "where": "F1p Phone, school formatting",
+     "variant": [
+      "progress",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "BNT-0",
+     "where": "S5 Papers needing attention, record panel",
+     "variant": [
+      "neutral",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "BOM-0",
+     "where": "S4 Admin state sheet",
+     "variant": [
+      "problem",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "BOR-0",
+     "where": "S4 Admin state sheet",
+     "variant": [
+      "success",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "BOX-0",
+     "where": "S4 Admin state sheet",
+     "variant": [
+      "problem",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "BQ3-0",
+     "where": "S4 Admin state sheet",
+     "variant": [
+      "problem",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AW8-0",
+     "where": "M2 Payment return states",
+     "variant": [
+      "progress"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AWK-0",
+     "where": "M2 Payment return states",
+     "variant": [
+      "caution"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AX0-0",
+     "where": "M2 Payment return states",
+     "variant": [
+      "success"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AXC-0",
+     "where": "M2 Payment return states",
+     "variant": [
+      "neutral"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AXP-0",
+     "where": "M2 Payment return states",
+     "variant": [
+      "caution"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AY0-0",
+     "where": "M2 Payment return states",
+     "variant": [
+      "neutral"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AYC-0",
+     "where": "M2 Payment return states",
+     "variant": [
+      "problem"
+     ]
+    },
+    {
+     "file": "design-system",
+     "node": "2LV-0",
+     "where": "Components 10: interpretation unavailable",
+     "variant": [
+      "caution",
+      "small"
+     ]
+    }
+   ],
+   "notLinked": [
+    {
+     "file": "website",
+     "node": "CPU-0",
+     "kind": "illustration",
+     "where": "E6 Inbox, signed-out return and submission",
+     "reason": "Annotated miniature of the sign-in return on the email journey board, drawn with a full border. The linked design for this notice is on T2."
+    },
+    {
+     "file": "website",
+     "node": "CQZ-0",
+     "kind": "illustration",
+     "where": "E6 Inbox, signed-out return and submission",
+     "reason": "Annotated miniature of the progress page on the email journey board, with a third annotation line. The linked design is the stage list on M3."
+    },
+    {
+     "file": "website",
+     "node": "63A-0",
+     "kind": "exception",
+     "where": "C4 Review and pay",
+     "reason": "Builder readiness panel with a status word and meter (application: notice--ready in teacher/paper.module.css). A different composition from the two-sentence notice."
+    },
+    {
+     "file": "website",
+     "node": "4ND-0",
+     "kind": "exception",
+     "where": "A4 Paper intent: filled",
+     "reason": "Builder-area intent check that predates the renewed notice (application: teacher/paper.module.css). Kept as drawn."
+    }
+   ]
+  }
+ },
+ "ownership": {
+  "token values": {
+   "owner": "Paper, Revise It Design System file",
+   "reaches": {
+    "Design System nodes": "native, immediate (Paper token binding)",
+    "Website file": "synchronised by paper:plan and paper:apply (tokens are scoped to one file in Paper 0.5.14)",
+    "application and email": "exported by paper:pull, then reviewed and deployed"
+   }
+  },
+  "component layers, spacing, type and colour bindings": {
+   "owner": "the master frame on the Design System page \"5 Linked components · masters (C15)\"",
+   "reaches": {
+    "registered Paper instances in both files": "synchronised by paper:plan and paper:apply (Paper has no native master and instance link)",
+    "application": "exported by paper:pull into app/paper-components.css, consumed by the shared component stylesheet"
+   }
+  },
+  "component behaviour, markup, accessibility and typed inputs": {
+   "owner": "the shared application module named in each family",
+   "reaches": {
+    "every screen that imports it": "native (one module, many imports)",
+    "Paper": "not generated; described on the contract boards"
+   }
+  },
+  "instance content and state": {
+   "owner": "each instance (Paper: slot text, image, declared overrides; application: props from the server and the teacher)",
+   "reaches": {}
+  },
+  "variant definitions": {
+   "owner": "this registry (the variants of each master)",
+   "reaches": {
+    "Paper instances": "paper:apply",
+    "application": "paper:pull"
+   }
+  },
+  "wording of facts and document names": {
+   "owner": "lib/jobs/contracts.ts and lib/jobs/presentation.ts",
+   "reaches": {
+    "web screens": "native import",
+    "email": "own copy, held equal by tests/unit/email.test.ts"
+   }
+  }
+ },
+ "families": {
+  "K01": {
+   "title": "Question context",
+   "masters": [
+    "question-context",
+    "question-context-card"
+   ],
+   "code": {
+    "definition": "app/(accounts)/system/question-context.tsx",
+    "stylesheet": "app/(accounts)/system/question-context.module.css",
+    "blocks": [
+     "question-context"
+    ],
+    "importSites": [
+     "app/(accounts)/teacher/orders/[id]/configure.tsx"
+    ],
+    "variants": {
+     "collapsed": "open is false",
+     "expanded": "open is true; shows the pinned outline rows",
+     "narrow": "viewport at or below 1050 pixels"
+    },
+    "inputs": {
+     "line": "one purchased occurrence: identifier, number, kind, marks range and its pinned outline",
+     "marks": "the marks chosen for this occurrence, or none yet",
+     "catalogue": "published topic, description and thumbnail for the purchased release",
+     "open / onToggle": "outline disclosure, held by the caller per occurrence identifier"
+    },
+    "instanceOwned": [
+     "every text and image shown",
+     "the outline rows of the pinned definition",
+     "whether the outline is open"
+    ]
+   },
+   "exceptions": [
+    {
+     "what": "Catalogue card and question detail panel",
+     "where": [
+      "app/(accounts)/teacher/paper/card.tsx",
+      "app/(accounts)/teacher/paper/detail.tsx"
+     ],
+     "reason": "Different purpose and layout (choose and add to a paper; selection control, budget impact). CatalogueCard is already one definition used by the catalogue grid and the related-questions list. They read the current catalogue release; the context reminder reads the purchased one, so the two must not be merged."
+    },
+    {
+     "what": "Submitted summary row",
+     "where": [
+      "app/(accounts)/teacher/orders/[id]/submitted-summary.tsx"
+     ],
+     "reason": "Read-only table of each occurrence's brief and choices after submission. Shares the tag and status components, not the reminder layout."
+    },
+    {
+     "what": "Question context card (Paper only)",
+     "where": [
+      "Paper master question-context-card"
+     ],
+     "reason": "Exploratory composition from the modular exploration. Not approved for build, so it has no application counterpart and is not exported to code."
+    }
+   ]
+  },
+  "K02": {
+   "title": "Fields and answer controls",
+   "masters": [],
+   "code": {
+    "definition": "app/(accounts)/forms.tsx",
+    "stylesheet": "app/(accounts)/experience.module.css",
+    "blocks": [
+     "field",
+     "disclosure"
+    ],
+    "importSites": [
+     "app/(accounts)/account/details.tsx",
+     "app/(accounts)/admin/accounts/review.tsx",
+     "app/(accounts)/admin/login/form.tsx",
+     "app/(accounts)/auth/confirm/form.tsx",
+     "app/(accounts)/forgot-password/page.tsx",
+     "app/(accounts)/login/form.tsx",
+     "app/(accounts)/register/form.tsx",
+     "app/(accounts)/reset-password/form.tsx"
+    ],
+    "variants": {
+     "TextField": "labelled input with error and hint",
+     "EmailField / PasswordField / SchoolFields": "fixed account fields",
+     "Disclosure": "collapsible secondary form"
+    },
+    "inputs": {
+     "label, name, error, hint": "supplied by the form; the server reply decides which field is invalid"
+    },
+    "instanceOwned": [
+     "values typed by the person",
+     "server validation messages"
+    ]
+   },
+   "paper": {
+    "status": "inventoried, not linked",
+    "uses": "9 field frames on page 2 (T1, T2, F1) plus text inputs on pages 5 and 7",
+    "reason": "The field drawings differ in structure between sign-in, formatting and the question editor. They need a design decision on one anatomy before a master can own them."
+   },
+   "exceptions": [
+    {
+     "what": "School formatting selects and checkbox",
+     "where": [
+      "app/(accounts)/teacher/paper/formatting.tsx"
+     ],
+     "reason": "Select and checkbox controls that TextField does not offer. They use the same field classes from the same stylesheet, so the visual definition is shared; the markup is local."
+    },
+    {
+     "what": "Staff review select and textarea",
+     "where": [
+      "app/(accounts)/admin/accounts/review.tsx"
+     ],
+     "reason": "Same: shared field classes, local select and textarea markup with staff-specific hints."
+    },
+    {
+     "what": "Question answer controls",
+     "where": [
+      "app/(accounts)/teacher/orders/[id]/configure.tsx"
+     ],
+     "reason": "Choice chips for authored question forms, with delegation, omission and forced values. Domain-specific; delegation is allowed only where the authored form permits it."
+    },
+    {
+     "what": "Legacy questionnaire renderer",
+     "where": [
+      "lib/jobs/questionnaire-fields.tsx"
+     ],
+     "reason": "Adapter for orders created before the per-question configuration. Kept so existing orders still render; not extended."
+    }
+   ]
+  },
+  "K03": {
+   "title": "Dismissible hint",
+   "masters": [
+    "hint"
+   ],
+   "code": null,
+   "paperToCode": "none: the dismissible hint is a C14 proposal and C14 has not returned. The application shows static field hints (field__hint) and the Jev suggestion list, which has its own Keep my answer control.",
+   "exceptions": [
+    {
+     "what": "No application component yet",
+     "where": [],
+     "reason": "Building it before the C14 decision would promote a proposed interaction into production. When it is built, dismissal must be scoped to the signed-in account and occurrence, and must never clear an answer."
+    }
+   ]
+  },
+  "K04": {
+   "title": "Task feedback",
+   "masters": [
+    "notice"
+   ],
+   "code": {
+    "definition": "app/(accounts)/system/notice.tsx",
+    "stylesheet": "app/(accounts)/system/notice.module.css",
+    "blocks": [
+     "notice",
+     "notice-stack"
+    ],
+    "importSites": [
+     "app/(accounts)/admin/accounts/page.tsx",
+     "app/(accounts)/admin/accounts/review.tsx",
+     "app/(accounts)/admin/papers/page.tsx",
+     "app/(accounts)/auth/confirm/form.tsx",
+     "app/(accounts)/auth/confirm/page.tsx",
+     "app/(accounts)/forms.tsx",
+     "app/(accounts)/login/page.tsx",
+     "app/(accounts)/register/page.tsx",
+     "app/(accounts)/teacher/orders/[id]/configure.tsx",
+     "app/(accounts)/teacher/orders/[id]/jev-advice.tsx",
+     "app/(accounts)/teacher/orders/[id]/view.tsx",
+     "app/(accounts)/teacher/orders/list.tsx",
+     "app/(accounts)/teacher/page.tsx",
+     "app/(accounts)/teacher/paper/formatting.tsx",
+     "app/(accounts)/teacher/workspace.tsx"
+    ],
+    "variants": {
+     "tone": "progress, caution, success, neutral, problem",
+     "prominent": "page-level title size",
+     "as=\"p\"": "single-line message",
+     "InlineNotice": "compact feedback beside a control in the question editor: problem, required, info"
+    },
+    "inputs": {
+     "tone, title, children, actions": "supplied by the feature; the server reply decides the tone and words",
+     "role": "status or alert, chosen by the caller"
+    },
+    "instanceOwned": [
+     "the message and its recovery actions"
+    ]
+   },
+   "differences": [
+    {
+     "property": "gap between title and body",
+     "paper": "6px (--pc-notice-gap)",
+     "application": "4px",
+     "decision": "pending; the deployed value is kept"
+    },
+    {
+     "property": "padding of a notice with the compact title",
+     "paper": "14px 16px (compact variant)",
+     "application": "18px 20px for both title sizes",
+     "decision": "pending; the deployed value is kept"
+    },
+    {
+     "property": "small density",
+     "paper": "state-sheet scale (14 and 13 pixel type)",
+     "application": "not used",
+     "decision": "Paper only"
+    }
+   ],
+   "privateStyles": [
+    {
+     "file": "app/(accounts)/teacher/paper.module.css",
+     "classes": [
+      "notice--success",
+      "notice--error",
+      "notice--unavailable",
+      "notice--info",
+      "notice--ready",
+      "notice--not-ready",
+      "notice--caution",
+      "notice__warning",
+      "notice__success"
+     ],
+     "reason": "Builder-area feedback that predates the renewed notice and is drawn differently on Paper page 5 (readiness panel, inline mark warnings). Folding it into the shared notice would change the accepted builder screens."
+    },
+    {
+     "file": "app/(accounts)/teacher/orders/[id]/configure.module.css",
+     "classes": [
+      "notice--complete"
+     ],
+     "reason": "Unreferenced style left from the earlier completion banner. Not used by any screen; left untouched."
+    }
+   ]
+  },
+  "K05": {
+   "title": "Collections",
+   "masters": [],
+   "code": null,
+   "paperToCode": "tokens only",
+   "paper": {
+    "status": "inventoried, not linked",
+    "uses": "paper-list (My papers), record-table (two staff queues), catalogue grid",
+    "reason": "Three collections with different row content and actions. The exploration itself asks for proof in two real contexts before a shared abstraction."
+   },
+   "exceptions": [
+    {
+     "what": "No single collection component",
+     "where": [
+      "app/(accounts)/teacher/orders/list.tsx",
+      "app/(accounts)/admin/accounts/page.tsx",
+      "app/(accounts)/admin/papers/page.tsx",
+      "app/(accounts)/teacher/paper/catalogue.tsx"
+     ],
+     "reason": "Each collection supplies its own query rules, row content and allowed actions. The two staff queues already share one record-table style block; My papers and the catalogue have their own. Search field, filter chips, empty state and pagination are shared style blocks in experience.module.css."
+    }
+   ]
+  },
+  "K06": {
+   "title": "Record frame",
+   "masters": [],
+   "code": null,
+   "paperToCode": "tokens only",
+   "paper": {
+    "status": "inventoried, not linked",
+    "uses": "side-panel (10 on page 7), record-panel (3 on page 3)",
+    "reason": "One comment thread is pinned to a side-panel frame; restructuring these frames is deferred until the two modes are designed as one component."
+   },
+   "exceptions": [
+    {
+     "what": "Two explicit frames",
+     "where": [
+      "app/(accounts)/teacher/orders/[id]/paper-panel.tsx",
+      "app/(accounts)/admin/accounts/review.tsx",
+      "app/(accounts)/admin/papers/page.tsx"
+     ],
+     "reason": "The teacher panel is a modal dialog that traps focus and returns it on close; the staff record is a route-based panel beside its queue. Different interaction modes, kept explicit. PaperPanel is one definition used for both the question editor and the paper review."
+    }
+   ]
+  },
+  "K07": {
+   "title": "Marks allocation",
+   "masters": [],
+   "code": null,
+   "paperToCode": "tokens only",
+   "paper": {
+    "status": "inventoried, not linked",
+    "uses": "stepper and marks-control on pages 5 and 7; marks-input in the paper table",
+    "reason": "Two layouts in the accepted designs."
+   },
+   "exceptions": [
+    {
+     "what": "Builder and paid editor steppers",
+     "where": [
+      "app/(accounts)/teacher/paper/builder.tsx",
+      "app/(accounts)/teacher/orders/[id]/configure.tsx"
+     ],
+     "reason": "Different layouts (range label inside the control before payment; fixed-width buttons after). Both only report a mark edit; ranges, totals and balance come from the workspace model before payment and from the server after it. No calculation lives in either control."
+    }
+   ]
+  },
+  "K08": {
+   "title": "Cognitive mix (Bloom's)",
+   "masters": [
+    "tag"
+   ],
+   "code": {
+    "definition": "app/(accounts)/system/tag.tsx",
+    "stylesheet": "app/(accounts)/system/tag.module.css",
+    "blocks": [
+     "tag"
+    ],
+    "importSites": [
+     "app/(accounts)/system/question-context.tsx",
+     "app/(accounts)/teacher/orders/[id]/configure.tsx",
+     "app/(accounts)/teacher/paper/builder.tsx",
+     "app/(accounts)/teacher/paper/detail.tsx",
+     "app/(accounts)/teacher/paper/ui.tsx"
+    ],
+    "variants": {
+     "category": "remember, understand, apply, analyse, evaluate, create",
+     "grouped": "the source allows two categories and does not say which",
+     "unclassified": "no category is known",
+     "column": "fixed width inside an outline row"
+    },
+    "inputs": {
+     "bloom": "the label to show",
+     "tone": "the category key when the label differs from it"
+    },
+    "instanceOwned": [
+     "the label text"
+    ]
+   },
+   "differences": [
+    {
+     "property": "create colour",
+     "paper": "var(--color-bloom-create), #6E4E28",
+     "application": "#735B79",
+     "decision": "pending; the deployed colour is kept and is not read from Paper"
+    },
+    {
+     "property": "unclassified in the catalogue detail",
+     "paper": "no master",
+     "application": "now the paid editor value (#E4E0D8 with dark text) in both areas; the catalogue detail previously used #F0EDE6 with grey text",
+     "decision": "unified in C15; report if the lighter value is preferred"
+    }
+   ],
+   "exceptions": [
+    {
+     "what": "Mix bars and rows",
+     "where": [
+      "app/(accounts)/teacher/paper/ui.tsx",
+      "app/(accounts)/teacher/orders/[id]/configure.tsx"
+     ],
+     "reason": "BloomBar (before payment, from published outlines) and MixRows (after payment, from the server composition) present different supplied results: exact weights versus settled and open ranges. Both take the category colour from the shared tag. Neither calculates."
+    }
+   ]
+  },
+  "K09": {
+   "title": "Paper facts and status",
+   "masters": [],
+   "code": {
+    "definition": "app/(accounts)/system/status.tsx",
+    "stylesheet": "app/(accounts)/system/status.module.css",
+    "blocks": [
+     "status"
+    ],
+    "importSites": [
+     "app/(accounts)/account/page.tsx",
+     "app/(accounts)/admin/accounts/page.tsx",
+     "app/(accounts)/admin/papers/page.tsx",
+     "app/(accounts)/teacher/orders/[id]/view.tsx",
+     "app/(accounts)/teacher/orders/list.tsx",
+     "app/(accounts)/teacher/workspace.tsx"
+    ],
+    "variants": {
+     "tone": "done, progress, attention, problem, closed",
+     "as=\"p\"": "block-level marker"
+    },
+    "inputs": {
+     "tone, label": "from the fact the server reported (lib/jobs/presentation.ts); payment, question details and documents stay three separate facts"
+    },
+    "instanceOwned": [
+     "the label"
+    ]
+   },
+   "paper": {
+    "status": "inventoried, not linked",
+    "uses": "status markers and paper-facts on pages 3 and 4, and Components 11",
+    "reason": "The markers are drawn as part of larger rows with differing structure; they share the status tokens, which are linked."
+   },
+   "exceptions": [],
+   "privateStyles": [
+    {
+     "file": "app/(accounts)/teacher/paper.module.css",
+     "classes": [
+      "status--ready",
+      "status--to-complete",
+      "status--invalid"
+     ],
+     "reason": "Row status words in the builder question table (Paper page 5), drawn as coloured text without a dot. They predate the renewed status marker; folding them in would change the accepted builder table."
+    }
+   ]
+  },
+  "K10": {
+   "title": "Document set",
+   "masters": [],
+   "code": null,
+   "paperToCode": "tokens only",
+   "paper": {
+    "status": "inventoried, not linked",
+    "uses": "4 document cards on M4 and one on Components 11",
+    "reason": "Single use in the accepted designs."
+   },
+   "exceptions": [
+    {
+     "what": "One list of names, three presentations",
+     "where": [
+      "lib/jobs/contracts.ts",
+      "lib/jobs/presentation.ts",
+      "app/(accounts)/teacher/orders/[id]/view.tsx",
+      "app/(accounts)/teacher/paper/review.tsx",
+      "lib/email/templates.ts"
+     ],
+     "reason": "documents and documentLabels in lib/jobs/contracts.ts are the single list. Delivery cards and the pre-payment list import it. Email keeps its own copy because the template module must load under plain Node; tests/unit/email.test.ts fails if the two lists differ. Download access stays with the server route."
+    }
+   ]
+  },
+  "K11": {
+   "title": "Navigation",
+   "masters": [],
+   "code": null,
+   "paperToCode": "tokens only",
+   "paper": {
+    "status": "inventoried, not linked",
+    "uses": "40 site-nav frames and 7 staff headers across pages 1 to 7",
+    "reason": "Each header shows a different current place and audience; a master with a current-place variant is the next family to link."
+   },
+   "exceptions": [
+    {
+     "what": "Three audiences",
+     "where": [
+      "app/(accounts)/shell.tsx",
+      "app/(accounts)/staff-header.tsx",
+      "app/page.tsx",
+      "app/pilot/page.tsx",
+      "app/privacy-policy/page.tsx"
+     ],
+     "reason": "Teacher, signed-out and staff headers keep their own destinations and permissions. They share the menu mechanics (useMenu and MenuButton from shell.tsx) and the nav-menu style block. The public marketing pages predate the account system and share only tokens and the wordmark."
+    }
+   ]
+  },
+  "K12": {
+   "title": "Email",
+   "masters": [],
+   "code": null,
+   "paperToCode": "tokens: the marked colour block in lib/email/templates.ts is written by paper:pull from the token map in this file",
+   "paper": {
+    "status": "inventoried, not linked",
+    "uses": "6 artboards on page 8",
+    "reason": "Email mock-ups are pictures of table markup; they follow the tokens, not a web master."
+   },
+   "exceptions": [
+    {
+     "what": "Separate renderer",
+     "where": [
+      "lib/email/templates.ts"
+     ],
+     "reason": "Email clients ignore stylesheets and variables, so the email keeps a table-based renderer with literal values. It shares token values (generated), document names (tested) and terminology."
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,14 @@
+/* Status marker (Paper K09). The one definition; screens import Status from ./status. */
+.status { display:inline-flex; align-items:center; gap:8px; }
+.status__dot--done, .status__dot--progress, .status__dot--attention, .status__dot--problem, .status__dot--closed { width:8px; height:8px; flex-shrink:0; border-radius:999px; }
+.status__dot--done { background:var(--color-status-done); }
+.status__dot--progress { background:var(--color-status-progress); }
+.status__dot--attention { background:var(--color-status-attention); }
+.status__dot--problem { background:var(--color-status-problem); }
+.status__dot--closed { border:1.5px solid var(--color-text-subtle); }
+.status__label--done, .status__label--progress, .status__label--attention, .status__label--problem, .status__label--closed { font-size:14px; line-height:18px; font-weight:600; }
+.status__label--done { color:var(--color-action-strong); }
+.status__label--progress { color:var(--color-structured); }
+.status__label--attention { color:var(--color-caution-text); }
+.status__label--problem { color:var(--color-warning-text); }
+.status__label--closed { color:var(--color-text-muted); }

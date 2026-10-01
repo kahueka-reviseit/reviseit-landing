@@ -9,7 +9,7 @@ const auth=vi.hoisted(()=>({supabase:null as any}));
 vi.mock('../../lib/auth/access',()=>({requireTeacher:async()=>({supabase:auth.supabase,account:{full_name:'Synthetic Teacher'}})}));
 import ConfigureOrder from '../../app/(accounts)/teacher/orders/[id]/configure';
 import OrderPage from '../../app/(accounts)/teacher/orders/[id]/page';
-import {briefPrompts} from '../../app/(accounts)/teacher/orders/[id]/question-context';
+import {briefPrompts} from '../../lib/configurator/brief';
 import {evaluate,project} from '../../lib/configurator/engine';
 import {questionContexts} from '../../lib/workspace/catalogue';
 import {previewCatalogue,previewConfiguration,previewDefinitions} from '../fixtures/configurator';

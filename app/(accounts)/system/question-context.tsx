@@ -1,18 +1,25 @@
 import {useLayoutEffect,useRef,useState} from 'react';
-import type {LineView} from '../../../../../lib/configurator/contracts';
-import type {QuestionField} from '../../../../../lib/jobs/questionnaire';
-import type {QuestionContext as Catalogue} from '../../../../../lib/workspace/contracts';
-import styles from './configure.module.css';
+import type {LineView} from '../../../lib/configurator/contracts';
+import type {QuestionContext as Catalogue} from '../../../lib/workspace/contracts';
+import {BloomTag} from './tag';
+import styles from './question-context.module.css';
 
 /**
- * Paper D9–D11: a read-only reminder of the purchased question above the teacher's brief.
- * It shows only published catalogue metadata and the order's pinned outline. Nothing here
- * writes answers, changes requiredness or asks for an interpretation.
+ * Question context (Paper K01; D9 to D11): a read-only reminder of the purchased question
+ * above the teacher's brief. It shows only published catalogue metadata and the order's
+ * pinned outline. Nothing here writes answers, changes requiredness or asks for an
+ * interpretation.
+ *
+ * Each use is one purchased occurrence. Everything that differs between two occurrences
+ * of the same question type (identifier, number, chosen marks, pinned outline) arrives
+ * through `line`; this component keeps no answers and shares no state between uses.
+ * Spacing, type and colour for the named layers come from the Paper master through
+ * `app/paper-components.css`.
  */
+export type QuestionContextLine = Pick<LineView,'id'|'number'|'kind'|'marks'|'outline'>;
 const range=(r:{min:number;max:number})=>r.min===r.max?String(r.min):`${r.min}–${r.max}`;
-const tagClass:Record<string,string>={remember:styles['tag--remember'],understand:styles['tag--understand'],apply:styles['tag--apply'],analyse:styles['tag--analyse'],evaluate:styles['tag--evaluate'],create:styles['tag--create']};
 
-export default function QuestionContext({line,marks,catalogue,open,onToggle}:{line:LineView;marks:number|null;catalogue?:Catalogue;open:boolean;onToggle:()=>void}) {
+export default function QuestionContext({line,marks,catalogue,open,onToggle}:{line:QuestionContextLine;marks:number|null;catalogue?:Catalogue;open:boolean;onToggle:()=>void}) {
   const [brokenImage,setBrokenImage]=useState<string|null>(null);
   // A long description is capped at four lines so the brief stays near; the full text is one click away.
   const summaryRef=useRef<HTMLParagraphElement>(null);
@@ -59,17 +66,9 @@ export default function QuestionContext({line,marks,catalogue,open,onToggle}:{li
         <ol className={styles['question-context__outline-list']}>{rows.map((r,i)=><li key={i} className={styles['question-context__outline-row']}>
           <span className={styles['question-context__part-number']}>{line.number}.{i+1}</span>
           <span className={styles['question-context__part-summary']}>{r.summary}</span>
-          <span className={`${styles['tag']} ${styles['question-context__tag']} ${tagClass[r.bloom.toLowerCase()]??styles['tag--unclassified']}`}>{r.bloom}</span>
+          <BloomTag bloom={r.bloom} className={styles['question-context__tag']}/>
         </li>)}</ol>
       </div></>}
     {line.kind==='structured'&&!rows.length&&<p className={styles['question-context__outline-missing']}>An example question outline has not been published for this question.</p>}
   </section>;
-}
-
-/**
- * Up to four of the item's own authored questions, required ones first, as starting
- * points for the brief. They are reminders only; the fields and their rules are unchanged.
- */
-export function briefPrompts(fields:QuestionField[]):string[] {
-  return [...fields.filter(f=>f.required),...fields.filter(f=>!f.required)].map(f=>f.label.trim()).filter(Boolean).slice(0,4);
 }

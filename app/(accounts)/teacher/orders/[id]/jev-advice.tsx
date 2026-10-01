@@ -2,6 +2,7 @@
 import {useEffect,useState} from 'react';
 import type {Answer,QuestionField} from '../../../../../lib/jobs/questionnaire';
 import styles from './configure.module.css';
+import {InlineNotice} from '../../../system/notice';
 
 type Hint={checkId:string;field:string;text:string;suggestion?:{field:string;option:string}};
 type Props={orderId:string;lineId:string;revision:number;enabled:boolean;saved:boolean;answers:Record<string,Answer>;fields:QuestionField[];onAccept:(field:string,answer:Answer)=>void};
@@ -29,7 +30,7 @@ export default function JevAdvice({orderId,lineId,revision,enabled,saved,answers
  if(!enabled)return null;
  const hints=state.hints.filter(h=>!dismissed.includes(h.checkId));
  const message=!saved?'Suggestions will update after your answers save.':!hasText?'Jev can help when you describe a choice in your own words.':state.status==='checking'?'Jev is checking how your notes fit your choices…':state.status==='checked'?(hints.length?'Consider these suggestions. Your choices remain yours.':state.hints.length?'You kept your answers. You can still finish your paper.':'Jev found no clear conflict in the notes it checked.'):state.status==='limit'?'Jev has reached the pilot suggestion limit. You can still finish your paper.':state.status==='not_applicable'?'There is no Jev check for this custom answer yet.':state.status==='idle'?'Jev will check your saved notes shortly.':'Jev suggestions are unavailable right now. You can still finish your paper.';
- return <section className={styles['notice--info']} aria-label="Jev suggestions">
+ return <InlineNotice as="section" tone="info" label="Jev suggestions">
   <strong>Jev suggestions · optional</strong><p role="status" className={styles['paragraph']}>{message}</p>
   {hints.map(h=>{
    const suggestion=h.suggestion;
@@ -45,5 +46,5 @@ export default function JevAdvice({orderId,lineId,revision,enabled,saved,answers
    </div>;
   })}
   <small>Relevant notes and selected options are sent directly to TypeSafe. Suggestions never change your answers automatically.</small>
- </section>;
+ </InlineNotice>;
 }

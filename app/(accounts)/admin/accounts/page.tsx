@@ -4,6 +4,8 @@ import { StaffHeader } from '../../staff-header';
 import { accountCounts, accountFilters, isFilter, papersNeedingAttention, searchTerm, statusLabels, type AccountStatus } from '../data';
 import { AddDepartment, FocusRow, ReviewPanel } from './review';
 import ui from '../../experience.module.css';
+import { Notice } from '../../system/notice';
+import { Status } from '../../system/status';
 
 /**
  * School accounts (Paper S3, S4, S6, S7p, S8p). The queue is filtered and searched on the
@@ -63,7 +65,7 @@ export default async function ReviewAccounts({ searchParams }: { searchParams: P
         <button className={ui['search-field__submit']} type="submit">Search</button>
       </form>
     </div>
-    {failed ? <div className={ui['notice--problem']} role="alert"><p className={ui['notice__title--compact']}>We could not load accounts</p><p className={ui['notice__body']}>Nothing was changed. Refresh to try again.</p></div> :
+    {failed ? <Notice tone="problem" role="alert" title="We could not load accounts">Nothing was changed. Refresh to try again.</Notice> :
     <div className={`${ui['record-layout']} ${current ? ui['record-layout--reviewing'] : ''}`}>
       <div className={ui['record-layout__list']}>
         {rows.length === 0 ? <section className={ui['empty-state']}><h2 className={ui['empty-state__title']}>{q ? 'No accounts match this search' : filter === 'pending' ? 'No accounts need a decision' : 'No accounts in this group'}</h2>
@@ -75,10 +77,10 @@ export default async function ReviewAccounts({ searchParams }: { searchParams: P
             return <Link id={`row-${a.user_id}`} key={a.user_id} role="row" href={href({ review: a.user_id })} scroll={false} aria-current={selectedRow ? 'true' : undefined} className={selectedRow ? ui['record-table__row--selected'] : ui['record-table__row']}>
               <span role="cell" className={ui['record-table__cell--primary']}><span className={ui['record-table__name']}>{a.full_name || 'School details incomplete'}</span><span className={ui['record-table__sub']}>{a.email}</span>
                 <span className={ui['record-table__sub']}>{a.requested_school} · {a.requested_department}</span>
-                <span className={ui['record-table__mobile-status']}><span className={ui['status']}><span className={ui[`status__dot--${s.tone}`]} aria-hidden="true"/><span className={ui[`status__label--${s.tone}`]}>{s.label} · email {a.email_confirmed_at ? 'confirmed' : 'not confirmed'}</span></span></span></span>
+                <span className={ui['record-table__mobile-status']}><Status tone={s.tone} label={<>{s.label} · email {a.email_confirmed_at ? 'confirmed' : 'not confirmed'}</>}/></span></span>
               <span role="cell" className={ui['record-table__cell--school']}><span className={ui['record-table__text']}>{a.school_id ? schools.get(a.school_id) ?? a.requested_school : a.requested_school}</span><span className={ui['record-table__sub']}>{a.department_id ? departmentName.get(a.department_id) ?? a.requested_department : a.requested_department}</span></span>
               <span role="cell" className={`${ui['record-table__cell--email']} ${a.email_confirmed_at ? ui['record-table__text'] : ui['record-table__text--caution']}`}>{a.email_confirmed_at ? 'Confirmed' : 'Not confirmed'}</span>
-              <span role="cell" className={ui['record-table__cell--status']}><span className={ui['status']}><span className={ui[`status__dot--${s.tone}`]} aria-hidden="true"/><span className={ui[`status__label--${s.tone}`]}>{s.label}</span></span></span>
+              <span role="cell" className={ui['record-table__cell--status']}><Status tone={s.tone} label={s.label}/></span>
               <span className={ui['record-table__cell--chevron']} aria-hidden="true">›</span>
             </Link>; })}
         </div>}
@@ -86,7 +88,7 @@ export default async function ReviewAccounts({ searchParams }: { searchParams: P
       </div>
       {current && <ReviewPanel key={current.user_id} account={{ ...current, schoolName: current.school_id ? schools.get(current.school_id) : undefined }} departments={departments}
         closeHref={href({ focus: current.user_id })} nextHref={nextId ? href({ review: nextId }) : undefined} statusLabel={statusLabels[current.status].label}/>}
-      {selected && !current && <aside className={ui['record-panel']}><div className={ui['record-panel__body']}><div className={ui['notice--neutral']} role="status"><p className={ui['notice__body']}>This account is not available to review. It may be your own account or no longer exist.</p></div><Link className={ui['link']} href={href({})}>Back to school accounts</Link></div></aside>}
+      {selected && !current && <aside className={ui['record-panel']}><div className={ui['record-panel__body']}><Notice tone="neutral" role="status">This account is not available to review. It may be your own account or no longer exist.</Notice><Link className={ui['link']} href={href({})}>Back to school accounts</Link></div></aside>}
     </div>}
   </div></main></>;
 }

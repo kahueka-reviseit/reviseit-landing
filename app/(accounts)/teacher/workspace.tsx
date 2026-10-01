@@ -12,6 +12,8 @@ import ReviewView from './paper/review';
 import { HomeView, ShapeView } from './paper/home';
 import FormattingView from './paper/formatting';
 import ui from '../experience.module.css';
+import { Notice } from '../system/notice';
+import { Status } from '../system/status';
 import PaperBar from './paper/paper-bar';
 
 const views:View[]=['home','shape','catalogue','question','builder','builder-question','builder-mcq','review','formatting'];
@@ -179,11 +181,11 @@ export default function WorkspaceView({initial}:{initial:Workspace}) {
   useEffect(()=>{if((view==='catalogue'||view==='builder')&&returnFocus.current){const el=document.getElementById(returnFocus.current);returnFocus.current=null;el?.focus();}},[view]);
 
   if(!data.module) return <div className={ui['page']}><header className={ui['page-header']}><div className={ui['page-header__titles']}><h1 className={ui['page-header__title']}>My curricula</h1></div></header>
-    <section className={ui['empty-state']}><p className={ui['status']}><span className={ui['status__dot--done']} aria-hidden="true"/><span className={ui['status__label--done']}>Access verified</span></p><h2 className={ui['empty-state__title']}>Your curricula will appear here</h2><p className={ui['empty-state__body']}>Your school is verified but no curriculum has been opened for your department yet. Contact Revise It to arrange access.</p><a className={ui['button--secondary']} href="mailto:kahueka@reviseit.io">Contact Revise It</a></section></div>;
+    <section className={ui['empty-state']}><Status as="p" tone="done" label="Access verified"/><h2 className={ui['empty-state__title']}>Your curricula will appear here</h2><p className={ui['empty-state__body']}>Your school is verified but no curriculum has been opened for your department yet. Contact Revise It to arrange access.</p><a className={ui['button--secondary']} href="mailto:kahueka@reviseit.io">Contact Revise It</a></section></div>;
   const detail=question?byId.get(question):undefined;
   const status=<>
-    <div aria-live="polite">{notice && <p role="status" className={ui['notice--success']}><span className={ui['notice__body']}>{notice}</span></p>}</div>
-    {error && <p role="alert" className={ui['notice--problem']}><span className={ui['notice__body']}>{error} <a className={ui['link']} href="/teacher">Reload workspace</a></span></p>}
+    <div aria-live="polite">{notice && <Notice as="p" tone="success" role="status">{notice}</Notice>}</div>
+    {error && <Notice as="p" tone="problem" role="alert">{error} <a className={ui['link']} href="/teacher">Reload workspace</a></Notice>}
   </>;
   const withBar=['catalogue','question'].includes(view);
   return <div className={`${styles['paper-journey']} ${withBar?styles['paper-journey--with-bottom-bar']:''}`}>

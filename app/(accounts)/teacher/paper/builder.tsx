@@ -5,7 +5,8 @@ import { formatMarks } from '../../../../lib/workspace/catalogue';
 import { codeOf, kindOf, outlineMix, topicGroups } from '../../../../lib/workspace/paper';
 import styles from '../paper.module.css';
 import { occurrenceName, type Occurrence, type PaperModel } from './model';
-import { BloomBar, BloomTag, Icon, PageHeader, Stages, type Stage } from './ui';
+import { BloomTag } from '../../system/tag';
+import { BloomBar, Icon, PageHeader, Stages, type Stage } from './ui';
 
 // ---------------------------------------------------------------- shared
 const stageLabels=['Paper shape','Choose questions','Set marks','Pay','Complete details'];

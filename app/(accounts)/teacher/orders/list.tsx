@@ -1,12 +1,11 @@
 import Link from 'next/link';
 import type { Order } from '../../../../lib/jobs/contracts';
-import { detailsFact, documentsFact, groupOrders, paperTitle, paymentFact, shortDate, stages, type Fact, type Row } from '../../../../lib/jobs/presentation';
+import { detailsFact, documentsFact, groupOrders, paperTitle, paymentFact, shortDate, stages, type Row } from '../../../../lib/jobs/presentation';
 import ui from '../../experience.module.css';
+import { Notice } from '../../system/notice';
+import { Status } from '../../system/status';
 
 /** M1 and M1p: every paper with payment, question details and documents as separate facts. */
-export function Status({tone,label}:{tone:Fact['tone'];label:string}) {
-  return <span className={ui['status']}><span className={ui[`status__dot--${tone}`]} aria-hidden="true"/><span className={ui[`status__label--${tone}`]}>{label}</span></span>;
-}
 function Next({order,row}:{order:Order;row:Row}) {
   const href=`/teacher/orders/${order.id}`,name=`${row.next.label.replace(' →','')}: ${paperTitle(order)}`;
   const cls=row.next.kind==='primary'?`${ui['button--primary']} ${ui['button--compact']}`:row.next.kind==='secondary'?ui['button--secondary']:ui['button--text'];
@@ -47,7 +46,7 @@ export default function PaperList({orders,curricula,school,failed=false}:{orders
       </div>
       <div className={ui['page-header__actions']}><a className={ui['button--primary']} href="/teacher?view=home">Build a new paper →</a></div>
     </header>
-    {failed?<div className={ui['notice--problem']} role="alert"><p className={ui['notice__title']}>We could not load your papers</p><p className={ui['notice__body']}>Refresh in a moment; nothing has been lost.</p></div>:
+    {failed?<Notice tone="problem" role="alert" prominent title="We could not load your papers">Refresh in a moment; nothing has been lost.</Notice>:
      !orders.length?<section className={ui['empty-state']}><h2 className={ui['empty-state__title']}>No papers yet</h2><p className={ui['empty-state__body']}>Choose questions in My curricula and continue to payment to start your first paper.</p><a className={ui['button--primary']} href="/teacher?view=home">Build a new paper →</a></section>:
      <section aria-label="Your papers">
       <div className={ui['paper-list']}>

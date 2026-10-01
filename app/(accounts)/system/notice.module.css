@@ -1,0 +1,21 @@
+/* Task feedback (Paper K04). The one definition; screens import Notice or InlineNotice from ./notice.
+   Every --pc-* value is exported from the Paper master by `npm run paper:pull` (app/paper-components.css).
+   Two registered differences keep the deployed look: the gap between title and body, and one padding for both title sizes. */
+.notice--progress, .notice--caution, .notice--success, .notice--neutral, .notice--problem {
+  display:flex; flex-direction:column; gap:4px; margin:0; padding:var(--pc-notice-padding-block) var(--pc-notice-padding-inline); border-radius:var(--pc-notice-border-radius); border-left:var(--pc-notice-border-left-width) solid; }
+.notice--progress { background:var(--pc-notice--progress-background-color); border-left-color:var(--pc-notice--progress-border-left-color); }
+.notice--caution { background:var(--pc-notice--caution-background-color); border-left-color:var(--pc-notice--caution-border-left-color); }
+.notice--success { background:var(--pc-notice--success-background-color); border-left-color:var(--pc-notice--success-border-left-color); }
+.notice--neutral { background:var(--pc-notice-background-color); border-left-color:var(--pc-notice-border-left-color); }
+.notice--problem { background:var(--pc-notice--problem-background-color); border-left-color:var(--pc-notice--problem-border-left-color); }
+.notice__title { margin:0; font-size:var(--pc-notice__title-font-size); line-height:var(--pc-notice__title-line-height); font-weight:var(--pc-notice__title-font-weight); color:var(--pc-notice__title-color); }
+.notice__title--compact { margin:0; font-size:var(--pc-notice__title--compact-font-size); line-height:var(--pc-notice__title--compact-line-height); font-weight:var(--pc-notice__title-font-weight); color:var(--pc-notice__title-color); }
+.notice__body { margin:0; font-size:var(--pc-notice__body-font-size); line-height:var(--pc-notice__body-line-height); color:var(--pc-notice__body-color); }
+.notice__actions { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:12px; }
+.notice-stack { display:flex; flex-direction:column; gap:12px; }
+
+/* Inline density, beside a control in the question editor. */
+.notice--inline-problem { margin:0; padding:10px 14px; border-left:3px solid var(--color-status-problem); background:var(--color-warning-tint); color:var(--color-warning-text); font-size:15px; line-height:20px; }
+.notice--inline-required, .notice--inline-info { margin:0; padding:16px; border-left:3px solid var(--color-action); background:var(--color-surface-muted); font-size:15px; line-height:22px; color:var(--color-text); }
+.notice--inline-info { display:grid; gap:8px; }
+.notice--inline-info strong { font-size:16px; }

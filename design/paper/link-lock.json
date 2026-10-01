@@ -1,0 +1,892 @@
+{
+ "meta": {
+  "last_updated": "2026-10-01"
+ },
+ "tokens": {
+  "website": {
+   "--color-background": "var(--color-bone-100)",
+   "--color-surface": "var(--color-white)",
+   "--color-surface-muted": "var(--color-bone-200)",
+   "--color-surface-paper": "var(--color-bone-50)",
+   "--color-text": "var(--color-ink-800)",
+   "--color-text-muted": "var(--color-ink-600)",
+   "--color-text-subtle": "var(--color-ink-400)",
+   "--color-border": "var(--color-bone-300)",
+   "--color-border-strong": "var(--color-bone-600)",
+   "--color-border-dashed": "var(--color-bone-500)",
+   "--color-track": "var(--color-bone-400)",
+   "--color-action": "var(--color-sage-500)",
+   "--color-action-strong": "var(--color-sage-700)",
+   "--color-action-tint": "var(--color-sage-100)",
+   "--color-action-tint-subtle": "var(--color-sage-50)",
+   "--color-action-track": "var(--color-sage-200)",
+   "--color-structured": "var(--color-slate-600)",
+   "--color-structured-tint": "var(--color-slate-100)",
+   "--color-structured-tint-subtle": "var(--color-slate-50)",
+   "--color-structured-track": "var(--color-slate-200)",
+   "--color-structured-on-inverse": "var(--color-slate-300)",
+   "--color-multiple-choice": "var(--color-gold-400)",
+   "--color-multiple-choice-text": "var(--color-gold-600)",
+   "--color-multiple-choice-tint": "var(--color-gold-100)",
+   "--color-caution-tint": "var(--color-gold-50)",
+   "--color-caution-border": "var(--color-gold-200)",
+   "--color-caution-text": "var(--color-gold-800)",
+   "--color-warning": "var(--color-terracotta-500)",
+   "--color-warning-tint": "var(--color-terracotta-50)",
+   "--color-warning-text": "var(--color-terracotta-800)",
+   "--color-inverse": "var(--color-navy-900)",
+   "--color-inverse-tint": "var(--color-navy-50)",
+   "--color-on-inverse": "var(--color-white)",
+   "--color-on-inverse-muted": "var(--color-sage-300)",
+   "--color-bloom-remember": "var(--color-sage-700)",
+   "--color-bloom-understand": "var(--color-navy-900)",
+   "--color-bloom-apply": "var(--color-gold-400)",
+   "--color-bloom-analyse": "var(--color-slate-600)",
+   "--color-bloom-evaluate": "var(--color-terracotta-500)",
+   "--color-bloom-create": "var(--color-gold-800)",
+   "--color-white": "#FFFFFF",
+   "--color-bone-50": "#FDFCF9",
+   "--color-bone-100": "#F8F6F0",
+   "--color-bone-200": "#F0EDE6",
+   "--color-bone-300": "#D5D1C8",
+   "--color-bone-400": "#C9C4B8",
+   "--color-bone-500": "#B9B4A8",
+   "--color-bone-600": "#898780",
+   "--color-ink-400": "#8A8A8A",
+   "--color-ink-600": "#4A4A4A",
+   "--color-ink-800": "#2D2D2D",
+   "--color-navy-50": "#F1F0F4",
+   "--color-navy-900": "#1A1A2E",
+   "--color-sage-50": "#F1F6F3",
+   "--color-sage-100": "#E6EFEA",
+   "--color-sage-200": "#D3E3DA",
+   "--color-sage-300": "#A7BEAE",
+   "--color-sage-500": "#5B8A72",
+   "--color-sage-700": "#436B56",
+   "--color-slate-50": "#F4F6F9",
+   "--color-slate-100": "#EAF0F7",
+   "--color-slate-200": "#D3DCE7",
+   "--color-slate-300": "#7C9CC4",
+   "--color-slate-600": "#3B5F8A",
+   "--color-gold-50": "#FFF8EC",
+   "--color-gold-100": "#F7EFE4",
+   "--color-gold-200": "#EBD3AE",
+   "--color-gold-400": "#D4A574",
+   "--color-gold-500": "#C49255",
+   "--color-gold-600": "#A87A45",
+   "--color-gold-800": "#6E4E28",
+   "--color-terracotta-50": "#FCF0EE",
+   "--color-terracotta-500": "#B85042",
+   "--color-terracotta-800": "#802F25",
+   "--color-status-done": "var(--color-action-strong)",
+   "--color-status-progress": "var(--color-structured)",
+   "--color-status-attention": "var(--color-gold-500)",
+   "--color-status-problem": "var(--color-warning)",
+   "--color-focus-ring": "var(--color-structured)",
+   "--font-display": "Playfair Display",
+   "--font-body": "Source Sans 3",
+   "--font-document": "Georgia",
+   "--text-2xs": "11px",
+   "--text-xs": "12px",
+   "--text-sm": "13px",
+   "--text-md": "14px",
+   "--text-base": "15px",
+   "--text-lg": "16px",
+   "--text-xl": "18px",
+   "--text-2xl": "22px",
+   "--text-3xl": "24px",
+   "--text-4xl": "28px",
+   "--text-5xl": "32px",
+   "--text-6xl": "44px",
+   "--text-7xl": "52px",
+   "--text-8xl": "64px",
+   "--text-9xl": "84px",
+   "--font-weight-regular": "400",
+   "--font-weight-semibold": "600",
+   "--font-weight-bold": "700",
+   "--tracking-tight": "-0.01em",
+   "--tracking-normal": "0em",
+   "--tracking-wide": "0.12em",
+   "--tracking-wider": "0.15em",
+   "--tracking-widest": "0.2em",
+   "--leading-2xs": "14px",
+   "--leading-xs": "16px",
+   "--leading-sm": "18px",
+   "--leading-prose-sm": "19px",
+   "--leading-base": "20px",
+   "--leading-prose": "21px",
+   "--leading-lg": "24px",
+   "--leading-xl": "26px",
+   "--leading-2xl": "30px",
+   "--leading-3xl": "34px",
+   "--leading-4xl": "50px",
+   "--leading-5xl": "58px",
+   "--leading-6xl": "64px",
+   "--leading-7xl": "84px",
+   "--opacity-track-on-inverse": "14%",
+   "--opacity-focus-row": "10%",
+   "--opacity-highlight": "40%",
+   "--opacity-disabled": "45%",
+   "--breakpoint-mobile": "390px",
+   "--breakpoint-tablet": "768px",
+   "--breakpoint-desktop": "1440px",
+   "--container-tile": "145px",
+   "--container-card": "282px",
+   "--container-dropdown": "340px",
+   "--container-search": "380px",
+   "--container-panel": "400px",
+   "--container-preview": "460px",
+   "--container-typeahead": "480px",
+   "--container-prose": "720px",
+   "--container-content": "1248px",
+   "--container-page": "1440px",
+   "--container-editor": "480px",
+   "--container-form": "560px",
+   "--spacing-0-5": "2px",
+   "--spacing-1": "4px",
+   "--spacing-1-5": "6px",
+   "--spacing-2": "8px",
+   "--spacing-2-5": "10px",
+   "--spacing-3": "12px",
+   "--spacing-3-5": "14px",
+   "--spacing-4": "16px",
+   "--spacing-4-5": "18px",
+   "--spacing-5": "20px",
+   "--spacing-6": "24px",
+   "--spacing-7": "28px",
+   "--spacing-8": "32px",
+   "--spacing-9": "36px",
+   "--spacing-10": "40px",
+   "--spacing-16": "64px",
+   "--spacing-20": "80px",
+   "--spacing-24": "96px",
+   "--radius-xs": "4px",
+   "--radius-sm": "6px",
+   "--radius-md": "8px",
+   "--radius-lg": "10px",
+   "--radius-xl": "12px",
+   "--radius-2xl": "14px",
+   "--radius-full": "999px",
+   "--color-off-white": "var(--color-bone-100)",
+   "--color-light-gray": "var(--color-bone-200)",
+   "--color-dark-text": "var(--color-ink-800)",
+   "--color-mid-text": "var(--color-ink-600)",
+   "--color-med-gray": "var(--color-ink-400)",
+   "--color-navy": "var(--color-navy-900)",
+   "--color-sage": "var(--color-sage-500)",
+   "--color-sage-dark": "var(--color-sage-700)",
+   "--color-sage-light": "var(--color-sage-300)",
+   "--color-terracotta": "var(--color-terracotta-500)",
+   "--color-gold": "var(--color-gold-400)",
+   "--color-slate-blue": "var(--color-slate-600)"
+  }
+ },
+ "instances": {
+  "website:A22-0": {
+   "master": "question-context",
+   "masterHash": "6cbd447e8a25",
+   "variant": "collapsed",
+   "state": {
+    "@root": "54881b005ce6",
+    "@root/question-context__heading": "fe83e2c002c9",
+    "@root/question-context__overview": "2bc90ead9631",
+    "@root/question-context__overview/question-context__diagram": "8f680b6c70a9",
+    "@root/question-context__overview/question-context__description": "8eb3ce8ef81f",
+    "@root/question-context__overview/question-context__description/question-context__topic": "a291ec24654f",
+    "@root/question-context__overview/question-context__description/question-context__summary": "408b01d7f6fd",
+    "@root/question-context__metadata": "6f95b2b1b0af",
+    "@root/question-context__metadata/question-context__marks": "3bdd23c1fb12",
+    "@root/question-context__metadata/question-context__range": "fe6746b958ef",
+    "@root/question-context__metadata/question-context__parts": "fe6746b958ef",
+    "@root/question-context__outline-trigger": "ce82ae355b83",
+    "@root/question-context__outline-trigger/question-context__outline-label": "f6f55f6bcd03",
+    "@root/question-context__outline-trigger/question-context__chevron": "f6f55f6bcd03"
+   },
+   "contentHash": "0597c5dbe196",
+   "synchronised": "2026-10-01T10:12:33.664Z"
+  },
+  "website:A3R-0": {
+   "master": "question-context",
+   "masterHash": "6cbd447e8a25",
+   "variant": "expanded",
+   "state": {
+    "@root": "54881b005ce6",
+    "@root/question-context__heading": "fe83e2c002c9",
+    "@root/question-context__overview": "2bc90ead9631",
+    "@root/question-context__overview/question-context__diagram": "8f680b6c70a9",
+    "@root/question-context__overview/question-context__description": "8eb3ce8ef81f",
+    "@root/question-context__overview/question-context__description/question-context__topic": "a291ec24654f",
+    "@root/question-context__overview/question-context__description/question-context__summary": "408b01d7f6fd",
+    "@root/question-context__metadata": "6f95b2b1b0af",
+    "@root/question-context__metadata/question-context__marks": "3bdd23c1fb12",
+    "@root/question-context__metadata/question-context__range": "fe6746b958ef",
+    "@root/question-context__metadata/question-context__parts": "fe6746b958ef",
+    "@root/question-context__outline-trigger": "ce82ae355b83",
+    "@root/question-context__outline-trigger/question-context__outline-label": "f6f55f6bcd03",
+    "@root/question-context__outline-trigger/question-context__chevron": "f6f55f6bcd03",
+    "@root/question-context__outline": "2463a860ee2b",
+    "@root/question-context__outline/question-context__outline-note": "3637abc63b59",
+    "@root/question-context__outline/question-context__outline-note/question-context__outline-caption": "9b9d2d0a6440",
+    "@root/question-context__outline/question-context__outline-row[0]": "0bafb35f3623",
+    "@root/question-context__outline/question-context__outline-row[0]/question-context__part-number": "68a0fc768852",
+    "@root/question-context__outline/question-context__outline-row[0]/question-context__part-summary": "329f1ffe6371",
+    "@root/question-context__outline/question-context__outline-row[0]/tag--remember": "182a0fa23a56",
+    "@root/question-context__outline/question-context__outline-row[0]/tag--remember/tag__label": "05ea8273dc9d",
+    "@root/question-context__outline/question-context__outline-row[1]": "0bafb35f3623",
+    "@root/question-context__outline/question-context__outline-row[1]/question-context__part-number": "68a0fc768852",
+    "@root/question-context__outline/question-context__outline-row[1]/question-context__part-summary": "329f1ffe6371",
+    "@root/question-context__outline/question-context__outline-row[1]/tag--remember": "3efba26a209a",
+    "@root/question-context__outline/question-context__outline-row[1]/tag--remember/tag__label": "5b732b049c5e",
+    "@root/question-context__outline/question-context__outline-row[2]": "0bafb35f3623",
+    "@root/question-context__outline/question-context__outline-row[2]/question-context__part-number": "68a0fc768852",
+    "@root/question-context__outline/question-context__outline-row[2]/question-context__part-summary": "329f1ffe6371",
+    "@root/question-context__outline/question-context__outline-row[2]/tag--remember": "3efba26a209a",
+    "@root/question-context__outline/question-context__outline-row[2]/tag--remember/tag__label": "5b732b049c5e",
+    "@root/question-context__outline/question-context__outline-row[3]": "0bafb35f3623",
+    "@root/question-context__outline/question-context__outline-row[3]/question-context__part-number": "68a0fc768852",
+    "@root/question-context__outline/question-context__outline-row[3]/question-context__part-summary": "329f1ffe6371",
+    "@root/question-context__outline/question-context__outline-row[3]/tag--remember": "3efba26a209a",
+    "@root/question-context__outline/question-context__outline-row[3]/tag--remember/tag__label": "5b732b049c5e",
+    "@root/question-context__outline/question-context__outline-row[4]": "0bafb35f3623",
+    "@root/question-context__outline/question-context__outline-row[4]/question-context__part-number": "68a0fc768852",
+    "@root/question-context__outline/question-context__outline-row[4]/question-context__part-summary": "329f1ffe6371",
+    "@root/question-context__outline/question-context__outline-row[4]/tag--remember": "3efba26a209a",
+    "@root/question-context__outline/question-context__outline-row[4]/tag--remember/tag__label": "5b732b049c5e",
+    "@root/question-context__outline/question-context__outline-row[5]": "0bafb35f3623",
+    "@root/question-context__outline/question-context__outline-row[5]/question-context__part-number": "68a0fc768852",
+    "@root/question-context__outline/question-context__outline-row[5]/question-context__part-summary": "329f1ffe6371",
+    "@root/question-context__outline/question-context__outline-row[5]/tag--remember": "576cb071d0dc",
+    "@root/question-context__outline/question-context__outline-row[5]/tag--remember/tag__label": "05ea8273dc9d"
+   },
+   "contentHash": "89a243a31d9c",
+   "synchronised": "2026-10-01T10:01:45.004Z"
+  },
+  "website:AG2-0": {
+   "master": "question-context",
+   "masterHash": "6cbd447e8a25",
+   "variant": [
+    "collapsed",
+    "narrow"
+   ],
+   "state": {
+    "@root": "22096f1111dd",
+    "@root/question-context__heading": "fe83e2c002c9",
+    "@root/question-context__overview": "2bc90ead9631",
+    "@root/question-context__overview/question-context__diagram": "8f680b6c70a9",
+    "@root/question-context__overview/question-context__description": "8eb3ce8ef81f",
+    "@root/question-context__overview/question-context__description/question-context__topic": "a291ec24654f",
+    "@root/question-context__overview/question-context__description/question-context__summary": "408b01d7f6fd",
+    "@root/question-context__metadata": "6f95b2b1b0af",
+    "@root/question-context__metadata/question-context__marks": "3bdd23c1fb12",
+    "@root/question-context__metadata/question-context__range": "fe6746b958ef",
+    "@root/question-context__metadata/question-context__parts": "fe6746b958ef",
+    "@root/question-context__outline-trigger": "ce82ae355b83",
+    "@root/question-context__outline-trigger/question-context__outline-label": "f6f55f6bcd03",
+    "@root/question-context__outline-trigger/question-context__chevron": "f6f55f6bcd03"
+   },
+   "contentHash": "0597c5dbe196",
+   "synchronised": "2026-10-01T10:12:33.680Z"
+  },
+  "website:4FP-0": {
+   "master": "tag",
+   "masterHash": "ba48f62fdb76",
+   "variant": "remember",
+   "state": {
+    "@root": "bc8144731abb",
+    "@root/tag__label": "05ea8273dc9d"
+   },
+   "contentHash": "a22b7654d13f",
+   "synchronised": "2026-10-01T10:01:44.845Z"
+  },
+  "website:4J9-0": {
+   "master": "tag",
+   "masterHash": "ba48f62fdb76",
+   "variant": "apply",
+   "state": {
+    "@root": "516db7519b40",
+    "@root/tag__label": "5b732b049c5e"
+   },
+   "contentHash": "e2ddd3583518",
+   "synchronised": "2026-10-01T10:01:44.854Z"
+  },
+  "website:4JJ-0": {
+   "master": "tag",
+   "masterHash": "ba48f62fdb76",
+   "variant": "apply",
+   "state": {
+    "@root": "516db7519b40",
+    "@root/tag__label": "5b732b049c5e"
+   },
+   "contentHash": "e2ddd3583518",
+   "synchronised": "2026-10-01T10:01:44.862Z"
+  },
+  "website:4JT-0": {
+   "master": "tag",
+   "masterHash": "ba48f62fdb76",
+   "variant": "apply",
+   "state": {
+    "@root": "516db7519b40",
+    "@root/tag__label": "5b732b049c5e"
+   },
+   "contentHash": "e2ddd3583518",
+   "synchronised": "2026-10-01T10:01:44.871Z"
+  },
+  "website:4K3-0": {
+   "master": "tag",
+   "masterHash": "ba48f62fdb76",
+   "variant": "apply",
+   "state": {
+    "@root": "516db7519b40",
+    "@root/tag__label": "5b732b049c5e"
+   },
+   "contentHash": "e2ddd3583518",
+   "synchronised": "2026-10-01T10:01:44.881Z"
+  },
+  "website:4KD-0": {
+   "master": "tag",
+   "masterHash": "ba48f62fdb76",
+   "variant": "analyse",
+   "state": {
+    "@root": "e077e5ce6aaf",
+    "@root/tag__label": "05ea8273dc9d"
+   },
+   "contentHash": "f5b0bde2d33d",
+   "synchronised": "2026-10-01T10:01:44.889Z"
+  },
+  "website:6LQ-0": {
+   "master": "tag",
+   "masterHash": "ba48f62fdb76",
+   "variant": "remember",
+   "state": {
+    "@root": "bc8144731abb",
+    "@root/tag__label": "05ea8273dc9d"
+   },
+   "contentHash": "a22b7654d13f",
+   "synchronised": "2026-10-01T10:01:44.897Z"
+  },
+  "website:6LY-0": {
+   "master": "tag",
+   "masterHash": "ba48f62fdb76",
+   "variant": "apply",
+   "state": {
+    "@root": "516db7519b40",
+    "@root/tag__label": "5b732b049c5e"
+   },
+   "contentHash": "e2ddd3583518",
+   "synchronised": "2026-10-01T10:01:44.904Z"
+  },
+  "website:6M6-0": {
+   "master": "tag",
+   "masterHash": "ba48f62fdb76",
+   "variant": "apply",
+   "state": {
+    "@root": "516db7519b40",
+    "@root/tag__label": "5b732b049c5e"
+   },
+   "contentHash": "e2ddd3583518",
+   "synchronised": "2026-10-01T10:01:44.914Z"
+  },
+  "website:6ME-0": {
+   "master": "tag",
+   "masterHash": "ba48f62fdb76",
+   "variant": "apply",
+   "state": {
+    "@root": "516db7519b40",
+    "@root/tag__label": "5b732b049c5e"
+   },
+   "contentHash": "e2ddd3583518",
+   "synchronised": "2026-10-01T10:01:44.923Z"
+  },
+  "website:6MM-0": {
+   "master": "tag",
+   "masterHash": "ba48f62fdb76",
+   "variant": "apply",
+   "state": {
+    "@root": "516db7519b40",
+    "@root/tag__label": "5b732b049c5e"
+   },
+   "contentHash": "e2ddd3583518",
+   "synchronised": "2026-10-01T10:01:44.931Z"
+  },
+  "website:6MU-0": {
+   "master": "tag",
+   "masterHash": "ba48f62fdb76",
+   "variant": "analyse",
+   "state": {
+    "@root": "e077e5ce6aaf",
+    "@root/tag__label": "05ea8273dc9d"
+   },
+   "contentHash": "f5b0bde2d33d",
+   "synchronised": "2026-10-01T10:01:44.941Z"
+  },
+  "website:F23-0": {
+   "master": "question-context-card",
+   "masterHash": "20af7c6f76da",
+   "variant": null,
+   "state": {
+    "@root": "374647fea1df",
+    "@root/question-context-card__label": "084e9692d158",
+    "@root/question-context-card__image": "12c2ee62035f",
+    "@root/question-context-card__content": "429ec1647fd8",
+    "@root/question-context-card__content/question-context-card__title": "1182192c4166",
+    "@root/question-context-card__content/question-context-card__meta": "0ab18fb1f1c6",
+    "@root/question-context-card__content/question-context-card__summary": "69a81f4de72c",
+    "@root/question-context-card__content/question-context-card__note": "0ab18fb1f1c6",
+    "@root/question-context-card__action": "69cf0d5f6d8e",
+    "@root/question-context-card__action/question-context-card__action-label": "0467cc0d87c8"
+   },
+   "contentHash": "fc8b69d158a9",
+   "synchronised": "2026-10-01T10:01:45.130Z"
+  },
+  "website:F2G-0": {
+   "master": "question-context-card",
+   "masterHash": "20af7c6f76da",
+   "variant": null,
+   "state": {
+    "@root": "374647fea1df",
+    "@root/question-context-card__label": "084e9692d158",
+    "@root/question-context-card__image": "12c2ee62035f",
+    "@root/question-context-card__content": "429ec1647fd8",
+    "@root/question-context-card__content/question-context-card__title": "1182192c4166",
+    "@root/question-context-card__content/question-context-card__meta": "0ab18fb1f1c6",
+    "@root/question-context-card__content/question-context-card__summary": "69a81f4de72c",
+    "@root/question-context-card__content/question-context-card__note": "0ab18fb1f1c6",
+    "@root/question-context-card__action": "69cf0d5f6d8e",
+    "@root/question-context-card__action/question-context-card__action-label": "0467cc0d87c8"
+   },
+   "contentHash": "600607cb15b6",
+   "synchronised": "2026-10-01T10:01:45.155Z"
+  },
+  "website:F2T-0": {
+   "master": "question-context-card",
+   "masterHash": "20af7c6f76da",
+   "variant": null,
+   "state": {
+    "@root": "374647fea1df",
+    "@root/question-context-card__label": "084e9692d158",
+    "@root/question-context-card__image": "12c2ee62035f",
+    "@root/question-context-card__content": "429ec1647fd8",
+    "@root/question-context-card__content/question-context-card__title": "1182192c4166",
+    "@root/question-context-card__content/question-context-card__meta": "0ab18fb1f1c6",
+    "@root/question-context-card__content/question-context-card__summary": "69a81f4de72c",
+    "@root/question-context-card__content/question-context-card__note": "0ab18fb1f1c6",
+    "@root/question-context-card__action": "69cf0d5f6d8e",
+    "@root/question-context-card__action/question-context-card__action-label": "0467cc0d87c8"
+   },
+   "contentHash": "0fe577e0d549",
+   "synchronised": "2026-10-01T10:01:45.176Z"
+  },
+  "website:F36-0": {
+   "master": "question-context-card",
+   "masterHash": "20af7c6f76da",
+   "variant": null,
+   "state": {
+    "@root": "374647fea1df",
+    "@root/question-context-card__label": "084e9692d158",
+    "@root/question-context-card__image": "12c2ee62035f",
+    "@root/question-context-card__content": "429ec1647fd8",
+    "@root/question-context-card__content/question-context-card__title": "1182192c4166",
+    "@root/question-context-card__content/question-context-card__meta": "0ab18fb1f1c6",
+    "@root/question-context-card__content/question-context-card__summary": "69a81f4de72c",
+    "@root/question-context-card__content/question-context-card__note": "0ab18fb1f1c6",
+    "@root/question-context-card__action": "69cf0d5f6d8e",
+    "@root/question-context-card__action/question-context-card__action-label": "0467cc0d87c8"
+   },
+   "contentHash": "d87c44cb4b7b",
+   "synchronised": "2026-10-01T10:01:45.198Z"
+  },
+  "design-system:2K6-0": {
+   "master": "question-context",
+   "masterHash": "6cbd447e8a25",
+   "variant": "collapsed",
+   "state": {
+    "@root": "54881b005ce6",
+    "@root/question-context__heading": "fe83e2c002c9",
+    "@root/question-context__overview": "2bc90ead9631",
+    "@root/question-context__overview/question-context__diagram": "8f680b6c70a9",
+    "@root/question-context__overview/question-context__description": "8eb3ce8ef81f",
+    "@root/question-context__overview/question-context__description/question-context__topic": "a291ec24654f",
+    "@root/question-context__overview/question-context__description/question-context__summary": "408b01d7f6fd",
+    "@root/question-context__metadata": "6f95b2b1b0af",
+    "@root/question-context__metadata/question-context__marks": "3bdd23c1fb12",
+    "@root/question-context__metadata/question-context__range": "fe6746b958ef",
+    "@root/question-context__metadata/question-context__parts": "fe6746b958ef",
+    "@root/question-context__outline-trigger": "ce82ae355b83",
+    "@root/question-context__outline-trigger/question-context__outline-label": "f6f55f6bcd03",
+    "@root/question-context__outline-trigger/question-context__chevron": "f6f55f6bcd03"
+   },
+   "contentHash": "36eb113b29aa",
+   "synchronised": "2026-10-01T10:02:05.786Z"
+  },
+  "website:F57-0": {
+   "master": "hint",
+   "masterHash": "cb373ae0146c",
+   "variant": "visible",
+   "state": {
+    "@root": "04d5b9aade39",
+    "@root/hint__content": "980c9e49f40b",
+    "@root/hint__content/hint__body": "0ab18fb1f1c6",
+    "@root/hint__action": "44ec1d596978"
+   },
+   "contentHash": "3a6498c1cdd3",
+   "synchronised": "2026-10-01T10:07:02.972Z"
+  },
+  "website:F6F-0": {
+   "master": "hint",
+   "masterHash": "cb373ae0146c",
+   "variant": "visible",
+   "state": {
+    "@root": "04d5b9aade39",
+    "@root/hint__content": "980c9e49f40b",
+    "@root/hint__content/hint__body": "0ab18fb1f1c6",
+    "@root/hint__action": "44ec1d596978"
+   },
+   "contentHash": "3a6498c1cdd3",
+   "synchronised": "2026-10-01T10:07:02.989Z"
+  },
+  "design-system:305-0": {
+   "master": "hint",
+   "masterHash": "cb373ae0146c",
+   "variant": "dismissed",
+   "state": {
+    "@root": "04d5b9aade39",
+    "@root/hint__action": "652e2e30b10e"
+   },
+   "contentHash": "44136fa355b3",
+   "synchronised": "2026-10-01T10:07:03.043Z"
+  },
+  "design-system:303-0": {
+   "master": "hint",
+   "masterHash": "cb373ae0146c",
+   "variant": "visible",
+   "state": {
+    "@root": "04d5b9aade39",
+    "@root/hint__content": "980c9e49f40b",
+    "@root/hint__content/hint__body": "0ab18fb1f1c6",
+    "@root/hint__action": "44ec1d596978"
+   },
+   "contentHash": "5e7187390943",
+   "synchronised": "2026-10-01T10:07:24.307Z"
+  },
+  "design-system:307-0": {
+   "master": "hint",
+   "masterHash": "cb373ae0146c",
+   "variant": "visible",
+   "state": {
+    "@root": "04d5b9aade39",
+    "@root/hint__content": "980c9e49f40b",
+    "@root/hint__content/hint__body": "0ab18fb1f1c6",
+    "@root/hint__action": "44ec1d596978"
+   },
+   "contentHash": "5e7187390943",
+   "synchronised": "2026-10-01T10:07:24.314Z"
+  },
+  "website:B6T-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "problem",
+    "compact"
+   ],
+   "state": {
+    "@root": "7ecd46c0d38b",
+    "@root/notice__title": "a35ece3b3369",
+    "@root/notice__body": "ed933782bdf7"
+   },
+   "contentHash": "7c99d6a2d526",
+   "synchronised": "2026-10-01T10:09:27.851Z"
+  },
+  "website:B7Q-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "caution",
+    "compact"
+   ],
+   "state": {
+    "@root": "a6957664712a",
+    "@root/notice__body": "ed933782bdf7"
+   },
+   "contentHash": "f359167188b5",
+   "synchronised": "2026-10-01T10:09:27.866Z"
+  },
+  "website:B8R-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "success",
+    "compact"
+   ],
+   "state": {
+    "@root": "527ef85aa22b",
+    "@root/notice__title": "a35ece3b3369",
+    "@root/notice__body": "ed933782bdf7"
+   },
+   "contentHash": "444149598539",
+   "synchronised": "2026-10-01T10:09:27.882Z"
+  },
+  "website:C0O-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "progress",
+    "compact"
+   ],
+   "state": {
+    "@root": "af9044a07604",
+    "@root/notice__title": "a35ece3b3369",
+    "@root/notice__body": "ed933782bdf7"
+   },
+   "contentHash": "44b77bf2f3a6",
+   "synchronised": "2026-10-01T10:09:27.899Z"
+  },
+  "website:C2C-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "success",
+    "small"
+   ],
+   "state": {
+    "@root": "527ef85aa22b",
+    "@root/notice__title": "6beeed5d8279",
+    "@root/notice__body": "40825728700a"
+   },
+   "contentHash": "124a447c906a",
+   "synchronised": "2026-10-01T10:09:27.914Z"
+  },
+  "website:C2F-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "caution",
+    "small"
+   ],
+   "state": {
+    "@root": "a6957664712a",
+    "@root/notice__title": "6beeed5d8279",
+    "@root/notice__body": "40825728700a"
+   },
+   "contentHash": "bf7e32d2ecdd",
+   "synchronised": "2026-10-01T10:09:27.930Z"
+  },
+  "website:C2I-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "problem",
+    "small"
+   ],
+   "state": {
+    "@root": "7ecd46c0d38b",
+    "@root/notice__title": "6beeed5d8279",
+    "@root/notice__body": "40825728700a"
+   },
+   "contentHash": "5d0d93bb5552",
+   "synchronised": "2026-10-01T10:09:27.944Z"
+  },
+  "website:C4E-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "progress",
+    "small"
+   ],
+   "state": {
+    "@root": "af9044a07604",
+    "@root/notice__title": "6beeed5d8279",
+    "@root/notice__body": "40825728700a"
+   },
+   "contentHash": "4c2553247005",
+   "synchronised": "2026-10-01T10:09:27.961Z"
+  },
+  "website:BNT-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "neutral",
+    "small"
+   ],
+   "state": {
+    "@root": "bd6e5c0ebceb",
+    "@root/notice__title": "6beeed5d8279",
+    "@root/notice__body": "40825728700a"
+   },
+   "contentHash": "991871e061f6",
+   "synchronised": "2026-10-01T10:09:27.980Z"
+  },
+  "website:BOM-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "problem",
+    "small"
+   ],
+   "state": {
+    "@root": "7ecd46c0d38b",
+    "@root/notice__title": "6beeed5d8279",
+    "@root/notice__body": "40825728700a"
+   },
+   "contentHash": "00b460f2e6b6",
+   "synchronised": "2026-10-01T10:09:27.993Z"
+  },
+  "website:BOR-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "success",
+    "small"
+   ],
+   "state": {
+    "@root": "527ef85aa22b",
+    "@root/notice__title": "6beeed5d8279",
+    "@root/notice__body": "40825728700a"
+   },
+   "contentHash": "85383b557af5",
+   "synchronised": "2026-10-01T10:09:28.011Z"
+  },
+  "website:BOX-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "problem",
+    "small"
+   ],
+   "state": {
+    "@root": "7ecd46c0d38b",
+    "@root/notice__title": "6beeed5d8279",
+    "@root/notice__body": "40825728700a"
+   },
+   "contentHash": "9b56de5ba729",
+   "synchronised": "2026-10-01T10:09:28.026Z"
+  },
+  "website:BQ3-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "problem",
+    "small"
+   ],
+   "state": {
+    "@root": "7ecd46c0d38b",
+    "@root/notice__title": "6beeed5d8279",
+    "@root/notice__body": "40825728700a"
+   },
+   "contentHash": "eaebb5dcee9e",
+   "synchronised": "2026-10-01T10:09:28.042Z"
+  },
+  "website:AW8-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "progress"
+   ],
+   "state": {
+    "@root": "254b36586358",
+    "@root/notice__title": "60b7aacd0ad8",
+    "@root/notice__body": "b339e4d6dd76"
+   },
+   "contentHash": "38bcc152afdc",
+   "synchronised": "2026-10-01T10:09:28.059Z"
+  },
+  "website:AWK-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "caution"
+   ],
+   "state": {
+    "@root": "399f82876015",
+    "@root/notice__title": "60b7aacd0ad8",
+    "@root/notice__body": "b339e4d6dd76"
+   },
+   "contentHash": "d1892cfb9c62",
+   "synchronised": "2026-10-01T10:09:28.074Z"
+  },
+  "website:AX0-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "success"
+   ],
+   "state": {
+    "@root": "eef1fccf4073",
+    "@root/notice__title": "60b7aacd0ad8",
+    "@root/notice__body": "b339e4d6dd76"
+   },
+   "contentHash": "766d8680923a",
+   "synchronised": "2026-10-01T10:09:28.089Z"
+  },
+  "website:AXC-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "neutral"
+   ],
+   "state": {
+    "@root": "6b5f49585e9d",
+    "@root/notice__title": "60b7aacd0ad8",
+    "@root/notice__body": "b339e4d6dd76"
+   },
+   "contentHash": "b32f0bae20cf",
+   "synchronised": "2026-10-01T10:09:28.105Z"
+  },
+  "website:AXP-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "caution"
+   ],
+   "state": {
+    "@root": "399f82876015",
+    "@root/notice__title": "60b7aacd0ad8",
+    "@root/notice__body": "b339e4d6dd76"
+   },
+   "contentHash": "be9c1445cff0",
+   "synchronised": "2026-10-01T10:09:28.125Z"
+  },
+  "website:AY0-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "neutral"
+   ],
+   "state": {
+    "@root": "6b5f49585e9d",
+    "@root/notice__title": "60b7aacd0ad8",
+    "@root/notice__body": "b339e4d6dd76"
+   },
+   "contentHash": "616680e05f0c",
+   "synchronised": "2026-10-01T10:09:28.142Z"
+  },
+  "website:AYC-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "problem"
+   ],
+   "state": {
+    "@root": "534859be8b5f",
+    "@root/notice__title": "60b7aacd0ad8",
+    "@root/notice__body": "b339e4d6dd76"
+   },
+   "contentHash": "14765828bdcb",
+   "synchronised": "2026-10-01T10:09:28.156Z"
+  },
+  "design-system:2LV-0": {
+   "master": "notice",
+   "masterHash": "0a0c71040491",
+   "variant": [
+    "caution",
+    "small"
+   ],
+   "state": {
+    "@root": "a6957664712a",
+    "@root/notice__title": "6beeed5d8279",
+    "@root/notice__body": "40825728700a"
+   },
+   "contentHash": "073ab746fd77",
+   "synchronised": "2026-10-01T10:09:28.171Z"
+  }
+ }
+}

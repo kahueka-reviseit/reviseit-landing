@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { Formatting } from '../../../../lib/workspace/contracts';
 import styles from '../paper.module.css';
 import ui from '../../experience.module.css';
+import { Notice } from '../../system/notice';
 import type { PaperModel } from './model';
 
 /**
@@ -27,9 +28,9 @@ export default function FormattingView({paper,preferences,setPreferences,dirty,s
     </header>
     <div className={ui['formatting']}>
       <form onSubmit={e=>{e.preventDefault();save();}} className={ui['formatting__form']} aria-describedby="formatting-scope">
-        <div id="formatting-scope" className={ui['notice--progress']}><p className={ui['notice__title--compact']}>Shared with your school</p><p className={ui['notice__body']}>These settings are shared with every teacher at {data.schoolName} for {name}. Saving sets them for future papers.</p></div>
-        <div aria-live="polite">{saved&&!problem&&<div className={ui['notice--success']} role="status"><p className={ui['notice__title--compact']}>School formatting saved for this curriculum.</p></div>}</div>
-        {problem&&<div className={ui[`notice--${problem.tone}`]} role="alert"><p className={ui['notice__title--compact']}>{problem.title}</p><p className={ui['notice__body']}>{problem.body}</p>{failure===409&&<div className={ui['notice__actions']}><a className={ui['button--secondary']} href="/teacher?view=formatting">Reload settings</a></div>}</div>}
+        <Notice id="formatting-scope" tone="progress" title="Shared with your school">These settings are shared with every teacher at {data.schoolName} for {name}. Saving sets them for future papers.</Notice>
+        <div aria-live="polite">{saved&&!problem&&<Notice tone="success" role="status" title="School formatting saved for this curriculum."/>}</div>
+        {problem&&<Notice tone={problem.tone} role="alert" title={problem.title} actions={failure===409?<a className={ui['button--secondary']} href="/teacher?view=formatting">Reload settings</a>:undefined}>{problem.body}</Notice>}
         <fieldset disabled={busy} className={ui['formatting__fields']}>
           <div className={ui['formatting__section-head']}><legend className={ui['formatting__legend']}>Page and text</legend><p className={ui['formatting__fixed']}>Page size: A4 portrait (fixed)</p></div>
           <div className={ui['form__row']}>

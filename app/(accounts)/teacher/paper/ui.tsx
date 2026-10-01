@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { BloomCategory } from '../../../../lib/workspace/contracts';
+import { bloomTone } from '../../system/tag';
 import styles from '../paper.module.css';
 
 /** Icons drawn from the Paper design; decorative, so hidden from assistive technology. */
@@ -18,15 +18,9 @@ export const Icon = {
   down:()=><svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2.5 6.5 L6 10 L9.5 6.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
 };
 
-export const bloomClass:Record<string,string> = {
-  Remember:styles['tag--remember'], Understand:styles['tag--understand'], Apply:styles['tag--apply'], Analyse:styles['tag--analyse'], Evaluate:styles['tag--evaluate'], Create:styles['tag--create'],
-};
-export function BloomTag({bloom}:{bloom:BloomCategory|string}) {
-  return <span className={`${styles['tag']} ${bloomClass[bloom] ?? styles['tag--unclassified']}`}>{bloom}</span>;
-}
 /** Proportional Bloom's bar; widths come from marks, never from invented weights. */
 export function BloomBar({rows}:{rows:{bloom:string;weight:number}[]}) {
-  return <span className={styles['bloom-mix__bar']} aria-hidden="true">{rows.map(r=><i key={r.bloom} className={bloomClass[r.bloom]} style={{flexGrow:r.weight}}/>)}</span>;
+  return <span className={styles['bloom-mix__bar']} aria-hidden="true">{rows.map(r=><i key={r.bloom} className={bloomTone(r.bloom)} style={{flexGrow:r.weight}}/>)}</span>;
 }
 
 export type Stage = {label:string; state:'done'|'now'|'next'};

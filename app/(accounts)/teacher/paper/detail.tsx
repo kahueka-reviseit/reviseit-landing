@@ -6,7 +6,8 @@ import { bloomSpan, codeOf, kindLabels, kindOf, outlineMix } from '../../../../l
 import styles from '../paper.module.css';
 import type { PaperModel } from './model';
 import { AddControl, CatalogueCard } from './card';
-import { BloomBar, BloomTag, Icon } from './ui';
+import { BloomTag } from '../../system/tag';
+import { BloomBar, Icon } from './ui';
 
 /** Paper B4. Shows only the published catalogue projection; scenario options stay paid-only. */
 export default function QuestionDetail({paper,entry,status,query}:{paper:PaperModel;entry:CatalogueEntry;status:ReactNode;query:string}) {

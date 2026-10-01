@@ -3,6 +3,7 @@ import { useFormState, useFormStatus } from 'react-dom';
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import type { FormState } from './actions';
 import ui from './experience.module.css';
+import { Notice } from './system/notice';
 
 /**
  * Account form parts (Paper T1, T2, S4). Every form posts to the existing server
@@ -15,8 +16,7 @@ export function Submit({ label, pending: pendingLabel = 'Please wait…', varian
 }
 function Reply({ state }: { state: FormState }) {
   if (!state.message || state.field) return null;
-  return <div className={state.success ? ui['notice--success'] : ui['notice--problem']} role={state.success ? 'status' : 'alert'}>
-    {state.title && <p className={ui['notice__title--compact']}>{state.title}</p>}<p className={ui['notice__body']}>{state.message}</p></div>;
+  return <Notice tone={state.success ? 'success' : 'problem'} role={state.success ? 'status' : 'alert'} title={state.title}>{state.message}</Notice>;
 }
 /** A form whose reply shows above its fields. `done` replaces the form after success. */
 export function AccountForm({ action, label, children, submit, done }: { action: Action; label: string; children: ReactNode | ((state: FormState) => ReactNode); submit?: 'primary'|'inverse'|'secondary'|'compact'; done?: (state: FormState) => ReactNode }) {

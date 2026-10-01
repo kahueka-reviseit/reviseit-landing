@@ -5,6 +5,7 @@ import { TeacherHeader } from '../shell';
 import { logout } from '../actions';
 import AccountDetails, { ResendConfirmation } from './details';
 import ui from '../experience.module.css';
+import { Status } from '../system/status';
 
 /**
  * My account (Paper T3, T4). One page says where access stands and the one action
@@ -40,7 +41,7 @@ export default async function Account() {
     <div className={ui['page-columns']}>
       <section className={ui['access-status']} aria-labelledby="access-title">
         <div className={ui['access-status__heading']}>
-          <p className={ui['access-status__marker']}><span className={ui[`status__dot--${access.tone}`]} aria-hidden="true"/><span className={ui[`status__label--${access.tone}`]}>{access.marker}</span></p>
+          <Status as="p" tone={access.tone} label={access.marker}/>
           <h2 id="access-title" className={ui['access-status__title']}>{access.title}</h2>
           <p className={ui['access-status__body']}>{access.body}</p>
         </div>

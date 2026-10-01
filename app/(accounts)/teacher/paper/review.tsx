@@ -1,16 +1,18 @@
 'use client';
 import type { ReactNode } from 'react';
+import { documents, documentLabels, type DocumentName } from '../../../../lib/jobs/contracts';
 import styles from '../paper.module.css';
 import type { PaperModel } from './model';
 import { journey } from './builder';
 import { Icon, PageHeader, Stages } from './ui';
 
-const documents=[
-  {name:'Question paper',detail:'In your school’s formatting',tone:styles['download-list__item--question-paper']},
-  {name:'Teacher marking memorandum',detail:'Mark by mark, for moderation',tone:styles['download-list__item--marking-memo']},
-  {name:'Learner memorandum',detail:'Worked answers for feedback',tone:styles['download-list__item--learner-memo']},
-  {name:'Teacher description',detail:'Bloom’s level for every subquestion',tone:styles['download-list__item--teacher-description']},
-];
+// Document set (Paper K10): the four names come from the one list used by delivery and email.
+const documentDetails:Record<DocumentName,{detail:string;tone:string}>={
+  paper:{detail:'In your school’s formatting',tone:styles['download-list__item--question-paper']},
+  memo:{detail:'Mark by mark, for moderation',tone:styles['download-list__item--marking-memo']},
+  'learner-memo':{detail:'Worked answers for feedback',tone:styles['download-list__item--learner-memo']},
+  'teacher-description':{detail:'Bloom’s level for every subquestion',tone:styles['download-list__item--teacher-description']},
+};
 const next=[
   {title:'Pay securely',text:'On Stripe’s page, then straight back here'},
   {title:'Complete the details',text:'Scenario questions for each question, or Choose for me'},
@@ -46,7 +48,7 @@ export default function ReviewView({paper,status}:{paper:PaperModel;status:React
         </section>
         <section className={styles['card--panel']} aria-labelledby="documents">
           <p id="documents" className={styles['eyebrow--neutral']}>You will receive four documents</p>
-          <ul className={styles['download-list']}>{documents.map(d=><li key={d.name} className={d.tone}><strong>{d.name}</strong><span>{d.detail}</span></li>)}</ul>
+          <ul className={styles['download-list']}>{documents.map(n=><li key={n} className={documentDetails[n].tone}><strong>{documentLabels[n]}</strong><span>{documentDetails[n].detail}</span></li>)}</ul>
         </section>
         <section className={styles['card--panel']} aria-labelledby="next-steps">
           <p id="next-steps" className={styles['eyebrow--neutral']}>What happens next</p>

@@ -5,6 +5,8 @@ import { StaffHeader } from '../../staff-header';
 import { accountCounts, emailKindLabels, emailNotifications, emailStatusLabels, papersNeedingAttention, reasonTone, searchTerm, type Attention } from '../data';
 import { CopyReference, FocusRow, RecordKeys } from './record';
 import ui from '../../experience.module.css';
+import { Notice } from '../../system/notice';
+import { Status } from '../../system/status';
 export const dynamic='force-dynamic';
 
 /**
@@ -46,7 +48,7 @@ export default async function ReviewPapers({ searchParams }: { searchParams: Pro
     <FocusRow id={params.focus}/>
     <header className={ui['page-header--staff']}><div className={ui['page-header__titles--staff']}><h1 className={ui['page-header__title--staff']}>Papers needing attention</h1>
       <p className={ui['page-header__lede--staff']}>Paid papers that stopped or cannot continue. There is no retry or refund button here: refund in Stripe with the payment reference, or contact the teacher.</p></div></header>
-    {!paid && <div className={ui['notice--caution']} role="status"><p className={ui['notice__body']}>Paid orders needing attention could not be loaded for this account. Held requests are still listed.</p></div>}
+    {!paid && <Notice tone="caution" role="status">Paid orders needing attention could not be loaded for this account. Held requests are still listed.</Notice>}
     <div className={ui['filter-bar']} role="navigation" aria-label="Filter papers">
       <Link href={href({ reason: undefined })} className={reason === 'all' ? ui['filter-chip--current'] : ui['filter-chip']} aria-current={reason === 'all' ? 'page' : undefined}>Needs attention · {items.length}</Link>
       {reasons.length > 1 && reasons.map(r => <Link key={r} href={href({ reason: r })} className={reason === r ? ui['filter-chip--current'] : ui['filter-chip']} aria-current={reason === r ? 'page' : undefined}>{r} · {items.filter(i => i.reason === r).length}</Link>)}
@@ -61,9 +63,9 @@ export default async function ReviewPapers({ searchParams }: { searchParams: Pro
         <div className={ui['record-table']} role="table" aria-label="Papers needing attention">
           <div className={ui['record-table__head']} role="row"><span role="columnheader" className={`${ui['record-table__heading']} ${ui['record-table__cell--reason']}`}>Reason</span><span role="columnheader" className={`${ui['record-table__heading']} ${ui['record-table__cell--primary']}`}>Paper and teacher</span><span role="columnheader" className={`${ui['record-table__heading']} ${ui['record-table__cell--payment']}`}>Payment</span><span role="columnheader" className={`${ui['record-table__heading']} ${ui['record-table__cell--mode']}`}>Mode</span></div>
           {shown.map(i => <Link id={`row-${i.id}`} key={i.id} role="row" href={href({ record: i.id })} scroll={false} aria-current={i.id === current?.id ? 'true' : undefined} className={i.id === current?.id ? ui['record-table__row--selected'] : ui['record-table__row']}>
-            <span role="cell" className={ui['record-table__cell--reason']}><span className={ui['status']}><span className={ui[`status__dot--${i.tone}`]} aria-hidden="true"/><span className={ui[`status__label--${i.tone}`]}>{i.reason}</span></span></span>
+            <span role="cell" className={ui['record-table__cell--reason']}><Status tone={i.tone} label={i.reason}/></span>
             <span role="cell" className={ui['record-table__cell--primary']}><span className={ui['record-table__name']}>{i.title}</span><span className={ui['record-table__sub']}>{[i.teacher, i.school].filter(Boolean).join(' · ') || i.state}</span>
-              <span className={ui['record-table__mobile-status']}><span className={ui['status']}><span className={ui[`status__dot--${i.tone}`]} aria-hidden="true"/><span className={ui[`status__label--${i.tone}`]}>{i.reason}</span></span></span></span>
+              <span className={ui['record-table__mobile-status']}><Status tone={i.tone} label={i.reason}/></span></span>
             <span role="cell" className={`${ui['record-table__cell--payment']} ${ui['record-table__text']}`}>{i.payment}</span>
             <span role="cell" className={`${ui['record-table__cell--mode']} ${ui['record-table__text']}`}>{i.mode}</span>
             <span className={ui['record-table__cell--chevron']} aria-hidden="true">›</span>
@@ -72,12 +74,12 @@ export default async function ReviewPapers({ searchParams }: { searchParams: Pro
       </div>
       {current && <aside className={ui['record-panel']} aria-labelledby="paper-record-title"><RecordKeys closeHref={href({ focus: current.id })}/>
         <div className={ui['record-panel__header']}><div className={ui['record-panel__titles']}><p className={ui['record-panel__eyebrow']}>Paper record</p><h2 id="paper-record-title" tabIndex={-1} className={ui['record-panel__title']}>{current.title}</h2>
-          <p className={ui['status']}><span className={ui[`status__dot--${current.tone}`]} aria-hidden="true"/><span className={ui[`status__label--${current.tone}`]}>{current.reason}{current.state === 'held' ? ' · no partial documents released' : ''}</span></p></div>
+          <Status as="p" tone={current.tone} label={<>{current.reason}{current.state === 'held' ? ' · no partial documents released' : ''}</>}/></div>
           <Link className={ui['record-panel__close']} href={href({ focus: current.id })} scroll={false} aria-label="Close paper record"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2 2 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></Link></div>
         <div className={ui['record-panel__body']}>
           <dl className={ui['key-value-list__rows']}>{([['Teacher', [current.teacher !== current.email ? current.teacher : '', current.email].filter(Boolean).join(' · ')], ['School', current.school], ['Payment', [current.payment, current.mode && `Stripe ${current.mode.toLowerCase()} mode`].filter(Boolean).join(' · ')], ['Payment reference', current.paymentIntent || (current.mode ? 'Reference pending' : '')], ['Order reference', current.id], ['Order state', current.state], ['Email', email ? `${emailKindLabels[email.kind]} · ${emailStatusLabels[email.status]?.label || email.status}` : '']] as const)
             .filter(([, v]) => v).map(([k, v]) => <div key={k} className={ui['key-value-list__row']}><dt className={ui['key-value-list__key']}>{k}</dt><dd className={k === 'Order reference' ? ui['key-value-list__value--subtle'] : ui['key-value-list__value']}>{v}</dd></div>)}</dl>
-          <div className={ui['notice--neutral']}><p className={ui['notice__title--compact']}>What you can do</p><p className={ui['notice__body']}>Contact the teacher, or refund in Stripe using the payment reference. A full refund recorded by Stripe closes the paper automatically. This page cannot approve, restart or refund.</p></div>
+          <Notice tone="neutral" title="What you can do">Contact the teacher, or refund in Stripe using the payment reference. A full refund recorded by Stripe closes the paper automatically. This page cannot approve, restart or refund.</Notice>
           <div className={ui['record-panel__actions']}>{current.email && <a className={ui['button--secondary']} href={`mailto:${current.email}?subject=${encodeURIComponent('Your Revise It paper ' + current.id.slice(0, 8))}`}>Email teacher</a>}
             {current.paymentIntent && <CopyReference value={current.paymentIntent}/>}</div>
         </div>

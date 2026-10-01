@@ -1,17 +1,17 @@
 {
   "meta": {
-    "last_updated": "2026-09-28"
+    "last_updated": "2026-10-01"
   },
   "fileId": "01M36MRM9HCJ4T87N081XDT4MX",
-  "tokenHash": "b9f678ac",
+  "tokenHash": "a19978d2",
   "tokens": [
     {
       "name": "--color-off-white",
-      "value": "#F8F6F0"
+      "value": "var(--color-bone-100)"
     },
     {
       "name": "--color-light-gray",
-      "value": "#F0EDE6"
+      "value": "var(--color-bone-200)"
     },
     {
       "name": "--color-white",
@@ -19,47 +19,47 @@
     },
     {
       "name": "--color-dark-text",
-      "value": "#2D2D2D"
+      "value": "var(--color-ink-800)"
     },
     {
       "name": "--color-mid-text",
-      "value": "#4A4A4A"
+      "value": "var(--color-ink-600)"
     },
     {
       "name": "--color-med-gray",
-      "value": "#8A8A8A"
+      "value": "var(--color-ink-400)"
     },
     {
       "name": "--color-border-strong",
-      "value": "#898780"
+      "value": "var(--color-bone-600)"
     },
     {
       "name": "--color-navy",
-      "value": "#1A1A2E"
+      "value": "var(--color-navy-900)"
     },
     {
       "name": "--color-sage",
-      "value": "#5B8A72"
+      "value": "var(--color-sage-500)"
     },
     {
       "name": "--color-sage-dark",
-      "value": "#436B56"
+      "value": "var(--color-sage-700)"
     },
     {
       "name": "--color-sage-light",
-      "value": "#A7BEAE"
+      "value": "var(--color-sage-300)"
     },
     {
       "name": "--color-terracotta",
-      "value": "#B85042"
+      "value": "var(--color-terracotta-500)"
     },
     {
       "name": "--color-gold",
-      "value": "#D4A574"
+      "value": "var(--color-gold-400)"
     },
     {
       "name": "--color-slate-blue",
-      "value": "#3B5F8A"
+      "value": "var(--color-slate-600)"
     },
     {
       "name": "--color-bone-50",

@@ -1,20 +1,19 @@
-/* Exported from Revise It Website in Paper, 2026-09-28 (C08). Token hash b9f678ac.
-   --color-border is the light divider; control outlines use --color-border-strong. */
+/* generated-by: paper:pull · content-hash: e9ac3f9a33a6 · Revise It Website tokens a19978d2, mirroring Design System 9065ba3a. Change a token in the Design System file in Paper, never here. */
 :root {
-  --color-off-white: #F8F6F0;
-  --color-light-gray: #F0EDE6;
+  --color-off-white: var(--color-bone-100);
+  --color-light-gray: var(--color-bone-200);
   --color-white: #FFFFFF;
-  --color-dark-text: #2D2D2D;
-  --color-mid-text: #4A4A4A;
-  --color-med-gray: #8A8A8A;
-  --color-border-strong: #898780;
-  --color-navy: #1A1A2E;
-  --color-sage: #5B8A72;
-  --color-sage-dark: #436B56;
-  --color-sage-light: #A7BEAE;
-  --color-terracotta: #B85042;
-  --color-gold: #D4A574;
-  --color-slate-blue: #3B5F8A;
+  --color-dark-text: var(--color-ink-800);
+  --color-mid-text: var(--color-ink-600);
+  --color-med-gray: var(--color-ink-400);
+  --color-border-strong: var(--color-bone-600);
+  --color-navy: var(--color-navy-900);
+  --color-sage: var(--color-sage-500);
+  --color-sage-dark: var(--color-sage-700);
+  --color-sage-light: var(--color-sage-300);
+  --color-terracotta: var(--color-terracotta-500);
+  --color-gold: var(--color-gold-400);
+  --color-slate-blue: var(--color-slate-600);
   --color-bone-50: #FDFCF9;
   --color-bone-100: #F8F6F0;
   --color-bone-200: #F0EDE6;

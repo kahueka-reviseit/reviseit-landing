@@ -8,6 +8,8 @@ import {shortDate,detailsFact,documentDescriptions,documentsFact,isClosed,journe
 import type {ConfigurationView} from '../../../../../lib/configurator/contracts';
 import type {QuestionContext} from '../../../../../lib/workspace/contracts';
 import ui from '../../../experience.module.css';
+import { Notice, NoticeStack } from '../../../system/notice';
+import { StatusDot } from '../../../system/status';
 import ConfigureOrder from './configure';
 import paper from './configure.module.css';
 import SubmittedSummary,{paperMeta} from './submitted-summary';
@@ -18,12 +20,12 @@ import SubmittedSummary,{paperMeta} from './submitted-summary';
  * this status page shows payment, question details and documents as separate facts.
  * Returning from Stripe proves nothing: the server confirms every payment.
  */
-function Notice({notice,children}:{notice:PaymentNotice;children?:ReactNode}){
- return <div className={ui[`notice--${notice.tone}`]} role={notice.tone==='problem'?'alert':'status'}><p className={ui['notice__title']}>{notice.title}</p><p className={ui['notice__body']}>{notice.body}</p>{children&&<div className={ui['notice__actions']}>{children}</div>}</div>;
+function PaymentNoticeView({notice,children}:{notice:PaymentNotice;children?:ReactNode}){
+ return <Notice tone={notice.tone} role={notice.tone==='problem'?'alert':'status'} prominent title={notice.title} actions={children}>{notice.body}</Notice>;
 }
 function FactView({label,fact}:{label:string;fact:Fact}){
  return <div className={ui['paper-facts__fact']}><dt className={ui['paper-facts__label']}>{label}</dt>
-  <dd className={ui['paper-facts__value']}><span className={ui[`status__dot--${fact.tone}`]} aria-hidden="true"/>{fact.value}</dd>
+  <dd className={ui['paper-facts__value']}><StatusDot tone={fact.tone}/>{fact.value}</dd>
   {fact.detail&&<dd className={ui['paper-facts__detail']}>{fact.detail}</dd>}</div>;
 }
 const DocumentIcon=()=><svg width="22" height="26" viewBox="0 0 22 26" aria-hidden="true"><path d="M3 1h11l5 5v18a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" strokeWidth="1.6"/><path d="M6 11h10M6 15h10M6 19h6" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>;
@@ -55,7 +57,7 @@ export default function OrderView({initial,catalogue={},curriculum,completionEma
   fetch(`/api/teacher/orders/${order.id}/configuration`,{cache:'no-store'}).then(async r=>r.ok?setSummary({state:'ready',view:await r.json()}):setSummary({state:'failed',view:null})).catch(()=>setSummary({state:'failed',view:null}));},[summaryKey]);
 
  const notice=paymentNotice(order,checking||(busy&&order.state==='awaiting_payment'));
- const noticeView=notice&&<Notice notice={notice}>{
+ const noticeView=notice&&<PaymentNoticeView notice={notice}>{
   notice.tone==='progress'?<button type="button" className={ui['button--secondary']} disabled={busy} onClick={()=>void payment('reconcile')}>Check again</button>:
   order.state==='awaiting_payment'&&order.payment&&['creating','open'].includes(order.payment.status)?<>
    {order.payment.checkoutUrl&&<a className={`${ui['button--primary']} ${ui['button--compact']}`} href={order.payment.checkoutUrl}>Continue to secure payment</a>}
@@ -63,13 +65,13 @@ export default function OrderView({initial,catalogue={},curriculum,completionEma
    <button type="button" className={ui['button--danger-text']} disabled={busy} onClick={()=>void payment('cancel')}>Cancel this checkout</button></>:
   notice.tone==='neutral'&&order.payment?.status!=='refunded'?<><a className={ui['button--secondary']} href="/teacher?view=home">Go to My curricula</a><Link className={ui['button--text']} href="/teacher/orders">Back to My papers</Link></>:
   notice.tone==='neutral'?<Link className={ui['button--text']} href="/teacher/orders">Back to My papers</Link>:
-  notice.tone==='caution'||notice.tone==='problem'?<a className={ui['button--text']} href={`mailto:kahueka@reviseit.io?subject=${encodeURIComponent('Paper '+order.id.slice(0,8))}`}>Email kahueka@reviseit.io</a>:null}</Notice>;
- const errorView=error&&<p role="alert" className={ui['notice--problem']}><span className={ui['notice__body']}>{error}</span></p>;
+  notice.tone==='caution'||notice.tone==='problem'?<a className={ui['button--text']} href={`mailto:kahueka@reviseit.io?subject=${encodeURIComponent('Paper '+order.id.slice(0,8))}`}>Email kahueka@reviseit.io</a>:null}</PaymentNoticeView>;
+ const errorView=error&&<Notice as="p" tone="problem" role="alert">{error}</Notice>;
  const live=<p className="visually-hidden" aria-live="polite">{stateLabels[order.state]||'Status unavailable'}</p>;
  const title=paperTitle(order,curriculum);
 
  if(configuring) return <div className={paper['order-page']}><ConfigureOrder key={order.state} orderId={order.id} catalogue={catalogue} title={title}
-   notice={<div className={ui['notice-stack']}>{live}{errorView}{noticeView}</div>} onSubmitted={()=>void refresh()}>
+   notice={<NoticeStack>{live}{errorView}{noticeView}</NoticeStack>} onSubmitted={()=>void refresh()}>
    <p className={ui['paper-facts__detail']}>{stateLabels[order.state]||'Status unavailable'} · Paper reference <code>{order.id}</code>{order.payment?.testMode?' · Stripe test mode, no real charge':''}</p></ConfigureOrder></div>;
 
  const i=stageIndex(order.state),view=summary.view;

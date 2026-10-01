@@ -6,9 +6,11 @@ import { groupLabel, type Attention, type CognitiveRow, type Configuration, type
 import styles from './configure.module.css';
 import JevAdvice from './jev-advice';
 import PaperPanel from './paper-panel';
-import QuestionContext,{briefPrompts} from './question-context';
+import QuestionContext from '../../../system/question-context';
+import {BloomTag,bloomTone} from '../../../system/tag';
+import {InlineNotice} from '../../../system/notice';
 import type {QuestionContext as Catalogue} from '../../../../../lib/workspace/contracts';
-import {emptyBrief,briefConflicts} from '../../../../../lib/configurator/brief';
+import {emptyBrief,briefConflicts,briefPrompts} from '../../../../../lib/configurator/brief';
 
 /**
  * Configured order (Paper C5, C6 and C3a): marks, parts and authored details stay
@@ -16,7 +18,6 @@ import {emptyBrief,briefConflicts} from '../../../../../lib/configurator/brief';
  * the server's projection; every rule and total comes back from the server after a save.
  */
 type SaveState = 'saved'|'pending'|'saving'|'conflict'|'failed';
-const bloomClass:Record<string,string>={grouped:styles['tag--grouped'],remember:styles['tag--remember'],understand:styles['tag--understand'],apply:styles['tag--apply'],analyse:styles['tag--analyse'],evaluate:styles['tag--evaluate'],create:styles['tag--create'],unclassified:styles['tag--unclassified']};
 
 function lineStatus(line:LineView,paid:boolean){
   if(line.marks.value===null || line.attention.some(a=>a.scope==='marks')) return {text:'Marks needed',ready:false};
@@ -28,7 +29,7 @@ const range=(r:{min:number;max:number})=>r.min===r.max?String(r.min):`${r.min}�
 /** Marks per category: the solid bar is settled in every permitted split, the pale bar is still open. */
 function MixRows({rows,scale,pending,label}:{rows:CognitiveRow[]; scale:number; pending:boolean; label:string}) {
   const pct=(n:number)=>`${Math.round(n/Math.max(1,scale)*100)}%`;
-  return <ul className={styles['bloom-mix']} aria-label={label}>{rows.map(r=>{const tone=bloomClass[r.grouped?'grouped':r.key]??bloomClass.unclassified;
+  return <ul className={styles['bloom-mix']} aria-label={label}>{rows.map(r=>{const tone=bloomTone(r.grouped?'grouped':r.key)??bloomTone('unclassified');
     return <li key={r.key}><span>{r.label}</span>
       <span className={`${styles['meter__track']} ${styles['meter__track--split']}`} aria-hidden="true"><i className={tone} style={{width:pct(r.min)}}/><i className={`${tone} ${styles['meter__open']}`} style={{width:pct(r.max-r.min)}}/></span>
       <span>{pending&&r.known&&r.max===0?'—':range(r)}</span></li>;})}</ul>;
@@ -72,9 +73,9 @@ function Chips({name,field,facet,value,onChange,disabled,attention}:{name:string
     </div>
     {writing&&<><label className={styles['text-field__label']} htmlFor={`${id}-text`}>Your answer for {field.label}</label>
       <textarea id={`${id}-text`} className={styles['text-input']} value={value.kind==='text'?value.text:''} disabled={disabled} maxLength={field.type==='text'?field.maxLength:2000} onChange={e=>onChange({kind:'text',text:e.target.value})}/></>}
-    {facet?.forced&&<p id={`${id}-reason`} className={styles['notice--required']}>Required by your other choices: {facet.options.find(o=>o.id===facet.forced)?.label}. {facet.reason}</p>}
+    {facet?.forced&&<InlineNotice tone="required" id={`${id}-reason`}>Required by your other choices: {facet.options.find(o=>o.id===facet.forced)?.label}. {facet.reason}</InlineNotice>}
     {options.some(o=>o.view?.disabled)&&<ul className={styles['paragraph']}>{options.filter(o=>o.view?.disabled).map(o=><li key={o.id}>{o.label}: {o.view?.reason}</li>)}</ul>}
-    {attention&&<p id={`${id}-attention`} role="alert" className={styles['notice--error']}>{attention.message}</p>}
+    {attention&&<InlineNotice tone="problem" role="alert" id={`${id}-attention`}>{attention.message}</InlineNotice>}
   </fieldset>;
 }
 
@@ -199,7 +200,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
   const saveNotice=<><p className={styles['save-status']} role="status">{saveText}</p>
     {save==='conflict'&&<button type="button" className={styles['button--secondary']} onClick={()=>void load()}>Load the latest saved choices</button>}
     {save==='failed'&&<button type="button" className={styles['button--secondary']} onClick={()=>void flush()}>Try saving again</button>}
-    {error&&<p role="alert" className={styles['notice--error']}>{error}</p>}</>;
+    {error&&<InlineNotice tone="problem" role="alert">{error}</InlineNotice>}</>;
   return <>
   <header className={styles['paper-header']}>
     <div><p className={styles['paper-header__breadcrumb']}><Link href="/teacher/orders">My papers</Link> / {title||'Your selected questions'} · {paid?'Paid':view.submitted?'Submitted':'Awaiting payment'}</p>
@@ -257,7 +258,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
         <div className={styles['question-order-controls']}><span className={styles['paragraph']}>Your words stay with this question.</span>
           <button type="button" className={styles['button--primary']} disabled={!editable||save!=='saved'||!brief?.text.trim()||!view.briefEnabled} onClick={()=>void configureBrief()}>{busy?'Configuring…':'Configure →'}</button></div>
         {save!=='saved'&&<p className={styles['paragraph']} role="status">{saveText}</p>}
-        {briefError&&<p role="alert" className={styles['notice--error']}>{briefError}</p>}
+        {briefError&&<InlineNotice tone="problem" role="alert">{briefError}</InlineNotice>}
         <button type="button" className={styles['button--text']} disabled={!editable} onClick={manualOptions}>{brief?.text?'Keep my words and choose options myself →':'Or choose the options yourself →'}</button>
         </>}
         {brief?.text&&<p className={styles['card__note']}>Your full description accompanies the final choices. Where they differ, your explicit choices take precedence.</p>}
@@ -282,9 +283,9 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
           <h2 id="details-heading" className={styles['card__title']}>{briefOn?(showManual?'Choose options yourself':'Still to decide'):(line.fields.length?'Set the details':'No further details are needed')}</h2></div>
           {editable&&line.fields.some(f=>f.allowAutomatic&&!draft.answers.items[line.id]?.[f.id])&&<button type="button" className={styles['button--text']} onClick={chooseAll}>Choose for me on all</button>}</div>
         {line.configurable==='authored'&&<p className={styles['paragraph']}>This question uses its authored details. Parts and cognitive levels are not yet classified.</p>}
-        {line.issues.map((m,i)=><p key={i} role="alert" className={styles['notice--error']}>{m}</p>)}
-        {line.diagram&&<div className={styles['notice--info']}><strong>{line.diagram.locked?'Stimulus diagram set by your choices':line.diagram.stimulus==='required'?'This question needs its diagram':line.diagram.stimulus==='not_applicable'?'No stimulus diagram for this question':'Stimulus diagram'}</strong>
-          <span>{line.diagram.learnerDrawn.length?'A drawing learners make themselves is a separate part and is not affected by the stimulus diagram choice.':'The stimulus diagram is what learners are given; it is separate from anything learners draw.'}</span></div>}
+        {line.issues.map((m,i)=><InlineNotice key={i} tone="problem" role="alert">{m}</InlineNotice>)}
+        {line.diagram&&<InlineNotice as="div" tone="info"><strong>{line.diagram.locked?'Stimulus diagram set by your choices':line.diagram.stimulus==='required'?'This question needs its diagram':line.diagram.stimulus==='not_applicable'?'No stimulus diagram for this question':'Stimulus diagram'}</strong>
+          <span>{line.diagram.learnerDrawn.length?'A drawing learners make themselves is a separate part and is not affected by the stimulus diagram choice.':'The stimulus diagram is what learners are given; it is separate from anything learners draw.'}</span></InlineNotice>}
         {line.fields.filter(f=>showManual||!draft.answers.items[line.id]?.[f.id]||!!attentionFor(f.id)).map(f=><Chips key={f.id} name={`q-${line.id}`} field={f} facet={line.facets.find(x=>x.id===f.id)} value={draft.answers.items[line.id]?.[f.id]} disabled={!editable}
           attention={attentionFor(f.id)} onChange={a=>setAnswer('item',f.id,a)}/>)}
         <JevAdvice orderId={orderId} lineId={line.id} revision={view.revision} enabled={!briefOn&&!!view.advice?.enabled&&view.advice.lineIds.includes(line.id)&&editable&&!busy}
@@ -303,8 +304,8 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
             <button type="button" aria-label={`One mark more for question ${line.number}`} disabled={!editable||(own.marks??0)>=line.marks.max} onClick={()=>setMarks(line.id,own.marks===null?line.marks.min:own.marks+1)}>+</button>
           </div>}
         </div>
-        {attentionFor('marks','marks')&&<p role="alert" className={styles['notice--error']}>{attentionFor('marks','marks')!.message}</p>}
-        {line.attention.filter(a=>a.scope==='marks'&&a.id!=='marks').map((a,i)=><p key={i} role="alert" className={styles['notice--error']}>{a.message}</p>)}
+        {attentionFor('marks','marks')&&<InlineNotice tone="problem" role="alert">{attentionFor('marks','marks')!.message}</InlineNotice>}
+        {line.attention.filter(a=>a.scope==='marks'&&a.id!=='marks').map((a,i)=><InlineNotice key={i} tone="problem" role="alert">{a.message}</InlineNotice>)}
         <p className={styles['card__footer']}>Paper total: {t.allocated} of {t.target??'—'} marks allocated. {t.remaining?`${t.remaining} still to allocate. `:''}{t.excess?`${t.excess} over the total. `:''}Move marks between questions within their ranges; the totals and cognitive mix update when saved.</p>
         {sameKind.length>1&&editable&&<div className={styles['question-order-controls']} role="group" aria-label={`Position of question ${line.number}`}>
           <span className={styles['paragraph']}>{line.kind==='multiple_choice'?'Order within multiple choice':'Order of structured questions'}: {position+1} of {sameKind.length}. Answers stay with the question.</span>
@@ -314,7 +315,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
       </section>      <section className={styles['card']} aria-labelledby="outline-heading">
         <p id="outline-heading" className={styles['card__eyebrow--structured']}>Question outline</p>
         {line.outline&&line.outline.rows.length?<><p className={styles['paragraph']}>One published example structure ({range(line.outline.subquestions)} subquestions). Your paper can differ within the published ranges.</p>
-          <ol className={styles['paper-preview']}>{line.outline.rows.map((r,i)=><li key={i}><span>{line.number}.{i+1} {r.summary}</span><span className={`${styles['tag']} ${bloomClass[r.bloom.toLowerCase()]??styles['tag--unclassified']}`}>{r.bloom}</span><span>{r.marks?range(r.marks):''}</span></li>)}</ol></>:
+          <ol className={styles['paper-preview']}>{line.outline.rows.map((r,i)=><li key={i}><span>{line.number}.{i+1} {r.summary}</span><BloomTag bloom={r.bloom}/><span>{r.marks?range(r.marks):''}</span></li>)}</ol></>:
          line.outline?<p className={styles['paragraph']}>{range(line.outline.subquestions)} subquestions. A reviewed outline has not been published for this question.</p>:
          <p className={styles['paragraph']}>A reviewed outline has not been published for this question yet.</p>}
       </section>
@@ -322,12 +323,12 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
 <section className={styles['card']}>        {(line.parts.length>1||line.parts.some(p=>!p.locked))&&<fieldset className={styles['choice-field']}><legend>What the question covers</legend><span className={styles['choice-field__message']} aria-hidden="true">Include or leave out each part</span>
           <ol className={styles['subquestion-list']}>{line.parts.map(p=><li key={p.id} className={p.included||p.possible?'':styles['subquestion-toggle--excluded']}>
             <label className={styles['subquestion-toggle__control']}><input type="checkbox" checked={p.included} disabled={!editable||p.locked} onChange={e=>togglePart(p.id,e.target.checked)}/><span aria-hidden="true" className={styles['switch']}/> <span className={styles['subquestion-toggle__number']}>{line.number}.{p.number}</span> <span className={styles['subquestion-toggle__text']}>{p.summary}</span></label>
-            <span className={`${styles['tag']} ${bloomClass[p.bloom??(p.bloomOptions.length?'grouped':'unclassified')]}`} title={p.bloomOptions.length?'The source allows either category and does not say which':undefined}>
-              {p.bloom?p.bloom.charAt(0).toUpperCase()+p.bloom.slice(1):p.bloomOptions.length?groupLabel(p.bloomOptions.join('-or-')):'Not yet classified'}</span>
+            <BloomTag className={styles['subquestion-toggle__tag']} tone={p.bloom??(p.bloomOptions.length?'grouped':'unclassified')} title={p.bloomOptions.length?'The source allows either category and does not say which':undefined}
+              bloom={p.bloom?p.bloom.charAt(0).toUpperCase()+p.bloom.slice(1):p.bloomOptions.length?groupLabel(p.bloomOptions.join('-or-')):'Not yet classified'}/>
             <span className={styles['subquestion-toggle__marks']}>{p.included||p.possible?(p.marks?range(p.marks):p.exampleMarks?`${range(p.exampleMarks)} in the source example`:'—'):<em>Left out</em>}</span>
             {p.learnerDrawn&&<span className={styles['paragraph']}>Learners draw this themselves</span>}
             {p.reason&&<span className={styles['paragraph']}>{p.reason}</span>}
-            {attentionFor(p.id,'part')&&<span role="alert" className={styles['notice--error']}>{attentionFor(p.id,'part')!.message}</span>}
+            {attentionFor(p.id,'part')&&<InlineNotice as="span" tone="problem" role="alert" className={styles['subquestion-toggle__message']}>{attentionFor(p.id,'part')!.message}</InlineNotice>}
           </li>)}</ol></fieldset>}
 </section>
 {paid&&line.composition&&<section className={styles['card']} aria-labelledby="line-mix-heading">
@@ -349,7 +350,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
         <p className={styles['save-status']} role="status">{saveText}</p>
         {save==='conflict'&&<button type="button" className={styles['button--secondary']} onClick={()=>void load()}>Load the latest saved choices</button>}
         {save==='failed'&&<button type="button" className={styles['button--secondary']} onClick={()=>void flush()}>Try saving again</button>}
-        {error&&<p role="alert" className={styles['notice--error']}>{error}</p>}
+        {error&&<InlineNotice tone="problem" role="alert">{error}</InlineNotice>}
       </section>
       <section className={styles['card']} aria-labelledby="budget-heading">
         <p id="budget-heading" className={styles['card__eyebrow--neutral']}>Marks budget</p>
@@ -362,7 +363,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
           <span className={styles['meter__track']} aria-hidden="true"><i className={s.key==='multiple_choice'?styles['meter__fill--multiple-choice']:styles['meter__fill--structured']} style={{width:`${s.target?Math.min(100,Math.round(s.allocated/s.target*100)):100}%`}}/></span></div>)}
         <div className={styles['totals']}><strong>Allocated</strong><strong>{t.allocated} of {t.target??'—'}</strong></div>
         {t.remaining>0&&<p className={styles['paragraph']}>{t.remaining} marks still to allocate</p>}
-        {t.excess>0&&<p className={styles['notice--error']}>{t.excess} marks over the paper total</p>}
+        {t.excess>0&&<InlineNotice tone="problem">{t.excess} marks over the paper total</InlineNotice>}
       </section>
       <section className={styles['card']} aria-labelledby="bloom-heading">
         <p id="bloom-heading" className={styles['card__eyebrow--neutral']}>Bloom’s cognitive mix · by marks</p>

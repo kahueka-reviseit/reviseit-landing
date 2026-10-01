@@ -40,3 +40,6 @@ supabase/.temp/
 supabase/.branches/
 
 /workspace-test-results/
+
+# Paper synchronisation previews and recovery journals (local; evidence is kept privately)
+.paper-link/

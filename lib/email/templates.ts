@@ -2,7 +2,8 @@
  * Transactional email templates (Paper: Revise It Website, page 8 "Email journey";
  * Design System, Components 12 "Email"). Email clients ignore stylesheets and
  * variables, so the Paper tokens appear here as literal values on tables and
- * inline styles. Georgia and Arial are the intentional fallbacks when the brand
+ * inline styles. The colour block below is resolved from those tokens by
+ * `npm run paper:pull`; the email keeps its own table-based renderer. Georgia and Arial are the intentional fallbacks when the brand
  * fonts are unavailable. No scripts, images, tracking pixels or attachments.
  *
  * Self-contained on purpose: `scripts/write-auth-templates.mts` imports it under
@@ -10,11 +11,13 @@
  */
 export const TEMPLATE_VERSION = 'c09-1';
 
+// paper:tokens:start (written by `npm run paper:pull` from design/paper/components.json; do not edit by hand)
 const color = {
   canvas: '#F8F6F0', card: '#FFFFFF', border: '#D5D1C8', rule: '#5B8A72', text: '#2D2D2D', muted: '#4A4A4A',
-  action: '#436B56', onAction: '#FFFFFF', done: '#436B56', problem: '#B85042', problemText: '#802F25',
-  problemTint: '#FCF0EE', account: '#3B5F8A', factsTint: '#F1F6F3', factsRule: '#D3E3DA', fallbackTint: '#F0EDE6',
+  action: '#436B56', onAction: '#FFFFFF', done: '#436B56', problem: '#B85042', problemText: '#802F25', problemTint: '#FCF0EE',
+  account: '#3B5F8A', factsTint: '#F1F6F3', factsRule: '#D3E3DA', fallbackTint: '#F0EDE6',
 };
+// paper:tokens:end
 const display = "'Playfair Display', Georgia, 'Times New Roman', serif";
 const body = "'Source Sans 3', 'Source Sans Pro', Arial, Helvetica, sans-serif";
 
