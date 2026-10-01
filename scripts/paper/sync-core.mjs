@@ -42,7 +42,7 @@ export function masterHash(master,spec={}) {
  * Returns the operations that bring the instance in line, the edits that must not be
  * overwritten (`drift`), the synchronised state to remember, and the instance's own content.
  */
-export function planInstance({master,instance,spec={},entry={},base,resolveNested=()=>null,prefix=''}) {
+export function planInstance({master,instance,spec={},entry={},base,baseContent,allowRemoval=false,resolveNested=()=>null,prefix=''}) {
   // An instance may combine variants, for example ["collapsed","narrow"]; later ones win.
   const names=[entry.variant??[]].flat(),missing=names.filter(n=>!spec.variants?.[n]);
   if(missing.length)return {ops:[],drift:[{kind:'unknown-variant',key:prefix||'@root',detail:`variant "${missing.join(', ')}" is not defined`}],state:{},content:{}};
@@ -107,7 +107,7 @@ export function planInstance({master,instance,spec={},entry={},base,resolveNeste
       used.forEach((c,i)=>{
         const key=repeat?`${parentKey}/${child.name}[${i}]`:`${parentKey}/${child.name}`;order.push(c);previous={id:c.id};
         if(nested){const link=resolveNested(c.name,spec);
-          if(link){const inner=planInstance({...link,instance:c,base,resolveNested,prefix:key});ops.push(...inner.ops);drift.push(...inner.drift);Object.assign(state,inner.state);Object.assign(content,inner.content);}
+          if(link){const inner=planInstance({...link,instance:c,base,baseContent,allowRemoval,resolveNested,prefix:key});ops.push(...inner.ops);drift.push(...inner.drift);Object.assign(state,inner.state);Object.assign(content,inner.content);}
           return;}
         compare(child,c,key);
       });
@@ -117,12 +117,48 @@ export function planInstance({master,instance,spec={},entry={},base,resolveNeste
       const key=`${parentKey}/${c.name}`;
       if(matches(c.name,extras)){content[key]={...(content[key]??{}),extra:true};continue;}
       if(omit.has(c.name))drift.push({kind:'omitted-layer-present',key,nodeId:c.id,detail:`this variant leaves out "${c.name}"`});
-      else if(base&&base[key]!==undefined)ops.push({op:'remove',key,nodeId:c.id});
+      else if(base&&base[key]!==undefined){
+        // The master no longer has this layer. Remove it only when nothing in it would be lost.
+        const risks=removalRisks(c,key,spec);
+        const renamed=ops.filter(o=>o.op==='insert'&&o.parentId===node.id).map(o=>o.key.split('/').pop());
+        if(!risks.length)ops.push({op:'remove',key,nodeId:c.id});
+        else if(allowRemoval)ops.push({op:'remove',key,nodeId:c.id,reviewed:true,losing:risks});
+        else drift.push({kind:'removal-would-lose-work',key,nodeId:c.id,risks,
+          detail:`the master no longer has "${c.name}"${renamed.length?` (it may have been renamed to "${renamed.join('", "')}")`:''}, but removing it here would lose: ${risks.map(r=>`${r.key} ${r.reason}`).join('; ')}. Review it, then apply with --accept-removal for this instance to remove it anyway.`});
+      }
       else drift.push({kind:'unrecognised-layer',key,nodeId:c.id,detail:`"${c.name}" is not part of the master and is not a declared extra`});
     }
     // Relative order of the master's layers; extras keep whatever position they have.
     const current=node.children.filter(c=>claimed.has(c.id));
     if(current.some((c,i)=>c.id!==order[i]?.id))ops.push({op:'order',key:parentKey,parentId:node.id,order:order.map(c=>c.id),from:current.map(c=>c.id)});
+  }
+
+  /**
+   * Everything a removal would destroy in one subtree: layers edited or added since the last
+   * synchronisation, and anything the instance owns (slot text, declared overrides).
+   */
+  function removalRisks(node,key,layerSpec) {
+    const risks=[];
+    const visit=(n,k,s,rootName)=>{
+      const name=rootName??n.name,known=base?.[k],free=new Set(s.overridable?.[name]??[]);
+      const slot=(s.slots??[]).includes(name)||baseContent?.[k]?.text!==undefined;
+      const synced=Object.fromEntries(Object.entries(n.styles).filter(([p,v])=>!free.has(p)&&v!==undefined));
+      const now={styles:synced};if(n.type==='Text'&&!slot)now.text=n.text;
+      if(known===undefined)risks.push({key:k,reason:'was added after the last synchronisation'});
+      else if(known!==hashOf(now))risks.push({key:k,reason:'was edited after the last synchronisation'});
+      if(slot&&n.type==='Text')risks.push({key:k,reason:'holds text owned by this instance',text:n.text});
+      const own=Object.keys(n.styles).filter(p=>free.has(p));
+      if(own.length)risks.push({key:k,reason:`holds properties owned by this instance (${own.join(', ')})`});
+      const seen={};
+      for(const c of n.children){
+        if(matches(c.name,s.nested)){const link=resolveNested(c.name,s);
+          if(link){visit(c,`${k}/${c.name}`,link.spec,link.master.name);continue;}}
+        const repeat=(s.repeat??[]).includes(c.name),i=seen[c.name]=(seen[c.name]??-1)+1;
+        visit(c,repeat?`${k}/${c.name}[${i}]`:`${k}/${c.name}`,s);
+      }
+    };
+    visit(node,key,layerSpec);
+    return risks;
   }
 
   compare(master,instance,prefix||'@root',master.name);
@@ -150,7 +186,7 @@ export function planTokens({source,mirror,base,aliases={}}) {
   }
   for(const token of mirror){
     if(owner.has(token.name)||aliases[token.name])continue;
-    if(base&&base[token.name]!==undefined)ops.push({op:'token-delete',name:token.name,from:token.value});
+    if(base&&base[token.name]!==undefined)ops.push({op:'token-delete',name:token.name,from:token.value,type:token.type});
     else drift.push({kind:'unregistered-token',key:token.name,found:token.value,detail:'exists only in the mirror file and is not a declared legacy alias'});
   }
   return {ops,drift,state};

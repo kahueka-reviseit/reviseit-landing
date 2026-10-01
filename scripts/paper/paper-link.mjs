@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {connectPaper} from './client.mjs';
-import {applyPlan,emptyLock,isClean,lockPath,readJson,registryPath,restoreJournal,summarise,survey,toPlan,writeJson} from './engine.mjs';
+import {applyPlan,emptyLock,isClean,lockPath,openJournals,readJson,registryPath,restoreJournal,summarise,survey,toPlan,writeJson} from './engine.mjs';
 import {exportCode} from './export-code.mjs';
 
 /**
@@ -15,7 +15,8 @@ import {exportCode} from './export-code.mjs';
  *   apply --plan <file>         apply that preview (refused if Paper changed since)
  *       --adopt <id,…|all>      allow the first synchronisation of the named instances
  *       --accept-master <id,…>  overwrite a reported manual edit with the master
- *   restore --journal <file>    undo one application
+ *       --accept-removal <id,…> remove a layer the master dropped even though it holds work (journalled)
+ *   restore --journal <file>    undo one application, interrupted or complete, after checking Paper
  *   pull [--check]              export tokens and component definitions to application code
  */
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
@@ -42,29 +43,36 @@ function print(result) {
 }
 
 if(command==='pull'){process.exitCode=await exportCode(root,{check:rest.includes('--check'),force:rest.includes('--force')});}
-else if(['status','plan','apply','restore'].includes(command)){
+else if(['status','plan','apply','restore','recover'].includes(command)){
   const registry=readJson(registryPath(root)),lock=readJson(lockPath(root),emptyLock());
   const paper=await connectPaper();
   try{
-    if(command==='status'){const result=await survey(paper,registry,lock);print(result);
+    const open=openJournals(journalDir);
+    const warnOpen=()=>{for(const f of open)console.log(`  problem: ${f} records an application that did not finish (${readJson(f).meta.status}). Run paper:restore -- --journal ${f}`);};
+    if(command==='status'){const result=await survey(paper,registry,lock);print(result);warnOpen();
       if(flag('out'))writeJson(flag('out'),toPlan(result,registry));
       // Fingerprint of what each instance owns (slot text, images, declared overrides), to compare before and after a change.
       if(flag('content'))writeJson(flag('content'),Object.fromEntries(result.instances.map(i=>[i.id,{master:i.master,where:i.where,contentHash:i.contentHash,content:i.content}])));
-      process.exitCode=isClean(result)?0:1;if(isClean(result))console.log('Every registered instance equals its master and the mirrored tokens equal their owner.');}
-    if(command==='plan'){const result=await survey(paper,registry,lock,{accept:list('accept-master')});print(result);
+      process.exitCode=isClean(result)&&!open.length?0:1;if(isClean(result)&&!open.length)console.log('Every registered instance equals its master and the mirrored tokens equal their owner.');}
+    if(command==='plan'){const result=await survey(paper,registry,lock,{accept:list('accept-master'),acceptRemoval:list('accept-removal')});print(result);
       const out=flag('out')??path.join(journalDir,'plan.json');writeJson(out,toPlan(result,registry));console.log(`Preview written to ${out}`);}
     if(command==='apply'){const plan=readJson(flag('plan'));if(!plan)throw new Error('apply needs --plan <file> from the plan command');
-      const report=await applyPlan(paper,registry,lock,plan,{adopt:list('adopt'),accept:list('accept-master'),journalDir});
-      writeJson(lockPath(root),lock);
+      if(open.length){warnOpen();throw new Error('An earlier application did not finish. Recover it before applying anything else.');}
+      const report=await applyPlan(paper,registry,lock,plan,{adopt:list('adopt'),accept:list('accept-master'),acceptRemoval:list('accept-removal'),journalDir,checkpoint:l=>writeJson(lockPath(root),l)});
       console.log(`Applied ${report.applied.length}, already equal ${report.unchanged.length}, refused ${report.refused.length}.`);
       for(const a of report.applied)console.log(`  applied ${a.id}: ${a.operations} operations`);
       for(const r of report.refused)console.log(`  refused ${r.id}: ${r.reason}${r.detail?` (${r.detail})`:''}`);
       if(report.journal)console.log(`Recovery journal: ${report.journal}`);
+      if(report.interrupted){console.log(`INTERRUPTED: ${report.interrupted.error}`);for(const u of report.interrupted.uncertain)console.log(`  result unknown: ${u.item} ${u.op} ${u.key}`);
+        console.log(`Nothing after that step was attempted. Inspect and undo with: npm run paper:restore -- --journal ${report.journal}`);process.exitCode=2;}
       if(flag('report'))writeJson(flag('report'),report);
       for(const key of Object.keys(registry.files))await paper.json('finish_working_on_nodes',{fileId:registry.files[key].id}).catch(()=>{});
-      process.exitCode=report.refused.length?1:0;}
-    if(command==='restore'){const journal=readJson(flag('journal'));if(!journal)throw new Error('restore needs --journal <file>');
-      const report=await restoreJournal(paper,registry,lock,journal);writeJson(lockPath(root),lock);
-      console.log(`Restored ${report.restored.join(', ')||'nothing'}.`);for(const n of report.notes)console.log(`  note: ${n}`);}
+      process.exitCode??=report.refused.length?1:0;}
+    if(command==='restore'||command==='recover'){const target=flag('journal'),journal=readJson(target);if(!journal)throw new Error('restore needs --journal <file>');
+      const report=await restoreJournal(paper,registry,lock,journal,{save:j=>writeJson(target,j)});writeJson(lockPath(root),lock);
+      const count=k=>report.outcomes.filter(o=>o.outcome===k).length;
+      console.log(`Restored ${report.restored.join(', ')||'nothing'}. Reverted ${count('reverted')}, never landed ${count('not-applied')}, never sent ${count('never-sent')}, left for review ${count('conflict')}.`);
+      for(const c of report.conflicts)console.log(`  left for review: ${c.item} ${c.key}: ${c.detail}`);
+      for(const n of report.notes)console.log(`  note: ${n}`);process.exitCode=report.conflicts.length?1:0;}
   }finally{paper.close();}
 }else{console.log(fs.readFileSync(fileURLToPath(import.meta.url),'utf8').split('\n').slice(9,19).map(l=>l.replace(/^ \* ?/,'')).join('\n'));process.exitCode=command?1:0;}
