@@ -19,3 +19,7 @@
 .notice--inline-required, .notice--inline-info { margin:0; padding:16px; border-left:3px solid var(--color-action); background:var(--color-surface-muted); font-size:15px; line-height:22px; color:var(--color-text); }
 .notice--inline-info { display:grid; gap:8px; }
 .notice--inline-info strong { font-size:16px; }
+
+/* Unframed density, a result beside a total in the paper builder and review. */
+.notice--text-problem { margin:0; font-size:13px; line-height:18px; color:var(--color-warning-text); }
+.notice--text-done { margin:0; font-size:14px; font-weight:600; color:var(--color-action-strong); }

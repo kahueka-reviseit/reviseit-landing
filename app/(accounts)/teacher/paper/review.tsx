@@ -2,6 +2,7 @@
 import type { ReactNode } from 'react';
 import { documents, documentLabels, type DocumentName } from '../../../../lib/jobs/contracts';
 import styles from '../paper.module.css';
+import { InlineNotice } from '../../system/notice';
 import type { PaperModel } from './model';
 import { journey } from './builder';
 import { Icon, PageHeader, Stages } from './ui';
@@ -66,8 +67,8 @@ export default function ReviewView({paper,status}:{paper:PaperModel;status:React
               <ul>{problems.map(p=><li key={p}>{p}</li>)}</ul>}
           </div>
           <p className={styles['card__note']}>This pilot allows up to {limits.questions} questions per paper{limits.structured<limits.questions||limits.multipleChoice<limits.questions?`, including up to ${limits.structured} structured and ${limits.multipleChoice} multiple-choice questions`:''}.</p>
-          {!withinPilotSize&&n<=limits.questions&&<p role="alert" className={styles['notice__warning']}>Reduce the number of structured or multiple-choice questions to fit the pilot limits before paying.</p>}
-          {n>limits.questions&&<p role="alert" className={styles['notice__warning']}>Remove {n-limits.questions} {n-limits.questions===1?'question':'questions'} before continuing to payment.</p>}
+          {!withinPilotSize&&n<=limits.questions&&<InlineNotice tone="problem" framed={false} role="alert">Reduce the number of structured or multiple-choice questions to fit the pilot limits before paying.</InlineNotice>}
+          {n>limits.questions&&<InlineNotice tone="problem" framed={false} role="alert">Remove {n-limits.questions} {n-limits.questions===1?'question':'questions'} before continuing to payment.</InlineNotice>}
           {!data.purchase?.available ? <p className={styles['card__body']}>Purchasing is not open for your account yet. Your saved selection stays here.</p> :
             paper.selectionDirty || !data.selection.revision ? <p className={styles['card__body']}>Save your selection before continuing to payment. <button type="button" className={styles['link']} disabled={busy} onClick={()=>void paper.save()}>Save selection</button></p> :
             occurrences.some(o=>!o.entry.orderable) ? <p className={styles['card__body']}>Remove questions that are not yet available before paying.</p> : null}

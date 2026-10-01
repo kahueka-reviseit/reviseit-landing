@@ -4,6 +4,7 @@ import { bloomCategories, type CatalogueEntry, type CatalogueSearch } from '../.
 import { formatMarks } from '../../../../lib/workspace/catalogue';
 import { applyFilters, codeOf, emptyFilters, filterCount, filterLabel, highlight, kindOf, markBands, matchesQuery, optionCount, topicGroups, type FilterKey, type Filters } from '../../../../lib/workspace/paper';
 import styles from '../paper.module.css';
+import { Notice } from '../../system/notice';
 import type { PaperModel } from './model';
 import { CatalogueCard } from './card';
 import { Icon } from './ui';
@@ -173,7 +174,7 @@ export default function CatalogueView({paper,status,query,setQuery,search,switch
       <Typeahead paper={paper} query={query} setQuery={setQuery}/>
     </header>
     {status}
-    {paper.stale && <p className={styles['notice--error']}>The catalogue has changed since you saved. Review the current entries and save a new selection. Your previous selection stays saved until then.</p>}
+    {paper.stale && <Notice as="p" tone="problem">The catalogue has changed since you saved. Review the current entries and save a new selection. Your previous selection stays saved until then.</Notice>}
     {data.entries.length===0 ? <p className={styles['empty-state']}>There are no published questions for this curriculum yet.</p> : <>
       <Overview paper={paper} compact={compact||active>0||!!q} setCompact={setCompact}/>
       <div className={styles['filter-bar']}>

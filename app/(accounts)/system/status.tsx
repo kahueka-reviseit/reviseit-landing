@@ -8,6 +8,7 @@ export type StatusTone = 'done'|'progress'|'attention'|'problem'|'closed';
 export function StatusDot({tone}:{tone:StatusTone}) {
   return <span className={styles[`status__dot--${tone}`]} aria-hidden="true"/>;
 }
-export function Status({tone,label,as:Tag='span'}:{tone:StatusTone;label:React.ReactNode;as?:'span'|'p'}) {
-  return <Tag className={styles['status']}><StatusDot tone={tone}/><span className={styles[`status__label--${tone}`]}>{label}</span></Tag>;
+/** `table` is the denser presentation inside a question table row: a regular-weight label in the body colour. */
+export function Status({tone,label,as:Tag='span',density='default'}:{tone:StatusTone;label:React.ReactNode;as?:'span'|'p'|'div';density?:'default'|'table'}) {
+  return <Tag className={styles['status']}><StatusDot tone={tone}/><span className={`${styles[`status__label--${tone}`]}${density==='table'?` ${styles['status__label--table']}`:''}`}>{label}</span></Tag>;
 }

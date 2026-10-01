@@ -39,6 +39,11 @@ export function NoticeStack({children}:{children:ReactNode}) {
  * conflict, a required consequence of another choice. Compact, and always persistent.
  */
 export type InlineTone = 'problem'|'required'|'info';
-export function InlineNotice({tone,children,role,id,as:Tag='p',className,label}:{tone:InlineTone;children:ReactNode;role?:'status'|'alert';id?:string;as?:'p'|'span'|'div'|'section';className?:string;label?:string}) {
-  return <Tag id={id} role={role} aria-label={label} className={`${styles[`notice--inline-${tone}`]}${className?` ${className}`:''}`}>{children}</Tag>;
+/**
+ * `framed={false}` is a one-line result beside a total ("14 of 20 marks"): coloured text only,
+ * in the problem or done tone. It is still persistent feedback, never dismissible.
+ */
+export function InlineNotice({tone,children,role,id,as:Tag='p',className,label,framed=true}:{tone:InlineTone|'done';children:ReactNode;role?:'status'|'alert';id?:string;as?:'p'|'span'|'div'|'section';className?:string;label?:string;framed?:boolean}) {
+  const look=framed?`notice--inline-${tone}`:`notice--text-${tone}`;
+  return <Tag id={id} role={role} aria-label={label} className={`${styles[look]}${className?` ${className}`:''}`}>{children}</Tag>;
 }

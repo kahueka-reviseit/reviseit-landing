@@ -35,6 +35,16 @@ describe('task feedback and status',()=>{
     render(<InlineNotice tone="problem" role="alert" id="q-1-marks-attention">Marks must be within 12 to 18.</InlineNotice>);
     expect(screen.getByRole('alert')).toHaveAttribute('id','q-1-marks-attention');
   });
+  it('offers the table density as an explicit variant of the same marker',()=>{
+    const {container}=render(<Status tone="done" density="table" label="Configured"/>);
+    expect(screen.getByText('Configured').className).toMatch(/status__label--done.*status__label--table/);
+    expect(container.querySelector('[aria-hidden="true"]')!.className).toContain('status__dot--done');
+  });
+  it('shows a one-line result beside a total without a frame, in the problem or done tone',()=>{
+    render(<><InlineNotice tone="problem" framed={false} role="alert">Remove 2 questions before continuing to payment.</InlineNotice><InlineNotice tone="done" framed={false}>20 of 20 multiple-choice marks ✓</InlineNotice></>);
+    expect(screen.getByRole('alert').className).toContain('notice--text-problem');
+    expect(screen.getByText(/20 of 20/).className).toContain('notice--text-done');
+  });
   it('shows a status as a hidden dot plus a readable label',()=>{
     const {container}=render(<Status tone="attention" label="Needs you"/>);
     expect(screen.getByText('Needs you').className).toContain('status__label--attention');

@@ -2,6 +2,7 @@
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import { kindOf, topicGroups } from '../../../../lib/workspace/paper';
 import styles from '../paper.module.css';
+import { Notice } from '../../system/notice';
 import type { PaperModel } from './model';
 import { journey } from './builder';
 import { Icon, Stages } from './ui';
@@ -105,7 +106,7 @@ export function ShapeView({paper,status}:{paper:PaperModel;status:ReactNode}) {
             <label className={styles['number-input--structured']}>Structured marks<input type="number" inputMode="numeric" min={0} value={structuredMarks ?? ''} disabled={!validTotal} onChange={e=>{const s=Number(e.target.value);if(Number.isInteger(s)&&validTotal)setMc(String(Math.max(0,t-s)));}}/></label>
           </div>
         </fieldset>
-        {problems.map(p=><p key={p} role="alert" className={styles['notice--caution']}>{p}</p>)}
+        {problems.map(p=><Notice key={p} as="p" tone="caution" role="alert">{p}</Notice>)}
         <div className={styles['form__actions']}>
           <button type="button" className={styles['link']} onClick={()=>paper.go('home')}>Cancel</button>
           {(paper.paperTarget!==null||Object.keys(sectionTargets).length>0)&&<button type="button" className={styles['link']} onClick={()=>{paper.setPaperTarget(null);paper.setSectionTarget('multiple_choice',undefined);paper.setSectionTarget('structured',undefined);setTotal('');setMc('');}}>Clear the shape</button>}

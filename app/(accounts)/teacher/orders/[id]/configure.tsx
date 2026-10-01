@@ -9,6 +9,7 @@ import PaperPanel from './paper-panel';
 import QuestionContext from '../../../system/question-context';
 import {BloomTag,bloomTone} from '../../../system/tag';
 import {InlineNotice} from '../../../system/notice';
+import {Status} from '../../../system/status';
 import type {QuestionContext as Catalogue} from '../../../../../lib/workspace/contracts';
 import {emptyBrief,briefConflicts,briefPrompts} from '../../../../../lib/configurator/brief';
 
@@ -231,7 +232,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
             onChange={e=>{const v=e.target.value.trim();setMarks(l.id,v===''?null:Number.isInteger(Number(v))?Number(v):m);}}/><small>of {range(l.marks)}</small></>}
         </div>
         <div role="cell" className={styles['question-table__parts']}>{l.kind==='multiple_choice'?'1':l.outline?range(l.outline.subquestions):'Not published'}<span className={styles['question-table__mobile-label']}> subquestions</span></div>
-        <div role="cell" className={`${styles['question-table__status']} ${status.ready?styles['question-table__status--ready']:''}`}><i aria-hidden="true"/>{paid&&status.ready?'Configured':status.text}</div>
+        <div role="cell" className={styles['question-table__status']}><Status density="table" tone={status.ready?'done':'attention'} label={paid&&status.ready?'Configured':status.text}/></div>
         <div role="cell" className={styles['question-table__actions']}><button type="button" className={styles['button--secondary']} disabled={busy} aria-label={`Edit question ${l.number}`} onClick={()=>go(i)}>Edit question</button></div>
       </div>;
     })}

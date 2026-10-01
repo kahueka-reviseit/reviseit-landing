@@ -15,6 +15,8 @@ const sortKeys=value=>Array.isArray(value)?value.map(sortKeys):value&&typeof val
 export const stable=value=>JSON.stringify(sortKeys(value));
 export const hashOf=value=>createHash('sha256').update(stable(value)).digest('hex').slice(0,12);
 const same=(a,b)=>stable(a??null)===stable(b??null);
+/** A tree without node identifiers, for comparing what Paper holds with what was written. */
+export const shape=node=>({name:node.name,type:node.type,styles:node.styles,...(node.type==='Text'?{text:node.text??''}:{}),children:node.children.map(shape)});
 export const matches=(name,patterns=[])=>patterns.some(p=>p.endsWith('*')?name.startsWith(p.slice(0,-1)):p===name);
 
 /** A master's layer names are the addresses used by slots, overrides and variants, so they must be unique. */
@@ -101,7 +103,7 @@ export function planInstance({master,instance,spec={},entry={},base,baseContent,
       if(!used.length&&!repeat){
         const key=`${parentKey}/${child.name}`;
         if(base&&Object.keys(base).some(k=>k===key||k.startsWith(key+'/')))drift.push({kind:'layer-deleted',key,parentId:node.id,detail:'a synchronised layer was removed from this instance'});
-        else{ops.push({op:'insert',key,parentId:node.id,after:previous,html:toHtml(desiredTree(child))});previous={inserted:key};}
+        else{const tree=desiredTree(child);ops.push({op:'insert',key,parentId:node.id,after:previous,html:toHtml(tree),tree:shape(tree)});previous={inserted:key};}
         continue;
       }
       used.forEach((c,i)=>{

@@ -64,17 +64,20 @@ npm run paper:plan -- --out plan.json     # write the preview
 npm run paper:apply -- --plan plan.json   # apply it; refused per instance if Paper changed since the preview
 npm run paper:pull                        # export tokens and master values to code (only when status is clean)
 npm run paper:pull -- --check             # report whether code is behind Paper, write nothing
-npm run paper:restore -- --journal <file> # undo one application
+npm run paper:restore -- --journal <file> # undo one application, interrupted or complete, after checking Paper
 npm run check:paper                       # offline: single definitions, generated files, lock (no Paper needed)
 ```
 
-Paper must be running with both files open. `apply` takes `--adopt <id,…|all>` for the first synchronisation of an instance and `--accept-master <id,…>` to overwrite a reported manual edit with the master. Previews and journals are written to `.paper-link/journal` (ignored by Git) or to `PAPER_LINK_JOURNAL`.
+Paper must be running with both files open. `apply` takes `--adopt <id,…|all>` for the first synchronisation of an instance, `--accept-master <id,…>` to overwrite a reported manual edit with the master, and `--accept-removal <id,…>` to remove a layer the master dropped even though it holds work (pass the same flag to `plan`). Previews and journals are written to `.paper-link/journal` (ignored by Git) or to `PAPER_LINK_JOURNAL`.
 
 ### What is protected
 
 - **Unrecognised edits.** The lock (`link-lock.json`) keeps one hash per synchronised layer. A layer that differs from both its master and its last synchronised state was edited by hand: it is reported as drift and never overwritten without `--accept-master`.
 - **Stale previews.** `apply` reads Paper again. An instance or master that changed after the preview is refused.
-- **Missed and detached instances.** `status` searches every active page for frames named like a registered component. An unregistered one, or a registered node that no longer exists, fails the check. Every page must be classified as active, illustration or historical.
+- **Layers the master drops.** A layer is removed from an instance only when every layer in its subtree is unchanged since the last synchronisation and holds nothing the instance owns (slot text, declared overrides). Otherwise the instance is refused with the reasons, including a hint when the master looks renamed. `--accept-removal` removes it after review; the journal keeps the whole subtree.
+- **Interrupted applications (C15A).** Before the first write to a token file or instance, its before-state and every intended operation are saved to the journal. Each operation is marked sent, then acknowledged. If Paper does not confirm a call, that operation is marked uncertain, the journal interrupted, and nothing further is attempted; `apply` exits with code 2. The lock is saved after each verified item only. `status` fails and `apply` refuses to start while such a journal is unrecovered.
+- **Recovery inspects first.** `paper:restore` puts a change back only where Paper still shows the value that application wrote. Where Paper shows the earlier value, the change never landed. Anything else is left alone and reported, and the journal stays open as `recovery-incomplete`. An insert whose reply was lost is found by layer name and compared by structure. Running it again does nothing more.
+- **Missed and detached instances.** `status` searches every active page for frames named like a registered component. An unregistered one, or a registered node that no longer exists, fails the check. Paper keeps a deleted layer readable with no parent, so the reader treats a node without a parent as gone. Every page must be classified as active, illustration or historical.
 - **Hand-edited generated files.** `paper-tokens.css` and `paper-components.css` carry a hash of their own content. `check:paper` fails on a hand edit and `paper:pull` refuses to overwrite one without `--force`.
 - **Private copies in code.** `check:paper` fails when a stylesheet outside the owner redefines a shared block, when an import site is missing from the registry, or when a stylesheet reads a value no master exports. Deliberate exceptions are listed in the registry with a reason.
 

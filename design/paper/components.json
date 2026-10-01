@@ -1001,14 +1001,20 @@
      "app/(accounts)/teacher/orders/[id]/view.tsx",
      "app/(accounts)/teacher/orders/list.tsx",
      "app/(accounts)/teacher/page.tsx",
+     "app/(accounts)/teacher/paper/builder.tsx",
+     "app/(accounts)/teacher/paper/catalogue.tsx",
+     "app/(accounts)/teacher/paper/detail.tsx",
      "app/(accounts)/teacher/paper/formatting.tsx",
+     "app/(accounts)/teacher/paper/home.tsx",
+     "app/(accounts)/teacher/paper/review.tsx",
      "app/(accounts)/teacher/workspace.tsx"
     ],
     "variants": {
      "tone": "progress, caution, success, neutral, problem",
      "prominent": "page-level title size",
      "as=\"p\"": "single-line message",
-     "InlineNotice": "compact feedback beside a control in the question editor: problem, required, info"
+     "InlineNotice": "compact feedback beside a control in the question editor: problem, required, info",
+     "InlineNotice framed={false}": "a one-line result beside a total in the builder and review: problem or done tone, text only"
     },
     "inputs": {
      "tone, title, children, actions": "supplied by the feature; the server reply decides the tone and words",
@@ -1036,30 +1042,29 @@
      "paper": "state-sheet scale (14 and 13 pixel type)",
      "application": "not used",
      "decision": "Paper only"
+    },
+    {
+     "property": "builder notices moved onto the shared notice",
+     "paper": "C2 and A4 (page 5) draw them at 12 by 14 padding with a 4 pixel radius and coloured body text",
+     "application": "stale catalogue, unavailable question and paper shape problems now use the shared notice: 18 by 20 padding, 10 pixel radius, muted body text, no outer margin",
+     "decision": "C15A: one notice definition; report if the older builder drawing is preferred"
     }
    ],
    "privateStyles": [
     {
      "file": "app/(accounts)/teacher/paper.module.css",
      "classes": [
-      "notice--success",
-      "notice--error",
-      "notice--unavailable",
-      "notice--info",
-      "notice--ready",
-      "notice--not-ready",
-      "notice--caution",
-      "notice__warning",
-      "notice__success"
+      "notice--info"
      ],
-     "reason": "Builder-area feedback that predates the renewed notice and is drawn differently on Paper page 5 (readiness panel, inline mark warnings). Folding it into the shared notice would change the accepted builder screens."
+     "reason": "Explanatory guidance beside the builder marks control (\"Change the allocation within 12 to 18 marks\"), drawn as notice--info on Paper C2 (4EM-0). It is optional advice, not task feedback, so it belongs to the dismissible hint that C14 is designing; it is not folded into the notice."
     },
     {
-     "file": "app/(accounts)/teacher/orders/[id]/configure.module.css",
+     "file": "app/(accounts)/teacher/paper.module.css",
      "classes": [
-      "notice--complete"
+      "notice--ready",
+      "notice--not-ready"
      ],
-     "reason": "Unreferenced style left from the earlier completion banner. Not used by any screen; left untouched."
+     "reason": "Readiness panel in the order summary, drawn on Paper C4 (63A-0) with a header, a large status word and a meter. A different composition from the two-sentence notice."
     }
    ]
   },
@@ -1199,13 +1204,15 @@
      "app/(accounts)/account/page.tsx",
      "app/(accounts)/admin/accounts/page.tsx",
      "app/(accounts)/admin/papers/page.tsx",
+     "app/(accounts)/teacher/orders/[id]/configure.tsx",
      "app/(accounts)/teacher/orders/[id]/view.tsx",
      "app/(accounts)/teacher/orders/list.tsx",
      "app/(accounts)/teacher/workspace.tsx"
     ],
     "variants": {
      "tone": "done, progress, attention, problem, closed",
-     "as=\"p\"": "block-level marker"
+     "as=\"p\"": "block-level marker",
+     "density=\"table\"": "question table status cell (Paper page 7, 7IU-0): same dot, 13 pixel regular label"
     },
     "inputs": {
      "tone, label": "from the fact the server reported (lib/jobs/presentation.ts); payment, question details and documents stay three separate facts"
@@ -1219,16 +1226,21 @@
     "uses": "status markers and paper-facts on pages 3 and 4, and Components 11",
     "reason": "The markers are drawn as part of larger rows with differing structure; they share the status tokens, which are linked."
    },
-   "exceptions": [],
-   "privateStyles": [
+   "exceptions": [
     {
-     "file": "app/(accounts)/teacher/paper.module.css",
-     "classes": [
-      "status--ready",
-      "status--to-complete",
-      "status--invalid"
+     "what": "Builder question table readiness words",
+     "where": [
+      "app/(accounts)/teacher/paper/builder.tsx"
      ],
-     "reason": "Row status words in the builder question table (Paper page 5), drawn as coloured text without a dot. They predate the renewed status marker; folding them in would change the accepted builder table."
+     "reason": "Paper page 5 (37Y-0) draws the builder row status as 12 pixel grey text over a progress bar that is hidden, not as the dot-and-label marker. The application shows the word in its tone colour. Its classes are now named question-table__status-text so they no longer look like the shared status block."
+    }
+   ],
+   "differences": [
+    {
+     "property": "paid question table dot colours",
+     "paper": "--color-sage (#5B8A72) ready, --color-gold (#D4A574) otherwise",
+     "application": "status tokens: --color-status-done (#436B56) and --color-status-attention (#C49255)",
+     "decision": "C15A: status meaning uses the status tokens everywhere; report if the lighter drawn colours are preferred"
     }
    ]
   },

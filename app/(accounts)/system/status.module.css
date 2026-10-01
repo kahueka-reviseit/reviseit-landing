@@ -12,3 +12,5 @@
 .status__label--attention { color:var(--color-caution-text); }
 .status__label--problem { color:var(--color-warning-text); }
 .status__label--closed { color:var(--color-text-muted); }
+/* Table density (Paper page 7, question table status cell): same dot, quieter label. */
+.status__label--table { font-size:13px; line-height:16px; font-weight:400; color:var(--color-text); }

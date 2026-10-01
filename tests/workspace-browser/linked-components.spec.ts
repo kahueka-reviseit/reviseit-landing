@@ -103,3 +103,14 @@ test('two occurrences of the same question type keep their own words and their o
  // Keyboard: Escape closes the editor and returns focus to the row that opened it.
  await page.keyboard.press('Escape');await expect(page.getByRole('button',{name:'Edit question 1.2',exact:true})).toBeFocused();
 });
+
+test('the paid question table status is the shared marker at table density',async({page},info)=>{
+ await page.goto('/configurator.html');
+ const cell=page.getByRole('row').nth(1).locator('[class*="status__label--"]');await expect(cell).toBeVisible();
+ await expect(cell).toHaveCSS('font-size','13px');await expect(cell).toHaveCSS('font-weight','400');
+ const dot=page.getByRole('row').nth(1).locator('[class*="status__dot--"]');
+ await expect(dot).toHaveCSS('width','8px');
+ const tone=(await dot.getAttribute('class'))!.match(/status__dot--(\w+)/)![1];
+ await set(page,`--color-status-${tone==='done'?'done':'attention'}`,'#0A0B0C');await expect(dot).toHaveCSS('background-color','rgb(10, 11, 12)');
+ save('table-status',info.project.name,{tone,fontSize:await css(cell,'font-size')});
+});

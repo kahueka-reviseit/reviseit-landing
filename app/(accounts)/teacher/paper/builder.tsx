@@ -6,6 +6,7 @@ import { codeOf, kindOf, outlineMix, topicGroups } from '../../../../lib/workspa
 import styles from '../paper.module.css';
 import { occurrenceName, type Occurrence, type PaperModel } from './model';
 import { BloomTag } from '../../system/tag';
+import { InlineNotice, Notice } from '../../system/notice';
 import { BloomBar, Icon, PageHeader, Stages, type Stage } from './ui';
 
 // ---------------------------------------------------------------- shared
@@ -72,7 +73,7 @@ function Rail({paper,children}:{paper:PaperModel;children?:ReactNode}) {
           {configured&&<label className={styles['totals__section-target']}>{k==='multiple_choice'?'Multiple-choice section total (optional)':'Structured section total (optional)'}
             <input type="number" min={0} max={3000} step={1} placeholder="Any" disabled={paper.busy} value={t ?? ''} aria-invalid={!ok}
               onChange={e=>{const v=toNumber(e.target.value);paper.setSectionTarget(k,Number.isNaN(v)?undefined:v);}}/></label>}
-          {!ok&&<p className={styles['notice__warning']}>{k==='multiple_choice'?'Multiple choice':'Structured'}: {total} of {t} marks.</p>}
+          {!ok&&<InlineNotice tone="problem" framed={false}>{k==='multiple_choice'?'Multiple choice':'Structured'}: {total} of {t} marks.</InlineNotice>}
         </div>;})}
       <div className={styles['totals']}><span>Paper total</span><strong>{allocatedTotal} marks</strong></div>
     </section>}
@@ -81,8 +82,8 @@ function Rail({paper,children}:{paper:PaperModel;children?:ReactNode}) {
       <p className={styles['card__body']}>This pilot allows up to {limits.questions} questions per paper. Each repeated multiple-choice question counts separately.
         {(limits.structured<limits.questions||limits.multipleChoice<limits.questions)&&` Up to ${limits.structured} structured questions and ${limits.multipleChoice} multiple-choice questions.`}</p>
       <p className={styles['card__figures']}><span>{structuredCount} of {limits.structured} structured</span><span>{mcqCount} of {limits.multipleChoice} multiple choice</span></p>
-      {!withinPilotSize&&n<=limits.questions&&<p role="alert" className={styles['notice__warning']}>Reduce the number of structured or multiple-choice questions to fit the pilot limits before paying.</p>}
-      {n>limits.questions&&<p role="alert" className={styles['notice__warning']}>Remove {n-limits.questions} {n-limits.questions===1?'question':'questions'} before continuing to payment.</p>}
+      {!withinPilotSize&&n<=limits.questions&&<InlineNotice tone="problem" framed={false} role="alert">Reduce the number of structured or multiple-choice questions to fit the pilot limits before paying.</InlineNotice>}
+      {n>limits.questions&&<InlineNotice tone="problem" framed={false} role="alert">Remove {n-limits.questions} {n-limits.questions===1?'question':'questions'} before continuing to payment.</InlineNotice>}
     </section>
     {children}
     <div className={styles['page-body__actions']}>
@@ -112,7 +113,7 @@ export function BuilderView({paper,status}:{paper:PaperModel;status:ReactNode}) 
   return <>
     <PageHeader eyebrow={`${data.module!.name} · paper builder`} title="Your paper" subtitle={paperSummary(paper)} aside={<Stages stages={journey(paper,2)}/>}/>
     {status}
-    {paper.stale && <p className={styles['notice--error']}>The catalogue has changed since you saved. Review the current entries and save a new selection. Your previous selection stays saved until then.</p>}
+    {paper.stale && <Notice as="p" tone="problem">The catalogue has changed since you saved. Review the current entries and save a new selection. Your previous selection stays saved until then.</Notice>}
     <div className={styles['page-body']}>
       <div className={styles['page-body__main']}>
         {occurrences.length===0 && <section className={styles['section']}><div className={styles['section__header']}><div><p className={styles['eyebrow--neutral']}>Your paper</p><h2>No questions yet</h2></div></div>
@@ -143,7 +144,7 @@ export function BuilderView({paper,status}:{paper:PaperModel;status:ReactNode}) 
                   <small>{codeOf(e.id)} · {e.topic}{e.preview?` · ${formatMarks(e.preview.subquestions)} subquestions`:''}</small><RowActions paper={paper} o={o} same={structured}/></span>
                 <span role="cell"><MarksInput paper={paper} entry={e}/></span>
                 <span role="cell" className={styles['question-table__cell--bloom']}>{mix.length?<><BloomBar rows={mix.map(m=>({bloom:m.bloom,weight:m.min}))}/><small>{mix.map(m=>`${m.bloom} ${m.min===m.max?m.min:`${m.min}–${m.max}`}`).join(' · ')}</small></>:<small>{e.preview?.outline?'Outline without part marks':'Not yet classified'}</small>}</span>
-                <span role="cell" className={`${styles['question-table__cell--status']} ${styles[({ok:'status--ready',todo:'status--to-complete',bad:'status--invalid'} as const)[s.tone]]}`}>{s.text}</span>
+                <span role="cell" className={`${styles['question-table__cell--status']} ${styles[({ok:'question-table__status-text--ready',todo:'question-table__status-text--to-complete',bad:'question-table__status-text--invalid'} as const)[s.tone]]}`}>{s.text}</span>
                 <span role="cell" className={styles['question-table__cell--actions']}><button type="button" className={styles['button--text']} onClick={()=>paper.go('builder-question',e.id)}>Set marks</button></span>
               </div>;})}
           </div>
@@ -192,7 +193,7 @@ export function BuilderQuestion({paper,entry,status}:{paper:PaperModel;entry:Cat
       <aside className={styles['page-body__aside']} aria-label="Question summary">
         <section className={styles['card']}><p className={styles['eyebrow--neutral']}>Question allocation</p>
           <p className={styles['marks-fixed__value']}>{set?`${value} marks`:'Marks needed'}</p>
-          <ul className={styles['list']}><li className={set&&paper.inRange(entry)?styles['status--ready']:''}>{set?(paper.inRange(entry)?`Marks set to ${value}`:`${value} is outside ${formatMarks(entry.marks)}`):'Set marks within the range'}</li>
+          <ul className={styles['list']}><li className={set&&paper.inRange(entry)?styles['list__item--done']:''}>{set?(paper.inRange(entry)?`Marks set to ${value}`:`${value} is outside ${formatMarks(entry.marks)}`):'Set marks within the range'}</li>
             <li>Parts, difficulty and scenario: after payment</li></ul></section>
         <section className={styles['card']}><div className={styles['card__heading']}><p className={styles['eyebrow--neutral']}>Question outline</p><span className={styles['status-tag']}>{outline?'Published example':'Not yet published'}</span></div>
           <div className={styles['paper-preview']}><p><strong>QUESTION {o.number}</strong><span>({set?value:formatMarks(entry.marks)})</span></p>
@@ -258,7 +259,7 @@ export function BuilderMultipleChoice({paper,status}:{paper:PaperModel;status:Re
       <aside className={styles['page-body__aside']} aria-label="Multiple-choice summary">
         <section className={styles['card']}><p className={styles['eyebrow--positive']}>Multiple choice</p>
           <p className={styles['marks-fixed__value']}>{mcq.length*2} marks <small>{mcq.length} {mcq.length===1?'item':'items'} × 2 marks</small></p>
-          {target!==undefined&&<p className={mcq.length*2===target?styles['notice__success']:styles['notice__warning']}>{mcq.length*2} of {target} multiple-choice marks{mcq.length*2===target?' ✓':''}</p>}
+          {target!==undefined&&<InlineNotice tone={mcq.length*2===target?'done':'problem'} framed={false}>{mcq.length*2} of {target} multiple-choice marks{mcq.length*2===target?' ✓':''}</InlineNotice>}
           <p className={styles['card__body']}>After payment, configure each item’s details, or choose for me where offered. Choices stay editable until submission.</p></section>
         {balance.length>0&&<section className={styles['card']}><p className={styles['eyebrow--neutral']}>Topic balance</p>
           <ul className={styles['topic-balance']}>{balance.map(g=><li key={g.topic}><span>{g.topic}</span><span aria-hidden="true" className={styles['card__blocks']}>{Array.from({length:g.total},(_,i)=><i key={i}/>)}</span><strong>{g.total}</strong></li>)}</ul></section>}

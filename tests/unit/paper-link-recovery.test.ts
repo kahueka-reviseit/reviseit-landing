@@ -121,7 +121,8 @@ describe('R1: an interrupted application leaves a recoverable record',()=>{
   });
 
   it('recovers a structural insert whose reply was lost, finding the new layer by name',async()=>{
-    await paper.json('write_html',{fileId:'ds',targetNodeId:node('ds','card').id,mode:'insert-children',html:'<div layer-name="card__hint" style="font-size:13px">Hint</div>'});
+    await paper.json('write_html',{fileId:'ds',targetNodeId:node('ds','card').id,mode:'insert-children',html:'<div layer-name="card__hint" style="font-size:13px;line-height:16px;color:#436B56">Hint</div>'});
+    paper.quirks.reorderStyles=true;// found live: Paper stores the same styles in another order
     const undo=fail('write_html',{applied:true});const report=await apply();undo();
     expect(node('web','card__hint',0)).toBeDefined();
     const op=journalOf(report).instances[0].ops.find((o:any)=>o.op==='insert');
@@ -129,6 +130,15 @@ describe('R1: an interrupted application leaves a recoverable record',()=>{
     const recovery=await restore(report.journal);
     expect(recovery.outcomes.map((o:any)=>o.outcome)).toEqual(['reverted']);
     expect(node('web','card__hint',0)).toBeUndefined();
+  });
+
+  it('leaves an inserted layer in place when it was edited after the interruption',async()=>{
+    await paper.json('write_html',{fileId:'ds',targetNodeId:node('ds','card').id,mode:'insert-children',html:'<div layer-name="card__hint" style="font-size:13px">Hint</div>'});
+    const undo=fail('write_html',{applied:true});const report=await apply();undo();
+    node('web','card__hint',0).text='Hint, reworded by hand';
+    const recovery=await restore(report.journal);
+    expect(recovery.conflicts).toEqual([expect.objectContaining({key:'@root/card__hint',detail:expect.stringMatching(/edited after this application/)})]);
+    expect(node('web','card__hint',0).text).toBe('Hint, reworded by hand');
   });
 
   it('recovers a reviewed removal by recreating the layer in its place',async()=>{

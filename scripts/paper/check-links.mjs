@@ -59,7 +59,9 @@ export function checkLinks(root) {
     const actual=importSites(root,code.definition),listed=[...code.importSites].sort();
     for(const site of actual.filter(s=>!listed.includes(s)))failures.push(`${id}: ${site} imports ${code.definition} but is not listed as a use`);
     for(const site of listed.filter(s=>!actual.includes(s)))failures.push(`${id}: ${site} is listed as a use of ${code.definition} but does not import it`);
-    const allowed=new Map((family.privateStyles??[]).map(p=>[path.join(root,p.file),new Set(p.classes)]));
+    // Several registered exceptions can name the same stylesheet; their classes add up.
+    const allowed=new Map();
+    for(const p of family.privateStyles??[]){const key=path.join(root,p.file);allowed.set(key,new Set([...(allowed.get(key)??[]),...p.classes]));}
     for(const file of modules){
       if(file===path.join(root,code.stylesheet))continue;
       const classes=new Set();

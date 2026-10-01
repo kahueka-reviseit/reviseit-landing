@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {parseSummary,readTree,toHtml,walk} from './tree.mjs';
-import {hashOf,masterHash,matches,planInstance,planTokens,stable,validateMaster} from './sync-core.mjs';
+import {hashOf,masterHash,matches,planInstance,planTokens,shape,stable,validateMaster} from './sync-core.mjs';
 
 /**
  * Reads Paper, compares every registered instance with its master, and applies an
@@ -298,7 +298,8 @@ export async function restoreJournal(paper,registry,lock,journal,{save=()=>{},no
           created=candidates[0]?await exists(entry.file,candidates[0].id):null;
         }
         if(!created)record(entry.id,o,'not-applied');
-        else if(toHtml(created)===o.html){await paper.json('delete_nodes',{fileId:id,nodeIds:[created.id]});record(entry.id,o,'reverted');}
+        // Paper may store the same styles in another order, so compare structure, not markup text.
+        else if(o.tree?stable(shape(created))===stable(o.tree):toHtml(created)===o.html){await paper.json('delete_nodes',{fileId:id,nodeIds:[created.id]});record(entry.id,o,'reverted');}
         else record(entry.id,o,'conflict','the inserted layer was edited after this application; left in place');
       }
       if(o.op==='remove'){
