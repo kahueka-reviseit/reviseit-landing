@@ -1,5 +1,6 @@
 import {useEffect,useRef,type ReactNode} from 'react';
 import styles from './configure.module.css';
+import { button } from '../../../system/button';
 export default function PaperPanel({title,eyebrow,summary,children,footer,onClose}:{title:string;eyebrow:string;summary:string;children:ReactNode;footer?:ReactNode;onClose:()=>void}) {
  const ref=useRef<HTMLDialogElement>(null);
  useEffect(()=>{
@@ -16,6 +17,6 @@ export default function PaperPanel({title,eyebrow,summary,children,footer,onClos
   <header className={styles['side-panel__header']}><div className={styles['side-panel__top']}><p>{eyebrow}</p><button type="button" aria-label="Close editor" onClick={onClose}>×</button></div>
    <h2 id="panel-title">{title}</h2><p className={styles['side-panel__summary']}>{summary}</p></header>
   <div className={styles['side-panel__body']}>{children}</div>
-  <footer className={styles['side-panel__footer']}>{footer??<button type="button" className={styles['button--secondary']} onClick={onClose}>Back to paper</button>}</footer>
+  <footer className={styles['side-panel__footer']}>{footer??<button type="button" className={button('secondary')} onClick={onClose}>Back to paper</button>}</footer>
  </dialog>;
 }

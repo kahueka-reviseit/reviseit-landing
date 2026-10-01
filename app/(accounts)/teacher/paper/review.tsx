@@ -6,6 +6,7 @@ import { InlineNotice } from '../../system/notice';
 import type { PaperModel } from './model';
 import { journey } from './builder';
 import { Icon, PageHeader, Stages } from './ui';
+import { button } from '../../system/button';
 
 // Document set (Paper K10): the four names come from the one list used by delivery and email.
 const documentDetails:Record<DocumentName,{detail:string;tone:string}>={
@@ -72,10 +73,10 @@ export default function ReviewView({paper,status}:{paper:PaperModel;status:React
           {!data.purchase?.available ? <p className={styles['card__body']}>Purchasing is not open for your account yet. Your saved selection stays here.</p> :
             paper.selectionDirty || !data.selection.revision ? <p className={styles['card__body']}>Save your selection before continuing to payment. <button type="button" className={styles['link']} disabled={busy} onClick={()=>void paper.save()}>Save selection</button></p> :
             occurrences.some(o=>!o.entry.orderable) ? <p className={styles['card__body']}>Remove questions that are not yet available before paying.</p> : null}
-          <button type="button" className={styles['button--pay']} disabled={busy||!paper.canPay} onClick={()=>void paper.checkout()}>{busy?'Please wait…':`Pay with Stripe · ${price}`}</button>
+          <button type="button" className={button('primary',{size:'large',full:true})} disabled={busy||!paper.canPay} onClick={()=>void paper.checkout()}>{busy?'Please wait…':`Pay with Stripe · ${price}`}</button>
           <p className={styles['order-summary__note']}>You will be taken to Stripe’s secure page. Your questions stay saved if you come back without paying. After payment is confirmed you answer the detailed questions for the questions you bought.</p>
         </section>
-        <button type="button" className={styles['button--secondary-wide']} onClick={()=>paper.go('builder')}>{Icon.back()} Back to paper builder</button>
+        <button type="button" className={button('secondary',{size:'large',full:true})} onClick={()=>paper.go('builder')}>{Icon.back()} Back to paper builder</button>
       </aside>
     </div>
   </>;

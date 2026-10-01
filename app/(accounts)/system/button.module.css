@@ -1,0 +1,29 @@
+/* Buttons (Paper Design System, Components 1 "Buttons"). The one definition; screens call button() from ./button.
+   Values from the board's specification: primary --color-action-strong, --text-lg 600, padding --spacing-4,
+   --radius-full; secondary 1px --color-action outline, --color-action-strong text; action --color-action. */
+.button { display:inline-flex; align-items:center; justify-content:center; gap:var(--spacing-1-5); margin:0; border:0; border-radius:var(--radius-full); font-family:var(--font-body),sans-serif; font-weight:var(--font-weight-semibold); text-decoration:none; white-space:nowrap; cursor:pointer; }
+.button:focus-visible { outline:3px solid var(--color-focus-ring); outline-offset:2px; }
+.button:disabled { opacity:var(--opacity-disabled); cursor:not-allowed; }
+
+.button--primary { background:var(--color-action-strong); color:var(--color-on-inverse); }
+.button--action { background:var(--color-action); color:var(--color-on-inverse); }
+.button--inverse { background:var(--color-inverse); color:var(--color-on-inverse); }
+.button--secondary { border:1px solid var(--color-action); background:var(--color-surface); color:var(--color-action-strong); }
+.button--primary:hover:not(:disabled), .button--action:hover:not(:disabled), .button--inverse:hover:not(:disabled) { filter:brightness(.92); }
+.button--secondary:hover:not(:disabled) { background:var(--color-action-tint); }
+.button--text, .button--danger { background:none; border-radius:var(--radius-xs); }
+.button--text { color:var(--color-action-strong); }
+.button--danger { color:var(--color-warning); text-decoration:underline 1px; text-underline-position:from-font; }
+.button--text:hover:not(:disabled) { text-decoration:underline; }
+
+/* Sizes. xsmall and small are application sizes the board does not draw; hero is the public site's. */
+.button--xsmall { padding:6px var(--spacing-3); font-size:var(--text-sm); line-height:var(--leading-xs); }
+.button--small { padding:9px var(--spacing-4); font-size:var(--text-md); line-height:var(--leading-sm); }
+.button--medium { padding:var(--spacing-3) var(--spacing-5); font-size:var(--text-base); line-height:var(--leading-sm); }
+.button--hero { padding:13px 30px; font-size:var(--text-base); line-height:var(--leading-sm); }
+.button--large { padding:var(--spacing-4); font-size:var(--text-lg); line-height:var(--leading-base); }
+/* As drawn: the outlined large button keeps its 1px border inside the same height and uses the base text size. */
+.button--secondary.button--large { padding:15px; font-size:var(--text-base); line-height:var(--leading-sm); }
+.button--link-small { padding:var(--spacing-1) 0; font-size:var(--text-sm); line-height:var(--leading-xs); }
+.button--link-medium { padding:6px 0; font-size:var(--text-md); line-height:var(--leading-sm); }
+.button--full { width:100%; }

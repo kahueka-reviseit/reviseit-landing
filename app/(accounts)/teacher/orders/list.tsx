@@ -4,11 +4,12 @@ import { detailsFact, documentsFact, groupOrders, paperTitle, paymentFact, short
 import ui from '../../experience.module.css';
 import { Notice } from '../../system/notice';
 import { Status } from '../../system/status';
+import { button } from '../../system/button';
 
 /** M1 and M1p: every paper with payment, question details and documents as separate facts. */
 function Next({order,row}:{order:Order;row:Row}) {
   const href=`/teacher/orders/${order.id}`,name=`${row.next.label.replace(' →','')}: ${paperTitle(order)}`;
-  const cls=row.next.kind==='primary'?`${ui['button--primary']} ${ui['button--compact']}`:row.next.kind==='secondary'?ui['button--secondary']:ui['button--text'];
+  const cls=row.next.kind==='primary'?button('primary',{size:'small'}):row.next.kind==='secondary'?button('secondary'):button('text');
   return <Link className={cls} href={href} aria-label={name}>{row.next.label}</Link>;
 }
 function StageMeter({stage}:{stage:number}) {
@@ -44,10 +45,10 @@ export default function PaperList({orders,curricula,school,failed=false}:{orders
         <h1 className={ui['page-header__title']}>My papers</h1>
         <p className={ui['page-header__lede']}>Every paper you have started, paid for or received. The first column tells you what, if anything, is waiting for you.</p>
       </div>
-      <div className={ui['page-header__actions']}><a className={ui['button--primary']} href="/teacher?view=home">Build a new paper →</a></div>
+      <div className={ui['page-header__actions']}><a className={button('primary')} href="/teacher?view=home">Build a new paper →</a></div>
     </header>
     {failed?<Notice tone="problem" role="alert" prominent title="We could not load your papers">Refresh in a moment; nothing has been lost.</Notice>:
-     !orders.length?<section className={ui['empty-state']}><h2 className={ui['empty-state__title']}>No papers yet</h2><p className={ui['empty-state__body']}>Choose questions in My curricula and continue to payment to start your first paper.</p><a className={ui['button--primary']} href="/teacher?view=home">Build a new paper →</a></section>:
+     !orders.length?<section className={ui['empty-state']}><h2 className={ui['empty-state__title']}>No papers yet</h2><p className={ui['empty-state__body']}>Choose questions in My curricula and continue to payment to start your first paper.</p><a className={button('primary')} href="/teacher?view=home">Build a new paper →</a></section>:
      <section aria-label="Your papers">
       <div className={ui['paper-list']}>
         <div className={ui['paper-list__head']} aria-hidden="true">

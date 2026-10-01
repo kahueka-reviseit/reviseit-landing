@@ -3,6 +3,7 @@ import {useEffect,useState} from 'react';
 import type {Answer,QuestionField} from '../../../../../lib/jobs/questionnaire';
 import styles from './configure.module.css';
 import {InlineNotice} from '../../../system/notice';
+import { button } from '../../../system/button';
 
 type Hint={checkId:string;field:string;text:string;suggestion?:{field:string;option:string}};
 type Props={orderId:string;lineId:string;revision:number;enabled:boolean;saved:boolean;answers:Record<string,Answer>;fields:QuestionField[];onAccept:(field:string,answer:Answer)=>void};
@@ -39,9 +40,9 @@ export default function JevAdvice({orderId,lineId,revision,enabled,saved,answers
    return <div key={h.checkId}>
     <p>{h.text}</p>
     <div className={styles['chip-group']}>
-     {suggestion&&option&&<button type="button" className={styles['button--secondary']} onClick={()=>onAccept(suggestion.field,{kind:'choice',choiceId:suggestion.option})}>Use {option.label}</button>}
-     <button type="button" className={styles['button--text']} onClick={()=>{const element=document.getElementById(`q-${lineId}-${h.field}`);element?.scrollIntoView({behavior:'smooth',block:'center'});element?.querySelector<HTMLTextAreaElement|HTMLInputElement>('textarea,input:not(:disabled)')?.focus();}}>Review answer</button>
-     <button type="button" className={styles['button--text']} onClick={()=>setDismissed(x=>[...x,h.checkId])}>Keep my answer</button>
+     {suggestion&&option&&<button type="button" className={button('secondary')} onClick={()=>onAccept(suggestion.field,{kind:'choice',choiceId:suggestion.option})}>Use {option.label}</button>}
+     <button type="button" className={button('text')} onClick={()=>{const element=document.getElementById(`q-${lineId}-${h.field}`);element?.scrollIntoView({behavior:'smooth',block:'center'});element?.querySelector<HTMLTextAreaElement|HTMLInputElement>('textarea,input:not(:disabled)')?.focus();}}>Review answer</button>
+     <button type="button" className={button('text')} onClick={()=>setDismissed(x=>[...x,h.checkId])}>Keep my answer</button>
     </div>
    </div>;
   })}

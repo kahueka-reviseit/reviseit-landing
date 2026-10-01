@@ -6,6 +6,7 @@ import HeroCycler from './components/HeroCycler/HeroCycler';
 import RealityShowcase from './components/RealityShowcase/RealityShowcase';
 import TrackedCTA from './components/TrackedCTA/TrackedCTA';
 import Footer from './components/Footer/Footer';
+import { button } from './(accounts)/system/button';
 
 export default function Home() {
   return (
@@ -57,13 +58,13 @@ export default function Home() {
               <HeroCycler />
             </div>
             <div className={styles['hero__actions']}>
-              <a href="#catalogue" className={styles['button--primary']}>
+              <a href="#catalogue" className={button('primary',{size:'hero'})}>
                 View the Catalogue &rarr;
               </a>
               <TrackedCTA
                 href="#tally-open=A7qv6z&tally-emoji-text=✏️&tally-emoji-animation=wave"
                 eventName="pilot_form_opened"
-                className={styles['button--secondary']}
+                className={button('secondary',{size:'hero'})}
               >
                 Join the Free Pilot
               </TrackedCTA>
@@ -228,7 +229,7 @@ export default function Home() {
             </div>
             <div className={styles['cta__actions']}>
               <p className={styles['cta__deadline']}>Applications close 15 Aug 2026</p>
-              <a href="/pilot" className={styles['button--pilot']}>
+              <a href="/pilot" className={button('action')}>
                 Learn more &rarr;
               </a>
             </div>

@@ -8,6 +8,7 @@ import { Notice } from '../../system/notice';
 import type { PaperModel } from './model';
 import { CatalogueCard } from './card';
 import { Icon } from './ui';
+import { button } from '../../system/button';
 
 type Option = {value:string; label:string};
 const filterDefs:{key:FilterKey; label:string; heading:string}[] = [
@@ -49,7 +50,7 @@ function FilterMenu({def,options,paper,query,open,onOpen,onClose}:{def:typeof fi
         return <label key={o.value} className={`${styles['filter-menu__option']} ${!n&&!on?styles['filter-menu__option--empty']:''}`}>
           <input type="checkbox" checked={on} disabled={!n&&!on} onChange={e=>set(o.value,e.target.checked)}/><span className={styles['checkbox']} aria-hidden="true">{on&&Icon.check(12)}</span>
           <span className={styles['filter-menu__option-label']}>{o.label}</span><span className={styles['filter-menu__option-count']}>{n}</span></label>;})}
-      <div className={styles['filter-menu__footer']}><button type="button" className={styles['button--primary-compact']} onClick={()=>{onClose(true);pill.current?.focus();}}>Show {shown} {shown===1?'question':'questions'}</button></div>
+      <div className={styles['filter-menu__footer']}><button type="button" className={button('action')} onClick={()=>{onClose(true);pill.current?.focus();}}>Show {shown} {shown===1?'question':'questions'}</button></div>
     </div>}
   </div>;
 }
@@ -184,7 +185,7 @@ export default function CatalogueView({paper,status,query,setQuery,search,switch
       {active>0 && <div className={styles['active-filters']}><span>Filtered by</span>
         {filterDefs.flatMap(def=>(filters[def.key] as string[]).map(v=><button key={def.key+v} type="button" className={styles['active-filters__chip']} aria-label={`Remove filter ${filterLabel(def.key,v)}`}
           onClick={()=>setFilters({...filters,[def.key]:(filters[def.key] as string[]).filter(x=>x!==v)})}>{filterLabel(def.key,v)}{Icon.close()}</button>))}
-        <button type="button" className={styles['button--clear']} onClick={()=>setFilters(emptyFilters())}>Clear all</button></div>}
+        <button type="button" className={button('danger')} onClick={()=>setFilters(emptyFilters())}>Clear all</button></div>}
       {hiddenSelected>0 && (active>0||q) && <p className={styles['paragraph--subtle']}>{hiddenSelected} selected {hiddenSelected===1?'question is':'questions are'} outside these results. Your selection is unchanged.</p>}
       {filters.bloom.length>0 && <p className={styles['paragraph--subtle']}>Bloom’s filtering uses published outlines only; {data.entries.filter(e=>!e.preview?.outline).length} questions without a published outline are not shown by this filter.</p>}
       {visible.length===0 ? <div className={styles['empty-state']}><h3>No matching questions</h3>
@@ -199,7 +200,7 @@ export default function CatalogueView({paper,status,query,setQuery,search,switch
     {others.map(module=><section key={module.id} className={styles['curriculum-suggestions']} aria-label={`Results in ${module.name}`}>
       <h3>Also in {module.name}</h3><p>Switch curriculum to add these questions. Each curriculum has its own saved paper.</p>
       <ul>{search!.result.matches.filter(m=>m.module.id===module.id).map(({entry})=><li key={entry.id}><span className={styles['typeahead__option-code']}>{codeOf(entry.id)}</span><span>{entry.title}</span><span className={styles['typeahead__option-marks']}>{formatMarks(entry.marks)}</span></li>)}</ul>
-      <button type="button" className={styles['button--secondary-compact']} disabled={busy} onClick={()=>switchCurriculum(module.id)}>Browse {module.name}</button>
+      <button type="button" className={button('secondary')} disabled={busy} onClick={()=>switchCurriculum(module.id)}>Browse {module.name}</button>
     </section>)}
   </>;
 }

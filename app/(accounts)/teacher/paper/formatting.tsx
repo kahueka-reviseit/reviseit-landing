@@ -5,6 +5,7 @@ import styles from '../paper.module.css';
 import ui from '../../experience.module.css';
 import { Notice } from '../../system/notice';
 import type { PaperModel } from './model';
+import { button } from '../../system/button';
 
 /**
  * School formatting (Paper F1, F1p). The controls are exactly the existing ones and
@@ -30,7 +31,7 @@ export default function FormattingView({paper,preferences,setPreferences,dirty,s
       <form onSubmit={e=>{e.preventDefault();save();}} className={ui['formatting__form']} aria-describedby="formatting-scope">
         <Notice id="formatting-scope" tone="progress" title="Shared with your school">These settings are shared with every teacher at {data.schoolName} for {name}. Saving sets them for future papers.</Notice>
         <div aria-live="polite">{saved&&!problem&&<Notice tone="success" role="status" title="School formatting saved for this curriculum."/>}</div>
-        {problem&&<Notice tone={problem.tone} role="alert" title={problem.title} actions={failure===409?<a className={ui['button--secondary']} href="/teacher?view=formatting">Reload settings</a>:undefined}>{problem.body}</Notice>}
+        {problem&&<Notice tone={problem.tone} role="alert" title={problem.title} actions={failure===409?<a className={button('secondary')} href="/teacher?view=formatting">Reload settings</a>:undefined}>{problem.body}</Notice>}
         <fieldset disabled={busy} className={ui['formatting__fields']}>
           <div className={ui['formatting__section-head']}><legend className={ui['formatting__legend']}>Page and text</legend><p className={ui['formatting__fixed']}>Page size: A4 portrait (fixed)</p></div>
           <div className={ui['form__row']}>
@@ -44,8 +45,8 @@ export default function FormattingView({paper,preferences,setPreferences,dirty,s
           <label className={ui['field__check']}><input type="checkbox" checked={preferences.answerLines} onChange={e=>setPreferences({...preferences,answerLines:e.target.checked})}/> Include answer lines for written responses</label>
         </fieldset>
         <div className={ui['formatting__actions']}>
-          <button type="button" className={ui['button--text']} onClick={()=>paper.go('home')}>← Back to {name}</button>
-          <button className={ui['button--primary']} disabled={busy || !dirty}>{busy?'Saving…':'Save school formatting'}</button>
+          <button type="button" className={button('text')} onClick={()=>paper.go('home')}>← Back to {name}</button>
+          <button className={button('primary')} disabled={busy || !dirty}>{busy?'Saving…':'Save school formatting'}</button>
         </div>
       </form>
       <section className={`${ui['formatting__preview']} ${preview?'':ui['formatting__preview--collapsed']}`} aria-label="Illustrative layout">

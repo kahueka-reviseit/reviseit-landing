@@ -6,6 +6,7 @@ import { Notice } from '../../system/notice';
 import type { PaperModel } from './model';
 import { journey } from './builder';
 import { Icon, Stages } from './ui';
+import { button } from '../../system/button';
 
 function counts(paper:PaperModel) {
   const e=paper.data.entries, structured=e.filter(x=>kindOf(x)==='structured');
@@ -58,8 +59,8 @@ export function HomeView({paper,status,switchCurriculum}:{paper:PaperModel;statu
           {current ? <><p className={styles['curriculum-card__count']}><strong>{c.total}</strong><span>catalogue questions</span></p>
             <span className={styles['type-split']} aria-hidden="true"><i className={styles['type-split__segment--structured']} style={{flexGrow:c.structured}}/><i className={styles['type-split__segment--multiple-choice']} style={{flexGrow:c.mcq}}/></span>
             <p className={styles['type-split__legend']}><span>{c.structured} structured</span><span>{c.mcq} multiple choice</span></p>
-            <button type="button" className={styles['button--primary-wide']} onClick={()=>paper.go('catalogue')}>Open catalogue {Icon.arrow()}</button></> :
-            <button type="button" className={styles['button--secondary-wide']} disabled={paper.busy} onClick={()=>switchCurriculum(m.id)}>Open curriculum {Icon.arrow()}</button>}
+            <button type="button" className={button('action',{size:'large',full:true})} onClick={()=>paper.go('catalogue')}>Open catalogue {Icon.arrow()}</button></> :
+            <button type="button" className={button('secondary',{size:'large',full:true})} disabled={paper.busy} onClick={()=>switchCurriculum(m.id)}>Open curriculum {Icon.arrow()}</button>}
         </li>;})}</ul></section>}
   </>;
 }
@@ -110,7 +111,7 @@ export function ShapeView({paper,status}:{paper:PaperModel;status:ReactNode}) {
         <div className={styles['form__actions']}>
           <button type="button" className={styles['link']} onClick={()=>paper.go('home')}>Cancel</button>
           {(paper.paperTarget!==null||Object.keys(sectionTargets).length>0)&&<button type="button" className={styles['link']} onClick={()=>{paper.setPaperTarget(null);paper.setSectionTarget('multiple_choice',undefined);paper.setSectionTarget('structured',undefined);setTotal('');setMc('');}}>Clear the shape</button>}
-          <button type="submit" className={styles['button--primary-compact']} disabled={!canApply}>{paper.occurrences.length?'Save and open the builder':'Continue to catalogue'} {Icon.arrow()}</button>
+          <button type="submit" className={button('action')} disabled={!canApply}>{paper.occurrences.length?'Save and open the builder':'Continue to catalogue'} {Icon.arrow()}</button>
         </div>
       </form>
       <aside className={styles['page-body__aside']} aria-label="Your paper’s shape">

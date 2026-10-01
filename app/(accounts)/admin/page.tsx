@@ -3,6 +3,7 @@ import { requireReviewer } from '../../../lib/auth/access';
 import { StaffHeader } from '../staff-header';
 import { accountCounts, emailKindLabels, emailNeedsLook, emailNotifications, emailStatusLabels, papersNeedingAttention, reasonTone } from './data';
 import ui from '../experience.module.css';
+import { button } from '../system/button';
 export const dynamic='force-dynamic';
 
 /** Staff overview (Paper S2): the two existing queues, at most five rows each. */
@@ -31,12 +32,12 @@ export default async function Administration() {
         <ul className={ui['queue-card__list']}>{(pending.data || []).map(a => <li key={a.user_id} className={ui['queue-card__item']}><Link className={ui['link']} href={`/admin/accounts?review=${a.user_id}`}>{a.full_name || 'School details incomplete'}</Link>
           <span className={a.email_confirmed_at ? ui['queue-card__item-note'] : ui['queue-card__item-note--caution']}>{a.email_confirmed_at ? a.requested_school : 'Email not confirmed'}</span></li>)}</ul>}
         {(accountsWaiting ?? 0) > 5 && <p className={ui['queue-card__more']}>and {(accountsWaiting ?? 0) - 5} more</p>}
-        <div><Link className={ui['button--inverse']} href="/admin/accounts">Review accounts →</Link></div></section>
+        <div><Link className={button('inverse')} href="/admin/accounts">Review accounts →</Link></div></section>
       <section className={ui['queue-card']} aria-labelledby="papers-queue"><h2 id="papers-queue" className={ui['queue-card__label']}>Papers</h2>
         <p className={ui['queue-card__count']}><span className={papersWaiting ? ui['queue-card__number--problem'] : ui['queue-card__number']}>{papersWaiting ?? '—'}</span><span className={ui['queue-card__caption']}>{papersWaiting === null ? 'count unavailable' : 'need attention'}</span></p>
         <ul className={ui['queue-card__list']}>{papers.slice(0, 5).map(p => <li key={p.id} className={ui['queue-card__item']}><Link className={ui['link']} href={`/admin/papers?record=${p.id}`}>{p.title}</Link><span className={reasonTone(p.reason) === 'problem' ? ui['queue-card__item-note--problem'] : ui['queue-card__item-note--caution']}>{p.reason}</span></li>)}</ul>
         {papers.length > 5 && <p className={ui['queue-card__more']}>and {papers.length - 5} more</p>}
-        <div><Link className={ui['button--inverse']} href="/admin/papers">Open papers →</Link></div></section>
+        <div><Link className={button('inverse')} href="/admin/papers">Open papers →</Link></div></section>
     </div>
     {emails && emails.length > 0 && <section className={ui['queue-card']} aria-labelledby="email-queue"><h2 id="email-queue" className={ui['queue-card__label']}>Email to teachers</h2>
       <p className={ui['queue-card__more']}>{emailProblems.length === 0 ? `No delivery problems in the last ${emails.length} messages. Delivered means the school's mail server accepted it, not that it was read.` : `${emailProblems.length} ${emailProblems.length === 1 ? 'message needs' : 'messages need'} a look. A failed email never holds a paper; the teacher can still open it from My papers.`}</p>

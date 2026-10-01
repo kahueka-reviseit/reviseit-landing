@@ -9,6 +9,7 @@ import type { PaperModel } from './model';
 import { AddControl, CatalogueCard } from './card';
 import { BloomTag } from '../../system/tag';
 import { BloomBar, Icon } from './ui';
+import { button } from '../../system/button';
 
 /** Paper B4. Shows only the published catalogue projection; scenario options stay paid-only. */
 export default function QuestionDetail({paper,entry,status,query}:{paper:PaperModel;entry:CatalogueEntry;status:ReactNode;query:string}) {
@@ -63,7 +64,7 @@ export default function QuestionDetail({paper,entry,status,query}:{paper:PaperMo
         </div>
         {entry.orderable ? <div className={styles['buy-panel__actions']}>
           {count ? <><AddControl entry={entry} count={count} disabled={busy} onToggle={toggle}/><span>In your paper{count>1?` ${count} times`:''}. {kind==='multiple_choice'?'Add another occurrence in the paper builder.':''}</span></> :
-            <button type="button" className={styles['button--primary-wide']} disabled={busy||ids.length>=30} onClick={()=>toggle(true)}>{Icon.plus()} Add to your paper</button>}
+            <button type="button" className={button('action',{size:'large',full:true})} disabled={busy||ids.length>=30} onClick={()=>toggle(true)}>{Icon.plus()} Add to your paper</button>}
         </div> : <Notice as="p" tone="problem">This question is not yet available to order. It stays visible so you can see the whole catalogue.</Notice>}
         <p className={styles['buy-panel__note']}>You set the exact marks in the paper builder; difficulty, parts and scenario details follow after payment. Nothing is charged until you check out.</p>
       </section>

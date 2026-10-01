@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import type { FormState } from './actions';
 import ui from './experience.module.css';
 import { Notice } from './system/notice';
+import { button } from './system/button';
 
 /**
  * Account form parts (Paper T1, T2, S4). Every form posts to the existing server
@@ -12,7 +13,7 @@ import { Notice } from './system/notice';
 type Action = (state: FormState, data: FormData) => Promise<FormState>;
 export function Submit({ label, pending: pendingLabel = 'Please wait…', variant = 'primary' }: { label: string; pending?: string; variant?: 'primary'|'inverse'|'secondary'|'compact' }) {
   const { pending } = useFormStatus();
-  return <button className={variant === 'compact' ? ui['button--primary'] : ui[`button--${variant}-large`]} disabled={pending} type="submit">{pending ? pendingLabel : label}</button>;
+  return <button className={variant === 'compact' ? button('primary') : button(variant, { size: 'large', full: true })} disabled={pending} type="submit">{pending ? pendingLabel : label}</button>;
 }
 function Reply({ state }: { state: FormState }) {
   if (!state.message || state.field) return null;

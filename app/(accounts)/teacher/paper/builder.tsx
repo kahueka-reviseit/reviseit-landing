@@ -8,6 +8,7 @@ import { occurrenceName, type Occurrence, type PaperModel } from './model';
 import { BloomTag } from '../../system/tag';
 import { InlineNotice, Notice } from '../../system/notice';
 import { BloomBar, Icon, PageHeader, Stages, type Stage } from './ui';
+import { button } from '../../system/button';
 
 // ---------------------------------------------------------------- shared
 const stageLabels=['Paper shape','Choose questions','Set marks','Pay','Complete details'];
@@ -87,8 +88,8 @@ function Rail({paper,children}:{paper:PaperModel;children?:ReactNode}) {
     </section>
     {children}
     <div className={styles['page-body__actions']}>
-      <button type="button" className={styles['button--primary-wide']} disabled={paper.busy||saving||n===0} onClick={()=>void review()}>{saving?'Saving your selection…':'Review and pay'} {Icon.arrow()}</button>
-      <button type="button" className={styles['button--secondary-wide']} onClick={()=>paper.go('catalogue')}>Add from catalogue</button>
+      <button type="button" className={button('action',{size:'large',full:true})} disabled={paper.busy||saving||n===0} onClick={()=>void review()}>{saving?'Saving your selection…':'Review and pay'} {Icon.arrow()}</button>
+      <button type="button" className={button('secondary',{size:'large',full:true})} onClick={()=>paper.go('catalogue')}>Add from catalogue</button>
       <p className={styles['save-status']}>{paper.selectionDirty?'Unsaved changes':paper.data.selection.revision?'Selection saved':'No saved selection yet'}
         {paper.selectionDirty&&<button type="button" className={styles['link']} disabled={paper.busy} onClick={()=>void paper.save()}>{paper.busy?'Please wait…':'Save selection'}</button>}</p>
       <p className={styles['card__note']}>Marks and totals are kept in this browser until you pay; your chosen questions are saved to your account.</p>
@@ -99,9 +100,9 @@ function Rail({paper,children}:{paper:PaperModel;children?:ReactNode}) {
 function RowActions({paper,o,same}:{paper:PaperModel;o:Occurrence;same:Occurrence[]}) {
   const at=same.indexOf(o), name=occurrenceName(o);
   return <span className={styles['question-table__actions']}>
-    <button type="button" className={styles['button--icon']} disabled={paper.busy||at===0} aria-label={`Move ${name} earlier`} onClick={()=>paper.move(o.index,-1)}>{Icon.up()}</button>
-    <button type="button" className={styles['button--icon']} disabled={paper.busy||at===same.length-1} aria-label={`Move ${name} later`} onClick={()=>paper.move(o.index,1)}>{Icon.down()}</button>
-    <button type="button" className={styles['button--remove']} disabled={paper.busy} aria-label={`Remove ${name}`} onClick={()=>paper.remove(o.index)}>Remove</button>
+    <button type="button" className={styles['question-table__move']} disabled={paper.busy||at===0} aria-label={`Move ${name} earlier`} onClick={()=>paper.move(o.index,-1)}>{Icon.up()}</button>
+    <button type="button" className={styles['question-table__move']} disabled={paper.busy||at===same.length-1} aria-label={`Move ${name} later`} onClick={()=>paper.move(o.index,1)}>{Icon.down()}</button>
+    <button type="button" className={button('danger',{size:'small'})} disabled={paper.busy} aria-label={`Remove ${name}`} onClick={()=>paper.remove(o.index)}>Remove</button>
   </span>;
 }
 
@@ -118,13 +119,13 @@ export function BuilderView({paper,status}:{paper:PaperModel;status:ReactNode}) 
       <div className={styles['page-body__main']}>
         {occurrences.length===0 && <section className={styles['section']}><div className={styles['section__header']}><div><p className={styles['eyebrow--neutral']}>Your paper</p><h2>No questions yet</h2></div></div>
           <p className={styles['section__body']}>Choose questions from the catalogue. They appear here so you can set marks and order them.</p>
-          <div className={styles['section__footer']}><button type="button" className={styles['button--secondary-compact']} onClick={()=>paper.go('catalogue')}>Browse the catalogue</button>{paper.configured&&paper.paperTarget===null&&<button type="button" className={styles['link']} onClick={()=>paper.go('shape')}>Set the paper’s shape first</button>}</div></section>}
+          <div className={styles['section__footer']}><button type="button" className={button('secondary')} onClick={()=>paper.go('catalogue')}>Browse the catalogue</button>{paper.configured&&paper.paperTarget===null&&<button type="button" className={styles['link']} onClick={()=>paper.go('shape')}>Set the paper’s shape first</button>}</div></section>}
         {mcq.length>0 && <section className={`${styles['section']} ${styles['section--multiple-choice']}`} aria-labelledby="section-a">
           <div className={styles['section__header']}>
             <div><p className={styles['eyebrow--multiple-choice']}>Section A · Question 1 · Multiple choice</p>
               <h2 id="section-a">{mcq.length} {mcTarget!==undefined?`of ${Math.floor(mcTarget/2)} `:''}chosen · {mcq.length*2}{mcTarget!==undefined?` of ${mcTarget}`:''} marks</h2></div>
             <div className={styles['section__meta']}><span>{mcq.every(o=>o.entry.orderable)?'Marks set · 2 each':'Includes unavailable items'}</span>
-              <button type="button" className={styles['button--text']} onClick={()=>paper.go('builder-mcq')}>Arrange</button></div>
+              <button type="button" className={button('text')} onClick={()=>paper.go('builder-mcq')}>Arrange</button></div>
           </div>
           <ol className={styles['multiple-choice-chips']}>{mcq.map(o=><li key={o.index} className={o.entry.orderable?'':styles['multiple-choice-chips__item--invalid']}>{o.number} {o.entry.title}{o.repeat?` · occurrence ${o.repeat+1}`:''}</li>)}</ol>
           <p className={styles['section__body']}>A multiple-choice type can be added more than once; each occurrence becomes its own question with its own details.</p>
@@ -133,7 +134,7 @@ export function BuilderView({paper,status}:{paper:PaperModel;status:ReactNode}) 
           <div className={styles['section__header']}>
             <div><p className={styles['eyebrow--structured']}>Section {mcq.length?'B':'A'} · Structured</p>
               <h2 id="section-b">{structured.length} {structured.length===1?'question':'questions'} · {paper.sectionTotal('structured')}{sectionTargets.structured!==undefined?` of ${sectionTargets.structured}`:''} marks</h2></div>
-            <button type="button" className={styles['button--secondary-compact']} onClick={()=>{paper.setFilters({...paper.filters,kinds:['structured']});paper.go('catalogue');}}>{Icon.plus(12)} Add from catalogue</button>
+            <button type="button" className={button('secondary')} onClick={()=>{paper.setFilters({...paper.filters,kinds:['structured']});paper.go('catalogue');}}>{Icon.plus(12)} Add from catalogue</button>
           </div>
           <div className={styles['question-table']} role="table" aria-label="Structured questions">
             <div role="row" className={styles['question-table__head']}><span role="columnheader">Q</span><span role="columnheader">Question</span><span role="columnheader">Marks</span><span role="columnheader">Bloom’s mix</span><span role="columnheader">Status</span><span role="columnheader"><span className={styles['visually-hidden']}>Actions</span></span></div>
@@ -145,7 +146,7 @@ export function BuilderView({paper,status}:{paper:PaperModel;status:ReactNode}) 
                 <span role="cell"><MarksInput paper={paper} entry={e}/></span>
                 <span role="cell" className={styles['question-table__cell--bloom']}>{mix.length?<><BloomBar rows={mix.map(m=>({bloom:m.bloom,weight:m.min}))}/><small>{mix.map(m=>`${m.bloom} ${m.min===m.max?m.min:`${m.min}–${m.max}`}`).join(' · ')}</small></>:<small>{e.preview?.outline?'Outline without part marks':'Not yet classified'}</small>}</span>
                 <span role="cell" className={`${styles['question-table__cell--status']} ${styles[({ok:'question-table__status-text--ready',todo:'question-table__status-text--to-complete',bad:'question-table__status-text--invalid'} as const)[s.tone]]}`}>{s.text}</span>
-                <span role="cell" className={styles['question-table__cell--actions']}><button type="button" className={styles['button--text']} onClick={()=>paper.go('builder-question',e.id)}>Set marks</button></span>
+                <span role="cell" className={styles['question-table__cell--actions']}><button type="button" className={button('text')} onClick={()=>paper.go('builder-question',e.id)}>Set marks</button></span>
               </div>;})}
           </div>
         </section>}
@@ -161,7 +162,7 @@ export function BuilderQuestion({paper,entry,status}:{paper:PaperModel;entry:Cat
   useEffect(()=>heading.current?.focus(),[entry.id]);
   const structured=paper.occurrences.filter(o=>o.kind==='structured');
   const o=structured.find(x=>x.entry.id===entry.id);
-  if(!o) return <section className={styles['empty-state']}><h2>This question is no longer in your paper</h2><button type="button" className={styles['button--secondary-compact']} onClick={()=>paper.go('builder')}>Back to paper builder</button></section>;
+  if(!o) return <section className={styles['empty-state']}><h2>This question is no longer in your paper</h2><button type="button" className={button('secondary')} onClick={()=>paper.go('builder')}>Back to paper builder</button></section>;
   const next=structured[structured.indexOf(o)+1];
   const value=paper.allocation[entry.id], set=Number.isInteger(value), range=entry.marks.max-entry.marks.min;
   const outline=entry.preview?.outline, mix=outlineMix(entry);
@@ -203,9 +204,9 @@ export function BuilderQuestion({paper,entry,status}:{paper:PaperModel;entry:Cat
           {mix.length>0&&<><BloomBar rows={mix.map(m=>({bloom:m.bloom,weight:m.min}))}/><p className={styles['card__note']}>{mix.map(m=>`${m.bloom} ${m.min===m.max?m.min:`${m.min} to ${m.max}`}`).join(' · ')}</p></>}
         </section>
         <div className={styles['page-body__actions']}>
-          {next?<button type="button" className={styles['button--primary-wide']} onClick={()=>paper.go('builder-question',next.entry.id)}>Next: Question {next.number} {Icon.arrow()}</button>:
-            <button type="button" className={styles['button--primary-wide']} onClick={()=>paper.go('builder')}>Back to paper builder {Icon.arrow()}</button>}
-          {next&&<button type="button" className={styles['button--secondary-wide']} onClick={()=>paper.go('builder')}>Back to paper builder</button>}
+          {next?<button type="button" className={button('action',{size:'large',full:true})} onClick={()=>paper.go('builder-question',next.entry.id)}>Next: Question {next.number} {Icon.arrow()}</button>:
+            <button type="button" className={button('action',{size:'large',full:true})} onClick={()=>paper.go('builder')}>Back to paper builder {Icon.arrow()}</button>}
+          {next&&<button type="button" className={button('secondary',{size:'large',full:true})} onClick={()=>paper.go('builder')}>Back to paper builder</button>}
         </div>
       </aside>
     </div>
@@ -234,7 +235,7 @@ export function BuilderMultipleChoice({paper,status}:{paper:PaperModel;status:Re
         <section className={`${styles['section']} ${styles['section--multiple-choice']} ${styles['section--flush']}`} aria-labelledby="mc-order">
           <div className={styles['section__header']}><div><p id="mc-order" className={styles['eyebrow--multiple-choice']}>Order on the paper</p>
             <p className={styles['section__body']}>Use the arrows to reorder. Swap a type here; configure each item’s detailed choices after payment.</p></div>
-            <button type="button" className={styles['button--secondary-compact']} disabled={busy||mcq.length<2} onClick={sortByTopic}>Sort by topic</button></div>
+            <button type="button" className={button('secondary')} disabled={busy||mcq.length<2} onClick={sortByTopic}>Sort by topic</button></div>
           {mcq.length===0?<p className={styles['section__body']}>No multiple-choice questions yet. <button type="button" className={styles['link']} onClick={()=>{paper.setFilters({...paper.filters,kinds:['multiple_choice']});paper.go('catalogue');}}>Browse multiple-choice types</button></p>:
           <div className={styles['question-table']} role="table" aria-label="Multiple-choice order">
             <div role="row" className={`${styles['question-table__head']} ${styles['question-table--multiple-choice']}`}><span role="columnheader">No.</span><span role="columnheader">Question type</span><span role="columnheader">Topic</span><span role="columnheader"><span className={styles['visually-hidden']}>Actions</span></span></div>
@@ -245,8 +246,8 @@ export function BuilderMultipleChoice({paper,status}:{paper:PaperModel;status:Re
                   <span role="cell" className={styles['question-table__cell--question']}><strong>{o.entry.title}{o.repeat?` · occurrence ${o.repeat+1}`:''}</strong><small>{codeOf(o.entry.id)}{o.entry.orderable?'':' · not yet available'}</small></span>
                   <span role="cell" className={styles['question-table__cell--topic']}>{o.entry.topic}</span>
                   <span role="cell" className={styles['question-table__cell--actions']}>
-                    <button type="button" className={styles['button--text']} aria-expanded={open} onClick={()=>setSwapping(open?null:o.index)}>{open?'Close':'Swap'}</button>
-                    <button type="button" className={styles['button--text']} disabled={busy||ids.length>=30} aria-label={`Add another ${o.entry.title}`} onClick={()=>paper.addAfter(o.index)}>+ another</button>
+                    <button type="button" className={button('text')} aria-expanded={open} onClick={()=>setSwapping(open?null:o.index)}>{open?'Close':'Swap'}</button>
+                    <button type="button" className={button('text')} disabled={busy||ids.length>=30} aria-label={`Add another ${o.entry.title}`} onClick={()=>paper.addAfter(o.index)}>+ another</button>
                     <RowActions paper={paper} o={o} same={mcq}/></span>
                 </div>
                 {open&&<div className={styles['swap-panel']}><p>Swap {o.number} for another {o.entry.topic} type</p>
@@ -264,8 +265,8 @@ export function BuilderMultipleChoice({paper,status}:{paper:PaperModel;status:Re
         {balance.length>0&&<section className={styles['card']}><p className={styles['eyebrow--neutral']}>Topic balance</p>
           <ul className={styles['topic-balance']}>{balance.map(g=><li key={g.topic}><span>{g.topic}</span><span aria-hidden="true" className={styles['card__blocks']}>{Array.from({length:g.total},(_,i)=><i key={i}/>)}</span><strong>{g.total}</strong></li>)}</ul></section>}
         <div className={styles['page-body__actions']}>
-          <button type="button" className={styles['button--primary-wide']} onClick={()=>paper.go('builder')}>Back to paper builder</button>
-          <button type="button" className={styles['button--secondary-wide']} onClick={()=>{paper.setFilters({...paper.filters,kinds:['multiple_choice']});paper.go('catalogue');}}>Add from catalogue</button>
+          <button type="button" className={button('action',{size:'large',full:true})} onClick={()=>paper.go('builder')}>Back to paper builder</button>
+          <button type="button" className={button('secondary',{size:'large',full:true})} onClick={()=>{paper.setFilters({...paper.filters,kinds:['multiple_choice']});paper.go('catalogue');}}>Add from catalogue</button>
         </div>
       </aside>
     </div>

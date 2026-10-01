@@ -6,6 +6,7 @@ import { AddDepartment, FocusRow, ReviewPanel } from './review';
 import ui from '../../experience.module.css';
 import { Notice } from '../../system/notice';
 import { Status } from '../../system/status';
+import { button } from '../../system/button';
 
 /**
  * School accounts (Paper S3, S4, S6, S7p, S8p). The queue is filtered and searched on the
@@ -70,7 +71,7 @@ export default async function ReviewAccounts({ searchParams }: { searchParams: P
       <div className={ui['record-layout__list']}>
         {rows.length === 0 ? <section className={ui['empty-state']}><h2 className={ui['empty-state__title']}>{q ? 'No accounts match this search' : filter === 'pending' ? 'No accounts need a decision' : 'No accounts in this group'}</h2>
           <p className={ui['empty-state__body']}>{q ? 'Try a different name, email address or school.' : 'New registrations appear here as soon as they are created.'}</p>
-          {filter === 'pending' && !q && <Link className={ui['button--secondary']} href={href({ status: 'approved' })}>Show verified accounts</Link>}</section> :
+          {filter === 'pending' && !q && <Link className={button('secondary')} href={href({ status: 'approved' })}>Show verified accounts</Link>}</section> :
         <div className={ui['record-table']} role="table" aria-label="School accounts">
           <div className={ui['record-table__head']} role="row"><span role="columnheader" className={`${ui['record-table__heading']} ${ui['record-table__cell--primary']}`}>Teacher</span><span role="columnheader" className={`${ui['record-table__heading']} ${ui['record-table__cell--school']}`}>School and department</span><span role="columnheader" className={`${ui['record-table__heading']} ${ui['record-table__cell--email']} ${ui['record-table__heading--email']}`}>Email</span><span role="columnheader" className={`${ui['record-table__heading']} ${ui['record-table__cell--status']}`}>Status</span></div>
           {rows.map(a => { const s = statusLabels[a.status]; const selectedRow = a.user_id === current?.user_id;

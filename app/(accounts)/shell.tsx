@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useId, useRef, useState } from 'react';
 import ui from './experience.module.css';
+import { button } from './system/button';
 
 /**
  * Headers for the three audiences (Paper C07 T1 to T4, M1, S2 to S8p). Teacher and
@@ -45,8 +46,8 @@ export function TeacherHeader({current,name,verified=true}:{current:TeacherPlace
 export function SignedOutHeader({entry}:{entry:'sign-in'|'create'|'none'}){
  return <header className={ui['site-header']}><nav className={ui['site-nav']} aria-label="Account navigation">
   <Link className={ui['site-nav__brand']} href="/">Revise It</Link>
-  {entry==='sign-in'&&<span className={ui['site-nav__entry']}><span className={ui['site-nav__prompt']}>Already have an account?</span><Link className={ui['button--secondary']} href="/login">Sign in</Link></span>}
-  {entry==='create'&&<span className={ui['site-nav__entry']}><span className={ui['site-nav__prompt']}>New to Revise It?</span><Link className={ui['button--secondary']} href="/register">Create account</Link></span>}
+  {entry==='sign-in'&&<span className={ui['site-nav__entry']}><span className={ui['site-nav__prompt']}>Already have an account?</span><Link className={button('secondary')} href="/login">Sign in</Link></span>}
+  {entry==='create'&&<span className={ui['site-nav__entry']}><span className={ui['site-nav__prompt']}>New to Revise It?</span><Link className={button('secondary')} href="/register">Create account</Link></span>}
  </nav></header>;
 }
 

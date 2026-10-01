@@ -7,6 +7,7 @@ import { CopyReference, FocusRow, RecordKeys } from './record';
 import ui from '../../experience.module.css';
 import { Notice } from '../../system/notice';
 import { Status } from '../../system/status';
+import { button } from '../../system/button';
 export const dynamic='force-dynamic';
 
 /**
@@ -80,7 +81,7 @@ export default async function ReviewPapers({ searchParams }: { searchParams: Pro
           <dl className={ui['key-value-list__rows']}>{([['Teacher', [current.teacher !== current.email ? current.teacher : '', current.email].filter(Boolean).join(' · ')], ['School', current.school], ['Payment', [current.payment, current.mode && `Stripe ${current.mode.toLowerCase()} mode`].filter(Boolean).join(' · ')], ['Payment reference', current.paymentIntent || (current.mode ? 'Reference pending' : '')], ['Order reference', current.id], ['Order state', current.state], ['Email', email ? `${emailKindLabels[email.kind]} · ${emailStatusLabels[email.status]?.label || email.status}` : '']] as const)
             .filter(([, v]) => v).map(([k, v]) => <div key={k} className={ui['key-value-list__row']}><dt className={ui['key-value-list__key']}>{k}</dt><dd className={k === 'Order reference' ? ui['key-value-list__value--subtle'] : ui['key-value-list__value']}>{v}</dd></div>)}</dl>
           <Notice tone="neutral" title="What you can do">Contact the teacher, or refund in Stripe using the payment reference. A full refund recorded by Stripe closes the paper automatically. This page cannot approve, restart or refund.</Notice>
-          <div className={ui['record-panel__actions']}>{current.email && <a className={ui['button--secondary']} href={`mailto:${current.email}?subject=${encodeURIComponent('Your Revise It paper ' + current.id.slice(0, 8))}`}>Email teacher</a>}
+          <div className={ui['record-panel__actions']}>{current.email && <a className={button('secondary')} href={`mailto:${current.email}?subject=${encodeURIComponent('Your Revise It paper ' + current.id.slice(0, 8))}`}>Email teacher</a>}
             {current.paymentIntent && <CopyReference value={current.paymentIntent}/>}</div>
         </div>
       </aside>}

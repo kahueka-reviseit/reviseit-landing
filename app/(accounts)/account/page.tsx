@@ -6,6 +6,7 @@ import { logout } from '../actions';
 import AccountDetails, { ResendConfirmation } from './details';
 import ui from '../experience.module.css';
 import { Status } from '../system/status';
+import { button } from '../system/button';
 
 /**
  * My account (Paper T3, T4). One page says where access stands and the one action
@@ -52,9 +53,9 @@ export default async function Account() {
             <span className={state === 'next' ? ui['access-path__label--next'] : ui['access-path__label']}>{label}<span className="visually-hidden">{state === 'done' ? ' (done)' : state === 'current' ? ' (current step)' : ''}</span></span>
           </li>; })}</ol>}
         <div className={ui['button-row']}>
-          {approved && <><a className={ui['button--primary']} href="/teacher?view=home">Go to My curricula →</a><Link className={ui['button--secondary']} href="/teacher/orders">My papers</Link></>}
+          {approved && <><a className={button('primary')} href="/teacher?view=home">Go to My curricula →</a><Link className={button('secondary')} href="/teacher/orders">My papers</Link></>}
           {!confirmed && <ResendConfirmation email={user.email || ''}/>}
-          {stopped && <a className={ui['button--secondary']} href="mailto:kahueka@reviseit.io">Email kahueka@reviseit.io</a>}
+          {stopped && <a className={button('secondary')} href="mailto:kahueka@reviseit.io">Email kahueka@reviseit.io</a>}
         </div>
       </section>
       <aside className={ui['page-columns__aside--wide']}>
@@ -70,9 +71,9 @@ export default async function Account() {
         {reviewer === true && <section className={ui['aside-card--staff']} aria-labelledby="staff-title">
           <h2 id="staff-title" className={ui['aside-card__heading']}>You also have staff access</h2>
           <p className={ui['aside-card__body']}>Staff work happens in the separate Revise It admin workspace. Teachers never see this panel.</p>
-          <div><Link className={ui['button--secondary']} href="/admin">Open admin workspace</Link></div>
+          <div><Link className={button('secondary')} href="/admin">Open admin workspace</Link></div>
         </section>}
-        <form action={logout}><button className={ui['button--text']}>Sign out</button></form>
+        <form action={logout}><button className={button('text')}>Sign out</button></form>
       </aside>
     </div>
   </div></main></>;

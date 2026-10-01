@@ -455,7 +455,7 @@ export default function TimeStarvation() {
         </div>
 
         {hasPlayed && !noMotion && (
-          <button onClick={replay} className={styles['button--replay']} type="button">↺ Replay</button>
+          <button onClick={replay} className={styles['calendar__replay']} type="button">↺ Replay</button>
         )}
       </div>
     </section>

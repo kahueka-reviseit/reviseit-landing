@@ -12,6 +12,7 @@ import {InlineNotice} from '../../../system/notice';
 import {Status} from '../../../system/status';
 import type {QuestionContext as Catalogue} from '../../../../../lib/workspace/contracts';
 import {emptyBrief,briefConflicts,briefPrompts} from '../../../../../lib/configurator/brief';
+import { button } from '../../../system/button';
 
 /**
  * Configured order (Paper C5, C6 and C3a): marks, parts and authored details stay
@@ -199,15 +200,15 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
   });}
   const closePanel=()=>setPanel(null);
   const saveNotice=<><p className={styles['save-status']} role="status">{saveText}</p>
-    {save==='conflict'&&<button type="button" className={styles['button--secondary']} onClick={()=>void load()}>Load the latest saved choices</button>}
-    {save==='failed'&&<button type="button" className={styles['button--secondary']} onClick={()=>void flush()}>Try saving again</button>}
+    {save==='conflict'&&<button type="button" className={button('secondary')} onClick={()=>void load()}>Load the latest saved choices</button>}
+    {save==='failed'&&<button type="button" className={button('secondary')} onClick={()=>void flush()}>Try saving again</button>}
     {error&&<InlineNotice tone="problem" role="alert">{error}</InlineNotice>}</>;
   return <>
   <header className={styles['paper-header']}>
     <div><p className={styles['paper-header__breadcrumb']}><Link href="/teacher/orders">My papers</Link> / {title||'Your selected questions'} · {paid?'Paid':view.submitted?'Submitted':'Awaiting payment'}</p>
       <h1 className={styles['paper-header__title']}>Your paper</h1></div>
     <div className={styles['paper-header__actions']}>
-      <button type="button" className={styles['button--primary']} onClick={()=>setPanel('review')}>Review paper →</button>
+      <button type="button" className={button('primary')} onClick={()=>setPanel('review')}>Review paper →</button>
     </div>
   </header>
   {notice}
@@ -233,19 +234,19 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
         </div>
         <div role="cell" className={styles['question-table__parts']}>{l.kind==='multiple_choice'?'1':l.outline?range(l.outline.subquestions):'Not published'}<span className={styles['question-table__mobile-label']}> subquestions</span></div>
         <div role="cell" className={styles['question-table__status']}><Status density="table" tone={status.ready?'done':'attention'} label={paid&&status.ready?'Configured':status.text}/></div>
-        <div role="cell" className={styles['question-table__actions']}><button type="button" className={styles['button--secondary']} disabled={busy} aria-label={`Edit question ${l.number}`} onClick={()=>go(i)}>Edit question</button></div>
+        <div role="cell" className={styles['question-table__actions']}><button type="button" className={button('secondary',{size:'xsmall'})} disabled={busy} aria-label={`Edit question ${l.number}`} onClick={()=>go(i)}>Edit question</button></div>
       </div>;
     })}
   </div>
   <details className={styles['paper-record']}><summary>Payment and request details</summary>{children}</details>
   {panel==='question'&&<PaperPanel title={line.title} eyebrow={`Question ${line.number} · ${line.kind==='multiple_choice'?'Multiple choice':'Structured'}${line.entryId?` · ${line.entryId.split(':').slice(1).join(':')}`:''}`} onClose={closePanel}
     summary={`${own.marks??'—'} marks · ${line.outstanding.length?`${line.outstanding.length} choices still to decide`:lineStatus(line,paid).text}`}
-    footer={<>{saveNotice}<button type="button" className={styles['button--secondary']} onClick={closePanel}>Close</button></>}>
+    footer={<>{saveNotice}<button type="button" className={button('secondary')} onClick={closePanel}>Close</button></>}>
     <div className={styles['question-editor']} ref={detailsRef}>
       <QuestionContext line={line} marks={own.marks} catalogue={line.entryId?catalogue[line.entryId]:undefined} open={!!outlineOpen[line.id]} onToggle={()=>setOutlineOpen(o=>({...o,[line.id]:!o[line.id]}))}/>
       {paid&&briefOn&&<section className={styles['brief-card']} aria-label="Your question brief">
         {briefDone&&!editingBrief[line.id]?<div className={styles['retained-brief']}>
-          <div><h3>Your brief</h3><button type="button" className={styles['button--text']} disabled={!editable} onClick={()=>setEditingBrief(m=>({...m,[line.id]:true}))}>Edit brief</button></div>
+          <div><h3>Your brief</h3><button type="button" className={button('text')} disabled={!editable} onClick={()=>setEditingBrief(m=>({...m,[line.id]:true}))}>Edit brief</button></div>
           <p>{brief.text}</p>
         </div>:<>
         <h2 id="brief-heading" className={styles['card__title']}>What would you like this question to do?</h2>
@@ -257,10 +258,10 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
           placeholder="For example: the setting you want, what learners are given and what they should work out…"
           onChange={e=>{const text=e.target.value;setBriefError('');update(c=>{c.briefs??={};c.briefs[line.id]??=emptyBrief();c.briefs[line.id].text=text;return c;});}}/>
         <div className={styles['question-order-controls']}><span className={styles['paragraph']}>Your words stay with this question.</span>
-          <button type="button" className={styles['button--primary']} disabled={!editable||save!=='saved'||!brief?.text.trim()||!view.briefEnabled} onClick={()=>void configureBrief()}>{busy?'Configuring…':'Configure →'}</button></div>
+          <button type="button" className={button('primary',{size:'large',full:true})} disabled={!editable||save!=='saved'||!brief?.text.trim()||!view.briefEnabled} onClick={()=>void configureBrief()}>{busy?'Configuring…':'Configure →'}</button></div>
         {save!=='saved'&&<p className={styles['paragraph']} role="status">{saveText}</p>}
         {briefError&&<InlineNotice tone="problem" role="alert">{briefError}</InlineNotice>}
-        <button type="button" className={styles['button--text']} disabled={!editable} onClick={manualOptions}>{brief?.text?'Keep my words and choose options myself →':'Or choose the options yourself →'}</button>
+        <button type="button" className={button('text',{className:styles['brief-card__manual']})} disabled={!editable} onClick={manualOptions}>{brief?.text?'Keep my words and choose options myself →':'Or choose the options yourself →'}</button>
         </>}
         {brief?.text&&<p className={styles['card__note']}>Your full description accompanies the final choices. Where they differ, your explicit choices take precedence.</p>}
         {briefDone&&Object.keys(brief.suggestions).length>0&&<div className={styles['interpretation']}>
@@ -269,8 +270,8 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
             <div className={styles['interpretation__answer']}><span className={styles['interpretation__label']}>{field.label}</span><strong className={styles['interpretation__value']}>{describe(field,answer)}</strong></div>
             <button type="button" className={styles['interpretation__change']} aria-label={`Change ${field.label}`} disabled={!editable} onClick={()=>setManual(m=>({...m,[line.id]:true}))}>Change</button>
             {conflicts.includes(id)&&<div className={styles['interpretation__conflict']} role="alert"><p>Your current choice differs: {describe(field,draft.answers.items[line.id]?.[id])}.</p>
-              <button type="button" className={styles['button--secondary']} disabled={!editable} onClick={()=>resolveBrief(id,true)}>Use the choice from my brief</button>{' '}
-              <button type="button" className={styles['button--secondary']} disabled={!editable} onClick={()=>resolveBrief(id,false)}>Keep my current choice</button></div>}
+              <button type="button" className={button('secondary')} disabled={!editable} onClick={()=>resolveBrief(id,true)}>Use the choice from my brief</button>{' '}
+              <button type="button" className={button('secondary')} disabled={!editable} onClick={()=>resolveBrief(id,false)}>Keep my current choice</button></div>}
             {brief.resolutions[id]==='choice'&&<p className={styles['interpretation__conflict']}>Your current choice takes precedence: {describe(field,draft.answers.items[line.id]?.[id])}</p>}
           </div>;})}
         </div>}
@@ -282,7 +283,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
       {paid&&(!briefOn||briefDone||showManual)&&<section className={styles['card']} aria-labelledby="details-heading">
         <div className={styles['card__header']}><div><p className={styles['card__eyebrow--structured']}>Question {line.number} · {line.title} · {own.marks??'?'} marks</p>
           <h2 id="details-heading" className={styles['card__title']}>{briefOn?(showManual?'Choose options yourself':'Still to decide'):(line.fields.length?'Set the details':'No further details are needed')}</h2></div>
-          {editable&&line.fields.some(f=>f.allowAutomatic&&!draft.answers.items[line.id]?.[f.id])&&<button type="button" className={styles['button--text']} onClick={chooseAll}>Choose for me on all</button>}</div>
+          {editable&&line.fields.some(f=>f.allowAutomatic&&!draft.answers.items[line.id]?.[f.id])&&<button type="button" className={button('text')} onClick={chooseAll}>Choose for me on all</button>}</div>
         {line.configurable==='authored'&&<p className={styles['paragraph']}>This question uses its authored details. Parts and cognitive levels are not yet classified.</p>}
         {line.issues.map((m,i)=><InlineNotice key={i} tone="problem" role="alert">{m}</InlineNotice>)}
         {line.diagram&&<InlineNotice as="div" tone="info"><strong>{line.diagram.locked?'Stimulus diagram set by your choices':line.diagram.stimulus==='required'?'This question needs its diagram':line.diagram.stimulus==='not_applicable'?'No stimulus diagram for this question':'Stimulus diagram'}</strong>
@@ -310,8 +311,8 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
         <p className={styles['card__footer']}>Paper total: {t.allocated} of {t.target??'—'} marks allocated. {t.remaining?`${t.remaining} still to allocate. `:''}{t.excess?`${t.excess} over the total. `:''}Move marks between questions within their ranges; the totals and cognitive mix update when saved.</p>
         {sameKind.length>1&&editable&&<div className={styles['question-order-controls']} role="group" aria-label={`Position of question ${line.number}`}>
           <span className={styles['paragraph']}>{line.kind==='multiple_choice'?'Order within multiple choice':'Order of structured questions'}: {position+1} of {sameKind.length}. Answers stay with the question.</span>
-          <button type="button" className={styles['button--secondary']} disabled={position===0} onClick={()=>moveLine(line.id,-1)}>Move earlier</button>
-          <button type="button" className={styles['button--secondary']} disabled={position===sameKind.length-1} onClick={()=>moveLine(line.id,1)}>Move later</button>
+          <button type="button" className={button('secondary')} disabled={position===0} onClick={()=>moveLine(line.id,-1)}>Move earlier</button>
+          <button type="button" className={button('secondary')} disabled={position===sameKind.length-1} onClick={()=>moveLine(line.id,1)}>Move later</button>
         </div>}
       </section>      <section className={styles['card']} aria-labelledby="outline-heading">
         <p id="outline-heading" className={styles['card__eyebrow--structured']}>Question outline</p>
@@ -349,8 +350,8 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
         {!view.submitted&&paid&&view.outstanding>0&&<p className={styles['paragraph']}>{view.outstanding} required {view.outstanding===1?'choice':'choices'} to make. Optional notes can stay blank.</p>}
         {view.issues.map((m,i)=><p key={i} className={styles['paragraph']}>{m}</p>)}
         <p className={styles['save-status']} role="status">{saveText}</p>
-        {save==='conflict'&&<button type="button" className={styles['button--secondary']} onClick={()=>void load()}>Load the latest saved choices</button>}
-        {save==='failed'&&<button type="button" className={styles['button--secondary']} onClick={()=>void flush()}>Try saving again</button>}
+        {save==='conflict'&&<button type="button" className={button('secondary')} onClick={()=>void load()}>Load the latest saved choices</button>}
+        {save==='failed'&&<button type="button" className={button('secondary')} onClick={()=>void flush()}>Try saving again</button>}
         {error&&<InlineNotice tone="problem" role="alert">{error}</InlineNotice>}
       </section>
       <section className={styles['card']} aria-labelledby="budget-heading">
@@ -373,7 +374,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
         {mix.notes.map((n,i)=><p key={i} className={styles['paragraph']}>{n}</p>)}
         <p className={styles['card__note']}>A range shows every split that the specifications and your choices allow. The highest values of different categories cannot all happen together. Specifications give example marks for their subquestions, so the split between them is a range. Where a specification states more subquestions than it lists, the others count as not yet classified; where a question’s structure is not yet chosen, each structure is calculated separately. Where the source names two possible Bloom’s categories for a subquestion without saying which, its marks stay together as one group, and nothing is spread across categories. A configured question has all its answers; its split can still be a range.</p>
       </section>
-      {paid&&!view.submitted&&<button type="button" className={styles['button--primary']} disabled={busy||!view.canSubmit||save!=='saved'} onClick={()=>void submit()}>{busy?'Submitting…':'Submit for generation →'}</button>}
+      {paid&&!view.submitted&&<button type="button" className={button('primary',{size:'large',className:styles['paper-review__submit']})} disabled={busy||!view.canSubmit||save!=='saved'} onClick={()=>void submit()}>{busy?'Submitting…':'Submit for generation →'}</button>}
       {paid&&!view.submitted&&<p className={styles['card__note']}>Once submitted, your choices are fixed for this paper. All four documents are released together.</p>}
     </aside></PaperPanel>}
   </>;

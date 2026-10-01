@@ -2,6 +2,7 @@ import Link from 'next/link';
 import CountdownTimer from '../components/CountdownTimer/CountdownTimer';
 import CompareModule from './CompareModule';
 import styles from './pilot.module.css';
+import { button } from '../(accounts)/system/button';
 
 export const metadata = {
   title: '2026 Pilot Programme — Revise It',
@@ -40,7 +41,7 @@ export default function PilotPage() {
           </p>
           <CountdownTimer />
           <p className={styles['cta__deadline']}>Applications close 15 August 2026</p>
-          <a href="#apply" className={styles['button--primary']}>Apply Now &darr;</a>
+          <a href="#apply" className={button('primary',{size:'hero'})}>Apply Now &darr;</a>
         </div>
       </section>
 
@@ -168,7 +169,7 @@ export default function PilotPage() {
             <span className={styles['pilot__spot-pill']}>Department 2 — Open</span>
             <span className={styles['pilot__spot-pill']}>Department 3 — Open</span>
           </div>
-          <a href="#apply" className={styles['button--primary']}>Apply Now &darr;</a>
+          <a href="#apply" className={button('primary',{size:'hero'})}>Apply Now &darr;</a>
         </div>
       </section>
 

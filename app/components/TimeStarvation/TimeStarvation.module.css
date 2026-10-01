@@ -305,7 +305,7 @@
 }
 
 /* ─── Replay button ──────────────────────────────────────────── */
-.button--replay {
+.calendar__replay {
   background: none;
   border: 1.5px solid var(--light-gray);
   border-radius: 4px;
@@ -317,7 +317,7 @@
   transition: border-color 0.15s ease, color 0.15s ease;
 }
 
-.button--replay:hover {
+.calendar__replay:hover {
   border-color: var(--mid-text);
   color: var(--dark-text);
 }

@@ -13,6 +13,7 @@ import { StatusDot } from '../../../system/status';
 import ConfigureOrder from './configure';
 import paper from './configure.module.css';
 import SubmittedSummary,{paperMeta} from './submitted-summary';
+import { button } from '../../../system/button';
 
 /**
  * One paper's page (Paper M2 to M4). Before submission a configured paper opens the
@@ -58,14 +59,14 @@ export default function OrderView({initial,catalogue={},curriculum,completionEma
 
  const notice=paymentNotice(order,checking||(busy&&order.state==='awaiting_payment'));
  const noticeView=notice&&<PaymentNoticeView notice={notice}>{
-  notice.tone==='progress'?<button type="button" className={ui['button--secondary']} disabled={busy} onClick={()=>void payment('reconcile')}>Check again</button>:
+  notice.tone==='progress'?<button type="button" className={button('secondary')} disabled={busy} onClick={()=>void payment('reconcile')}>Check again</button>:
   order.state==='awaiting_payment'&&order.payment&&['creating','open'].includes(order.payment.status)?<>
-   {order.payment.checkoutUrl&&<a className={`${ui['button--primary']} ${ui['button--compact']}`} href={order.payment.checkoutUrl}>Continue to secure payment</a>}
-   <button type="button" className={ui['button--secondary']} disabled={busy} onClick={()=>void payment('reconcile')}>I have paid: check again</button>
-   <button type="button" className={ui['button--danger-text']} disabled={busy} onClick={()=>void payment('cancel')}>Cancel this checkout</button></>:
-  notice.tone==='neutral'&&order.payment?.status!=='refunded'?<><a className={ui['button--secondary']} href="/teacher?view=home">Go to My curricula</a><Link className={ui['button--text']} href="/teacher/orders">Back to My papers</Link></>:
-  notice.tone==='neutral'?<Link className={ui['button--text']} href="/teacher/orders">Back to My papers</Link>:
-  notice.tone==='caution'||notice.tone==='problem'?<a className={ui['button--text']} href={`mailto:kahueka@reviseit.io?subject=${encodeURIComponent('Paper '+order.id.slice(0,8))}`}>Email kahueka@reviseit.io</a>:null}</PaymentNoticeView>;
+   {order.payment.checkoutUrl&&<a className={button('primary',{size:'small'})} href={order.payment.checkoutUrl}>Continue to secure payment</a>}
+   <button type="button" className={button('secondary')} disabled={busy} onClick={()=>void payment('reconcile')}>I have paid: check again</button>
+   <button type="button" className={button('danger')} disabled={busy} onClick={()=>void payment('cancel')}>Cancel this checkout</button></>:
+  notice.tone==='neutral'&&order.payment?.status!=='refunded'?<><a className={button('secondary')} href="/teacher?view=home">Go to My curricula</a><Link className={button('text')} href="/teacher/orders">Back to My papers</Link></>:
+  notice.tone==='neutral'?<Link className={button('text')} href="/teacher/orders">Back to My papers</Link>:
+  notice.tone==='caution'||notice.tone==='problem'?<a className={button('text')} href={`mailto:kahueka@reviseit.io?subject=${encodeURIComponent('Paper '+order.id.slice(0,8))}`}>Email kahueka@reviseit.io</a>:null}</PaymentNoticeView>;
  const errorView=error&&<Notice as="p" tone="problem" role="alert">{error}</Notice>;
  const live=<p className="visually-hidden" aria-live="polite">{stateLabels[order.state]||'Status unavailable'}</p>;
  const title=paperTitle(order,curriculum);
@@ -115,7 +116,7 @@ export default function OrderView({initial,catalogue={},curriculum,completionEma
       <h2 className={ui['form-card__title']}>Your answers</h2>
       {isQuestionnaire(order.form)&&grouped?<QuestionnaireFields form={order.form} answers={grouped} onChange={value=>{setGrouped(value);setFieldError(null);setError('');}} fieldError={fieldError} disabled={busy}/>:Array.isArray(order.form)?order.form.map(q=><div key={q.id} className={ui['field']}><label className={ui['field__label']} htmlFor={'answer-'+q.id}>{q.label}</label><select className={ui['field__select']} id={'answer-'+q.id} required value={answers[q.id]||''} onChange={e=>setAnswers({...answers,[q.id]:e.target.value})}><option value="" disabled>Choose an answer</option>{q.options.map(o=><option key={o}>{o}</option>)}</select></div>):null}
       <p className={ui['form-card__note']}>Check your answers before submitting. They are fixed for this request once submitted.</p>
-      <div><button className={ui['button--primary']} disabled={busy||!key}>{busy?'Submitting…':'Submit answers'}</button></div></form>}
+      <div><button className={button('primary')} disabled={busy||!key}>{busy?'Submitting…':'Submit answers'}</button></div></form>}
      {showSummary&&<SubmittedSummary view={view} state={summary.state}/>}
      {!order.configurable&&order.answerSummary?<section className={ui['submitted-summary']} aria-labelledby="receipt-title"><div className={ui['submitted-summary__header']}><h2 id="receipt-title" className={ui['submitted-summary__title']}>What you asked for</h2></div>
       {order.answerSummary.map((section,n)=><div key={n} className={ui['submitted-summary__row']}><div className={ui['submitted-summary__brief']}><h3 className={ui['submitted-summary__question-title']}>{section.title}</h3><dl className={ui['submitted-summary__chips']}>{section.fields.map((field,j)=><div key={j} className={ui['submitted-summary__chip']}><dt className={ui['submitted-summary__term']}>{field.label}:</dt> <dd className={ui['submitted-summary__definition']}>{field.value}</dd></div>)}</dl></div></div>)}</section>
@@ -130,7 +131,7 @@ export default function OrderView({initial,catalogue={},curriculum,completionEma
       <div className={ui['key-value-list__row']}><dt className={ui['key-value-list__key']}>Paper reference</dt><dd className={ui['key-value-list__value--subtle']} title={order.id}>{order.id.slice(0,8)}</dd></div></dl></section>
      <div className={ui['help-card']}><p className={ui['help-card__title']}>{order.state==='released'?'Something not right in a document?':'Need to reach us?'}</p>
       <p className={ui['help-card__body']}>Email <a href="mailto:kahueka@reviseit.io">kahueka@reviseit.io</a> {order.state==='released'?'and include the paper reference. Your documents stay available here.':'with the paper reference.'}{i>=0?' You do not need to submit again.':''}</p></div>
-     <button type="button" className={ui['button--secondary']} onClick={()=>void refresh()}>Refresh status</button>
+     <button type="button" className={button('secondary')} onClick={()=>void refresh()}>Refresh status</button>
     </aside>
    </div>
   </div>

@@ -1311,6 +1311,132 @@
      "reason": "Email clients ignore stylesheets and variables, so the email keeps a table-based renderer with literal values. It shares token values (generated), document names (tested) and terminology."
     }
    ]
+  },
+  "K13": {
+   "title": "Buttons",
+   "masters": [],
+   "code": {
+    "definition": "app/(accounts)/system/button.ts",
+    "stylesheet": "app/(accounts)/system/button.module.css",
+    "blocks": [
+     "button"
+    ],
+    "importSites": [
+     "app/(accounts)/account/page.tsx",
+     "app/(accounts)/admin/accounts/page.tsx",
+     "app/(accounts)/admin/accounts/review.tsx",
+     "app/(accounts)/admin/page.tsx",
+     "app/(accounts)/admin/papers/page.tsx",
+     "app/(accounts)/admin/papers/record.tsx",
+     "app/(accounts)/auth/confirm/form.tsx",
+     "app/(accounts)/forms.tsx",
+     "app/(accounts)/shell.tsx",
+     "app/(accounts)/teacher/orders/[id]/configure.tsx",
+     "app/(accounts)/teacher/orders/[id]/jev-advice.tsx",
+     "app/(accounts)/teacher/orders/[id]/paper-panel.tsx",
+     "app/(accounts)/teacher/orders/[id]/view.tsx",
+     "app/(accounts)/teacher/orders/list.tsx",
+     "app/(accounts)/teacher/page.tsx",
+     "app/(accounts)/teacher/paper/builder.tsx",
+     "app/(accounts)/teacher/paper/catalogue.tsx",
+     "app/(accounts)/teacher/paper/detail.tsx",
+     "app/(accounts)/teacher/paper/formatting.tsx",
+     "app/(accounts)/teacher/paper/home.tsx",
+     "app/(accounts)/teacher/paper/review.tsx",
+     "app/(accounts)/teacher/workspace.tsx",
+     "app/page.tsx",
+     "app/pilot/page.tsx"
+    ],
+    "variants": {
+     "tone": "primary, action, secondary, inverse, text, danger",
+     "size": "xsmall (table rows), small, medium, hero (public site), large (panel or form commit)",
+     "full": "fills its container"
+    },
+    "inputs": {
+     "tone, size, full": "chosen by the screen; a layout class may be added, never a visual one"
+    },
+    "instanceOwned": [
+     "label",
+     "what the button does"
+    ]
+   },
+   "paper": {
+    "status": "specification board, not yet a synchronised master",
+    "uses": "Design System Components 1 \"Buttons\" (C-0) specifies the anatomy; about 450 button layers on the Website pages"
+   },
+   "differences": [
+    {
+     "property": "account primary",
+     "paper": "board: 16 padding as a panel commit, 12 by 20 as a standalone action",
+     "application": "standalone primaries move from 12 by 22 to 12 by 20; form commits from a 48 pixel height to 52 (16 padding, 20 line)",
+     "decision": "C16: follow the board"
+    },
+    {
+     "property": "secondary outline",
+     "paper": "1px --color-action outline on --color-surface",
+     "application": "account secondaries had a darker --color-action-strong outline on transparent; now as drawn",
+     "decision": "C16: follow the board"
+    },
+    {
+     "property": "paid editor commit buttons",
+     "paper": "--text-lg 16/20",
+     "application": "were 17/22 with 16 by 24 padding; now 16/20 with 16 padding",
+     "decision": "C16: follow the board"
+    },
+    {
+     "property": "builder full-width action, pay and back buttons",
+     "paper": "secondary large 15 padding at --text-base; primary large in the order card drawn at 17 padding",
+     "application": "one large size (16 padding); the pay button is 2 pixels shorter than its drawing, the back button text 15 pixels instead of 16",
+     "decision": "C16: one large size"
+    },
+    {
+     "property": "public site",
+     "paper": "Website page 1 draws 13 by 30 at 15/18",
+     "application": "hero size as drawn; the pilot page CTA was 14 by 32 at 16 pixels and the navigation pilot link 11 by 24 at 14.4 pixels, now hero and action medium",
+     "decision": "C16: follow the drawing"
+    },
+    {
+     "property": "hover and focus",
+     "paper": "secondary hover tint fill drawn; primary hover lift only proposed",
+     "application": "every button gets the focus ring; filled buttons darken slightly on hover as the public site already did; text links underline on hover",
+     "decision": "C16: one behaviour everywhere"
+    },
+    {
+     "property": "text and destructive links",
+     "paper": "14/18 600; destructive underlined in --color-warning",
+     "application": "padding normalised to 6 by 0 (was 8 by 4, 6 by 0 or 4 by 0); cancel checkout and clear filters now underlined as drawn",
+     "decision": "C16: follow the board"
+    },
+    {
+     "property": "paid table \"Edit question\" and the staff record footer",
+     "paper": "not drawn at board scale",
+     "application": "table edit buttons keep their 13 pixel size as the xsmall size; the staff record footer no longer forces a 48 pixel height on phones (the large size is 52)",
+     "decision": "C16"
+    }
+   ],
+   "exceptions": [
+    {
+     "what": "Builder move earlier and later controls",
+     "where": [
+      "app/(accounts)/teacher/paper/builder.tsx"
+     ],
+     "reason": "28 pixel round icon controls inside a table row (question-table__move), not labelled buttons."
+    },
+    {
+     "what": "Pilot comparison replay control",
+     "where": [
+      "app/components/TimeStarvation/TimeStarvation.tsx"
+     ],
+     "reason": "A square control inside an illustrative widget on the public site (calendar__replay), not a pill button."
+    },
+    {
+     "what": "Catalogue add control",
+     "where": [
+      "app/(accounts)/teacher/paper/card.tsx"
+     ],
+     "reason": "A checkbox drawn as the board's round add button and \"Added\" pill (catalogue-card__add); its state is a selection, not a command."
+    }
+   ]
   }
  }
 }

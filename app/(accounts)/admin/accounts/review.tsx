@@ -7,6 +7,7 @@ import { Submit, TextField } from '../../forms';
 import { registerDepartment, reviewAccount } from '../../actions';
 import ui from '../../experience.module.css';
 import { Notice } from '../../system/notice';
+import { button } from '../../system/button';
 
 /**
  * Review panel (Paper S3, S4, S6, S8p). No decision is preselected: the reviewer must
@@ -33,8 +34,8 @@ export function ReviewPanel({account,departments,closeHref,nextHref,statusLabel}
     </div>
     {state.success ? <div className={ui['record-panel__body']}>
       <Notice focusRef={notice} tabIndex={-1} tone="success" role="status" title={<>{state.title} · {account.full_name}</>}>{state.message} The queue has been refreshed.</Notice>
-      <div className={ui['record-panel__actions']}>{nextHref ? <Link className={ui['button--primary']} href={nextHref} scroll={false}>Next account needing a decision</Link> : <p className={ui['record-panel__footnote']}>No other account in this list needs a decision.</p>}
-        <Link className={ui['button--text']} href={closeHref} scroll={false}>Back to school accounts</Link></div>
+      <div className={ui['record-panel__actions']}>{nextHref ? <Link className={button('primary')} href={nextHref} scroll={false}>Next account needing a decision</Link> : <p className={ui['record-panel__footnote']}>No other account in this list needs a decision.</p>}
+        <Link className={button('text')} href={closeHref} scroll={false}>Back to school accounts</Link></div>
     </div> :
     <form action={action} className={ui['record-panel__form']}>
       <input type="hidden" name="user_id" value={account.user_id}/><input type="hidden" name="revision" value={account.revision}/>
@@ -68,7 +69,7 @@ export function ReviewPanel({account,departments,closeHref,nextHref,statusLabel}
 export function AddDepartment({open}:{open:boolean}) {
   const [shown, setShown] = useState(open);
   const [state, action] = useFormState(registerDepartment, { message: '' });
-  if (!shown) return <button type="button" className={ui['button--secondary']} onClick={() => setShown(true)} aria-expanded={false}>+ Add a verified school department</button>;
+  if (!shown) return <button type="button" className={button('secondary')} onClick={() => setShown(true)} aria-expanded={false}>+ Add a verified school department</button>;
   return <section className={ui['aside-card--form']} aria-label="Add a verified school department">
     <div className={ui['aside-card__header']}><h2 className={ui['aside-card__heading']}>Add a verified school department</h2>
       <button type="button" className={ui['record-panel__close']} aria-label="Close" onClick={() => setShown(false)}><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2 2 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></button></div>

@@ -136,38 +136,6 @@
 }
 
 /* ─── Buttons ───────────────────────────────────────────────── */
-.button--primary {
-  display: inline-block;
-  background: var(--color-action-strong);
-  color: var(--color-white);
-  font-family: var(--font-body), sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
-  padding: 13px 30px;
-  border-radius: 999px;
-  transition: background 0.15s ease;
-}
-
-.button--primary:hover {
-  filter: brightness(0.92);
-}
-
-.button--secondary {
-  display: inline-block;
-  background: transparent;
-  color: var(--color-action-strong);
-  font-family: var(--font-body), sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
-  padding: 13px 30px;
-  border-radius: 999px;
-  border: 1px solid var(--color-action-strong);
-  transition: background 0.15s ease;
-}
-
-.button--secondary:hover {
-  background: var(--color-action-tint);
-}
 
 /* ─── Section helpers ───────────────────────────────────────── */
 .section__eyebrow {
@@ -1089,22 +1057,6 @@
   color: var(--color-gold);
   color: var(--gold);
   margin: 0;
-}
-
-.button--pilot {
-  display: inline-block;
-  font-family: var(--font-body), sans-serif;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--color-white);
-  background: var(--color-action);
-  padding: 11px 24px;
-  border-radius: 999px;
-  text-decoration: none;
-  transition: background 0.15s ease;
-}
-.button--pilot:hover {
-  background: var(--color-action-strong);
 }
 
 /* ─── Footer ────────────────────────────────────────────────── */
