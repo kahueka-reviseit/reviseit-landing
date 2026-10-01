@@ -3,13 +3,13 @@
    Explicit variants: narrow, prominent (builder paper shape), staff (denser staff review), secondary label,
    answer and writing text areas (paid question editor, kept as they are until C14 redesigns it). */
 
-.field { display:flex; flex-direction:column; gap:6px; }
-.field--narrow { width:180px; flex:0 0 180px; display:flex; flex-direction:column; gap:6px; }
+.field { display:flex; flex-direction:column; gap:var(--pc-field-gap); }
+.field--narrow { width:180px; flex:0 0 180px; display:flex; flex-direction:column; gap:var(--pc-field-gap); }
 .field__label-row { display:flex; justify-content:space-between; align-items:baseline; gap:12px; }
 .field__label-row a { font-size:14px; line-height:18px; }
-.field__label { font-size:14px; line-height:18px; font-weight:600; color:var(--color-text); }
-.field__input { width:100%; min-width:0; height:46px; padding:0 14px; border:1px solid var(--color-border-strong); border-radius:8px; background:var(--color-surface); font:400 15px/20px var(--font-body),sans-serif; color:var(--color-text); }
-.field__input--invalid { width:100%; min-width:0; height:46px; padding:0 13px; border:2px solid var(--color-warning); border-radius:8px; background:var(--color-surface); font:400 15px/20px var(--font-body),sans-serif; color:var(--color-text); }
+.field__label { font-size:var(--pc-field__label-font-size); line-height:var(--pc-field__label-line-height); font-weight:var(--pc-field__label-font-weight); color:var(--pc-field__label-color); }
+.field__input { width:100%; min-width:0; height:var(--pc-text-input-height); padding:0 var(--pc-text-input-padding-inline); border:var(--pc-text-input-border-width) solid var(--pc-text-input-border-color); border-radius:var(--pc-text-input-border-radius); background:var(--pc-text-input-background-color); font:var(--pc-field__value-font-weight) var(--pc-field__value-font-size)/var(--pc-field__value-line-height) var(--font-body),sans-serif; color:var(--pc-field__value-color); }
+.field__input--invalid { width:100%; min-width:0; height:var(--pc-text-input-height); padding:0 calc(var(--pc-text-input-padding-inline) - 1px); border:var(--pc-text-input--error-border-width) solid var(--pc-text-input--error-border-color); border-radius:var(--pc-text-input-border-radius); background:var(--pc-text-input-background-color); font:var(--pc-field__value-font-weight) var(--pc-field__value-font-size)/var(--pc-field__value-line-height) var(--font-body),sans-serif; color:var(--pc-field__value-color); }
 .field__textarea { width:100%; min-width:0; min-height:88px; padding:10px 14px; border:1px solid var(--color-border-strong); border-radius:8px; background:var(--color-surface); font:400 14px/20px var(--font-body),sans-serif; color:var(--color-text); resize:vertical; }
 .field__select { width:100%; min-width:0; height:46px; padding:0 36px 0 14px; border:1px solid var(--color-border-strong); border-radius:8px; background:var(--color-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%234A4A4A' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center; appearance:none; font:400 15px/20px var(--font-body),sans-serif; color:var(--color-text); }
 .field__input:focus-visible, .field__input--invalid:focus-visible, .field__textarea:focus-visible, .field__select:focus-visible { outline:3px solid var(--color-focus-ring); outline-offset:1px; }
@@ -18,9 +18,9 @@
 .field__toggle { position:absolute; right:6px; top:50%; transform:translateY(-50%); height:36px; padding:0 10px; border:0; background:none; font:600 13px/16px var(--font-body),sans-serif; color:var(--color-action-strong); cursor:pointer; }
 .field__select--staff { width:100%; min-width:0; height:44px; padding:0 36px 0 14px; border:1px solid var(--color-border-strong); border-radius:8px; background:var(--color-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%234A4A4A' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center; appearance:none; font:400 14px/18px var(--font-body),sans-serif; color:var(--color-text); }
 .field__select--staff:focus-visible { outline:3px solid var(--color-focus-ring); outline-offset:1px; }
-.field__hint { margin:0; font-size:13px; line-height:18px; color:var(--color-text-muted); }
+.field__hint { margin:0; font-size:var(--pc-field__hint-font-size); line-height:var(--pc-field__hint-line-height); color:var(--pc-field__hint-color); }
 .field__hint--staff { margin:0; font-size:12px; line-height:17px; color:var(--color-text-muted); }
-.field__error { display:flex; gap:6px; margin:0; font-size:13px; line-height:18px; color:var(--color-warning-text); }
+.field__error { display:flex; gap:var(--pc-field__error-gap); margin:0; font-size:var(--pc-field__error-text-font-size); line-height:var(--pc-field__error-text-line-height); color:var(--pc-field__error-text-color); }
 .field__check { display:flex; align-items:center; gap:12px; font-size:15px; line-height:20px; color:var(--color-text); }
 .field__check input { width:22px; height:22px; accent-color:var(--color-action-strong); }
 @media (max-width:640px) {

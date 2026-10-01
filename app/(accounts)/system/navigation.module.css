@@ -1,15 +1,17 @@
 /* Navigation (family K11). The one definition of the site header for teachers, signed-out visitors and the
    public site; screens render SiteHeader from ./navigation. Three explicit variants, as drawn:
    account (Website page 2, T1 to T4), public (page 1, home) and inverse (page 1, pilot and privacy). The staff
-   header keeps its own navy design and shares the phone menu below. */
+   header keeps its own navy design and shares the phone menu below. The account bar, wordmark, links and avatar
+   read --pc-* values exported from the Paper master (K11) by `npm run paper:pull`; the public and inverse variants
+   keep application values. */
 .site-header { display:flex; flex-direction:column; width:100%; border-top:6px solid var(--color-action); font-family:var(--font-body),sans-serif; }
 .site-nav { position:relative; }
 .site-nav__inner { display:flex; align-items:center; justify-content:space-between; gap:20px; }
-.site-nav__brand { display:inline-flex; font-family:var(--font-display),Georgia,serif; font-size:24px; line-height:30px; font-weight:700; letter-spacing:var(--tracking-tight); color:var(--color-text); text-decoration:none; }
-.site-nav__links { display:flex; align-items:center; gap:32px; }
-.site-nav__link { display:flex; align-items:center; gap:10px; padding-bottom:6px; border-bottom:2px solid transparent; font-size:15px; line-height:18px; color:var(--color-text-muted); text-decoration:none; }
-.site-nav__link--current { display:flex; align-items:center; gap:10px; padding-bottom:4px; border-bottom:2px solid var(--color-action-strong); font-size:15px; line-height:18px; font-weight:600; color:var(--color-text); text-decoration:none; }
-.site-nav__avatar { width:30px; height:30px; flex-shrink:0; display:flex; align-items:center; justify-content:center; border-radius:999px; background:var(--color-action-tint); color:var(--color-action-strong); font-size:12px; line-height:16px; font-weight:600; }
+.site-nav__brand { display:inline-flex; font-family:var(--font-display),Georgia,serif; font-size:var(--pc-site-nav__brand-font-size); line-height:var(--pc-site-nav__brand-line-height); font-weight:var(--pc-site-nav__brand-font-weight); letter-spacing:var(--tracking-tight); color:var(--color-text); text-decoration:none; }
+.site-nav__links { display:flex; align-items:center; gap:var(--pc-site-nav__links-gap); }
+.site-nav__link { display:flex; align-items:center; gap:10px; padding-bottom:var(--pc-site-nav__link--papers-padding-bottom); border-bottom:2px solid transparent; font-size:var(--pc-site-nav__label--papers-font-size); line-height:var(--pc-site-nav__label--papers-line-height); color:var(--pc-site-nav__label--papers-color); text-decoration:none; }
+.site-nav__link--current { display:flex; align-items:center; gap:10px; padding-bottom:var(--pc-site-nav__link--papers--current-papers-padding-bottom); border-bottom:var(--pc-site-nav__link--papers--current-papers-border-bottom-width) solid var(--pc-site-nav__link--papers--current-papers-border-bottom-color); font-size:var(--pc-site-nav__label--papers-font-size); line-height:var(--pc-site-nav__label--papers-line-height); font-weight:var(--pc-site-nav__label--papers--current-papers-font-weight); color:var(--pc-site-nav__label--papers--current-papers-color); text-decoration:none; }
+.site-nav__avatar { width:var(--pc-site-nav__avatar-width); height:var(--pc-site-nav__avatar-height); flex-shrink:0; display:flex; align-items:center; justify-content:center; border-radius:var(--pc-site-nav__avatar-border-radius); background:var(--pc-site-nav__avatar-background-color); color:var(--pc-site-nav__initials-color); font-size:var(--pc-site-nav__initials-font-size); line-height:var(--pc-site-nav__initials-line-height); font-weight:var(--pc-site-nav__initials-font-weight); }
 .site-nav__prompt { font-size:15px; line-height:18px; color:var(--color-text-muted); }
 .site-nav__entry { display:flex; align-items:center; gap:20px; }
 .site-nav__separator { color:var(--color-surface-muted); user-select:none; }
@@ -23,8 +25,8 @@
 .site-nav__menu-icon::after { content:''; position:absolute; left:0; right:0; top:3px; border-top:2px solid currentColor; }
 
 /* account: signed-in teachers and signed-out account pages */
-.site-nav--account { border-bottom:1px solid var(--color-surface-muted); }
-.site-nav--account { padding:22px 64px; }
+.site-nav--account { border-bottom:var(--pc-site-nav-border-bottom-width) solid var(--pc-site-nav-border-bottom-color); }
+.site-nav--account { padding:var(--pc-site-nav-padding-block) var(--pc-site-nav-padding-inline); }
 /* public: the home page, links centred between the wordmark and the sign-in action */
 .site-nav--public { position:sticky; top:0; z-index:100; background:var(--color-background); border-bottom:1px solid var(--color-surface-muted); }
 .site-nav--public .site-nav__inner { display:grid; grid-template-columns:1fr auto 1fr; max-width:1100px; height:60px; margin:0 auto; padding:0 24px; }

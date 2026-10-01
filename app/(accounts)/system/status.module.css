@@ -1,16 +1,17 @@
-/* Status marker (Paper K09). The one definition; screens import Status from ./status. */
-.status { display:inline-flex; align-items:center; gap:8px; }
-.status__dot--done, .status__dot--progress, .status__dot--attention, .status__dot--problem, .status__dot--closed { width:8px; height:8px; flex-shrink:0; border-radius:999px; }
-.status__dot--done { background:var(--color-status-done); }
-.status__dot--progress { background:var(--color-status-progress); }
-.status__dot--attention { background:var(--color-status-attention); }
-.status__dot--problem { background:var(--color-status-problem); }
-.status__dot--closed { border:1.5px solid var(--color-text-subtle); }
-.status__label--done, .status__label--progress, .status__label--attention, .status__label--problem, .status__label--closed { font-size:14px; line-height:18px; font-weight:600; }
-.status__label--done { color:var(--color-action-strong); }
-.status__label--progress { color:var(--color-structured); }
-.status__label--attention { color:var(--color-caution-text); }
-.status__label--problem { color:var(--color-warning-text); }
-.status__label--closed { color:var(--color-text-muted); }
+/* Status marker (Paper master K09). The one definition; screens import Status from ./status. Every --pc-* value is
+   exported from the Paper master by `npm run paper:pull`. */
+.status { display:inline-flex; align-items:center; gap:var(--pc-status-gap); }
+.status__dot--done, .status__dot--progress, .status__dot--attention, .status__dot--problem, .status__dot--closed { width:var(--pc-status-dot-width); height:var(--pc-status-dot-height); flex-shrink:0; border-radius:var(--pc-status-dot-border-radius); }
+.status__dot--done { background:var(--pc-status-dot-background-color); }
+.status__dot--progress { background:var(--pc-status-dot--progress-background-color); }
+.status__dot--attention { background:var(--pc-status-dot--attention-background-color); }
+.status__dot--problem { background:var(--pc-status-dot--problem-background-color); }
+.status__dot--closed { border:var(--pc-status-dot--closed-border-width) solid var(--pc-status-dot--closed-border-color); }
+.status__label--done, .status__label--progress, .status__label--attention, .status__label--problem, .status__label--closed { font-size:var(--pc-status__label-font-size); line-height:var(--pc-status__label-line-height); font-weight:var(--pc-status__label-font-weight); }
+.status__label--done { color:var(--pc-status__label-color); }
+.status__label--progress { color:var(--pc-status__label--progress-color); }
+.status__label--attention { color:var(--pc-status__label--attention-color); }
+.status__label--problem { color:var(--pc-status__label--problem-color); }
+.status__label--closed { color:var(--pc-status__label--closed-color); }
 /* Table density (Paper page 7, question table status cell): same dot, quieter label. */
-.status__label--table { font-size:13px; line-height:16px; font-weight:400; color:var(--color-text); }
+.status__label--table { font-size:var(--pc-status__label--table-font-size); line-height:var(--pc-status__label--table-line-height); font-weight:var(--pc-status__label--table-font-weight); color:var(--pc-status__label--table-color); }

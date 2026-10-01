@@ -1263,7 +1263,6 @@
    "file": "design-system",
    "node": "33C-0",
    "block": "status",
-   "export": false,
    "scan": [
     "question-table__cell--status",
     "question-list__status",
@@ -2626,6 +2625,1864 @@
      "reason": "Paper page 5 draws the builder row status as grey text over a hidden progress bar, not as the dot marker; recorded under K09 as a distinct presentation."
     }
    ]
+  },
+  "button": {
+   "family": "K13",
+   "file": "design-system",
+   "node": "33O-0",
+   "block": "button",
+   "scan": [
+    "button"
+   ],
+   "slots": [
+    "button__label"
+   ],
+   "overridable": {
+    "button": [
+     "width",
+     "flexShrink",
+     "flexGrow",
+     "alignSelf"
+    ]
+   },
+   "variants": {
+    "primary": {},
+    "action": {
+     "styles": {
+      "button": {
+       "backgroundColor": "var(--color-action)"
+      }
+     }
+    },
+    "inverse": {
+     "styles": {
+      "button": {
+       "backgroundColor": "var(--color-inverse)"
+      }
+     }
+    },
+    "secondary": {
+     "styles": {
+      "button": {
+       "backgroundColor": "var(--color-surface)",
+       "borderWidth": "1px",
+       "borderStyle": "solid",
+       "borderColor": "var(--color-action)"
+      },
+      "button__label": {
+       "color": "var(--color-action-strong)"
+      }
+     }
+    },
+    "xsmall": {
+     "styles": {
+      "button": {
+       "paddingBlock": "6px",
+       "paddingInline": "var(--spacing-3)"
+      },
+      "button__label": {
+       "fontSize": "var(--text-sm)",
+       "lineHeight": "var(--leading-xs)"
+      }
+     }
+    },
+    "small": {
+     "styles": {
+      "button": {
+       "paddingBlock": "9px",
+       "paddingInline": "var(--spacing-4)"
+      },
+      "button__label": {
+       "fontSize": "var(--text-md)",
+       "lineHeight": "var(--leading-sm)"
+      }
+     }
+    },
+    "medium": {},
+    "hero": {
+     "styles": {
+      "button": {
+       "paddingBlock": "13px",
+       "paddingInline": "30px"
+      }
+     }
+    },
+    "large": {
+     "styles": {
+      "button": {
+       "paddingBlock": "var(--spacing-4)",
+       "paddingInline": "var(--spacing-4)"
+      },
+      "button__label": {
+       "fontSize": "var(--text-lg)",
+       "lineHeight": "var(--leading-base)"
+      }
+     }
+    },
+    "outlined-large": {
+     "styles": {
+      "button": {
+       "paddingBlock": "15px",
+       "paddingInline": "15px"
+      },
+      "button__label": {
+       "fontSize": "var(--text-base)",
+       "lineHeight": "var(--leading-sm)"
+      }
+     }
+    }
+   },
+   "instances": [
+    {
+     "file": "website",
+     "node": "B5-0",
+     "where": "p-2-0",
+     "variant": [
+      "primary",
+      "hero"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "B7-0",
+     "where": "p-2-0",
+     "variant": [
+      "secondary",
+      "hero"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "19Q-0",
+     "where": "p-2-0",
+     "variant": [
+      "action",
+      "medium"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "1NC-0",
+     "where": "p-2-0",
+     "variant": [
+      "primary",
+      "hero"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "1VZ-0",
+     "where": "p-2-0",
+     "variant": [
+      "primary",
+      "hero"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "269-0",
+     "where": "p-2-0",
+     "variant": [
+      "primary",
+      "hero"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "26B-0",
+     "where": "p-2-0",
+     "variant": [
+      "secondary",
+      "hero"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "371-0",
+     "where": "p-6-0",
+     "variant": [
+      "secondary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "3M5-0",
+     "where": "p-6-0",
+     "variant": [
+      "primary",
+      "large"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "3M7-0",
+     "where": "p-6-0",
+     "variant": [
+      "secondary",
+      "large",
+      "outlined-large"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "4Q5-0",
+     "where": "p-6-0",
+     "variant": [
+      "primary",
+      "large"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "4Q7-0",
+     "where": "p-6-0",
+     "variant": [
+      "secondary",
+      "large",
+      "outlined-large"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "5GL-0",
+     "where": "p-6-0",
+     "variant": [
+      "secondary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "5ZI-0",
+     "where": "p-6-0",
+     "variant": [
+      "primary",
+      "large"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7HS-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "medium"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7HU-0",
+     "where": "p-8-0",
+     "variant": [
+      "primary",
+      "medium"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7IY-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7JH-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7K5-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7KT-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7LH-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7M5-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7MT-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7NH-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7O5-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7OT-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7PO-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7Q7-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7QW-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EE6-0",
+     "where": "p-8-0",
+     "variant": [
+      "primary",
+      "medium"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "ED7-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "ECJ-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EBV-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EB7-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EAJ-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "E9V-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "E97-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "E8J-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "E7V-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "E77-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "E6I-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "E5T-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "E54-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "ELJ-0",
+     "where": "p-8-0",
+     "variant": [
+      "primary",
+      "medium"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EKK-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EK3-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EJM-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EJ5-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EIO-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EI7-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EHQ-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EH9-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EGS-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EGB-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EFT-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EFB-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EET-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EM2-0",
+     "where": "p-8-0",
+     "variant": [
+      "primary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "80S-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "medium"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "80Q-0",
+     "where": "p-8-0",
+     "variant": [
+      "primary",
+      "medium"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7ZR-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7Z3-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7YF-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7XR-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7X3-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7WF-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7VR-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7V3-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7UF-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7TR-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7SD-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7RO-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "836-0",
+     "where": "p-8-0",
+     "variant": [
+      "primary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8DK-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8CW-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8C8-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8BK-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8AW-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8A8-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "89K-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "88W-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "888-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "87K-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "866-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "85H-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "83D-0",
+     "where": "p-8-0",
+     "variant": [
+      "primary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8W4-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8VG-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8US-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8U4-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8TG-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8SS-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8S4-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8RG-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8QS-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8Q4-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8OQ-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8O1-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8KS-0",
+     "where": "p-8-0",
+     "variant": [
+      "primary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A0L-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9ZX-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9Z9-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9YL-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9XX-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9X9-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9WL-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9VX-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9V9-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9UL-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9T7-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9SI-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9R9-0",
+     "where": "p-8-0",
+     "variant": [
+      "primary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "ACR-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AC3-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "ABF-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AAR-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AA3-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A9F-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A8R-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A83-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A7F-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A6R-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A5D-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A4O-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A35-0",
+     "where": "p-8-0",
+     "variant": [
+      "primary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "97P-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "971-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "96D-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "95P-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "951-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "94D-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "93P-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "931-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "92D-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "91P-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "90B-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8ZM-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9L0-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9KC-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9JO-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9J0-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9IC-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9HO-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9H0-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9GC-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9FO-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9F0-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9DM-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9CX-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9MT-0",
+     "where": "p-8-0",
+     "variant": [
+      "primary",
+      "medium"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8I2-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8II-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8J6-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8JU-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "xsmall"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8KB-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8KD-0",
+     "where": "p-8-0",
+     "variant": [
+      "primary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AGP-0",
+     "where": "p-8-0",
+     "variant": [
+      "secondary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "BAF-0",
+     "where": "p-A-0",
+     "variant": [
+      "primary",
+      "medium"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "BAH-0",
+     "where": "p-A-0",
+     "variant": [
+      "secondary",
+      "medium"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "BBI-0",
+     "where": "p-A-0",
+     "variant": [
+      "secondary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "BCD-0",
+     "where": "p-A-0",
+     "variant": [
+      "secondary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "BCJ-0",
+     "where": "p-A-0",
+     "variant": [
+      "secondary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "C1R-0",
+     "where": "p-A-0",
+     "variant": [
+      "primary",
+      "medium"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "BFP-0",
+     "where": "p-B-0",
+     "variant": [
+      "secondary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "BII-0",
+     "where": "p-B-0",
+     "variant": [
+      "primary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "BNX-0",
+     "where": "p-B-0",
+     "variant": [
+      "secondary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "BNZ-0",
+     "where": "p-B-0",
+     "variant": [
+      "secondary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AHX-0",
+     "where": "p-C-0",
+     "variant": [
+      "primary",
+      "medium"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AIQ-0",
+     "where": "p-C-0",
+     "variant": [
+      "primary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AJ6-0",
+     "where": "p-C-0",
+     "variant": [
+      "secondary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AKE-0",
+     "where": "p-C-0",
+     "variant": [
+      "secondary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AWD-0",
+     "where": "p-C-0",
+     "variant": [
+      "secondary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AWP-0",
+     "where": "p-C-0",
+     "variant": [
+      "primary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AWR-0",
+     "where": "p-C-0",
+     "variant": [
+      "secondary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AX5-0",
+     "where": "p-C-0",
+     "variant": [
+      "primary",
+      "small"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AXH-0",
+     "where": "p-C-0",
+     "variant": [
+      "secondary",
+      "small"
+     ]
+    }
+   ],
+   "notLinked": [
+    {
+     "file": "website",
+     "node": "63H-0",
+     "kind": "exception",
+     "where": "p-6-0",
+     "reason": "one-off size or fill not in the size scale (button--primary 17px/- 17px var(--color-sage-dark))"
+    },
+    {
+     "file": "website",
+     "node": "3HW-0",
+     "kind": "exception",
+     "where": "p-6-0",
+     "reason": "one-off size or fill not in the size scale (button--primary 14px/20px 16px var(--color-sage-dark))"
+    },
+    {
+     "file": "website",
+     "node": "3I5-0",
+     "kind": "exception",
+     "where": "p-6-0",
+     "reason": "one-off size or fill not in the size scale (button--secondary 13px/20px 16px )"
+    },
+    {
+     "file": "website",
+     "node": "4G9-0",
+     "kind": "exception",
+     "where": "p-6-0",
+     "reason": "one-off size or fill not in the size scale (button--primary 14px/26px 16px var(--color-sage-dark))"
+    },
+    {
+     "file": "website",
+     "node": "620-0",
+     "kind": "exception",
+     "where": "p-6-0",
+     "reason": "one-off size or fill not in the size scale (button--primary 11px/- 15px var(--color-sage))"
+    },
+    {
+     "file": "website",
+     "node": "8EJ-0",
+     "kind": "exception",
+     "where": "p-8-0",
+     "reason": "one-off size or fill not in the size scale (button--primary 11px/20px 15px #E6EFEA)"
+    },
+    {
+     "file": "website",
+     "node": "8X3-0",
+     "kind": "exception",
+     "where": "p-8-0",
+     "reason": "one-off size or fill not in the size scale (button--primary 11px/20px 15px #E6EFEA)"
+    },
+    {
+     "file": "website",
+     "node": "8XW-0",
+     "kind": "exception",
+     "where": "p-8-0",
+     "reason": "one-off size or fill not in the size scale (button--primary 11px/24px 16px var(--color-sage-dark))"
+    },
+    {
+     "file": "website",
+     "node": "A1K-0",
+     "kind": "exception",
+     "where": "p-8-0",
+     "reason": "one-off size or fill not in the size scale (button--primary 11px/20px 15px #E6EFEA)"
+    },
+    {
+     "file": "website",
+     "node": "A2W-0",
+     "kind": "exception",
+     "where": "p-8-0",
+     "reason": "one-off size or fill not in the size scale (button--primary 12px/20px 16px var(--color-sage-dark))"
+    },
+    {
+     "file": "website",
+     "node": "ADQ-0",
+     "kind": "exception",
+     "where": "p-8-0",
+     "reason": "one-off size or fill not in the size scale (button--primary 11px/20px 15px #E6EFEA)"
+    },
+    {
+     "file": "website",
+     "node": "A3I-0",
+     "kind": "exception",
+     "where": "p-8-0",
+     "reason": "one-off size or fill not in the size scale (button--primary 12px/20px 16px var(--color-sage-dark))"
+    },
+    {
+     "file": "website",
+     "node": "98O-0",
+     "kind": "exception",
+     "where": "p-8-0",
+     "reason": "one-off size or fill not in the size scale (button--primary 11px/20px 15px #E6EFEA)"
+    },
+    {
+     "file": "website",
+     "node": "9AU-0",
+     "kind": "exception",
+     "where": "p-8-0",
+     "reason": "one-off size or fill not in the size scale (button--secondary 9px/18px 15px )"
+    },
+    {
+     "file": "website",
+     "node": "9LZ-0",
+     "kind": "exception",
+     "where": "p-8-0",
+     "reason": "one-off size or fill not in the size scale (button--primary 11px/20px 15px #E6EFEA)"
+    },
+    {
+     "file": "website",
+     "node": "9N3-0",
+     "kind": "exception",
+     "where": "p-8-0",
+     "reason": "one-off size or fill not in the size scale (button--secondary 9px/18px 15px )"
+    },
+    {
+     "file": "website",
+     "node": "9PA-0",
+     "kind": "exception",
+     "where": "p-8-0",
+     "reason": "one-off size or fill not in the size scale (button--secondary 9px/14px 15px )"
+    },
+    {
+     "file": "website",
+     "node": "9PC-0",
+     "kind": "exception",
+     "where": "p-8-0",
+     "reason": "one-off size or fill not in the size scale (button--secondary 9px/14px 15px )"
+    },
+    {
+     "file": "website",
+     "node": "AFT-0",
+     "kind": "exception",
+     "where": "p-8-0",
+     "reason": "one-off size or fill not in the size scale (button--primary 12px/20px 16px var(--color-sage-dark))"
+    },
+    {
+     "file": "website",
+     "node": "B4B-0",
+     "kind": "exception",
+     "where": "p-A-0",
+     "reason": "one-off size or fill not in the size scale (button--secondary 8px/18px 15px )"
+    },
+    {
+     "file": "website",
+     "node": "B5Z-0",
+     "kind": "exception",
+     "where": "p-A-0",
+     "reason": "one-off size or fill not in the size scale (button--primary -/- 16px var(--color-action-strong))"
+    },
+    {
+     "file": "website",
+     "node": "B0J-0",
+     "kind": "exception",
+     "where": "p-C-0",
+     "reason": "one-off size or fill not in the size scale (button--primary -/- 15px var(--color-action-strong))"
+    },
+    {
+     "file": "website",
+     "node": "B0Y-0",
+     "kind": "exception",
+     "where": "p-C-0",
+     "reason": "one-off size or fill not in the size scale (button--secondary -/- 15px )"
+    }
+   ]
   }
  },
  "ownership": {
@@ -2730,7 +4587,9 @@
   },
   "K02": {
    "title": "Fields and answer controls",
-   "masters": [],
+   "masters": [
+    "field"
+   ],
    "code": {
     "definition": "app/(accounts)/forms.tsx",
     "stylesheet": "app/(accounts)/system/field.module.css",
@@ -2766,9 +4625,10 @@
     ]
    },
    "paper": {
-    "status": "inventoried, not linked",
-    "uses": "9 field frames on page 2 (T1, T2, F1) plus text inputs on pages 5 and 7",
-    "reason": "The field drawings differ in structure between sign-in, formatting and the question editor. They need a design decision on one anatomy before a master can own them."
+    "status": "linked",
+    "uses": "5 labelled text fields on Website page 2 (sign-in, registration and school formatting) synchronised from the master; 4 field drawings not linked (selects, number inputs and the question editor answer areas have a different anatomy)",
+    "code": "the application stylesheet reads every drawn value through the --pc-* variables exported by paper:pull (label, text input, typed value, hint and error); the prominent, staff, number and editor variants keep application values",
+    "reason": "One anatomy settled from the design system board: label, text input with its value, optional hint, optional error with icon. Selects, number inputs and the question editor stay separate until C14 supplies its design."
    },
    "exceptions": [
     {
@@ -2806,6 +4666,24 @@
      "paper": "-",
      "application": "the 14 pixel rule now targets the link element rather than a class from another stylesheet",
      "decision": "no visible change"
+    },
+    {
+     "property": "input fill (Paper)",
+     "paper": "four drawn inputs had no fill (transparent on a white board)",
+     "application": "--color-surface",
+     "decision": "C15C: the Paper inputs now fill with --color-surface; no visible change on white"
+    },
+    {
+     "property": "school heading input line height (Paper)",
+     "paper": "18 pixels",
+     "application": "20 pixels (--leading-base)",
+     "decision": "C15C: the Paper input now uses 20 pixels"
+    },
+    {
+     "property": "department placeholder (Paper)",
+     "paper": "grey placeholder text",
+     "application": "grey placeholder text",
+     "decision": "C15C: kept through an explicit placeholder variant, so adoption does not darken it"
     }
    ]
   },
@@ -3042,7 +4920,9 @@
   },
   "K09": {
    "title": "Paper facts and status",
-   "masters": [],
+   "masters": [
+    "status"
+   ],
    "code": {
     "definition": "app/(accounts)/system/status.tsx",
     "stylesheet": "app/(accounts)/system/status.module.css",
@@ -3071,9 +4951,9 @@
     ]
    },
    "paper": {
-    "status": "inventoried, not linked",
-    "uses": "status markers and paper-facts on pages 3 and 4, and Components 11",
-    "reason": "The markers are drawn as part of larger rows with differing structure; they share the status tokens, which are linked."
+    "status": "linked",
+    "uses": "139 status markers on Website pages 4, 5 and 7 synchronised from the master; 6 builder table cells not linked (they draw grey readiness words over a progress bar, see the exception)",
+    "code": "the application stylesheet reads every drawn value through the --pc-* variables exported by paper:pull (dot, label, five tones and the table density)"
    },
    "exceptions": [
     {
@@ -3090,6 +4970,24 @@
      "paper": "--color-sage (#5B8A72) ready, --color-gold (#D4A574) otherwise",
      "application": "status tokens: --color-status-done (#436B56) and --color-status-attention (#C49255)",
      "decision": "C15A: status meaning uses the status tokens everywhere; report if the lighter drawn colours are preferred"
+    },
+    {
+     "property": "status dot colours (Paper)",
+     "paper": "87 dots drawn in --color-sage and 38 in #D08A3A",
+     "application": "--color-status-done (#436B56) and --color-status-attention (#C49255)",
+     "decision": "C15C: the Paper markers now use the status tokens, as decided in C15A for the application"
+    },
+    {
+     "property": "\"Details to complete\" and \"Marks needed\" table dots (Paper)",
+     "paper": "eight drawn in --color-sage, the colour for done",
+     "application": "attention gold for an incomplete question",
+     "decision": "C15C: the Paper markers now show attention gold, matching what the words mean"
+    },
+    {
+     "property": "question list marker gap (Paper)",
+     "paper": "6 pixels on four list rows",
+     "application": "8 pixels",
+     "decision": "C15C: the Paper rows now use 8 pixels"
     }
    ]
   },
@@ -3119,7 +5017,9 @@
   },
   "K11": {
    "title": "Navigation",
-   "masters": [],
+   "masters": [
+    "site-nav"
+   ],
    "code": {
     "definition": "app/(accounts)/system/navigation.tsx",
     "stylesheet": "app/(accounts)/system/navigation.module.css",
@@ -3150,8 +5050,9 @@
     ]
    },
    "paper": {
-    "status": "inventoried, not yet a synchronised master",
-    "uses": "40 site-nav and 7 staff-header frames across pages 1 to 7"
+    "status": "linked",
+    "uses": "20 account and builder bars on Website pages 2, 4, 5 and 7 synchronised from the master on Design System page 5; 14 bars not linked (the public and pilot bars on page 1, the staff headers on page 3, and drawings whose links differ)",
+    "code": "the application stylesheet reads every drawn value through the --pc-* variables exported by paper:pull (account variant: bar, wordmark, links, current place, avatar); the public and inverse variants keep application values"
    },
    "exceptions": [
     {
@@ -3167,19 +5068,37 @@
      "property": "wordmark tracking",
      "paper": "-0.01em on the public pages",
      "application": "now -0.01em on account pages too",
-     "decision": "C16: one wordmark"
+     "decision": "C15C: one wordmark"
     },
     {
      "property": "pilot back link",
      "paper": "14/18 at 60 percent white",
      "application": "was 0.85rem in --color-sage-light; now 14/18 in --color-on-inverse-muted (the same sage-light), white on hover",
-     "decision": "C16"
+     "decision": "C15C"
     },
     {
      "property": "public home bar",
      "paper": "--color-off-white with a --color-light-gray rule",
      "application": "same values through --color-background and --color-surface-muted",
      "decision": "no visible change"
+    },
+    {
+     "property": "builder bar padding (Paper)",
+     "paper": "five builder bars on page 5 were drawn with 96 pixel side padding",
+     "application": "64 pixels",
+     "decision": "C15C: the Paper bars now use the master value, 64 pixels"
+    },
+    {
+     "property": "current place underline (Paper)",
+     "paper": "15 bars drew the underline in --color-sage",
+     "application": "--color-action-strong (dark sage)",
+     "decision": "C15C: the Paper bars now use --color-action-strong"
+    },
+    {
+     "property": "gap between initials and account name (Paper)",
+     "paper": "unset on 15 bars (the avatar and label touched)",
+     "application": "10 pixels",
+     "decision": "C15C: the Paper bars now use --spacing-2-5"
     }
    ]
   },
@@ -3205,7 +5124,9 @@
   },
   "K13": {
    "title": "Buttons",
-   "masters": [],
+   "masters": [
+    "button"
+   ],
    "code": {
     "definition": "app/(accounts)/system/button.ts",
     "stylesheet": "app/(accounts)/system/button.module.css",
@@ -3252,57 +5173,76 @@
     ]
    },
    "paper": {
-    "status": "specification board, not yet a synchronised master",
-    "uses": "Design System Components 1 \"Buttons\" (C-0) specifies the anatomy; about 450 button layers on the Website pages"
+    "status": "linked",
+    "uses": "176 labelled primary and secondary buttons synchronised; 23 one-off sizes, 159 text-link layers and 113 icon buttons are not linked (different anatomy)",
+    "code": "the application stylesheet reads every drawn value through the --pc-* variables exported by paper:pull (tones and sizes); text and destructive links keep application values"
    },
    "differences": [
     {
      "property": "account primary",
      "paper": "board: 16 padding as a panel commit, 12 by 20 as a standalone action",
      "application": "standalone primaries move from 12 by 22 to 12 by 20; form commits from a 48 pixel height to 52 (16 padding, 20 line)",
-     "decision": "C16: follow the board"
+     "decision": "C15C: follow the board"
     },
     {
      "property": "secondary outline",
      "paper": "1px --color-action outline on --color-surface",
      "application": "account secondaries had a darker --color-action-strong outline on transparent; now as drawn",
-     "decision": "C16: follow the board"
+     "decision": "C15C: follow the board"
     },
     {
      "property": "paid editor commit buttons",
      "paper": "--text-lg 16/20",
      "application": "were 17/22 with 16 by 24 padding; now 16/20 with 16 padding",
-     "decision": "C16: follow the board"
+     "decision": "C15C: follow the board"
     },
     {
      "property": "builder full-width action, pay and back buttons",
      "paper": "secondary large 15 padding at --text-base; primary large in the order card drawn at 17 padding",
      "application": "one large size (16 padding); the pay button is 2 pixels shorter than its drawing, the back button text 15 pixels instead of 16",
-     "decision": "C16: one large size"
+     "decision": "C15C: one large size"
     },
     {
      "property": "public site",
      "paper": "Website page 1 draws 13 by 30 at 15/18",
      "application": "hero size as drawn; the pilot page CTA was 14 by 32 at 16 pixels and the navigation pilot link 11 by 24 at 14.4 pixels, now hero and action medium",
-     "decision": "C16: follow the drawing"
+     "decision": "C15C: follow the drawing"
     },
     {
      "property": "hover and focus",
      "paper": "secondary hover tint fill drawn; primary hover lift only proposed",
      "application": "every button gets the focus ring; filled buttons darken slightly on hover as the public site already did; text links underline on hover",
-     "decision": "C16: one behaviour everywhere"
+     "decision": "C15C: one behaviour everywhere"
     },
     {
      "property": "text and destructive links",
      "paper": "14/18 600; destructive underlined in --color-warning",
      "application": "padding normalised to 6 by 0 (was 8 by 4, 6 by 0 or 4 by 0); cancel checkout and clear filters now underlined as drawn",
-     "decision": "C16: follow the board"
+     "decision": "C15C: follow the board"
     },
     {
      "property": "paid table \"Edit question\" and the staff record footer",
      "paper": "not drawn at board scale",
      "application": "table edit buttons keep their 13 pixel size as the xsmall size; the staff record footer no longer forces a 48 pixel height on phones (the large size is 52)",
-     "decision": "C16"
+     "decision": "C15C"
+    },
+    {
+     "property": "secondary outline and fill (Paper)",
+     "paper": "131 drawn in --color-sage-dark, 13 in --color-action-strong and one in --color-inverse; 149 without a fill",
+     "application": "1 pixel --color-action outline on --color-surface",
+     "decision": "C15C: the Paper buttons now match the board"
+    },
+    {
+     "property": "button padding (Paper)",
+     "paper": "between-scale paddings: 8, 10, 11, 14 or 15 pixels high and 14, 18, 22, 24 or 32 pixels wide",
+     "application": "the size scale (xsmall, small, medium, hero, large)",
+     "decision": "C15C: each Paper button now uses the nearest size on the scale"
+    },
+    {
+     "property": "label weight, size and colour (Paper)",
+     "paper": "a few labels drawn at weight 400 or 500, 14 or 16 pixels, or dark text on a secondary",
+     "application": "semibold 15 pixels; secondary labels in --color-action-strong",
+     "decision": "C15C: the Paper labels now match the board"
     }
    ],
    "exceptions": [
