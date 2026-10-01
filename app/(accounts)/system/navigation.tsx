@@ -11,7 +11,7 @@ import styles from './navigation.module.css';
 export type NavVariant='account'|'public'|'inverse';
 export function SiteHeader({variant,label,brandHref,children}:{variant:NavVariant;label?:string;brandHref?:string;children?:ReactNode}) {
   const brand=brandHref?<Link className={styles['site-nav__brand']} href={brandHref}>Revise It</Link>:<span className={styles['site-nav__brand']}>Revise It</span>;
-  return <header className={styles['site-header']}>
+  return <header className={[styles['site-header'],styles[`site-header--${variant}`]].filter(Boolean).join(' ')}>
     <nav className={`${styles['site-nav']} ${styles[`site-nav--${variant}`]}`} aria-label={label}>
       <div className={styles['site-nav__inner']}>{brand}{children}</div>
     </nav>

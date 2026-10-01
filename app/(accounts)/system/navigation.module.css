@@ -5,6 +5,9 @@
    read --pc-* values exported from the Paper master (K11) by `npm run paper:pull`; the public and inverse variants
    keep application values. */
 .site-header { display:flex; flex-direction:column; width:100%; border-top:6px solid var(--color-action); font-family:var(--font-body),sans-serif; }
+/* The public bar stays in view while the page scrolls. The header itself is sticky (a sticky child of a header
+   no taller than it would scroll away with it); the -6px offset lets the stripe scroll off and pins the bar at 0. */
+.site-header--public { position:sticky; top:-6px; z-index:100; }
 .site-nav { position:relative; }
 .site-nav__inner { display:flex; align-items:center; justify-content:space-between; gap:20px; }
 .site-nav__brand { display:inline-flex; font-family:var(--font-display),Georgia,serif; font-size:var(--pc-site-nav__brand-font-size); line-height:var(--pc-site-nav__brand-line-height); font-weight:var(--pc-site-nav__brand-font-weight); letter-spacing:var(--tracking-tight); color:var(--color-text); text-decoration:none; }
@@ -28,7 +31,7 @@
 .site-nav--account { border-bottom:var(--pc-site-nav-border-bottom-width) solid var(--pc-site-nav-border-bottom-color); }
 .site-nav--account { padding:var(--pc-site-nav-padding-block) var(--pc-site-nav-padding-inline); }
 /* public: the home page, links centred between the wordmark and the sign-in action */
-.site-nav--public { position:sticky; top:0; z-index:100; background:var(--color-background); border-bottom:1px solid var(--color-surface-muted); }
+.site-nav--public { background:var(--color-background); border-bottom:1px solid var(--color-surface-muted); }
 .site-nav--public .site-nav__inner { display:grid; grid-template-columns:1fr auto 1fr; max-width:1100px; height:60px; margin:0 auto; padding:0 24px; }
 .site-nav--public .site-nav__links { gap:10px; font-size:14px; font-weight:500; }
 .site-nav--public .site-nav__link { padding:0; border:0; font-size:14px; line-height:18px; transition:color .15s ease; }

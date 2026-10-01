@@ -45,3 +45,29 @@ test('privacy policy is reachable and its home link returns to the site', async 
   await expect(page).toHaveURL('/');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 });
+
+// C15C review R1: the shared header must keep the public bar in view while the page scrolls (desktop and phone
+// projects both run this), without making the account or inverse headers sticky.
+test('public header bar stays at the top of the viewport while the home page scrolls', async ({ page }) => {
+  await page.goto('/');
+  const bar = page.getByRole('navigation', { name: 'Site' });
+  await expect(bar).toBeVisible();
+  for (const y of [600, 2400]) {
+    await page.evaluate((top) => window.scrollTo(0, top), y);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThanOrEqual(y - 1);
+    await expect.poll(async () => Math.round((await bar.boundingBox())!.y)).toBe(0);
+    await expect(bar.getByText('Revise It', { exact: true })).toBeInViewport();
+  }
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect.poll(async () => Math.round((await bar.boundingBox())!.y)).toBe(6);
+});
+
+test('account and inverse headers still scroll with the page', async ({ page }) => {
+  for (const path of ['/login', '/pilot']) {
+    await page.goto(path);
+    const header = page.locator('header').first();
+    await expect(header).toBeVisible();
+    expect(await header.evaluate((el) => getComputedStyle(el).position)).toBe('static');
+    expect(await header.locator('nav').evaluate((el) => getComputedStyle(el).position)).not.toBe('sticky');
+  }
+});
