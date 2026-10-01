@@ -111,7 +111,8 @@ export async function exportCode(root,{check=false,force=false,paper:given}={}){
     }
     if(!check&&changed.includes(files.email))execFileSync(process.execPath,['scripts/write-auth-templates.mts'],{cwd:root,stdio:'inherit'});
     for(const file of refused)console.error(`refused: ${file} was edited by hand after it was generated. Move the change to Paper, or rerun with --force to discard it.`);
-    console.log(changed.length?`${check?'Out of date':'Updated'}: ${changed.join(', ')}`:'Application code already matches Paper.');
+    if(changed.length)console.log(`${check?'Out of date':'Updated'}: ${changed.join(', ')}`);
+    else if(!refused.length)console.log('Application code already matches Paper.');
     return refused.length||(check&&changed.length)?1:0;
   }finally{if(!given)paper.close();}
 }
