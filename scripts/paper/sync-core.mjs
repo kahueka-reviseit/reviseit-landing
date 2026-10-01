@@ -56,7 +56,8 @@ export function planInstance({master,instance,spec={},entry={},base,baseContent,
   const omit=new Set([...variant.omit,...(entry.omit??[])]);
   const extras=[...(spec.extras??[]),...(entry.extras??[])];
   const ops=[],drift=[],state={},content={};
-  const styleFor=(name,node)=>({...node.styles,...(variant.styles[name]??{}),...(entry.overrides?.[name]??{})});
+  // A variant may remove a master style by giving it null (for example a closed status dot has an outline, not a fill).
+  const styleFor=(name,node)=>Object.fromEntries(Object.entries({...node.styles,...(variant.styles[name]??{}),...(entry.overrides?.[name]??{})}).filter(([,v])=>v!==null));
   const textFor=(name,node)=>variant.text[name]??node.text??'';
   const desiredTree=node=>({...node,styles:styleFor(node.name,node),text:node.type==='Text'?textFor(node.name,node):undefined,children:node.children.filter(c=>!omit.has(c.name)).map(desiredTree)});
 
@@ -85,7 +86,9 @@ export function planInstance({master,instance,spec={},entry={},base,baseContent,
     state[key]=hashOf(now);
     if(Object.keys(own).length)content[key]={...(content[key]??{}),styles:own};
     if(slot)content[key]={...(content[key]??{}),text:node.text};
-    if(node.type!==masterNode.type)drift.push({kind:'layer-type',key,nodeId:node.id,found:node.type,master:masterNode.type});
+    // Paper draws a plain box as either a Frame or a Rectangle; without children the two are the same shape.
+    const box=n=>(n.type==='Frame'||n.type==='Rectangle')&&!n.children.length;
+    if(node.type!==masterNode.type&&!(box(node)&&box(masterNode)))drift.push({kind:'layer-type',key,nodeId:node.id,found:node.type,master:masterNode.type});
     children(masterNode,node,key);
   }
 

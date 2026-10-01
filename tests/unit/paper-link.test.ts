@@ -87,6 +87,26 @@ describe('one master, every registered instance',()=>{
     expect(isClean(await survey(paper,registry,lock))).toBe(true);
   });
 
+  it('treats a childless Rectangle and Frame as the same box, but not a Text',async()=>{
+    // A layer with no children: the master draws a Frame, this instance a Rectangle.
+    for(const [file,nth] of [['ds',0],['ds',1],['web',0],['web',1]] as const)paper.node(file,'card__rows',nth).children=[];
+    const plain=await survey(paper,registry,emptyLock());
+    paper.node('web','card__rows',0).type='Rectangle' as any;
+    const kinds=(await survey(paper,registry,emptyLock())).instances.flatMap((i:any)=>i.drift.map((d:any)=>d.kind));
+    expect(plain.instances.flatMap((i:any)=>i.drift)).toEqual([]);
+    expect(kinds).not.toContain('layer-type');
+    paper.node('web','card__rows',0).type='Text' as any;
+    expect((await survey(paper,registry,lock)).instances.flatMap((i:any)=>i.drift.map((d:any)=>d.kind))).toContain('layer-type');
+  });
+
+  it('lets a variant remove a master style with null',async()=>{
+    registry.masters.card.variants.bare={styles:{card:{backgroundColor:null}}};
+    registry.masters.card.instances[1].variant='bare';
+    await sync({});
+    expect(paper.node('web','card',0).styles.backgroundColor).toBeUndefined();
+    expect(isClean(await survey(paper,registry,lock))).toBe(true);
+  });
+
   it('changes nothing on a second run with no new input',async()=>{
     paper.edit('ds','card',{gap:'24px'});await sync({});
     const writes=paper.calls.length,again=await sync({});

@@ -45,7 +45,7 @@ export function componentValues(id,spec,tree){
   });
   for(const [variant,definition] of Object.entries(spec.variants??{}))
     for(const [layer,styles] of Object.entries(definition.styles??{}))
-      for(const [prop,value] of Object.entries(styles))if(exported.test(prop))values[`--pc-${layer}--${variant}-${kebab(prop)}`]=String(value);
+      for(const [prop,value] of Object.entries(styles))if(exported.test(prop))values[`--pc-${layer}--${variant}-${kebab(prop)}`]=value===null?'initial':String(value);
   return values;
 }
 export function componentsCss(record){

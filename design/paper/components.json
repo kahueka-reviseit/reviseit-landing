@@ -90,6 +90,10 @@
     "p-G-0": {
      "status": "illustration",
      "role": "platform map and screen directory"
+    },
+    "p-J-0": {
+     "status": "proposal",
+     "role": "department credits design from a separate thread; not scanned or changed by component synchronisation"
     }
    }
   }
@@ -787,6 +791,1839 @@
      "kind": "exception",
      "where": "A4 Paper intent: filled",
      "reason": "Builder-area intent check that predates the renewed notice (application: teacher/paper.module.css). Kept as drawn."
+    }
+   ]
+  },
+  "site-nav": {
+   "family": "K11",
+   "file": "design-system",
+   "node": "32C-0",
+   "block": "site-nav",
+   "scan": [
+    "site-nav"
+   ],
+   "slots": [
+    "site-nav__initials",
+    "site-nav__label--curricula",
+    "site-nav__label--papers",
+    "site-nav__label--account"
+   ],
+   "variants": {
+    "current-curricula": {
+     "styles": {
+      "site-nav__link--curricula": {
+       "paddingBottom": "4px",
+       "borderBottomWidth": "2px",
+       "borderBottomStyle": "solid",
+       "borderBottomColor": "var(--color-action-strong)"
+      },
+      "site-nav__label--curricula": {
+       "fontWeight": "var(--font-weight-semibold)",
+       "color": "var(--color-text)"
+      }
+     }
+    },
+    "current-papers": {
+     "styles": {
+      "site-nav__link--papers": {
+       "paddingBottom": "4px",
+       "borderBottomWidth": "2px",
+       "borderBottomStyle": "solid",
+       "borderBottomColor": "var(--color-action-strong)"
+      },
+      "site-nav__label--papers": {
+       "fontWeight": "var(--font-weight-semibold)",
+       "color": "var(--color-text)"
+      }
+     }
+    },
+    "current-account": {
+     "styles": {
+      "site-nav__link--account": {
+       "paddingBottom": "4px",
+       "borderBottomWidth": "2px",
+       "borderBottomStyle": "solid",
+       "borderBottomColor": "var(--color-action-strong)"
+      },
+      "site-nav__label--account": {
+       "fontWeight": "var(--font-weight-semibold)",
+       "color": "var(--color-text)"
+      }
+     }
+    },
+    "no-avatar": {
+     "omit": [
+      "site-nav__avatar"
+     ]
+    }
+   },
+   "instances": [
+    {
+     "file": "website",
+     "node": "7HD-0",
+     "where": "page p-8-0",
+     "variant": [
+      "current-papers",
+      "no-avatar"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EEE-0",
+     "where": "page p-8-0",
+     "variant": [
+      "current-papers",
+      "no-avatar"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "ELP-0",
+     "where": "page p-8-0",
+     "variant": [
+      "current-papers",
+      "no-avatar"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "80Y-0",
+     "where": "page p-8-0",
+     "variant": [
+      "current-papers",
+      "no-avatar"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8ER-0",
+     "where": "page p-8-0",
+     "variant": [
+      "current-papers",
+      "no-avatar"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "5N0-0",
+     "where": "page p-6-0",
+     "variant": [
+      "current-curricula",
+      "no-avatar"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "65W-0",
+     "where": "page p-6-0",
+     "variant": [
+      "current-curricula",
+      "no-avatar"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "6I0-0",
+     "where": "page p-6-0",
+     "variant": [
+      "current-curricula",
+      "no-avatar"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "6T6-0",
+     "where": "page p-6-0",
+     "variant": [
+      "current-curricula",
+      "no-avatar"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "3JI-0",
+     "where": "page p-6-0",
+     "variant": [
+      "current-curricula",
+      "no-avatar"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "C03-0",
+     "where": "page p-A-0",
+     "variant": [
+      "current-curricula"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AHF-0",
+     "where": "page p-C-0",
+     "variant": [
+      "current-papers"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AL6-0",
+     "where": "page p-C-0",
+     "variant": [
+      "current-papers"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AUF-0",
+     "where": "page p-C-0",
+     "variant": [
+      "current-papers"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "B8Z-0",
+     "where": "page p-A-0",
+     "variant": [
+      "current-account"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8XB-0",
+     "where": "page p-8-0",
+     "variant": [
+      "current-papers",
+      "no-avatar"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A1S-0",
+     "where": "page p-8-0",
+     "variant": [
+      "current-papers",
+      "no-avatar"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "ADY-0",
+     "where": "page p-8-0",
+     "variant": [
+      "current-papers",
+      "no-avatar"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "98W-0",
+     "where": "page p-8-0",
+     "variant": [
+      "current-papers",
+      "no-avatar"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9M7-0",
+     "where": "page p-8-0",
+     "variant": [
+      "current-papers",
+      "no-avatar"
+     ]
+    }
+   ],
+   "notLinked": [
+    {
+     "file": "website",
+     "node": "8Q-0",
+     "kind": "variant",
+     "where": "Home, desktop: public variant (centred links, sign-in action)",
+     "reason": "public variant (centred links, sign-in action)"
+    },
+    {
+     "file": "website",
+     "node": "25M-0",
+     "kind": "variant",
+     "where": "Home, mobile: public variant",
+     "reason": "public variant"
+    },
+    {
+     "file": "website",
+     "node": "1MK-0",
+     "kind": "variant",
+     "where": "Pilot programme: inverse variant",
+     "reason": "inverse variant"
+    },
+    {
+     "file": "website",
+     "node": "1ZT-0",
+     "kind": "variant",
+     "where": "Privacy policy: inverse variant",
+     "reason": "inverse variant"
+    },
+    {
+     "file": "website",
+     "node": "B47-0",
+     "kind": "exception",
+     "where": "T1 Create your account: signed-out variant with a prompt and a button",
+     "reason": "signed-out variant with a prompt and a button"
+    },
+    {
+     "file": "website",
+     "node": "34C-0",
+     "kind": "exception",
+     "where": "C1 builder overview: links drawn as plain text, not link frames; linking would rebuild them",
+     "reason": "links drawn as plain text, not link frames; linking would rebuild them"
+    },
+    {
+     "file": "website",
+     "node": "3Z4-0",
+     "kind": "exception",
+     "where": "C2: links drawn as plain text",
+     "reason": "links drawn as plain text"
+    },
+    {
+     "file": "website",
+     "node": "4XH-0",
+     "kind": "exception",
+     "where": "C3: links drawn as plain text",
+     "reason": "links drawn as plain text"
+    },
+    {
+     "file": "website",
+     "node": "53J-0",
+     "kind": "exception",
+     "where": "C4: links drawn as plain text",
+     "reason": "links drawn as plain text"
+    },
+    {
+     "file": "website",
+     "node": "3FP-0",
+     "kind": "exception",
+     "where": "A1 My curricula: an older account cluster (site-nav__account) instead of the three links",
+     "reason": "an older account cluster (site-nav__account) instead of the three links"
+    },
+    {
+     "file": "website",
+     "node": "3K6-0",
+     "kind": "exception",
+     "where": "A2: older account cluster",
+     "reason": "older account cluster"
+    },
+    {
+     "file": "website",
+     "node": "3S5-0",
+     "kind": "exception",
+     "where": "A3: older account cluster",
+     "reason": "older account cluster"
+    },
+    {
+     "file": "website",
+     "node": "4IT-0",
+     "kind": "exception",
+     "where": "A4: older account cluster",
+     "reason": "older account cluster"
+    },
+    {
+     "file": "website",
+     "node": "8HC-0",
+     "kind": "exception",
+     "where": "D4 phone: a single current-place label instead of links",
+     "reason": "a single current-place label instead of links"
+    }
+   ]
+  },
+  "field": {
+   "family": "K02",
+   "file": "design-system",
+   "node": "32W-0",
+   "block": "field",
+   "scan": [
+    "field",
+    "field--error"
+   ],
+   "slots": [
+    "field__label",
+    "field__value",
+    "field__hint",
+    "field__error-text"
+   ],
+   "overridable": {
+    "field": [
+     "width",
+     "flexShrink",
+     "flexGrow",
+     "flexBasis"
+    ]
+   },
+   "extras": [
+    "SVG"
+   ],
+   "variants": {
+    "plain": {
+     "omit": [
+      "field__hint",
+      "field__error"
+     ]
+    },
+    "hint": {
+     "omit": [
+      "field__error"
+     ]
+    },
+    "error": {
+     "omit": [
+      "field__hint"
+     ],
+     "styles": {
+      "text-input": {
+       "borderWidth": "2px",
+       "borderColor": "var(--color-warning)"
+      }
+     }
+    },
+    "placeholder": {
+     "styles": {
+      "field__value": {
+       "color": "var(--color-text-subtle)"
+      }
+     }
+    }
+   },
+   "instances": [
+    {
+     "file": "website",
+     "node": "B53-0",
+     "where": "T1 Create your account: full name",
+     "variant": "plain"
+    },
+    {
+     "file": "website",
+     "node": "B58-0",
+     "where": "T1: school",
+     "variant": "plain"
+    },
+    {
+     "file": "website",
+     "node": "B5C-0",
+     "where": "T1: department (narrow)",
+     "variant": [
+      "plain",
+      "placeholder"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "B5G-0",
+     "where": "T1: school email, error",
+     "variant": "error"
+    },
+    {
+     "file": "website",
+     "node": "C1F-0",
+     "where": "F1 School formatting: school heading, with hint",
+     "variant": "hint"
+    }
+   ],
+   "notLinked": [
+    {
+     "file": "website",
+     "node": "B5P-0",
+     "kind": "exception",
+     "where": "T1: password",
+     "reason": "A password control with a show toggle and an icon hint; a separate control anatomy"
+    },
+    {
+     "file": "website",
+     "node": "C0W-0",
+     "kind": "exception",
+     "where": "F1: font",
+     "reason": "A select with a chevron; a separate control anatomy"
+    },
+    {
+     "file": "website",
+     "node": "C12-0",
+     "kind": "exception",
+     "where": "F1: text size",
+     "reason": "A select"
+    },
+    {
+     "file": "website",
+     "node": "C18-0",
+     "kind": "exception",
+     "where": "F1: spacing",
+     "reason": "A segmented control"
+    }
+   ]
+  },
+  "status": {
+   "family": "K09",
+   "file": "design-system",
+   "node": "33C-0",
+   "block": "status",
+   "export": false,
+   "scan": [
+    "question-table__cell--status",
+    "question-list__status",
+    "paper-list__cell--status"
+   ],
+   "slots": [
+    "status__label"
+   ],
+   "overridable": {
+    "status": [
+     "width",
+     "flexShrink"
+    ]
+   },
+   "variants": {
+    "done": {},
+    "progress": {
+     "styles": {
+      "status-dot": {
+       "backgroundColor": "var(--color-status-progress)"
+      },
+      "status__label": {
+       "color": "var(--color-structured)"
+      }
+     }
+    },
+    "attention": {
+     "styles": {
+      "status-dot": {
+       "backgroundColor": "var(--color-status-attention)"
+      },
+      "status__label": {
+       "color": "var(--color-caution-text)"
+      }
+     }
+    },
+    "problem": {
+     "styles": {
+      "status-dot": {
+       "backgroundColor": "var(--color-status-problem)"
+      },
+      "status__label": {
+       "color": "var(--color-warning-text)"
+      }
+     }
+    },
+    "closed": {
+     "styles": {
+      "status-dot": {
+       "backgroundColor": null,
+       "borderWidth": "1.5px",
+       "borderStyle": "solid",
+       "borderColor": "var(--color-text-subtle)"
+      },
+      "status__label": {
+       "color": "var(--color-text-muted)"
+      }
+     }
+    },
+    "table": {
+     "styles": {
+      "status__label": {
+       "fontSize": "var(--text-sm)",
+       "lineHeight": "var(--leading-xs)",
+       "fontWeight": "var(--font-weight-regular)",
+       "color": "var(--color-text)"
+      }
+     }
+    }
+   },
+   "instances": [
+    {
+     "file": "website",
+     "node": "7IU-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7JJ-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7K7-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7KV-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7LJ-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7M7-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7MV-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7NJ-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7O7-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7OV-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7PK-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7Q9-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7QY-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "ED9-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "ECL-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EBX-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EB9-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EAL-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "E9X-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "E99-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "E8L-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "E7X-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "E79-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "E6K-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "E5V-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "E56-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EKM-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EK5-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EJO-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EJ7-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EIQ-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EI9-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EHS-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EHB-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EGU-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EGD-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EFV-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EFD-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "EEV-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7ZT-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7Z5-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7YH-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7XT-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7X5-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7WH-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7VT-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7V5-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7UH-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7TT-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7T4-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7SF-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "7RQ-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8DM-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8CY-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8CA-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8BM-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8AY-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8AA-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "89M-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "88Y-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "88A-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "87M-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "86X-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "868-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "85J-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8W6-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8VI-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8UU-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8U6-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8TI-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8SU-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8S6-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8RI-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8QU-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8Q6-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8PH-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8OS-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8O3-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A0N-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9ZZ-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9ZB-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9YN-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9XZ-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9XB-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9WN-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9VZ-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9VB-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9UN-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9TY-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9T9-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9SK-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "ACT-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AC5-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "ABH-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AAT-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AA5-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A9H-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A8T-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A85-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A7H-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A6T-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A64-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A5F-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "A4Q-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "97R-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "973-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "96F-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "95R-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "953-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "94F-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "93R-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "933-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "92F-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "91R-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "912-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "90D-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8ZO-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9L2-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9KE-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9JQ-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9J2-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9IE-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9HQ-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9H2-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9GE-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9FQ-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9F2-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9ED-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9DO-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "9CZ-0",
+     "where": "p-8-0 question-table__cell--status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8HY-0",
+     "where": "p-8-0 question-list__status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8IK-0",
+     "where": "p-8-0 question-list__status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8J8-0",
+     "where": "p-8-0 question-list__status",
+     "variant": [
+      "done",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "8JW-0",
+     "where": "p-8-0 question-list__status",
+     "variant": [
+      "attention",
+      "table"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AIB-0",
+     "where": "p-C-0 paper-list__cell--status",
+     "variant": [
+      "attention"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AIU-0",
+     "where": "p-C-0 paper-list__cell--status",
+     "variant": [
+      "attention"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AJ9-0",
+     "where": "p-C-0 paper-list__cell--status",
+     "variant": [
+      "progress"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AJY-0",
+     "where": "p-C-0 paper-list__cell--status",
+     "variant": [
+      "done"
+     ]
+    },
+    {
+     "file": "website",
+     "node": "AKJ-0",
+     "where": "p-C-0 paper-list__cell--status",
+     "variant": [
+      "closed"
+     ]
+    }
+   ],
+   "notLinked": [
+    {
+     "file": "website",
+     "node": "37Y-0",
+     "kind": "exception",
+     "where": "builder C1 table and status column",
+     "reason": "Paper page 5 draws the builder row status as grey text over a hidden progress bar, not as the dot marker; recorded under K09 as a distinct presentation."
+    },
+    {
+     "file": "website",
+     "node": "3AA-0",
+     "kind": "exception",
+     "where": "builder C1 table and status column",
+     "reason": "Paper page 5 draws the builder row status as grey text over a hidden progress bar, not as the dot marker; recorded under K09 as a distinct presentation."
+    },
+    {
+     "file": "website",
+     "node": "3AT-0",
+     "kind": "exception",
+     "where": "builder C1 table and status column",
+     "reason": "Paper page 5 draws the builder row status as grey text over a hidden progress bar, not as the dot marker; recorded under K09 as a distinct presentation."
+    },
+    {
+     "file": "website",
+     "node": "3BC-0",
+     "kind": "exception",
+     "where": "builder C1 table and status column",
+     "reason": "Paper page 5 draws the builder row status as grey text over a hidden progress bar, not as the dot marker; recorded under K09 as a distinct presentation."
+    },
+    {
+     "file": "website",
+     "node": "3GL-0",
+     "kind": "exception",
+     "where": "builder C1 table and status column",
+     "reason": "Paper page 5 draws the builder row status as grey text over a hidden progress bar, not as the dot marker; recorded under K09 as a distinct presentation."
+    },
+    {
+     "file": "website",
+     "node": "3BV-0",
+     "kind": "exception",
+     "where": "builder C1 table and status column",
+     "reason": "Paper page 5 draws the builder row status as grey text over a hidden progress bar, not as the dot marker; recorded under K09 as a distinct presentation."
     }
    ]
   }
