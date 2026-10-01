@@ -7,6 +7,7 @@ import { serviceClient } from '../../../../lib/supabase/service';
 import { authConfig } from '../../../../lib/supabase/config';
 export const dynamic='force-dynamic';
 function refusal(message:string){
+ if(/Use department credit/.test(message))return reply({error:'Return to your paper and create it with department credit.'},409);
  const mix=/^This pilot allows up to (\d{1,2}) structured and (\d{1,2}) multiple-choice questions per paper\./.exec(message);
  if(mix)return reply({error:`This pilot allows up to ${mix[1]} structured and ${mix[2]} multiple-choice questions per paper.`},422);
  const size=/^This pilot allows up to (\d{1,2}) questions per paper\./.exec(message);

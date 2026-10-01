@@ -37,12 +37,13 @@ async function call(config: StripeConfig, method: 'GET' | 'POST', path: string, 
   if (!response.ok || !value) throw new StripeError('Stripe request failed', response.status, value?.error?.code);
   return value;
 }
-export type CheckoutSession = { id: string; url: string | null; livemode: boolean; status: string; paymentStatus: string; amountTotal: number | null; currency: string | null; clientReferenceId: string | null; metadataOrderId: string | null; paymentIntent: string | null };
+export type CheckoutSession = { id: string; url: string | null; livemode: boolean; status: string; paymentStatus: string; amountTotal: number | null; currency: string | null; clientReferenceId: string | null; metadataOrderId: string | null; metadataPurchaseId?:string|null; paymentIntent: string | null };
 export function readSession(value: Record<string, any>): CheckoutSession {
   if (value?.object !== 'checkout.session' || typeof value.id !== 'string') throw new StripeError('Unexpected Stripe object', 502);
   return { id: value.id, url: typeof value.url === 'string' ? value.url : null, livemode: value.livemode === true, status: String(value.status), paymentStatus: String(value.payment_status),
     amountTotal: Number.isSafeInteger(value.amount_total) ? value.amount_total : null, currency: typeof value.currency === 'string' ? value.currency : null,
     clientReferenceId: typeof value.client_reference_id === 'string' ? value.client_reference_id : null,
+    metadataPurchaseId: typeof value.metadata?.credit_purchase_id==='string'?value.metadata.credit_purchase_id:null,
     metadataOrderId: typeof value.metadata?.order_id === 'string' ? value.metadata.order_id : null,
     paymentIntent: typeof value.payment_intent === 'string' ? value.payment_intent : typeof value.payment_intent?.id === 'string' ? value.payment_intent.id : null };
 }
@@ -75,3 +76,14 @@ export async function expireCheckoutSession(config: StripeConfig, id: string, fe
 export function sessionRecord(s: CheckoutSession) {
   return { id: s.id, clientReferenceId: s.clientReferenceId, metadataOrderId: s.metadataOrderId, livemode: s.livemode, amountTotal: s.amountTotal, currency: s.currency, paymentStatus: s.paymentStatus, status: s.status, paymentIntent: s.paymentIntent };
 }
+
+export async function createCreditCheckoutSession(config:StripeConfig,input:{purchaseId:string;amountMinor:number;siteUrl:string;email:string;expiresAt:Date},fetcher?:Fetcher){
+ if(!Number.isSafeInteger(input.amountMinor)||input.amountMinor<100||input.amountMinor>100000000)throw new StripeError('Invalid top-up',400);
+ const p=new URLSearchParams({mode:'payment','line_items[0][quantity]':'1','line_items[0][price_data][currency]':'zar',
+ 'line_items[0][price_data][unit_amount]':String(input.amountMinor),'line_items[0][price_data][product_data][name]':'Revise It department credit',
+ client_reference_id:input.purchaseId,'metadata[credit_purchase_id]':input.purchaseId,'payment_intent_data[metadata][credit_purchase_id]':input.purchaseId,
+ success_url:`${input.siteUrl}/teacher/department?purchase=${input.purchaseId}`,cancel_url:`${input.siteUrl}/teacher/department?purchase=${input.purchaseId}`,
+ 'adaptive_pricing[enabled]':'false',expires_at:String(Math.floor(input.expiresAt.getTime()/1000)),customer_email:input.email});
+ return readSession(await call(config,'POST','/v1/checkout/sessions',p,`reviseit-credit-${input.purchaseId}`,fetcher));
+}
+export function creditSessionRecord(s:CheckoutSession){return {...sessionRecord(s),metadataPurchaseId:s.metadataPurchaseId??null};}

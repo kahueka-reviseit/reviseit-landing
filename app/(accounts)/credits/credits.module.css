@@ -1,0 +1,24 @@
+/* C16 H2/T1/S1/M1: exact Paper CSS values, using the shared semantic tokens. */
+.department {padding:48px 64px 32px;max-width:1440px;margin:auto;width:100%;box-sizing:border-box;}
+.department__header {display:flex;justify-content:space-between;gap:24px;align-items:flex-end;margin-bottom:28px;}
+.department__eyebrow {font-size:12px;line-height:16px;letter-spacing:.2em;text-transform:uppercase;color:var(--color-structured);font-weight:600;}
+.department__title {font-family:var(--font-display);font-size:52px;line-height:58px;letter-spacing:-.01em;margin:10px 0;}
+.department__lede {font-size:16px;line-height:24px;color:var(--color-text-muted);max-width:640px;}
+.department__columns {display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:32px;align-items:start;}
+.department__stack {display:grid;gap:24px;min-width:0;}
+.credit-card {background:var(--color-surface);border:1px solid var(--color-border);border-radius:14px;overflow:hidden;}
+.credit-card__body {padding:28px 32px 24px;}
+.credit-card__title {font-family:var(--font-display);font-size:24px;line-height:30px;margin:0 0 16px;}
+.credit-card__label {font-size:12px;line-height:16px;letter-spacing:.12em;color:var(--color-text-muted);font-weight:600;}
+.credit-card__balance {font-size:64px;line-height:72px;font-weight:600;letter-spacing:-.02em;margin:4px 0 12px;}
+.credit-card__row {display:flex;gap:16px;align-items:center;padding:14px 32px;border-top:1px solid var(--color-surface-muted);}
+.credit-card__primary {flex:1;min-width:0;overflow-wrap:anywhere;}
+.credit-card__secondary {display:block;font-size:13px;line-height:18px;color:var(--color-text-muted);}
+.credit-card__amount {min-width:100px;text-align:right;font-variant-numeric:tabular-nums;}
+.credit-card__form {display:grid;gap:16px;}
+.credit-card__field {display:grid;gap:6px;}
+.credit-card__actions {display:flex;gap:12px;flex-wrap:wrap;}
+.credit-card__empty {padding:20px 32px;color:var(--color-text-muted);}
+.credit-card__role {border-radius:999px;background:var(--color-action-tint);color:var(--color-action-strong);padding:3px 10px;font-size:12px;font-weight:600;}
+@media(max-width:900px){.department {padding:32px 24px;}.department__columns {grid-template-columns:1fr;}.department__header {align-items:start;flex-direction:column;}}
+@media(max-width:480px){.department {padding:28px 20px;}.department__title {font-size:32px;line-height:38px;}.credit-card__body {padding:24px 20px;}.credit-card__row {padding:14px 20px;flex-wrap:wrap;}.credit-card__balance {font-size:48px;line-height:56px;}.credit-card__amount {min-width:80px;}}

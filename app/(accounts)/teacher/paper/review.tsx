@@ -1,5 +1,6 @@
 'use client';
 import type { ReactNode } from 'react';
+import {CreditCheckout} from '../../credits/checkout';
 import { documents, documentLabels, type DocumentName } from '../../../../lib/jobs/contracts';
 import styles from '../paper.module.css';
 import { InlineNotice } from '../../system/notice';
@@ -34,7 +35,7 @@ export default function ReviewView({paper,status}:{paper:PaperModel;status:React
   (['multiple_choice','structured'] as const).forEach(k=>{const t=paper.sectionTargets[k];if(t!==undefined&&t!==paper.sectionTotal(k))problems.push(`${k==='multiple_choice'?'Multiple choice':'Structured'} section: ${paper.sectionTotal(k)} of ${t} marks.`);});
   const lineStatus=(ok:boolean)=>ok?'Marks set':'Marks needed';
   return <>
-    <PageHeader back={{label:`Back to paper builder · ${data.module!.name}`,onClick:()=>paper.go('builder')}} title="Review and pay"
+    <PageHeader back={{label:`Back to paper builder · ${data.module!.name}`,onClick:()=>paper.go('builder')}} title={data.purchase?.departmentCredit?"Review and create":"Review and pay"}
       subtitle={`${data.module!.name} · ${configured?(paperTarget!==null?`${paperTarget} marks`:'total not set'):`${allocatedTotal} marks`} · ${n} ${n===1?'question':'questions'}`} aside={<Stages stages={journey(paper,3)}/>}/>
     {status}
     <div className={styles['page-body']}>
@@ -54,11 +55,12 @@ export default function ReviewView({paper,status}:{paper:PaperModel;status:React
         </section>
         <section className={styles['card--panel']} aria-labelledby="next-steps">
           <p id="next-steps" className={styles['eyebrow--neutral']}>What happens next</p>
-          <ol className={styles['steps']}>{next.map((s,i)=><li key={s.title}><span>{i+1}</span><strong>{s.title}</strong><p>{s.text}</p></li>)}</ol>
+          <ol className={styles['steps']}>{(data.purchase?.departmentCredit?[{title:'Create with department credit',text:'Accept the quoted price. Your total marks and price then stay fixed.'},...next.slice(1)]:next).map((s,i)=><li key={s.title}><span>{i+1}</span><strong>{s.title}</strong><p>{s.text}</p></li>)}</ol>
         </section>
       </div>
       <aside className={styles['page-body__aside']} aria-label="Order summary">
         <section className={`${styles['card']} ${styles['section--order']}`}>
+          {data.purchase?.departmentCredit?<CreditCheckout key={JSON.stringify([paper.allocation,paper.sectionTargets,paper.paperTarget,paper.ids,paper.data.selection.revision])} paper={paper}/>:<>
           <p className={styles['eyebrow--positive']}>Order summary</p>
           <p className={styles['order-summary__line']}><span>Revise It assessment paper (pilot)</span><span>{price}</span></p>
           <p className={styles['order-summary__total']}><span>Total</span><strong>{price}</strong></p>
@@ -75,6 +77,7 @@ export default function ReviewView({paper,status}:{paper:PaperModel;status:React
             occurrences.some(o=>!o.entry.orderable) ? <p className={styles['card__body']}>Remove questions that are not yet available before paying.</p> : null}
           <button type="button" className={button('primary',{size:'large',full:true})} disabled={busy||!paper.canPay} onClick={()=>void paper.checkout()}>{busy?'Please wait…':`Pay with Stripe · ${price}`}</button>
           <p className={styles['order-summary__note']}>You will be taken to Stripe’s secure page. Your questions stay saved if you come back without paying. After payment is confirmed you answer the detailed questions for the questions you bought.</p>
+          </>}
         </section>
         <button type="button" className={button('secondary',{size:'large',full:true})} onClick={()=>paper.go('builder')}>{Icon.back()} Back to paper builder</button>
       </aside>

@@ -4495,7 +4495,7 @@
    }
   },
   "component layers, spacing, type and colour bindings": {
-   "owner": "the master frame on the Design System page \"5 Linked components · masters (C15)\"",
+   "owner": "the master frame on the Design System page \"5 Linked components \u00b7 masters (C15)\"",
    "reaches": {
     "registered Paper instances in both files": "synchronised by paper:plan and paper:apply (Paper has no native master and instance link)",
     "application": "exported by paper:pull into app/paper-components.css, consumed by the shared component stylesheet"
@@ -4717,12 +4717,19 @@
     "importSites": [
      "app/(accounts)/admin/accounts/page.tsx",
      "app/(accounts)/admin/accounts/review.tsx",
+     "app/(accounts)/admin/departments/page.tsx",
      "app/(accounts)/admin/papers/page.tsx",
      "app/(accounts)/auth/confirm/form.tsx",
      "app/(accounts)/auth/confirm/page.tsx",
+     "app/(accounts)/credits/checkout.tsx",
+     "app/(accounts)/credits/grant-form.tsx",
+     "app/(accounts)/credits/member-controls.tsx",
+     "app/(accounts)/credits/offers.tsx",
+     "app/(accounts)/credits/topup.tsx",
      "app/(accounts)/forms.tsx",
      "app/(accounts)/login/page.tsx",
      "app/(accounts)/register/page.tsx",
+     "app/(accounts)/teacher/department/page.tsx",
      "app/(accounts)/teacher/orders/[id]/configure.tsx",
      "app/(accounts)/teacher/orders/[id]/jev-advice.tsx",
      "app/(accounts)/teacher/orders/[id]/view.tsx",
@@ -5141,8 +5148,14 @@
      "app/(accounts)/admin/papers/page.tsx",
      "app/(accounts)/admin/papers/record.tsx",
      "app/(accounts)/auth/confirm/form.tsx",
+     "app/(accounts)/credits/checkout.tsx",
+     "app/(accounts)/credits/grant-form.tsx",
+     "app/(accounts)/credits/member-controls.tsx",
+     "app/(accounts)/credits/offers.tsx",
+     "app/(accounts)/credits/topup.tsx",
      "app/(accounts)/forms.tsx",
      "app/(accounts)/shell.tsx",
+     "app/(accounts)/teacher/department/page.tsx",
      "app/(accounts)/teacher/orders/[id]/configure.tsx",
      "app/(accounts)/teacher/orders/[id]/jev-advice.tsx",
      "app/(accounts)/teacher/orders/[id]/paper-panel.tsx",

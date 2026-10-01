@@ -18,6 +18,7 @@ const closedPayments = ['expired','failed','cancelled','refunded'];
 
 export function paymentFact(payment:Order['payment'], internalTest=false):Fact {
   if(!payment) return internalTest?{tone:'closed',value:'No payment',detail:'Internal test order'}:{tone:'closed',value:'No payment recorded'};
+  if(payment.source==='department_credit')return payment.status==='refunded'?{tone:'closed',value:'Credit returned',detail:'Paper closed'}:{tone:'done',value:`${formatRand(payment.amountMinor)} from department credit`,detail:payment.testMode?'Test credit, no real money':'Department balance debited'};
   const test=payment.testMode?'Stripe test mode, no real charge':undefined;
   const amount=formatRand(payment.amountMinor);
   switch(payment.status){

@@ -1,4 +1,4 @@
-import { retrieveCheckoutSession,sessionRecord,stripeConfig,verifySignature } from '../../../../lib/payments/stripe';
+import { retrieveCheckoutSession,sessionRecord,creditSessionRecord,stripeConfig,verifySignature } from '../../../../lib/payments/stripe';
 import { serviceClient } from '../../../../lib/supabase/service';
 import { reply } from '../../../../lib/jobs/server';
 export const dynamic='force-dynamic';
@@ -19,14 +19,18 @@ export async function POST(request:Request){
  try{
   if(checkoutEvents.includes(event.type)){
    const session=await retrieveCheckoutSession(stripe,String(object?.id||''));
-   const r=await service.rpc('record_stripe_checkout',{event_id:event.id,event_type:event.type,event_livemode:event.livemode,session:sessionRecord(session)});
+   const r=session.metadataPurchaseId?await service.rpc('record_credit_checkout',{event_id:event.id,event_type:event.type,event_livemode:event.livemode,session:creditSessionRecord(session)}):await service.rpc('record_stripe_checkout',{event_id:event.id,event_type:event.type,event_livemode:event.livemode,session:sessionRecord(session)});
    if(r.error)throw new Error('Record failed');
    return reply({received:true,outcome:r.data?.outcome??null});
   }
   if(event.type==='charge.refunded'&&typeof object?.payment_intent==='string'){
    const r=await service.rpc('record_stripe_refund',{event_id:event.id,event_livemode:event.livemode,payment_intent:object.payment_intent,amount_refunded:Number(object.amount_refunded),refund_currency:String(object.currency)});
    if(r.error)throw new Error('Record failed');
+   {const credit=await service.rpc('record_credit_payment_alert',{event_id:event.id,event_livemode:event.livemode,payment_intent:object.payment_intent,amount_refunded:Number(object.amount_refunded),disputed:false});if(credit.error)throw new Error('Credit alert failed');}
    return reply({received:true,outcome:r.data?.outcome??null});
+  }
+  if(event.type==='charge.dispute.created'&&typeof object?.payment_intent==='string'){
+   const r=await service.rpc('record_credit_payment_alert',{event_id:event.id,event_livemode:event.livemode,payment_intent:object.payment_intent,amount_refunded:0,disputed:true});if(r.error)throw new Error('Credit alert failed');return reply({received:true,outcome:'needs_review'});
   }
   return reply({received:true,outcome:'ignored'});
  }catch{return reply({error:'Temporarily unavailable'},500);}

@@ -1,3 +1,4 @@
+import {creditsEnabled} from '../../../../../lib/credits/server';
 import { notFound } from 'next/navigation';
 import { requireTeacher } from '../../../../../lib/auth/access';
 import { isUuid } from '../../../../../lib/jobs/contracts';
@@ -18,6 +19,6 @@ export default async function OrderPage({params}:{params:Promise<{id:string}>}){
  // Promise an email only when completion email is actually on for this teacher.
  const delivery=await supabase.rpc('my_email_delivery');
  const completionEmail=!delivery.error&&delivery.data?.completionEmail===true&&typeof delivery.data.address==='string'?delivery.data.address:null;
- return <><TeacherHeader current="papers" name={account.full_name}/><main className={ui['site-shell__main']}>
+ return <><TeacherHeader departmentEnabled={creditsEnabled()} current="papers" name={account.full_name}/><main className={ui['site-shell__main']}>
   <OrderView initial={order} curriculum={module.data?.name??undefined} catalogue={questionContexts(order.moduleId,order.release,catalogue?.data)} completionEmail={completionEmail}/></main></>;
 }

@@ -10,7 +10,7 @@ import { evaluate, generationPlan, project, readDefinitions, storedEvaluation, t
  * with the service client and never returned to the browser.
  */
 export type Loaded = {row:Row; defs:Definitions; configuration:Configuration; evaluation:Evaluation; view:ConfigurationView};
-type Row = {orderId:string; state:string; paid:boolean; paymentStatus:string; revision:number; configuration:unknown; form:unknown; snapshot:unknown; definitionsSha256:string; submitted:boolean};
+type Row = {purchasedTotal?:number|null;orderId:string; state:string; paid:boolean; paymentStatus:string; revision:number; configuration:unknown; form:unknown; snapshot:unknown; definitionsSha256:string; submitted:boolean};
 
 export class ConfigurationError extends Error { constructor(message:string, readonly status:number) { super(message); } }
 
@@ -24,10 +24,11 @@ export async function loadConfiguration(service:SupabaseClient, orderId:string, 
   const paid=row.paid && row.state!=='awaiting_payment';
   const evaluation=evaluate(defs,row.configuration,{paid});
   return {row,defs,configuration:row.configuration,evaluation,
-    view:project(defs,row.configuration,evaluation,{orderId:row.orderId,state:row.state,paymentStatus:row.paymentStatus,revision:row.revision,submitted:row.submitted})};
+    view:{...project(defs,row.configuration,evaluation,{orderId:row.orderId,state:row.state,paymentStatus:row.paymentStatus,revision:row.revision,submitted:row.submitted}),purchasedTotal:row.purchasedTotal??null}};
 }
 
 function refusal(message:string):ConfigurationError {
+  if(/Purchased total/.test(message))return new ConfigurationError('The purchased total is fixed. Redistribute marks between questions instead.',422);
   if(/Configuration changed/.test(message)) return new ConfigurationError('This paper changed in another tab or window. Reload to see the latest saved choices; your edits on this page are kept until you reload.',409);
   if(/already submitted/.test(message)) return new ConfigurationError('This paper has already been submitted. Its choices are fixed.',409);
   if(/cannot be configured|cannot be submitted/.test(message)) return new ConfigurationError('This paper can no longer be changed. Refresh to see its current state.',409);

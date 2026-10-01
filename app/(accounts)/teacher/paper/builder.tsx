@@ -14,7 +14,7 @@ import { button } from '../../system/button';
 const stageLabels=['Paper shape','Choose questions','Set marks','Pay','Complete details'];
 export function journey(paper:PaperModel,current:number):Stage[] {
   const done=[paper.paperTarget!==null||!paper.configured,paper.occurrences.length>0&&!paper.selectionDirty,paper.marksSet&&paper.balanced,false,false];
-  return stageLabels.map((label,i)=>({label,state:i===current?'now':i<current&&done[i]?'done':'next'}));
+  return stageLabels.map((label,i)=>({label:i===3&&paper.data.purchase?.departmentCredit?'Create':label,state:i===current?'now':i<current&&done[i]?'done':'next'}));
 }
 const toNumber=(v:string)=>v.trim()===''?NaN:Number.isInteger(Number(v))?Number(v):NaN;
 export function paperSummary(paper:PaperModel):string {
@@ -88,7 +88,7 @@ function Rail({paper,children}:{paper:PaperModel;children?:ReactNode}) {
     </section>
     {children}
     <div className={styles['page-body__actions']}>
-      <button type="button" className={button('action',{size:'large',full:true})} disabled={paper.busy||saving||n===0} onClick={()=>void review()}>{saving?'Saving your selection…':'Review and pay'} {Icon.arrow()}</button>
+      <button type="button" className={button('action',{size:'large',full:true})} disabled={paper.busy||saving||n===0} onClick={()=>void review()}>{saving?'Saving your selection…':paper.data.purchase?.departmentCredit?'Review and create':'Review and pay'} {Icon.arrow()}</button>
       <button type="button" className={button('secondary',{size:'large',full:true})} onClick={()=>paper.go('catalogue')}>Add from catalogue</button>
       <p className={styles['save-status']}>{paper.selectionDirty?'Unsaved changes':paper.data.selection.revision?'Selection saved':'No saved selection yet'}
         {paper.selectionDirty&&<button type="button" className={styles['link']} disabled={paper.busy} onClick={()=>void paper.save()}>{paper.busy?'Please wait…':'Save selection'}</button>}</p>

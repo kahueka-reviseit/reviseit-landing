@@ -11,15 +11,15 @@ import { button } from './system/button';
  * signed-out pages share the sage-striped header; staff pages use the navy header.
  * On phones the links collapse behind one Menu button that closes with Escape.
  */
-export type TeacherPlace = 'curricula'|'papers'|'account';
+export type TeacherPlace = 'curricula'|'papers'|'account'|'department';
 export function initials(name:string){const parts=name.trim().split(/\s+/).filter(Boolean);return (parts.length>1?parts[0][0]+parts[parts.length-1][0]:(parts[0]||'?').slice(0,2)).toUpperCase();}
 
 /** Signed-in teacher header. Until access is verified only My account is shown (T4). */
-export function TeacherHeader({current,name,verified=true}:{current:TeacherPlace;name?:string;verified?:boolean}){
+export function TeacherHeader({current,name,verified=true,departmentEnabled=false}:{current:TeacherPlace;name?:string;verified?:boolean;departmentEnabled?:boolean}){
  const menu=useMenu(),id=useId();
  const links:{place:TeacherPlace;href:string;label:string;full?:boolean}[]=verified?[
   // A full load: the workspace reads its screen from the address on arrival.
-  {place:'curricula',href:'/teacher?view=home',label:'My curricula',full:true},{place:'papers',href:'/teacher/orders',label:'My papers'},{place:'account',href:'/account',label:'My account'}]:
+  {place:'curricula',href:'/teacher?view=home',label:'My curricula',full:true},{place:'papers',href:'/teacher/orders',label:'My papers'},...(departmentEnabled?[{place:'department' as const,href:'/teacher/department',label:'My department'}]:[]),{place:'account',href:'/account',label:'My account'}]:
   [{place:'account',href:'/account',label:'My account'}];
  const link=(l:typeof links[number],cls:string,avatar:boolean)=>{
   const body=<>{avatar&&l.place==='account'&&name?<span className={nav['site-nav__avatar']} aria-hidden="true">{initials(name)}</span>:null}{l.label}</>;

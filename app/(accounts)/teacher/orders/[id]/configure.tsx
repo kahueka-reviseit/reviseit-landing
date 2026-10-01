@@ -214,12 +214,13 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
   </header>
   {notice}
   <div className={styles['paper-totals']}>
-    <label>Paper total <input aria-label="Paper total" inputMode="numeric" value={draft.targets.paper??''} disabled={!editable}
+    <label>Paper total <input aria-label="Paper total" inputMode="numeric" value={draft.targets.paper??''} disabled={!editable||view.purchasedTotal!=null}
       onChange={e=>{const v=e.target.value.trim();update(c=>{c.targets.paper=v===''?null:Number.isInteger(Number(v))?Number(v):c.targets.paper;return c;});}}/> marks</label>
     <strong className={t.complete?styles['paper-totals__balanced']:styles['paper-totals__remaining']}>{t.allocated} allocated · {t.excess?`${t.excess} over total`:t.remaining?`${t.remaining} still to allocate`:t.complete?'balanced':t.target===null?'set a total':'check question marks'}</strong>
     <span>{t.sections.map(s=>`${s.label} ${s.allocated}${s.target!==null?` of ${s.target}`:''}`).join(' · ')}</span>
     <span>{view.lines.filter(l=>l.ready).length} of {view.lines.length} questions {paid?'configured':'have marks'}</span>
   </div>
+  {view.purchasedTotal!=null&&<p className={styles['paper-save']}>Your purchased total is fixed at {view.purchasedTotal} marks. You can redistribute marks within each question’s range and edit its details before submitting.</p>}
   <div className={styles['paper-save']}>{!panel&&save!=='saved'&&saveNotice}</div>
   <div className={styles['question-table']} role="table" aria-label="Questions in your paper">
     <div className={styles['question-table__head']} role="row">{['No.','Question','Topic','Type','Marks','Subquestions','Status','Actions'].map(h=><div role="columnheader" key={h}>{h}</div>)}</div>
@@ -357,7 +358,7 @@ export default function ConfigureOrder({orderId,onSubmitted,title,children,notic
       </section>
       <section className={styles['card']} aria-labelledby="budget-heading">
         <p id="budget-heading" className={styles['card__eyebrow--neutral']}>Marks budget</p>
-        <label className={styles['totals__paper-target']}>Paper total<input aria-label="Review paper total" inputMode="numeric" value={draft.targets.paper??''} disabled={!editable} onChange={e=>{const v=e.target.value.trim();update(c=>{c.targets.paper=v===''?null:Number.isInteger(Number(v))?Number(v):c.targets.paper;return c;});}}/></label>
+        <label className={styles['totals__paper-target']}>Paper total<input aria-label="Review paper total" inputMode="numeric" value={draft.targets.paper??''} disabled={!editable||view.purchasedTotal!=null} onChange={e=>{const v=e.target.value.trim();update(c=>{c.targets.paper=v===''?null:Number.isInteger(Number(v))?Number(v):c.targets.paper;return c;});}}/></label>
         {t.sections.map(s=><div key={s.key} className={styles['budget-line']}><label className={styles['totals__section-target']}><span>{s.label}</span>
           <input inputMode="numeric" aria-label={`${s.label} section total (optional)`} placeholder="Any" value={draft.targets.sections?.[s.key]??''} disabled={!editable}
             onChange={e=>{const v=e.target.value.trim();update(c=>{const sec={...(c.targets.sections??{})};if(v==='')delete sec[s.key];else if(Number.isInteger(Number(v)))sec[s.key]=Number(v);

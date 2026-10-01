@@ -1,3 +1,4 @@
+import {creditsEnabled} from '../../../lib/credits/server';
 import Link from 'next/link';
 import { requireReviewer } from '../../../lib/auth/access';
 import { StaffHeader } from '../staff-header';
@@ -21,7 +22,7 @@ export default async function Administration() {
     ...(queue || []).filter(q => !(paid || []).some(p => p.orderId === q.id)).map(q => ({ id: q.id, title: q.title, reason: q.state === 'held' ? 'Generation held' : 'Being checked' }))];
   const first = (account.full_name || '').split(/\s+/)[0];
   const accountsWaiting = counts?.pending ?? null, papersWaiting = paid || queue ? papers.length : null;
-  return <><StaffHeader current="overview" signedIn name={first || undefined} counts={{ accounts: accountsWaiting, papers: papersWaiting }}/>
+  return <><StaffHeader creditsEnabled={creditsEnabled()} current="overview" signedIn name={first || undefined} counts={{ accounts: accountsWaiting, papers: papersWaiting }}/>
     <main className={ui['site-shell__main']}><div className={ui['page--staff']}>
     <header className={ui['page-header--staff']}><div className={ui['page-header__titles--staff']}><h1 className={ui['page-header__title--staff']}>{greeting()}{first ? `, ${first}` : ''}</h1>
       <p className={ui['page-header__lede--staff']}>{accountsWaiting === 0 && papersWaiting === 0 ? 'Nothing needs you right now.' : 'Two queues wait for a person. Start with whichever has work.'}</p></div></header>

@@ -106,6 +106,7 @@ export type CompositionSummary = {exact:boolean; settled:number; unclassified:nu
 /** 'apply-or-analyse' -> 'Apply or Analyse' */
 export const groupLabel=(key:string)=>key.split('-or-').map(k=>bloomLabels[k as BloomKey]??k).join(' or ');
 export type ConfigurationView = {
+  purchasedTotal?:number|null;
   briefEnabled?:boolean;
   advice?:{enabled:boolean;lineIds:string[]};
   orderId:string; state:string; paid:boolean; paymentStatus:string; revision:number; submitted:boolean;

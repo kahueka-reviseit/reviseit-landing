@@ -1,4 +1,5 @@
 import 'server-only';
+import {creditsEnabled} from '../credits/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { defaultFormatting, cataloguePreview, type Workspace, type Curriculum } from './contracts';
 import { thumbnailFor } from './catalogue';
@@ -13,7 +14,7 @@ export async function readWorkspace(client: SupabaseClient, schoolId:string, mod
   if (moduleId && !module) throw new Error('Curriculum access required');
   const empty:Workspace={schoolName:schoolResult.data?.name || 'Your school',curricula,module:module || null,entries:[],formatting:{revision:0,preferences:defaultFormatting},selection:{revision:0,release:module?.release || '',entryIds:[]}};
   if (!module) return empty;
-  const [catalogue, formatting, selection, purchase, configurator] = await Promise.all([
+  const [catalogue, formatting, selection, purchase, configurator, creditStatus] = await Promise.all([
     client.from('teacher_catalogue_summaries').select('entry_id,title,topic,description,marks_min,marks_max,thumbnail_alt,preview,orderable').eq('module_id',module.id).eq('release',module.release).order('entry_id'),
     client.from('school_formatting').select('revision,preferences').eq('module_id',module.id).maybeSingle(),
     client.from('paper_selections').select('revision,release,entry_ids').eq('module_id',module.id).maybeSingle(),
@@ -21,12 +22,13 @@ export async function readWorkspace(client: SupabaseClient, schoolId:string, mod
     client.rpc('pilot_checkout_status'),
     // Whether new checkouts use editable configuration; an error keeps the existing path.
     client.rpc('configurator_status'),
+    creditsEnabled()?client.rpc('department_credit_enabled'):Promise.resolve({data:false,error:null}),
   ]);
   if (catalogue.error || formatting.error || selection.error) throw new Error('Workspace unavailable');
   return {...empty,
     entries:(catalogue.data || []).map(c=>({id:c.entry_id,title:c.title,topic:c.topic,description:c.description,marks:{min:c.marks_min,max:c.marks_max},orderable:c.orderable===true,preview:cataloguePreview(c.preview),thumbnail:thumbnailFor(module.id,module.release,c.entry_id,c.thumbnail_alt)})),
     formatting:formatting.data || empty.formatting,
     selection:selection.data ? {revision:selection.data.revision,release:selection.data.release,entryIds:selection.data.entry_ids} : empty.selection,
-    purchase:{available:!purchase.error && purchase.data?.available===true,amountMinor:10000,currency:'zar',maxQuestions:Number.isInteger(purchase.data?.maxQuestions)?purchase.data.maxQuestions:30,maxStructured:Number.isInteger(purchase.data?.maxStructured)?purchase.data.maxStructured:30,maxMultipleChoice:Number.isInteger(purchase.data?.maxMultipleChoice)?purchase.data.maxMultipleChoice:30,configurator:!configurator.error && configurator.data?.enabled===true},
+    purchase:{departmentCredit:creditsEnabled()&&!creditStatus.error&&creditStatus.data===true,available:!purchase.error && purchase.data?.available===true,amountMinor:10000,currency:'zar',maxQuestions:Number.isInteger(purchase.data?.maxQuestions)?purchase.data.maxQuestions:30,maxStructured:Number.isInteger(purchase.data?.maxStructured)?purchase.data.maxStructured:30,maxMultipleChoice:Number.isInteger(purchase.data?.maxMultipleChoice)?purchase.data.maxMultipleChoice:30,configurator:!configurator.error && configurator.data?.enabled===true},
   };
 }

@@ -1,3 +1,4 @@
+import {creditsEnabled} from '../../../../lib/credits/server';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { requireAccount } from '../../../../lib/auth/access';
@@ -44,7 +45,7 @@ export default async function ReviewPapers({ searchParams }: { searchParams: Pro
   const href = (next: Partial<Params>) => { const u = new URLSearchParams(); const merged = { reason: reason === 'all' ? undefined : reason, q: q || undefined, ...next };
     for (const [k, v] of Object.entries(merged)) if (v) u.set(k, v); const s = u.toString(); return `/admin/papers${s ? `?${s}` : ''}`; };
   const firstName = (account.full_name || '').split(/\s+/)[0] || undefined;
-  return <><StaffHeader current="papers" signedIn name={firstName} counts={{ accounts: counts?.pending ?? null, papers: items.length }} record={current ? { back: href({ focus: current.id }), label: 'Papers' } : undefined}/>
+  return <><StaffHeader creditsEnabled={creditsEnabled()} current="papers" signedIn name={firstName} counts={{ accounts: counts?.pending ?? null, papers: items.length }} record={current ? { back: href({ focus: current.id }), label: 'Papers' } : undefined}/>
     <main className={ui['site-shell__main']}><div className={`${ui['page--staff']} ${current ? ui['page--reviewing'] : ''}`}>
     <FocusRow id={params.focus}/>
     <header className={ui['page-header--staff']}><div className={ui['page-header__titles--staff']}><h1 className={ui['page-header__title--staff']}>Papers needing attention</h1>

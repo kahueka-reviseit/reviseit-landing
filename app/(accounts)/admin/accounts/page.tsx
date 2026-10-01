@@ -1,3 +1,4 @@
+import {creditsEnabled} from '../../../../lib/credits/server';
 import Link from 'next/link';
 import { requireReviewer } from '../../../../lib/auth/access';
 import { StaffHeader } from '../../staff-header';
@@ -46,7 +47,7 @@ export default async function ReviewAccounts({ searchParams }: { searchParams: P
   const nextId = current ? pendingIds.find(id => id !== current.user_id && pendingIds.indexOf(id) > pendingIds.indexOf(current.user_id)) ?? pendingIds.find(id => id !== current.user_id) : undefined;
   const position = current ? `${rows.findIndex(r => r.user_id === current.user_id) + 1} of ${rows.length}` : undefined;
   const firstName = (account.full_name || '').split(/\s+/)[0] || undefined;
-  return <><StaffHeader current="accounts" signedIn name={firstName} counts={{ accounts: counts?.pending ?? null, papers: paperCount }}
+  return <><StaffHeader creditsEnabled={creditsEnabled()} current="accounts" signedIn name={firstName} counts={{ accounts: counts?.pending ?? null, papers: paperCount }}
       record={current ? { back: href({ focus: current.user_id }), label: 'School accounts', position: position && !position.startsWith('0') ? position : undefined } : undefined}/>
     <main className={ui['site-shell__main']}><div className={`${ui['page--staff']} ${current ? ui['page--reviewing'] : ''}`}>
     <FocusRow id={params.focus}/>

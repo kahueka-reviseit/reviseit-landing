@@ -1,3 +1,4 @@
+import {creditsEnabled} from '../../../lib/credits/server';
 import Link from 'next/link';
 import { requireAccount } from '../../../lib/auth/access';
 import { canEnterWorkspace } from '../../../lib/auth/policy';
@@ -33,7 +34,7 @@ export default async function Account() {
     : { tone:'progress', marker:'With our team', title:'Your account is awaiting verification', body:'We check your school and department independently before opening any curricula. Nothing more is needed from you. Questions: kahueka@reviseit.io.', step:2 };
   const stopped = access.tone === 'problem';
   const schoolName = (school.data as { name?: string } | null)?.name, departmentName = (department.data as { name?: string } | null)?.name;
-  return <><TeacherHeader current="account" name={account.full_name} verified={approved}/><main className={ui['site-shell__main']}><div className={ui['page']}>
+  return <><TeacherHeader departmentEnabled={creditsEnabled()} current="account" name={account.full_name} verified={approved}/><main className={ui['site-shell__main']}><div className={ui['page']}>
     <header className={ui['page-header']}><div className={ui['page-header__titles']}>
       <p className={ui['page-header__eyebrow']}>My account</p>
       <h1 className={ui['page-header__title']}>{account.full_name || 'Your account'}</h1>
