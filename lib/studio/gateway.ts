@@ -79,9 +79,12 @@ export async function handleStudioGateway(request: Request, deps: GatewayDeps): 
         if (!lease(v) || !isUuid(v.validationArtifactId) || !Array.isArray(v.entries) || v.entries.length > 500
           || !v.entries.every((e: any) => e && isUuid(e.artifactId) && ['add', 'replace', 'retire'].includes(e.action) && Object.keys(e).length === 2)) break;
         return json({ result: await call(rpc, 'studio_put_changeset', { ...fenced(v), p_entries: v.entries, p_validation_artifact: v.validationArtifactId }) });
-      case 'complete':
+      case 'complete': {
         if (!lease(v) || !Array.isArray(v.outputs) || v.outputs.length > 500 || !v.outputs.every(isUuid)) break;
+        const refs = await call<any[]>(rpc, 'studio_completion_outputs', fenced(v));
+        for (const info of refs) await readForWorker(rpc, storage, info);
         return json({ result: await call(rpc, 'studio_complete', { ...fenced(v), p_outputs: v.outputs }) });
+      }
       case 'fail':
         if (!lease(v) || typeof v.error !== 'string' || typeof v.retryable !== 'boolean') break;
         return json({ result: await call(rpc, 'studio_fail', { ...fenced(v), p_error: v.error.slice(0, 1000), p_retryable: v.retryable }) });

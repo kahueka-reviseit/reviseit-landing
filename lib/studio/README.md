@@ -1,14 +1,22 @@
 # Curriculum Studio foundation (assignment 02)
 
-Candidate for Codex review. Not deployed; the migration is not applied to any hosted database.
+Corrected local candidate (02A). Not deployed; migrations 039 and 040 are unapplied to hosted databases.
 
 ## What exists
 
 - `supabase/migrations/202610080039_studio_foundation.sql`: additive schema and commands. Private
   `studio_*` tables (row security on, no direct grants); every command is a security-definer function.
   Editors (`authenticated` + confirmed account reviewer + `private.studio_editors`), the Studio worker
-  gateway (`service_role`, reached only through `STUDIO_WORKER_TOKEN`) and the local operator
+  gateway (`service_role`, reached through `STUDIO_WORKER_TOKEN`) and the local operator
   (`reviseit_studio_operator`) each get only their own functions.
+- `202610080040_studio_verification_and_apply.sql` closes verification and apply boundaries. Only
+  server-side `service_role` calls can attest an upload or recovery; their actor is derived from the
+  authenticated editor by `requireStudioEditor().verifiedRpc`. The database rechecks that actor's
+  editor status and upload ownership. Browser-role direct attestations are refused. The same server
+  service client is used by the worker gateway, whose closed action list never exposes attestations.
+  Completion resolves artifact-to-blob identities; the gateway rereads output bytes immediately
+  before completion, and the database locks/checks their integrity rows. There is still no R2/Postgres
+  transaction; later deletion is discovered by verified reads/reconciliation and blocks consumption.
 - `lib/studio/`: storage interface with local emulation and private R2 (S3 Signature Version 4),
   upload finalisation, verified reads, explicit recovery, reconciliation, the worker gateway handler and
   strict coverage arithmetic. Rollback SQL in `rollback/`.
@@ -48,6 +56,12 @@ evidence of real R2 behaviour. Provider calls are mocked throughout.
 ## Rollback
 
 Back up and export any Studio evidence, then run `rollback/202610080039_studio_foundation.down.sql`
-and remove the migration history record with the process that applied it. Forward recovery is simply
-re-applying the migration; `tests/database/studio-migration.test.ts` proves both leave every existing
+and remove BOTH Studio migration history records with the process that applied them. Forward recovery
+re-applies 039 then 040; `tests/database/studio-migration.test.ts` proves both leave every existing
 object byte-identical. Storage objects under `studio/` are removed separately and only after export.
+
+Migration 040 replaces only Studio functions. Deploy it with its matching server callers; old callers
+lack the trusted actor argument and fail closed. Existing pre-040 change sets do not have the newly
+bound change-set ID and must be recreated and reviewed before local apply. Do not backfill approved
+hashes or roll back to the vulnerable attestation grants. This candidate has no production Studio data.
+The existing funded-order/teacher queue surface is checked for unchanged definitions and behaviour.

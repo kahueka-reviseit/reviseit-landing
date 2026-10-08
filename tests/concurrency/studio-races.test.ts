@@ -26,6 +26,13 @@ async function rpc(c: Client, fn: string, args: Record<string, unknown>) {
   const r = await c.query(`select public.${fn}(${keys.map((k, i) => `${k}=>$${i + 1}::${t.types[t.names.indexOf(k)]}`).join(',')}) as r`, params);
   return r.rows[0].r;
 }
+// Explicit test-only server attestation session; editor RPCs themselves remain unprivileged.
+async function verify(c: Client, fn: string, args: Record<string, unknown>) {
+  const actor = (await c.query('select auth.uid() id')).rows[0].id;
+  const trusted = await worker();
+  try { return await rpc(trusted, fn, {...args,p_actor:actor}); }
+  finally { await trusted.end(); }
+}
 const editor = () => session({ role: 'authenticated', id: ids.editor }), editor2 = () => session({ role: 'authenticated', id: ids.editor2 }), worker = () => session({ role: 'service_role' });
 
 beforeAll(async () => {
@@ -59,8 +66,8 @@ afterAll(async () => {
 async function blob(c: Client, content: string) {
   const bytes = '%PDF-1.7 ' + content, digest = sha(bytes), size = Buffer.byteLength(bytes);
   const s = await rpc(c, 'studio_create_upload', { p_module: MODULE, p_sha256: digest, p_size: size, p_media_type: 'application/pdf', p_filename: 'r.pdf', p_purpose: 'source', p_command: randomUUID() });
-  await rpc(c, 'studio_prepare_commit', { p_session: s.sessionId, p_sha256: digest, p_size: size, p_detected_type: 'application/pdf' });
-  return (await rpc(c, 'studio_commit_upload', { p_session: s.sessionId })).blobId;
+  await verify(c, 'studio_prepare_commit', { p_session: s.sessionId, p_sha256: digest, p_size: size, p_detected_type: 'application/pdf' });
+  return (await verify(c, 'studio_commit_upload', { p_session: s.sessionId })).blobId;
 }
 async function startRun(c: Client) {
   const b = await blob(c, randomUUID());
@@ -140,7 +147,7 @@ test('simultaneous finalisation of identical bytes in separate sessions yields o
       const bytes = '%PDF-1.7 same ' + i, digest = sha(bytes), size = Buffer.byteLength(bytes);
       const mk = (c: Client) => rpc(c, 'studio_create_upload', { p_module: MODULE, p_sha256: digest, p_size: size, p_media_type: 'application/pdf', p_filename: 's.pdf', p_purpose: 'source', p_command: randomUUID() });
       const [sa, sb] = await Promise.all([mk(a), mk(b)]);
-      const fin = async (c: Client, s: any) => { await rpc(c, 'studio_prepare_commit', { p_session: s.sessionId, p_sha256: digest, p_size: size, p_detected_type: 'application/pdf' }); return rpc(c, 'studio_commit_upload', { p_session: s.sessionId }); };
+      const fin = async (c: Client, s: any) => { await verify(c, 'studio_prepare_commit', { p_session: s.sessionId, p_sha256: digest, p_size: size, p_detected_type: 'application/pdf' }); return verify(c, 'studio_commit_upload', { p_session: s.sessionId }); };
       const [ra, rb] = await Promise.all([fin(a, sa), fin(b, sb)]);
       expect(ra.blobId).toBe(rb.blobId);
       expect((await owner.query('select count(*)::int n from private.studio_blobs where sha256=$1', [digest])).rows[0].n).toBe(1);
@@ -154,7 +161,7 @@ test('a garbage-collection claim and a finalisation of the same key never both p
     for (let i = 0; i < 40; i++) {
       const bytes = '%PDF-1.7 gc ' + i, digest = sha(bytes), size = Buffer.byteLength(bytes), target = `studio/blobs/${MODULE}/${digest}`;
       const s = await rpc(a, 'studio_create_upload', { p_module: MODULE, p_sha256: digest, p_size: size, p_media_type: 'application/pdf', p_filename: 'g.pdf', p_purpose: 'source', p_command: randomUUID() });
-      const [gc, prep] = await Promise.allSettled([rpc(w, 'studio_gc_claim', { p_key: target }), rpc(a, 'studio_prepare_commit', { p_session: s.sessionId, p_sha256: digest, p_size: size, p_detected_type: 'application/pdf' })]);
+      const [gc, prep] = await Promise.allSettled([rpc(w, 'studio_gc_claim', { p_key: target }), verify(a, 'studio_prepare_commit', { p_session: s.sessionId, p_sha256: digest, p_size: size, p_detected_type: 'application/pdf' })]);
       const claimed = gc.status === 'fulfilled' && gc.value === true, prepared = prep.status === 'fulfilled';
       expect(claimed && prepared).toBe(false); expect(claimed || prepared).toBe(true);
       if (claimed) { gcWins++; await rpc(w, 'studio_gc_finish', { p_key: target }); } else finWins++;

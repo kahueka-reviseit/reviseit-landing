@@ -5,7 +5,7 @@ import { PGlite } from '@electric-sql/pglite';
 import { readFileSync, readdirSync } from 'node:fs';
 import { test, expect } from 'vitest';
 
-const STUDIO = '202610080039_studio_foundation.sql';
+const STUDIO = ['202610080039_studio_foundation.sql', '202610080040_studio_verification_and_apply.sql'];
 const migrations = readdirSync('supabase/migrations').filter(f => f.endsWith('.sql')).sort();
 async function database(files: string[]) {
   const db = new PGlite();
@@ -32,7 +32,7 @@ async function surface(db: PGlite) {
 }
 
 test('the Studio migration is additive: every existing function, table, column, policy and privilege is byte-identical', async () => {
-  const before = await database(migrations.filter(f => f !== STUDIO)), after = await database(migrations);
+  const before = await database(migrations.filter(f => !STUDIO.includes(f))), after = await database(migrations);
   expect(await surface(after)).toEqual(await surface(before));
   await before.close(); await after.close();
 }, 120000);
@@ -44,7 +44,7 @@ test('rollback removes only Studio objects, and the migration applies forward ag
   expect((await db.query(`select 1 from pg_proc where proname like 'studio\\_%'`)).rows).toEqual([]);
   expect((await db.query(`select 1 from pg_roles where rolname='reviseit_studio_operator'`)).rows).toEqual([]);
   expect(await surface(db)).toEqual(original);
-  await db.exec(readFileSync('supabase/migrations/' + STUDIO, 'utf8'));
+  for (const f of STUDIO) await db.exec(readFileSync('supabase/migrations/' + f, 'utf8'));
   expect((await db.query(`select count(*)::int n from pg_proc where proname like 'studio\\_%'`)).rows[0]).toMatchObject({ n: expect.any(Number) });
   expect(await surface(db)).toEqual(original);
   await db.close();

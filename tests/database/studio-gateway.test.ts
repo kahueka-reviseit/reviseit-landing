@@ -60,6 +60,16 @@ describe('worker protocol through the gateway', () => {
     expect(Buffer.from((await store.get(`studio/blobs/${MODULE}/${sha(inventory)}`))!).toString()).toBe(inventory);
     expect((await post({ action: 'complete', attemptId: c.attemptId, lease: c.lease, outputs: [out.body.result.artifactId] })).body.result.state).toBe('succeeded');
   });
+  test('deleting stored output after registration blocks completion and records missing integrity', async () => {
+    await run();
+    const c = (await post({ action: 'claim', worker: 'studio-a' })).body.result;
+    const out = await post({action:'output',attemptId:c.attemptId,lease:c.lease,logicalKey:'inventory',kind:'inventory',mediaType:'application/json',content:Buffer.from('{}').toString('base64')});
+    await store.delete(`studio/blobs/${MODULE}/${sha('{}')}`);
+    const done = await post({action:'complete',attemptId:c.attemptId,lease:c.lease,outputs:[out.body.result.artifactId]});
+    expect(done.status).toBe(409);expect(done.body.error).toMatch(/Integrity blocked/);
+    expect((await s.sql('select integrity from private.studio_blobs where sha256=$1',[sha('{}')]))[0].integrity).toBe('missing');
+    expect((await s.sql('select state from private.studio_stages where id=$1',[c.stageId]))[0].state).toBe('running');
+  });
   test('a stale worker gets a lease-lost refusal and its output is not stored as a revision', async () => {
     await run();
     const a = (await post({ action: 'claim', worker: 'studio-a' })).body.result;

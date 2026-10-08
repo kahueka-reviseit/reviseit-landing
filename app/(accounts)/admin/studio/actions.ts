@@ -25,9 +25,9 @@ export async function startUpload(input: { moduleId: string; sha256: string; siz
 }
 export async function finishUpload(sessionId: string): Promise<ActionResult> {
   try {
-    const { rpc } = await requireStudioEditor(); const storage = studioStorage();
+    const { verifiedRpc } = await requireStudioEditor(); const storage = studioStorage();
     if (!storage || !isUuid(sessionId)) return { ok: false, error: 'Studio storage is not configured.' };
-    return { ok: true, value: await finaliseUpload(rpc, storage, sessionId) };
+    return { ok: true, value: await finaliseUpload(verifiedRpc, storage, sessionId) };
   } catch (e) { return fail(e); }
 }
 export async function createSource(form: FormData): Promise<ActionResult> {

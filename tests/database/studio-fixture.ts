@@ -6,6 +6,10 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { createHash, randomUUID } from 'node:crypto';
 import type { Rpc } from '../../lib/studio/contracts';
 
+import { verifiedUploadRpc } from '../../lib/studio/uploads';
+const trusted = new WeakMap<Rpc, Rpc>();
+export function verified(rpc: Rpc): Rpc { const result = trusted.get(rpc); if (!result) throw new Error('Not an editor test session'); return result; }
+
 export const ids = {
   editor: '00000000-0000-4000-8000-0000000000e1', editor2: '00000000-0000-4000-8000-0000000000e2',
   outsider: '00000000-0000-4000-8000-0000000000e3', teacher: '00000000-0000-4000-8000-0000000000e4',
@@ -56,7 +60,7 @@ export class StudioDb {
     else if (actor.kind === 'anon') await this.db.exec('set role anon');
   }
   rpc(actor: Actor): Rpc {
-    return (name, args) => {
+    const rpc: Rpc = (name, args) => {
       const run = async () => {
         const t = this.types.get(name);
         if (!t) return { data: null, error: { message: `function public.${name} does not exist` } };
@@ -73,6 +77,8 @@ export class StudioDb {
       };
       return this.serial(run);
     };
+    if (actor.kind === 'user') trusted.set(rpc, verifiedUploadRpc(rpc, this.rpc({kind:'service'}), actor.id));
+    return rpc;
   }
   async sql<T = any>(text: string, params: unknown[] = [], role?: string) {
     return this.serial(async () => {
@@ -96,8 +102,8 @@ export async function blob(rpc: Rpc, module: string, content: string, type = 'ap
   const bytes = type === 'application/pdf' ? '%PDF-1.7 synthetic ' + content : content;
   const digest = sha(bytes), size = Buffer.byteLength(bytes);
   const s = await ok(rpc, 'studio_create_upload', { p_module: module, p_sha256: digest, p_size: size, p_media_type: type, p_filename: 'synthetic.' + (type === 'application/pdf' ? 'pdf' : 'md'), p_purpose: purpose, p_command: key() });
-  await ok(rpc, 'studio_prepare_commit', { p_session: s.sessionId, p_sha256: digest, p_size: size, p_detected_type: type });
-  const c = await ok(rpc, 'studio_commit_upload', { p_session: s.sessionId });
+  await ok(verified(rpc), 'studio_prepare_commit', { p_session: s.sessionId, p_sha256: digest, p_size: size, p_detected_type: type });
+  const c = await ok(verified(rpc), 'studio_commit_upload', { p_session: s.sessionId });
   return c.blobId as string;
 }
 

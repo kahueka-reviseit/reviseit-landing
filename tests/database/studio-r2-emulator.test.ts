@@ -8,7 +8,7 @@ import { randomUUID } from 'node:crypto';
 import { R2StudioStorage, signV4 } from '../../lib/studio/storage/r2';
 import { createUpload, finaliseUpload, readBlob } from '../../lib/studio/uploads';
 import { reconcileStorage } from '../../lib/studio/reconcile';
-import { StudioDb, ids, MODULE, sha, ok, key } from './studio-fixture';
+import { verified, StudioDb, ids, MODULE, sha, ok, key } from './studio-fixture';
 
 const endpoint = process.env.STUDIO_S3_TEST_ENDPOINT || '';
 const enabled = /^http:\/\/127\.0\.0\.1:\d+$/.test(endpoint);
@@ -43,19 +43,19 @@ test.skipIf(!enabled)('presigned provisional upload, verified finalisation, and 
   const u = await createUpload(ed(), r2, { moduleId: MODULE, sha256: sha(bytes), size: bytes.length, mediaType: 'application/pdf', filename: 'e.pdf', purpose: 'source', command: key() });
   expect(u.upload.url).toContain('/studio/uploads/');
   expect((await fetch(u.upload.url, { method: 'PUT', headers: u.upload.headers, body: bytes })).status).toBe(200);
-  const f = await finaliseUpload(ed(), r2, u.sessionId) as any;
+  const f = await finaliseUpload(verified(ed()), r2, u.sessionId) as any;
   expect(f).toMatchObject({ state: 'finalised', duplicate: false });
   // Replay the same still-valid signed URL with different bytes.
   expect((await fetch(u.upload.url, { method: 'PUT', headers: u.upload.headers, body: new TextEncoder().encode('%PDF-1.7 replaced') })).status).toBe(200);
   expect(Buffer.from((await readBlob(ed(), r2, f.blobId)).bytes).toString()).toBe('%PDF-1.7 emulator upload');
-  expect(await finaliseUpload(ed(), r2, u.sessionId)).toMatchObject({ state: 'finalised', blobId: f.blobId });
+  expect(await finaliseUpload(verified(ed()), r2, u.sessionId)).toMatchObject({ state: 'finalised', blobId: f.blobId });
 });
 
 test.skipIf(!enabled)('a deleted committed object is detected as missing on read and by reconciliation', async () => {
   const bytes = new TextEncoder().encode('%PDF-1.7 emulator loss');
   const u = await createUpload(ed(), r2, { moduleId: MODULE, sha256: sha(bytes), size: bytes.length, mediaType: 'application/pdf', filename: 'l.pdf', purpose: 'source', command: key() });
   await fetch(u.upload.url, { method: 'PUT', headers: u.upload.headers, body: bytes });
-  const f = await finaliseUpload(ed(), r2, u.sessionId) as any;
+  const f = await finaliseUpload(verified(ed()), r2, u.sessionId) as any;
   await r2.delete(`studio/blobs/${MODULE}/${sha(bytes)}`);
   const report = await reconcileStorage(s.rpc({ kind: 'service' }), r2, { graceMs: 0 });
   expect(report.missing).toContain(`studio/blobs/${MODULE}/${sha(bytes)}`);

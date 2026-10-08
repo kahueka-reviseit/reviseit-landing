@@ -10,7 +10,7 @@ import { LocalStudioStorage } from '../../lib/studio/storage/local';
 import { createUpload, finaliseUpload, readBlob, recoverBlob } from '../../lib/studio/uploads';
 import { reconcileStorage } from '../../lib/studio/reconcile';
 import type { Rpc } from '../../lib/studio/contracts';
-import { StudioDb, ids, MODULE, sha, ok, key } from './studio-fixture';
+import { verified, StudioDb, ids, MODULE, sha, ok, key } from './studio-fixture';
 
 let s: StudioDb, dir: string, store: LocalStudioStorage;
 const ed = () => s.rpc({ kind: 'user', id: ids.editor }), svc = () => s.rpc({ kind: 'service' });
@@ -36,31 +36,31 @@ const blobRows = (digest: string) => s.sql('select id, integrity from private.st
 describe('finalisation protocol', () => {
   test('duplicate uploads of identical bytes produce one immutable object and one verified blob', async () => {
     const bytes = pdf('duplicate'), a = await upload(bytes), b = await upload(bytes);
-    const [ra, rb] = [await finaliseUpload(ed(), store, a.sessionId), await finaliseUpload(ed(), store, b.sessionId)];
+    const [ra, rb] = [await finaliseUpload(verified(ed()), store, a.sessionId), await finaliseUpload(verified(ed()), store, b.sessionId)];
     expect(ra).toMatchObject({ state: 'finalised', duplicate: false }); expect(rb).toMatchObject({ state: 'finalised', duplicate: true });
     expect((ra as any).blobId).toBe((rb as any).blobId);
     expect((await store.list('studio/blobs/')).map(o => o.key)).toEqual([`studio/blobs/${MODULE}/${sha(bytes)}`]);
   });
   test('replaying a still-valid signed URL after finalisation cannot change committed evidence', async () => {
     const bytes = pdf('original'), u = await upload(bytes);
-    const f = await finaliseUpload(ed(), store, u.sessionId) as any;
+    const f = await finaliseUpload(verified(ed()), store, u.sessionId) as any;
     await store.acceptSignedPut(u.upload.url, pdf('replaced through a replayed URL'));
     expect(Buffer.from((await readBlob(ed(), store, f.blobId)).bytes).toString()).toBe('%PDF-1.7 original');
-    expect(await finaliseUpload(ed(), store, u.sessionId)).toMatchObject({ state: 'finalised', blobId: f.blobId });
+    expect(await finaliseUpload(verified(ed()), store, u.sessionId)).toMatchObject({ state: 'finalised', blobId: f.blobId });
     // The signed URL can only ever address the provisional key.
     await expect(store.presignPut(`studio/blobs/${MODULE}/${sha(bytes)}`, { expiresSeconds: 60, contentType: 'application/pdf' })).rejects.toThrow(/Only provisional upload keys/);
   });
   test('corruption before finalisation is rejected and nothing reaches the immutable key', async () => {
     const u = await upload(pdf('actually sent'), pdf('what the client claimed'));
-    expect(await finaliseUpload(ed(), store, u.sessionId)).toMatchObject({ state: 'rejected', reason: 'digest mismatch' });
+    expect(await finaliseUpload(verified(ed()), store, u.sessionId)).toMatchObject({ state: 'rejected', reason: 'digest mismatch' });
     expect(await store.list('studio/blobs/')).toEqual([]);
     const v = await upload(new TextEncoder().encode('not a pdf at all'), new TextEncoder().encode('not a pdf at all'));
-    expect(await finaliseUpload(ed(), store, v.sessionId)).toMatchObject({ state: 'rejected', reason: 'type mismatch' });
+    expect(await finaliseUpload(verified(ed()), store, v.sessionId)).toMatchObject({ state: 'rejected', reason: 'type mismatch' });
   });
   test('storage write succeeds but the database commit fails: a retry commits once, reusing the verified object', async () => {
     const bytes = pdf('db failure'), u = await upload(bytes);
     let fail = true;
-    const flaky: Rpc = (name, args) => name === 'studio_commit_upload' && fail ? (fail = false, Promise.resolve({ data: null, error: { message: 'connection reset' } })) : ed()(name, args);
+    const flaky: Rpc = (name, args) => name === 'studio_commit_upload' && fail ? (fail = false, Promise.resolve({ data: null, error: { message: 'connection reset' } })) : verified(ed())(name, args);
     await expect(finaliseUpload(flaky, store, u.sessionId)).rejects.toThrow(/connection reset/);
     expect(await store.get(`studio/blobs/${MODULE}/${sha(bytes)}`)).not.toBeNull();
     expect(await blobRows(sha(bytes))).toEqual([]);
@@ -69,7 +69,7 @@ describe('finalisation protocol', () => {
   });
   test('concurrent finalisation of one session and of two identical sessions converges on one blob', async () => {
     const bytes = pdf('concurrent'), a = await upload(bytes), b = await upload(bytes);
-    const results = await Promise.all([finaliseUpload(ed(), store, a.sessionId), finaliseUpload(ed(), store, a.sessionId), finaliseUpload(ed(), store, b.sessionId)]);
+    const results = await Promise.all([finaliseUpload(verified(ed()), store, a.sessionId), finaliseUpload(verified(ed()), store, a.sessionId), finaliseUpload(verified(ed()), store, b.sessionId)]);
     expect(new Set(results.map((r: any) => r.blobId)).size).toBe(1);
     expect(await blobRows(sha(bytes))).toHaveLength(1);
   });
@@ -77,7 +77,7 @@ describe('finalisation protocol', () => {
     const bytes = pdf('genuine'), target = `studio/blobs/${MODULE}/${sha(bytes)}`;
     await store.put(target, pdf('tampered orphan'), 'application/pdf');
     const u = await upload(bytes);
-    await expect(finaliseUpload(ed(), store, u.sessionId)).rejects.toThrow(/differs from its digest; recorded and not overwritten/);
+    await expect(finaliseUpload(verified(ed()), store, u.sessionId)).rejects.toThrow(/differs from its digest; recorded and not overwritten/);
     expect(Buffer.from((await store.get(target))!).toString()).toBe('%PDF-1.7 tampered orphan');
     const report = await reconcileStorage(svc(), store, { graceMs: 0, deleteOrphans: true });
     expect(report.refused).toContain(target); // the session is still verifying that key
@@ -85,30 +85,30 @@ describe('finalisation protocol', () => {
     const second = await reconcileStorage(svc(), store, { graceMs: 0, deleteOrphans: true });
     expect(second.deleted).toContain(target);
     const v = await upload(bytes);
-    expect(await finaliseUpload(ed(), store, v.sessionId)).toMatchObject({ state: 'finalised' });
+    expect(await finaliseUpload(verified(ed()), store, v.sessionId)).toMatchObject({ state: 'finalised' });
   });
 });
 
 describe('integrity and recovery', () => {
   test('a missing committed object is detected on read, blocks further reads, and recovers only explicitly', async () => {
-    const bytes = pdf('to lose'), u = await upload(bytes), f = await finaliseUpload(ed(), store, u.sessionId) as any;
+    const bytes = pdf('to lose'), u = await upload(bytes), f = await finaliseUpload(verified(ed()), store, u.sessionId) as any;
     await store.delete(`studio/blobs/${MODULE}/${sha(bytes)}`);
     await expect(readBlob(ed(), store, f.blobId)).rejects.toThrow(/Integrity blocked: bytes missing/);
     expect(await blobRows(sha(bytes))).toEqual([{ id: f.blobId, integrity: 'missing' }]);
     await expect(readBlob(ed(), store, f.blobId)).rejects.toThrow(/Integrity blocked/);
-    await expect(recoverBlob(ed(), store, f.blobId, pdf('wrong bytes'), 'Restore from scanner archive', 'application/pdf')).rejects.toThrow(/do not match/);
+    await expect(recoverBlob(verified(ed()), store, f.blobId, pdf('wrong bytes'), 'Restore from scanner archive', 'application/pdf')).rejects.toThrow(/do not match/);
     expect((await blobRows(sha(bytes)))[0].integrity).toBe('recovering'); // still blocks consumption
-    await recoverBlob(ed(), store, f.blobId, bytes, 'Restore from scanner archive', 'application/pdf');
+    await recoverBlob(verified(ed()), store, f.blobId, bytes, 'Restore from scanner archive', 'application/pdf');
     expect(Buffer.from((await readBlob(ed(), store, f.blobId)).bytes).toString()).toBe('%PDF-1.7 to lose');
   });
   test('corrupt committed bytes are detected by digest on every read', async () => {
-    const bytes = pdf('to corrupt'), u = await upload(bytes), f = await finaliseUpload(ed(), store, u.sessionId) as any;
+    const bytes = pdf('to corrupt'), u = await upload(bytes), f = await finaliseUpload(verified(ed()), store, u.sessionId) as any;
     await store.put(`studio/blobs/${MODULE}/${sha(bytes)}`, pdf('to c0rrupt'), 'application/pdf');
     await expect(readBlob(ed(), store, f.blobId)).rejects.toThrow(/bytes corrupt/);
     expect((await blobRows(sha(bytes)))[0].integrity).toBe('corrupt');
   });
   test('denied or unavailable storage is recorded as inaccessible, not as success', async () => {
-    const bytes = pdf('denied'), u = await upload(bytes), f = await finaliseUpload(ed(), store, u.sessionId) as any;
+    const bytes = pdf('denied'), u = await upload(bytes), f = await finaliseUpload(verified(ed()), store, u.sessionId) as any;
     store.fault = op => { if (op === 'get') throw new Error('403'); };
     await expect(readBlob(ed(), store, f.blobId)).rejects.toThrow(/inaccessible/);
     store.fault = null;
@@ -118,7 +118,7 @@ describe('integrity and recovery', () => {
 
 describe('reconciliation', () => {
   test('young orphans are kept, old orphans deleted under a claim, referenced blobs kept, missing blobs reported', async () => {
-    const keep = pdf('referenced'), u = await upload(keep); await finaliseUpload(ed(), store, u.sessionId);
+    const keep = pdf('referenced'), u = await upload(keep); await finaliseUpload(verified(ed()), store, u.sessionId);
     const orphan = `studio/blobs/${MODULE}/${sha('orphan')}`; await store.put(orphan, new TextEncoder().encode('orphan'), 'application/pdf');
     const young = await reconcileStorage(svc(), store, { deleteOrphans: true });
     expect(young.keptYoung).toContain(orphan); expect(young.deleted).toEqual([]);

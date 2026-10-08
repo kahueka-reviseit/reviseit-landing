@@ -1,6 +1,8 @@
 import 'server-only';
 import { redirect } from 'next/navigation';
 import { requireReviewer } from '../auth/access';
+import { serviceClient } from '../supabase/service';
+import { verifiedUploadRpc } from './uploads';
 import type { Rpc } from './contracts';
 
 /**
@@ -13,5 +15,7 @@ export async function requireStudioEditor() {
   const { data, error } = await context.supabase.rpc('studio_is_editor');
   if (error || data !== true) redirect('/admin');
   const rpc: Rpc = (name, args) => context.supabase.rpc(name, args);
-  return { ...context, rpc };
+  const service = serviceClient();
+  const verifiedRpc = verifiedUploadRpc(rpc, (name, args) => service ? service.rpc(name, args) : Promise.resolve({ data: null, error: { message: 'Studio verification is not configured' } }), context.user.id);
+  return { ...context, rpc, verifiedRpc };
 }

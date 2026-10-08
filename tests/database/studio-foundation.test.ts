@@ -3,7 +3,7 @@
 // Each test states the invariant it demonstrates. Worker steps are synthetic protocol calls: they prove
 // durable state, fencing and review binding, not model extraction or scientific classification.
 import { beforeAll, beforeEach, afterAll, describe, test, expect } from 'vitest';
-import { StudioDb, ids, MODULE, OTHER, SKILL, PROFILE, AUTH, sha, ok, refused, key, blob, baseBank, importSnapshot, accept, work, complete, gate, type BankFile } from './studio-fixture';
+import { verified, StudioDb, ids, MODULE, OTHER, SKILL, PROFILE, AUTH, sha, ok, refused, key, blob, baseBank, importSnapshot, accept, work, complete, gate, type BankFile } from './studio-fixture';
 
 let s: StudioDb;
 const ed = () => s.rpc({ kind: 'user', id: ids.editor }), ed2 = () => s.rpc({ kind: 'user', id: ids.editor2 });
@@ -86,32 +86,32 @@ describe('uploads and verified blobs (C02)', () => {
     const mk = () => ok(ed(), 'studio_create_upload', { p_module: MODULE, p_sha256: digest, p_size: size, p_media_type: 'application/pdf', p_filename: 'dup.pdf', p_purpose: 'source', p_command: key() });
     const a = await mk(), b = await mk();
     expect(a.sessionId).not.toBe(b.sessionId); expect(a.provisionalKey).not.toBe(b.provisionalKey);
-    for (const x of [a, b]) await ok(ed(), 'studio_prepare_commit', { p_session: x.sessionId, p_sha256: digest, p_size: size, p_detected_type: 'application/pdf' });
-    const ca = await ok(ed(), 'studio_commit_upload', { p_session: a.sessionId }), cb = await ok(ed(), 'studio_commit_upload', { p_session: b.sessionId });
+    for (const x of [a, b]) await ok(verified(ed()), 'studio_prepare_commit', { p_session: x.sessionId, p_sha256: digest, p_size: size, p_detected_type: 'application/pdf' });
+    const ca = await ok(verified(ed()), 'studio_commit_upload', { p_session: a.sessionId }), cb = await ok(verified(ed()), 'studio_commit_upload', { p_session: b.sessionId });
     expect(ca.blobId).toBe(cb.blobId); expect([ca.duplicate, cb.duplicate]).toEqual([false, true]);
     expect((await s.sql('select count(*)::int n from private.studio_blobs where sha256=$1', [digest]))[0].n).toBe(1);
   });
   test('a failed or abandoned session reserves nothing; another session with the same claim still finalises', async () => {
     const digest = sha('%PDF-1.7 claimed'), mk = () => ok(ed(), 'studio_create_upload', { p_module: MODULE, p_sha256: digest, p_size: 16, p_media_type: 'application/pdf', p_filename: 'c.pdf', p_purpose: 'source', p_command: key() });
     const bad = await mk(), abandoned = await mk(), good = await mk();
-    expect(await ok(ed(), 'studio_prepare_commit', { p_session: bad.sessionId, p_sha256: sha('different bytes'), p_size: 16, p_detected_type: 'application/pdf' })).toMatchObject({ state: 'rejected', reason: 'digest mismatch' });
+    expect(await ok(verified(ed()), 'studio_prepare_commit', { p_session: bad.sessionId, p_sha256: sha('different bytes'), p_size: 16, p_detected_type: 'application/pdf' })).toMatchObject({ state: 'rejected', reason: 'digest mismatch' });
     void abandoned;
-    await ok(ed(), 'studio_prepare_commit', { p_session: good.sessionId, p_sha256: digest, p_size: 16, p_detected_type: 'application/pdf' });
-    expect(await ok(ed(), 'studio_commit_upload', { p_session: good.sessionId })).toMatchObject({ state: 'finalised', duplicate: false });
-    expect(await refused(ed(), 'studio_commit_upload', { p_session: bad.sessionId })).toMatch(/Upload session is rejected/);
+    await ok(verified(ed()), 'studio_prepare_commit', { p_session: good.sessionId, p_sha256: digest, p_size: 16, p_detected_type: 'application/pdf' });
+    expect(await ok(verified(ed()), 'studio_commit_upload', { p_session: good.sessionId })).toMatchObject({ state: 'finalised', duplicate: false });
+    expect(await refused(verified(ed()), 'studio_commit_upload', { p_session: bad.sessionId })).toMatch(/Upload session is rejected/);
   });
   test('corruption before finalisation is rejected on size, digest and sniffed type', async () => {
     for (const [sha256, size, type, reason] of [[sha('other'), 10, 'application/pdf', 'digest mismatch'], [null, 11, 'application/pdf', 'size mismatch'], [null, 10, 'image/png', 'type mismatch']] as const) {
       const digest = sha('%PDF-1.7 x');
       const u = await ok(ed(), 'studio_create_upload', { p_module: MODULE, p_sha256: digest, p_size: 10, p_media_type: 'application/pdf', p_filename: 'x.pdf', p_purpose: 'source', p_command: key() });
-      expect(await ok(ed(), 'studio_prepare_commit', { p_session: u.sessionId, p_sha256: sha256 ?? digest, p_size: size, p_detected_type: type })).toMatchObject({ state: 'rejected', reason });
+      expect(await ok(verified(ed()), 'studio_prepare_commit', { p_session: u.sessionId, p_sha256: sha256 ?? digest, p_size: size, p_detected_type: type })).toMatchObject({ state: 'rejected', reason });
     }
   });
   test('an expired session cannot finalise and its claim protects nothing', async () => {
     const digest = sha('%PDF-1.7 late');
     const u = await ok(ed(), 'studio_create_upload', { p_module: MODULE, p_sha256: digest, p_size: 14, p_media_type: 'application/pdf', p_filename: 'l.pdf', p_purpose: 'source', p_command: key() });
     await s.sql("update private.studio_upload_sessions set expires_at=now()-interval '1 second' where id=$1", [u.sessionId]);
-    expect(await ok(ed(), 'studio_prepare_commit', { p_session: u.sessionId, p_sha256: digest, p_size: 14, p_detected_type: 'application/pdf' })).toEqual({ state: 'expired' });
+    expect(await ok(verified(ed()), 'studio_prepare_commit', { p_session: u.sessionId, p_sha256: digest, p_size: 14, p_detected_type: 'application/pdf' })).toEqual({ state: 'expired' });
     expect(await ok(svc(), 'studio_gc_claim', { p_key: u.provisionalKey })).toBe(true);
   });
   test('replaying a create-upload command returns the same session; reusing its key for another request is refused', async () => {
@@ -128,9 +128,9 @@ describe('uploads and verified blobs (C02)', () => {
     expect(await ok(svc(), 'studio_gc_claim', { p_key: u.provisionalKey })).toBe(false);
     const target = `studio/blobs/${MODULE}/${digest}`;
     expect(await ok(svc(), 'studio_gc_claim', { p_key: target })).toBe(true); // orphan at that key
-    expect(await refused(ed(), 'studio_prepare_commit', { p_session: u.sessionId, p_sha256: digest, p_size: 16, p_detected_type: 'application/pdf' })).toMatch(/cleanup in progress/);
+    expect(await refused(verified(ed()), 'studio_prepare_commit', { p_session: u.sessionId, p_sha256: digest, p_size: 16, p_detected_type: 'application/pdf' })).toMatch(/cleanup in progress/);
     await ok(svc(), 'studio_gc_finish', { p_key: target });
-    await ok(ed(), 'studio_prepare_commit', { p_session: u.sessionId, p_sha256: digest, p_size: 16, p_detected_type: 'application/pdf' });
+    await ok(verified(ed()), 'studio_prepare_commit', { p_session: u.sessionId, p_sha256: digest, p_size: 16, p_detected_type: 'application/pdf' });
     expect(await ok(svc(), 'studio_gc_claim', { p_key: target })).toBe(false); // now being finalised
   });
 });
@@ -148,10 +148,10 @@ describe('integrity states block consumption (C02)', () => {
     // Finalising the same bytes again does not silently restore; recovery is explicit and audited.
     const digest = sha('%PDF-1.7 synthetic will go missing');
     const u = await ok(ed(), 'studio_create_upload', { p_module: MODULE, p_sha256: digest, p_size: 34, p_media_type: 'application/pdf', p_filename: 'p.pdf', p_purpose: 'source', p_command: key() });
-    await ok(ed(), 'studio_prepare_commit', { p_session: u.sessionId, p_sha256: digest, p_size: 34, p_detected_type: 'application/pdf' });
-    expect(await refused(ed(), 'studio_commit_upload', { p_session: u.sessionId })).toMatch(/explicit recovery/);
+    await ok(verified(ed()), 'studio_prepare_commit', { p_session: u.sessionId, p_sha256: digest, p_size: 34, p_detected_type: 'application/pdf' });
+    expect(await refused(verified(ed()), 'studio_commit_upload', { p_session: u.sessionId })).toMatch(/explicit recovery/);
     await ok(ed(), 'studio_begin_recovery', { p_blob: b, p_reason: 'Restoring verified original bytes' });
-    await ok(ed(), 'studio_complete_recovery', { p_blob: b });
+    await ok(verified(ed()), 'studio_complete_recovery', { p_blob: b });
     const st = await stage(r.runId, 'S1_extract');
     await ok(ed(), 'studio_retry_stage', { p_stage: st.id, p_expected_attempts: 0, p_reason: 'Bytes recovered and verified', p_command: key() });
     expect((await ok(svc(), 'studio_claim', { p_worker: 'synthetic-worker' })).stageKey).toBe('S1_extract');

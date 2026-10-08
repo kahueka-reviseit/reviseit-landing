@@ -89,3 +89,9 @@ export async function recoverBlob(rpc: Rpc, storage: StudioStorage, blobId: stri
   if (!check || sha256(check) !== begin.sha256) throw new StudioError('Recovered bytes failed verification', 'integrity');
   return await call(rpc, 'studio_complete_recovery', { p_blob: blobId });
 }
+
+/** Build only on the server after authenticating the editor. Never return this capability to a client. */
+export function verifiedUploadRpc(editor: Rpc, verifier: Rpc, actor: string): Rpc {
+  return (name, args) => ['studio_prepare_commit', 'studio_commit_upload', 'studio_complete_recovery'].includes(name)
+    ? verifier(name, { ...args, p_actor: actor }) : editor(name, args);
+}
