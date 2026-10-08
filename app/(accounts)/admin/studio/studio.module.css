@@ -1,0 +1,14 @@
+.studio { display:flex; flex-direction:column; gap:28px; }
+.card { background:var(--color-surface, #fff); border:1px solid var(--color-border, #d9dde3); border-radius:12px; padding:20px 24px; display:flex; flex-direction:column; gap:12px; overflow-x:auto; }
+.card__title { margin:0; font-size:13px; line-height:18px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--color-text-muted); }
+.table { width:100%; border-collapse:collapse; font-size:14px; line-height:20px; }
+.table th { text-align:left; font-weight:600; padding:6px 10px 6px 0; border-bottom:1px solid var(--color-border, #d9dde3); white-space:nowrap; }
+.table td { padding:8px 10px 8px 0; border-bottom:1px solid var(--color-border-subtle, #eef0f3); vertical-align:top; }
+.mono { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; word-break:break-all; }
+.state { display:inline-block; padding:1px 8px; border-radius:999px; font-size:12px; font-weight:600; background:var(--color-border-subtle, #eef0f3); }
+.state--problem { composes:state; background:#fde8e6; color:#8a1c12; }
+.state--done { composes:state; background:#e6f3ea; color:#1d5a32; }
+.form { display:flex; flex-wrap:wrap; align-items:flex-end; gap:10px; }
+.form label { display:flex; flex-direction:column; gap:4px; font-size:13px; }
+.form input, .form select, .form textarea { font:inherit; padding:6px 8px; border:1px solid var(--color-border, #c9ced6); border-radius:8px; min-width:180px; }
+.note { margin:0; font-size:13px; line-height:18px; color:var(--color-text-muted); }
