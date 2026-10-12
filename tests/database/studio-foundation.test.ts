@@ -42,7 +42,7 @@ async function toG3(run: string, draft: string | null = '# PHYS_02 synthetic for
   let w = await work(svc(), [{ key: 'gap_list', kind: 'gap_list', content: '{"gaps":[]}' }], 'S4_prioritise'); await complete(svc(), w.claim, w.made);
   w = await work(svc(), draft ? [{ key: 'record:task_type:PHYS_02', kind: 'draft_record', content: draft, record: DRAFT, media: 'text/markdown' }] : [], 'S5_draft'); await complete(svc(), w.claim, w.made);
   w = await work(svc(), [{ key: 'validation', kind: 'validation_result', content: '{"structural_ok":true}', meta: VALID }], 'S6_assemble_validate');
-  const drafts = (w.claim.upstream as any[]).map(a => ({ artifactId: a.id, action: 'replace' }));
+  const drafts = (w.claim.upstream as any[]).filter(a => a.logicalKey.startsWith('record:')).map(a => ({ artifactId: a.id, action: 'replace' }));
   await ok(svc(), 'studio_put_changeset', { p_attempt: w.claim.attemptId, p_lease: w.claim.lease, p_entries: drafts, p_validation_artifact: w.made[0] });
   await complete(svc(), w.claim, w.made);
 }
@@ -291,7 +291,7 @@ describe('reviews bind exact revisions (C06)', () => {
     let w = await work(svc(), [{ key: 'gap_list', kind: 'gap_list', content: '{}' }], 'S4_prioritise'); await complete(svc(), w.claim, w.made);
     w = await work(svc(), [{ key: 'record:task_type:PHYS_02', kind: 'draft_record', content: '# new', record: DRAFT, media: 'text/markdown' }], 'S5_draft'); await complete(svc(), w.claim, w.made);
     w = await work(svc(), [{ key: 'validation', kind: 'validation_result', content: '{"structural_ok":false}', meta: { exitStatus: 1, scope: 'complete_candidate' } }], 'S6_assemble_validate');
-    await ok(svc(), 'studio_put_changeset', { p_attempt: w.claim.attemptId, p_lease: w.claim.lease, p_entries: (w.claim.upstream as any[]).map(a => ({ artifactId: a.id, action: 'replace' })), p_validation_artifact: w.made[0] });
+    await ok(svc(), 'studio_put_changeset', { p_attempt: w.claim.attemptId, p_lease: w.claim.lease, p_entries: (w.claim.upstream as any[]).filter(a => a.logicalKey.startsWith('record:')).map(a => ({ artifactId: a.id, action: 'replace' })), p_validation_artifact: w.made[0] });
     await complete(svc(), w.claim, w.made);
     expect(await gate(ed(), run, 'G3_records').catch(e => e.message)).toMatch(/Passing validation of the complete candidate required/);
   });

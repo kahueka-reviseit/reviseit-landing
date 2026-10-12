@@ -48,6 +48,9 @@ export async function handleStudioGateway(request: Request, deps: GatewayDeps): 
       case 'intake_inputs':
         if (!lease(v)) break;
         return json({ result: await call(rpc, 'studio_intake_inputs', fenced(v)) });
+      case 'analysis_inputs':
+        if (!lease(v)) break;
+        return json({ result: await call(rpc, 'studio_analysis_inputs', fenced(v)) });
       case 'matching_inputs':
         if (!lease(v)) break;
         return json({ result: await call(rpc, 'studio_matching_inputs', fenced(v)) });
