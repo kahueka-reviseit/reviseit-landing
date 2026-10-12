@@ -328,3 +328,47 @@ test('record revision requests serialize with approval and competing reviewer fe
   evidence.revisionRequests={pairs:20,requests,approvals,conflictingWinners:0};
  }finally{await a.end();await b.end();await w.end();}
 },120000);
+
+async function paperSql(query:string,args:unknown[]=[]){return (await owner.query(query,args)).rows;}
+async function startPaper(caller:Client,pages=17,purpose='rehearsal',change:(p:any)=>void=()=>{}){
+ const operator=await session({role:'reviseit_studio_operator'});
+ try {
+ const id='paper-'+randomUUID();await paperSql('insert into private.studio_provider_profiles values ($1,$2,$3,$4,true)',[id,'live','synthetic','synthetic']);
+ const b=await blob(caller,'synthetic paper');const src=await rpc(caller,'studio_create_source',{p_module:MODULE,p_title:'Synthetic paper trial',p_files:[{blobId:b,role:'question_paper',filename:'synthetic.pdf'}],p_identity:{},p_command:randomUUID()});
+ const r=await rpc(caller,'studio_start_run',{p_source:src.sourceId,p_expected_source_revision:1,p_purpose:purpose,p_snapshot:snapshot,p_skill_contract:SKILL,p_profile:id,p_command:randomUUID()});
+ const i=(await paperSql('select * from private.studio_run_inputs where run_id=$1',[r.runId]))[0];
+ const source=(await paperSql('select * from private.studio_blobs where id=$1',[b]))[0];
+ const plan={schema:'reviseit/studio-paper-intake-plan@1',moduleId:MODULE,inputManifest:{sourceSha256:source.sha256,sourceBytes:Number(source.size_bytes),policySha256:i.policy_sha256,skillSha256:i.skill_sha256,pageCount:pages,pages:Array.from({length:pages},(_,n)=>({filePage:n+1,renderSha256:sha('render'+n),textSha256:sha('text'+n)}))},
+  phaseLimits:{page:{requestBytes:786432,outputTokens:8192,images:1},reconcile:{requestBytes:262144,outputTokens:32768,images:0}},
+  limits:{trialMicro:12000000,runMicro:10000000,stageMicro:10000000,operationMicro:2000000,maxDispatches:pages+1,requiredBalanceMicro:10000000}};
+ change(plan);
+ const c={...contract(),id,profile_id:id,mode:'openrouter',model:'synthetic/model',endpoint:'https://openrouter.ai/api/v1/chat/completions',
+  input_micro_per_million:2000000,output_micro_per_million:10000000,max_input_tokens:790528,max_request_bytes:786432,max_output_tokens:32768,max_images:1,image_token_ceiling:4096,
+  evidence:{paperIntake:plan,planDigest:sha('synthetic-plan')}};
+ const fields=Object.keys(c);await paperSql(`insert into private.studio_budget_contracts(${fields.join(',')}) values(${fields.map((_,n)=>'$'+(n+1)).join(',')})`,Object.values(c).map(v=>typeof v==='object'?JSON.stringify(v):v));
+ const trial=randomUUID();await rpc(operator,'studio_budget_grant',{...grantArgs(r.runId),p_trial:trial,p_contract:id,p_trial_limit:12000000,p_run_limit:10000000,p_stage_limit:10000000,p_operation_limit:2000000});
+ const args={p_run:r.runId,p_plan_sha256:sha('synthetic-plan'),p_key_evidence_sha256:sha('synthetic-proof'),p_expires:new Date(Date.now()+3600000).toISOString(),p_reference:'Synthetic paper trial explicit authorisation',p_scope:{sourceDigest:i.source_digest,bankManifestSha256:i.bank_manifest_sha256,policySha256:i.policy_sha256,skillSha256:i.skill_sha256}};
+ return {run:r.runId,args,c,trial};
+ }finally{await operator.end();}
+}
+
+test('20 competing reservations for one paper page admit exactly one operation',async()=>{
+ const ed=await editor(),wa=await worker(),wb=await worker(),op=await session({role:'reviseit_studio_operator'});
+ try{
+  for(let n=0;n<20;n++){
+   await owner.query("update private.studio_stages set state='cancelled' where state in ('queued','running')");
+   const r=await startPaper(ed);await rpc(op,'studio_live_authorise_paper',r.args);
+   const cl=await rpc(wa,'studio_claim_live',{p_worker:'paper-race',p_run:r.run,p_bundle:r.c.bundle_sha256,p_plan:sha('synthetic-plan'),p_key_evidence:sha('synthetic-proof')});
+   const reservations=[];
+   for(let j=0;j<2;j++){
+    const digest=sha('page-race-'+j),p=await rpc(wa,'studio_provider_prepare',{p_attempt:cl.attemptId,p_lease:cl.lease,p_operation:'page:'+j,p_request_digest:digest});
+    reservations.push({p_attempt:cl.attemptId,p_lease:cl.lease,p_provider_attempt:p.providerAttemptId,p_request_manifest:manifest(digest,{contractId:r.c.id,mode:'openrouter',model:r.c.model,endpoint:r.c.endpoint,intakePhase:'page',sourcePage:1,imageCount:1,inputTokenBound:4196,outputTokens:8192})});
+   }
+   const results=await Promise.allSettled([rpc(wa,'studio_budget_reserve',reservations[0]),rpc(wb,'studio_budget_reserve',reservations[1])]);
+   expect(results.filter(x=>x.status==='fulfilled')).toHaveLength(1);
+   expect(String((results.find(x=>x.status==='rejected') as PromiseRejectedResult).reason)).toMatch(/already reserved/);
+   expect((await paperSql('select count(*)::int n from private.studio_budget_reservations where run_id=$1',[r.run]))[0].n).toBe(1);
+  }
+  evidence.paperPageReservation={pairs:20,accepted:20,refused:20,duplicates:0};
+ }finally{await ed.end();await wa.end();await wb.end();await op.end();}
+});

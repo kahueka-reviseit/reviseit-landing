@@ -1,6 +1,6 @@
 {
  "meta": {
-  "last_updated": "2026-10-01",
+  "last_updated": "2026-10-12",
   "purpose": "Registry of shared components across the two Paper files and the application. Paper 0.5.14 links tokens natively inside one file only; every other link listed here is explicit synchronisation run by scripts/paper/paper-link.mjs.",
   "paperVersion": "0.5.14"
  },
@@ -5149,6 +5149,7 @@
      "app/(accounts)/admin/papers/page.tsx",
      "app/(accounts)/admin/papers/record.tsx",
      "app/(accounts)/admin/studio/page.tsx",
+     "app/(accounts)/admin/studio/request-changes.tsx",
      "app/(accounts)/admin/studio/runs/[id]/page.tsx",
      "app/(accounts)/admin/studio/upload-source.tsx",
      "app/(accounts)/auth/confirm/form.tsx",
