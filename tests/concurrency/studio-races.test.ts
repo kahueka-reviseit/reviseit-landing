@@ -269,3 +269,32 @@ test('concurrent conflicting evidence declarations preserve exactly one immutabl
  evidence.conflictingEvidence={accepted:1,rejected:1};
  }finally{await a.end();await wa.end();await wb.end();}
 });
+
+test('record revision requests serialize with approval and competing reviewer feedback',async()=>{
+ const a=await editor(),b=await editor2(),w=await worker();let requests=0,approvals=0;
+ try {
+  for(let i=0;i<20;i++){
+   await owner.query("update private.studio_stages set state='cancelled' where state in ('queued','running')");
+   const run=await startRun(a);
+   const finish=async(kind:string|null)=>{
+    const c=await rpc(w,'studio_claim',{p_worker:'revision-race'});let made:string[]=[];
+    if(kind){const data=JSON.stringify({synthetic:true,iteration:i});const out=await rpc(w,'studio_put_output',{p_attempt:c.attemptId,p_lease:c.lease,p_logical_key:kind,p_kind:kind,p_sha256:sha(data),p_size:Buffer.byteLength(data),p_media_type:'application/json',p_schema:null,p_record:null,p_meta:kind==='validation_result'?{exitStatus:0,scope:'complete_candidate'}:{},p_provider_attempt:null});made=[out.artifactId];}
+    if(kind==='validation_result')await rpc(w,'studio_put_changeset',{p_attempt:c.attemptId,p_lease:c.lease,p_entries:[],p_validation_artifact:made[0]});
+    await rpc(w,'studio_complete',{p_attempt:c.attemptId,p_lease:c.lease,p_outputs:made});
+   };
+   const approve=async(g:string)=>{const v=await rpc(a,'studio_gate_view',{p_run:run,p_gate:g});return rpc(a,'studio_record_decision',{p_run:run,p_gate:g,p_expected_version:v.version,p_bound:v.binding.artifacts.map((x:any)=>x.id),p_outcome:'approved',p_rationale:'Synthetic review',p_authorisation:AUTH,p_items:[],p_command:randomUUID()});};
+   await finish('inventory');await approve('G1_inventory');await finish('task_matches');await finish('spec_matches');await approve('G2_matches');await finish('gap_list');await finish(null);await finish('validation_result');
+   const v=await rpc(a,'studio_gate_view',{p_run:run,p_gate:'G3_records'}),common={p_run:run,p_gate:'G3_records',p_expected_version:v.version,p_bound:v.binding.artifacts.map((x:any)=>x.id)};
+   const request=(cl:Client)=>rpc(cl,'studio_request_revision',{...common,p_instruction:'Review the deferred gaps and explain the evidence.',p_command:randomUUID()});
+   const competing=i<10?request(b):rpc(b,'studio_record_decision',{...common,p_outcome:'approved',p_rationale:'Synthetic concurrent approval',p_authorisation:AUTH,p_items:[],p_command:randomUUID()});
+   const results=await Promise.allSettled([request(a),competing]);
+   expect(results.filter(r=>r.status==='fulfilled')).toHaveLength(1);
+   const rows=(await owner.query('select id from private.studio_revision_requests where run_id=$1',[run])).rows;
+   const after=await rpc(a,'studio_gate_view',{p_run:run,p_gate:'G3_records'});
+   if(rows.length){requests++;expect(rows).toHaveLength(1);expect(after.live).toBeNull();expect(after.binding).toBeNull();
+    expect((await owner.query("select count(*)::int n from private.studio_stages where run_id=$1 and stage_key='S5_draft' and state='queued'",[run])).rows[0].n).toBe(1);
+   }else{approvals++;expect(after.live).not.toBeNull();}
+  }
+  evidence.revisionRequests={pairs:20,requests,approvals,conflictingWinners:0};
+ }finally{await a.end();await b.end();await w.end();}
+},120000);

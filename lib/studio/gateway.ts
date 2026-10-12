@@ -55,6 +55,12 @@ export async function handleStudioGateway(request: Request, deps: GatewayDeps): 
       case 'matching_inputs':
         if (!lease(v)) break;
         return json({ result: await call(rpc, 'studio_matching_inputs', fenced(v)) });
+      case 'claim_mock':
+        if (typeof v.worker !== 'string' || !WORKER.test(v.worker)) break;
+        return json({ result: await call(rpc, 'studio_claim_mock', { p_worker: v.worker }) });
+      case 'claim_recorded':
+        if (typeof v.worker !== 'string' || !WORKER.test(v.worker) || !isUuid(v.runId) || !isSha256(v.bundleSha256)) break;
+        return json({ result: await call(rpc, 'studio_claim_recorded', { p_worker: v.worker, p_run: v.runId, p_bundle: v.bundleSha256 }) });
       case 'claim':
         if (typeof v.worker !== 'string' || !WORKER.test(v.worker)) break;
         return json({ result: await call(rpc, 'studio_claim', { p_worker: v.worker }) });

@@ -41,6 +41,8 @@ export async function createSource(form: FormData): Promise<ActionResult> {
 }
 export async function startRun(form: FormData) {
   const { rpc } = await requireStudioEditor();
+  const options = await call<any>(rpc, 'studio_execution_options', {});
+  if (!options.profiles.some((p: any) => p.id === form.get('profile')) || !options.skills.some((k: any) => k.id === form.get('skillContract'))) throw new StudioError('Choose a registered recorded runtime and analysis skill.');
   await call(rpc, 'studio_start_run', { p_source: String(form.get('sourceId')), p_expected_source_revision: Number(form.get('revision')), p_purpose: String(form.get('purpose')),
     p_snapshot: String(form.get('snapshotId')), p_skill_contract: String(form.get('skillContract')), p_profile: String(form.get('profile')), p_command: commandKey(form.get('command')) });
   revalidatePath('/admin/studio');
@@ -64,4 +66,19 @@ export async function cancelStage(form: FormData) {
   const { rpc } = await requireStudioEditor();
   await call(rpc, 'studio_cancel_stage', { p_stage: String(form.get('stageId')), p_reason: String(form.get('reason') || 'Cancelled by an editor'), p_command: commandKey(form.get('command')) });
   revalidatePath(`/admin/studio/runs/${String(form.get('runId'))}`);
+}
+
+/** A request for corrections is distinct from approval and from retrying a failed call. */
+export async function requestRevision(_previous: ActionResult | null, form: FormData): Promise<ActionResult> {
+  try {
+    const { rpc } = await requireStudioEditor();
+    const run = String(form.get('runId'));
+    const result = await call(rpc, 'studio_request_revision', {
+      p_run: run, p_gate: String(form.get('gate')), p_expected_version: Number(form.get('version')),
+      p_bound: String(form.get('bound') || '').split(',').filter(isUuid),
+      p_instruction: String(form.get('instruction') || ''), p_command: commandKey(form.get('command')),
+    });
+    revalidatePath(`/admin/studio/runs/${run}`);
+    return { ok: true, value: result };
+  } catch (e) { return fail(e); }
 }

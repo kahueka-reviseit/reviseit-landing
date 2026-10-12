@@ -173,10 +173,10 @@ for(const newRecords of [false,true])test.skipIf(!enabled)(`complete recorded S1
  const src=await ok(editor,'studio_create_source',{p_module:MODULE,p_title:'Synthetic complete analysis',p_files:[{blobId:b.blobId,role:'question_paper',filename:'synthetic.pdf'}],p_identity:{},p_command:key()});
  const runId=(await ok(editor,'studio_start_run',{p_source:src.sourceId,p_expected_source_revision:1,p_purpose:'canonical',p_snapshot:pinned,p_skill_contract:'synthetic-analysis@1',p_profile:PROFILE,p_command:key()})).runId;
  await grantBudget(db,runId);
- const execute=async(stage:string,finish=true,replay=false,c?:any,root?:string)=>{
+ const execute=async(stage:string,finish=true,replay=false,c?:any,root?:string,propose=newRecords)=>{
   c??=await ok(svc(),'studio_claim',{p_worker:'analysis-test'});expect(c.stageKey).toBe(stage);
   const mode=stage==='S1_extract'?'automatic_intake':stage==='S2_task_match'||stage==='S3_spec_match'?'analysis_match':'analysis_stage';
-  const p=await child({mode,state:root||state(),claim:c,newRecords,replay,finish});expect(p.code,p.err).toBe(0);
+  const p=await child({mode,state:root||state(),claim:c,newRecords:propose,replay,finish});expect(p.code,p.err).toBe(0);
   return JSON.parse(p.out);
  };
  await execute('S1_extract');expect(await ok(svc(),'studio_claim',{p_worker:'before-G1'})).toBeNull();await gate(editor,runId,'G1_inventory');
@@ -199,12 +199,54 @@ for(const newRecords of [false,true])test.skipIf(!enabled)(`complete recorded S1
  const g4=await ok(editor,'studio_gate_view',{p_run:runId,p_gate:'G4_content'});
  const judgments=g4.changeset.records.map((r:any)=>({recordKind:r.kind,recordId:r.id,aspect:'method',verdict:'unresolved',reason:'Synthetic protocol test, not scientific acceptance',disposition:'scoped_exception',exceptionRationale:'Synthetic fixtures only; no bank write or publication'}));
  await gate(editor,runId,'G4_content','approved',judgments);
- const c7=await ok(svc(),'studio_claim',{p_worker:'package'}),s7=state();
+ let c7=await ok(svc(),'studio_claim',{p_worker:'package'});const s7=state();
+ if(newRecords){
+  const before=await ok(editor,'studio_gate_view',{p_run:runId,p_gate:'G4_content'});
+  const request={p_run:runId,p_gate:'G4_content',p_expected_version:before.version,p_bound:before.binding.artifacts.map((a:any)=>a.id),p_instruction:'Clarify the observed method and retain source evidence.',p_command:key()};
+  for(const actor of [svc(),db.rpc({kind:'anon'}),db.rpc({kind:'user',id:ids.outsider})])
+   expect(await refused(actor,'studio_request_revision',request)).toMatch(/permission denied|editor access/);
+  const revision=await ok(editor,'studio_request_revision',request);
+  expect(await ok(editor,'studio_request_revision',request)).toEqual(revision);
+  expect(await refused(svc(),'studio_heartbeat',{p_attempt:c7.attemptId,p_lease:c7.lease})).toMatch(/lease lost/);
+  expect((await ok(editor,'studio_gate_view',{p_run:runId,p_gate:'G3_records'})).live).toBeNull();
+  expect((await ok(editor,'studio_gate_view',{p_run:runId,p_gate:'G4_content'})).live).toBeNull();
+  expect(await refused(editor,'studio_request_revision',{...request,p_command:key()})).toMatch(/Gate changed|not ready/);
+  expect((await db.sql("select state from private.studio_changesets where id=$1",[changeset[0].id]))[0].state).toBe('superseded');
+  const budget=(await ok(editor,'studio_execution_view',{p_run:runId})).budget;
+  expect(await ok(svc(),'studio_claim_recorded',{p_worker:'correction',p_run:runId,p_bundle:sha('wrong')})).toBeNull();
+  const correctedClaim=await ok(svc(),'studio_claim_recorded',{p_worker:'correction',p_run:runId,p_bundle:budget.bundleSha256});
+  expect(correctedClaim.stageKey).toBe('S5_draft');expect(correctedClaim.stageId).not.toBe(c5.stageId);
+  expect(correctedClaim.revisionRequest.instruction).toBe(request.p_instruction);
+  const revised=await execute('S5_draft',true,false,correctedClaim);expect(revised.report.drafts).toHaveLength(4);
+  const oldIds=draft.report.drafts.map((d:any)=>d.artifactId),newIds=revised.report.drafts.map((d:any)=>d.artifactId);
+  expect(newIds.some((id:string)=>oldIds.includes(id))).toBe(false);
+  const task=revised.report.drafts.find((d:any)=>d.proposal.kind==='task_type');
+  expect(task.sha256).not.toBe(draft.report.drafts.find((d:any)=>d.proposal.kind==='task_type').sha256);
+  const rechecked=await execute('S6_assemble_validate');expect(rechecked.report.bankStructuralOk).toBe(true);
+  const nextG3=await ok(editor,'studio_gate_view',{p_run:runId,p_gate:'G3_records'});
+  expect(nextG3.live).toBeNull();expect(nextG3.changeset.id).not.toBe(changeset[0].id);
+  await gate(editor,runId,'G3_records');await gate(editor,runId,'G4_content','approved',judgments);
+  c7=await ok(svc(),'studio_claim',{p_worker:'revised-package'});
+ }
+
  const packaged=await execute('S7_package',false,false,c7,s7);expect(packaged.report.requiredFiles).toHaveLength(13);
  expect(packaged.report.files.length).toBe(newRecords?22:13);expect(packaged.report.integrationOccurred).toBe(false);
  expect(packaged.report.sourceAttachments).toHaveLength(1);
  const again=await execute('S7_package',true,true,c7,state());expect(again.report).toEqual(packaged.report);
  const g5=await ok(editor,'studio_gate_view',{p_run:runId,p_gate:'G5_integration'});expect(g5.live).toBeNull();expect(g5.changeset.state).toBe('draft');
+ if(newRecords){
+  const reviewed=await ok(editor,'studio_gate_view',{p_run:runId,p_gate:'G4_content'});
+  await ok(editor,'studio_request_revision',{p_run:runId,p_gate:'G4_content',p_expected_version:reviewed.version,p_bound:reviewed.binding.artifacts.map((a:any)=>a.id),p_instruction:'Defer all proposed records pending more source evidence.',p_command:key()});
+  const budget=(await ok(editor,'studio_execution_view',{p_run:runId})).budget;
+  const correction=await ok(svc(),'studio_claim_recorded',{p_worker:'deferral',p_run:runId,p_bundle:budget.bundleSha256});
+  const deferred=await execute('S5_draft',true,false,correction,undefined,false);expect(deferred.report.drafts).toHaveLength(0);
+  await execute('S6_assemble_validate');
+  const empty=await ok(editor,'studio_gate_view',{p_run:runId,p_gate:'G3_records'});expect(empty.changeset.records).toHaveLength(0);
+  expect(await db.sql("select id from private.studio_artifacts where run_id=$1 and kind='draft_record' and state='current'",[runId])).toHaveLength(0);
+  await gate(editor,runId,'G3_records');await gate(editor,runId,'G4_content','approved',[]);
+  const pack=await execute('S7_package');expect(pack.report.files).toHaveLength(13);
+  expect((await ok(editor,'studio_execution_view',{p_run:runId})).revisionRequests).toHaveLength(2);
+ }
  expect((await db.sql('select accepted_snapshot_id from private.studio_modules where module_id=$1',[MODULE]))[0].accepted_snapshot_id).toBe(pinned);
 },120000);
 
@@ -241,4 +283,18 @@ test.skipIf(!enabled)('large remote envelope is chunked, immutable, protected fr
  const corrupt=await child({mode:'settle',state:state(),providerAttemptId:aid});expect(corrupt.code).not.toBe(0);
  expect(await ok(svc(),'studio_evidence_pending',{})).toMatchObject([{providerAttemptId:aid,integrityBlocked:true}]);
  expect((await db.sql('select count(*)::int n from private.studio_provider_attempts'))[0].n).toBe(1);
+});
+
+test.skipIf(!enabled)('recorded worker claims only its named funded run; mock worker cannot consume recorded work',async()=>{
+ const first=await run(false),second=await run(true),bundle=sha(readFileSync(join(WORKER!,'studio/execution/manifest.json')));
+ expect((await ok(ed(),'studio_execution_view',{p_run:first})).budget).toBeNull();
+ expect((await ok(ed(),'studio_execution_options',{})).profiles.map((p:any)=>p.id)).toContain(PROFILE);
+ for(const actor of [ed(),db.rpc({kind:'anon'}),db.rpc({kind:'operator'})])
+  expect(await refused(actor,'studio_claim_recorded',{p_worker:'scoped',p_run:second,p_bundle:bundle})).toMatch(/permission denied/);
+ expect(await ok(svc(),'studio_claim_recorded',{p_worker:'scoped',p_run:first,p_bundle:bundle})).toBeNull();
+ expect(await ok(svc(),'studio_claim_recorded',{p_worker:'scoped',p_run:second,p_bundle:sha('different bundle')})).toBeNull();
+ const mock=await ok(svc(),'studio_claim_mock',{p_worker:'mock'});expect(mock.runId).toBe(first);
+ await ok(svc(),'studio_fail',{p_attempt:mock.attemptId,p_lease:mock.lease,p_error:'Synthetic explicit stop',p_retryable:false});
+ expect(await ok(svc(),'studio_claim_mock',{p_worker:'mock'})).toBeNull();
+ const recorded=await ok(svc(),'studio_claim_recorded',{p_worker:'scoped',p_run:second,p_bundle:bundle});expect(recorded.runId).toBe(second);
 });

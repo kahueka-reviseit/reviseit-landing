@@ -18,6 +18,7 @@ export default async function Studio() {
   const { rpc, account } = await requireStudioEditor();
   let data: Overview | null = null;
   try { data = await call<Overview>(rpc, 'studio_overview', {}); } catch { data = null; }
+  const execution = await call<any>(rpc, 'studio_execution_options', {});
   const first = (account.full_name || '').split(/\s+/)[0];
   return <><StaffHeader creditsEnabled={creditsEnabled()} signedIn name={first || undefined}/>
     <main className={ui['site-shell__main']}><div className={ui['page--staff']}>
@@ -35,10 +36,13 @@ export default async function Studio() {
             {data.sources.map(src => { const snaps = data!.snapshots.filter(x => x.moduleId === src.moduleId);
               return <tr key={src.id}><td>{src.title}</td><td>{src.moduleId}</td><td>{src.revision}</td><td>
                 <form action={startRun} className={s.form}><input type="hidden" name="sourceId" value={src.id}/><input type="hidden" name="revision" value={src.revision}/>
-                  <input type="hidden" name="skillContract" value="past-paper-analysis@2026-10-07"/><input type="hidden" name="profile" value="mock-v0"/><input type="hidden" name="command" value={randomUUID()}/>
+                  <input type="hidden" name="command" value={randomUUID()}/>
+                  <label>Analysis skill<select name="skillContract" required>{execution.skills.map((x: any) => <option key={x.id} value={x.id}>{x.id}</option>)}</select></label>
+                  <label>Recorded runtime profile<select name="profile" required>{execution.profiles.map((x: any) => <option key={x.id} value={x.id}>{x.id} · recorded replies</option>)}</select></label>
+                  <p className={s.note}>The operator must bind this run to a matching runtime allowance before its worker can start. No live model calls are enabled.</p>
                   <label>Purpose<select name="purpose" defaultValue="rehearsal"><option value="rehearsal">Rehearsal (isolated)</option><option value="canonical">Canonical</option></select></label>
                   <label>Bank snapshot<select name="snapshotId">{snaps.map(x => <option key={x.id} value={x.id}>{x.purpose} · {x.origin} · {x.manifestSha256.slice(0, 10)}</option>)}</select></label>
-                  <button className={button('secondary', { size: 'small' })}>Start run</button></form></td></tr>; })}
+                  <button disabled={!execution.profiles.length || !execution.skills.length || !snaps.length} className={button('secondary', { size: 'small' })}>Start recorded run</button></form></td></tr>; })}
           </tbody></table>
         </section>
         <section className={s.card} aria-labelledby="runs"><h2 id="runs" className={s.card__title}>Runs</h2>

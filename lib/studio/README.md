@@ -1,6 +1,6 @@
 # Curriculum Studio foundation (assignment 02)
 
-Corrected local candidate. Studio migrations 039–044 are local-only; this build does not deploy them.
+Corrected local candidate. Studio migrations 039–048 are local-only; this build does not deploy them.
 
 ## What exists
 
@@ -58,7 +58,7 @@ evidence of real R2 behaviour. Provider calls are mocked throughout.
 For full Studio decommission only, back up and export all Studio and financial evidence before
 running `rollback/202610080039_studio_foundation.down.sql`. Remove the corresponding Studio migration
 history records with the process that applied them. Forward recovery applies all Studio migrations
-in order (currently 039–044); `tests/database/studio-migration.test.ts` proves they leave every existing
+in order (currently 039–048); `tests/database/studio-migration.test.ts` proves they leave every existing
 object byte-identical. Storage objects under `studio/` are removed separately and only after export.
 This destructive rollback is not a financial reset or the routine downgrade path for migration 043.
 
@@ -91,7 +91,7 @@ the existing receipt without reserving or billing twice.
 
 The new exchange always requires a budget. Original mock-v0 protocol fixtures without a budget remain
 available. Every live profile is disabled at dispatch, and contracts accept only recorded mode.
-No contract provisioning interface, spending UI or OpenRouter network adapter is included.
+Contract provisioning remains an operator command. The admin now displays recorded allowances and simulated usage (migration 048 below); no OpenRouter network adapter is included.
 
 Migration 043 also qualifies provider operations by stage identity: separate runs pinning identical
 bytes no longer share an attempt. Historical operation rows are reused by their own stage/key tuple;
@@ -110,3 +110,26 @@ batch plus a deterministic whole-paper evidence report. G2 binds all of these; S
 independently of S2. The new integration fixture proves 62 leaves in 12 task batches and 11 structured
 specification batches, repeatable without new dispatches, with G2 left unapproved. Its source, intake
 receipts and replies are synthetic; it does not prove automatic extraction or model quality.
+
+## Recorded controls and correction loop (migration 048)
+
+The admin start form lists registered skill contracts and recorded profiles; it no longer silently
+selects the mock runtime. Starting a run does not grant an allowance. The operator still binds its
+immutable recorded budget contract using `studio_budget_grant`; the run screen shows that waiting
+state, allowance identity, held/settled simulated usage, current stages and historical revisions.
+
+The recorded worker claims one named run with the exact execution-bundle allowance. Its mock CLI
+uses a separate claim function that excludes budget-bound runs. The legacy internal `claim` action
+remains for protocol fixtures; the production CLI does not use it in either mode.
+
+At G3 or G4, **Request changes and redraft** saves the editor's instruction and exact reviewed binding,
+records a returned decision, invalidates G3–G5, withdraws the old proposed candidate and queues a new
+S5 stage identity. Old evidence remains immutable and readable. The worker receives the prior draft
+bytes plus feedback, authors fresh contracts and indexes, reassesses coverage, and runs S6 on the
+complete candidate. It must pass the same checks and receive fresh G3/G4 approvals before packaging.
+A record omitted by the new draft plan cannot leak in from the superseded plan. Already-running
+packaging is fenced out. Repeated commands replay; stale review screens fail rather than overwrite.
+
+This is a feedback-driven redrafting loop, not an inline Markdown editor. The low-level revision RPC
+still cannot make an arbitrary text edit satisfy the execution metadata contract. No direct-edit
+bypass was added. These controls remain local candidate work; migration 048 is not deployed.
