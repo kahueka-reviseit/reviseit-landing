@@ -45,6 +45,9 @@ export async function handleStudioGateway(request: Request, deps: GatewayDeps): 
   if (!v || typeof v !== 'object' || Array.isArray(v) || typeof v.action !== 'string') return json({ error: 'Invalid request' }, 400);
   try {
     switch (v.action) {
+      case 'intake_inputs':
+        if (!lease(v)) break;
+        return json({ result: await call(rpc, 'studio_intake_inputs', fenced(v)) });
       case 'matching_inputs':
         if (!lease(v)) break;
         return json({ result: await call(rpc, 'studio_matching_inputs', fenced(v)) });
