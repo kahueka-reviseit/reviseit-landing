@@ -10,7 +10,7 @@ import { join } from 'node:path';
 import { handleStudioGateway } from '../../lib/studio/gateway';
 import { LocalStudioStorage } from '../../lib/studio/storage/local';
 import { StudioDb, ids, MODULE, SKILL, PROFILE, sha, ok, refused, key, blob, verified, baseBank, importSnapshot, accept, gate, work, complete } from './studio-fixture';
-import { installBudgetContract, grantBudget } from './studio-budget-fixture';
+import { installBudgetContract, grantBudget, contract, grantArgs } from './studio-budget-fixture';
 const WORKER=process.env.STUDIO_E2E_WORKER, PYTHON=process.env.STUDIO_EXECUTION_PYTHON;
 const enabled=!!WORKER && !!PYTHON, TOKEN='r'.repeat(48);
 const db=new StudioDb();let server:Server,origin='',dir:string,snapshot:string,store:LocalStudioStorage;
@@ -297,4 +297,48 @@ test.skipIf(!enabled)('recorded worker claims only its named funded run; mock wo
  await ok(svc(),'studio_fail',{p_attempt:mock.attemptId,p_lease:mock.lease,p_error:'Synthetic explicit stop',p_retryable:false});
  expect(await ok(svc(),'studio_claim_mock',{p_worker:'mock'})).toBeNull();
  const recorded=await ok(svc(),'studio_claim_recorded',{p_worker:'scoped',p_run:second,p_bundle:bundle});expect(recorded.runId).toBe(second);
+});
+
+for(const scenario of ['success','charged_error','unknown_cost','before_raw','after_remote'])test.skipIf(!enabled)(`OpenRouter loopback ${scenario}: real admission and remote recovery without resend`,async()=>{
+ const fixture=await child({mode:'openrouter_fixture'});expect(fixture.code,fixture.err).toBe(0);
+ const {profile,reply}=JSON.parse(fixture.out);
+ const c={...contract(sha(readFileSync(join(WORKER!,'studio/execution/manifest.json')))),id:'openrouter-synthetic-v1',
+  endpoint:profile.endpoint,model:profile.model,capability_sha256:profile.capability_sha256,pricing_sha256:profile.pricing_sha256,
+  input_micro_per_million:profile.input_micro_per_million,output_micro_per_million:profile.output_micro_per_million};
+ const fields=Object.keys(c);
+ await db.sql(`insert into private.studio_budget_contracts(${fields.join(',')},evidence) values(${fields.map((_,i)=>'$'+(i+1)).join(',')},$${fields.length+1})`,[...Object.values(c),JSON.stringify({synthetic:true,operatorNote:"not-for-worker",openrouter:{...profile,unrelatedNote:"not-for-worker"}})]);
+ const runId=await run(false);await ok(db.rpc({kind:'operator'}),'studio_budget_grant',{...grantArgs(runId),p_contract:c.id});
+ const claim=await ok(svc(),'studio_claim',{p_worker:'loopback'}),lease={attemptId:claim.attemptId,lease:claim.lease};
+ const context=await ok(svc(),'studio_budget_context',{p_attempt:claim.attemptId,p_lease:claim.lease});
+ expect(context.contract.evidence).toEqual({openrouter:profile});
+ expect(await refused(ed(),'studio_budget_context',{p_attempt:claim.attemptId,p_lease:claim.lease})).toMatch(/permission denied/);
+ let calls=0,sent:Buffer|undefined;
+ const http=createServer(async(req,res)=>{
+  const chunks:Buffer[]=[];for await(const part of req)chunks.push(part as Buffer);sent=Buffer.concat(chunks);calls++;
+  expect(req.headers.authorization).toBe('Bearer synthetic-loopback-only');
+  expect(JSON.parse(sent.toString())).not.toHaveProperty('pins');
+  const rows=await db.sql('select dispatch_state from private.studio_provider_attempts');expect(rows[0].dispatch_state).toBe('dispatched');
+  const response=scenario==='charged_error'?{error:{code:429},usage:{cost:'0.000003'}}:reply;
+  if(scenario==='unknown_cost')delete response.usage;
+  res.writeHead(scenario==='charged_error'?429:200,{'Content-Type':'application/json','Retry-After':'0'});res.end(JSON.stringify(response));
+ });
+ await new Promise<void>(r=>http.listen(0,'127.0.0.1',r));const address=http.address();const port=typeof address==='object'&&address?address.port:0;
+ const root=state(),cfg={mode:'exchange',state:root,lease,openrouter:{profile,port}};
+ try{
+  const first=await child({...cfg,crash:['before_raw','after_remote'].includes(scenario)?scenario:undefined});
+  expect(calls,first.err).toBe(1);expect(!!sent).toBe(true);
+  if(scenario==='success')expect(first.code,first.err).toBe(0);else expect(first.code).not.toBe(0);
+  const attempts=await db.sql('select * from private.studio_provider_attempts');expect(attempts).toHaveLength(1);
+  const settled=await child({mode:'settle',state:state(),providerAttemptId:attempts[0].id});
+  if(scenario==='before_raw')expect(settled.code).not.toBe(0);else expect(settled.code,settled.err).toBe(0);
+  const repeated=await child(cfg);
+  if(['success','after_remote'].includes(scenario)){expect(repeated.code,repeated.err).toBe(0);expect(JSON.parse(repeated.out).reused).toBe(true);}
+  else expect(repeated.code).not.toBe(0);
+  expect(calls).toBe(1);
+  const row=(await db.sql('select dispatch_state,usage from private.studio_provider_attempts'))[0];
+  const budget=(await db.sql('select actual_micro,reserved_micro from private.studio_budget_reservations'))[0];
+  if(scenario==='charged_error'){expect(row.dispatch_state).toBe('failed');expect(Number(budget.actual_micro)).toBe(3);expect(row.usage.studioOutcome).toBe('provider_error');}
+  if(['before_raw','unknown_cost'].includes(scenario)){expect(budget.actual_micro).toBeNull();expect(Number(budget.reserved_micro)).toBeGreaterThan(0);}
+  expect(await db.sql('select * from private.studio_decisions')).toHaveLength(0);
+ }finally{await new Promise<void>(r=>http.close(()=>r()));}
 });

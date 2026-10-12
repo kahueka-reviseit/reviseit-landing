@@ -1,8 +1,10 @@
 // Admission describes the exact reconstructed request, not a worker-supplied token estimate.
 // Only the recorded profile exists. Live endpoint/tokenizer evidence needs a later reviewed contract.
 import { createHash } from 'node:crypto';
+import { unwrapOpenRouter } from './openrouter-request';
 export function budgetManifest(bytes: Uint8Array, contract: any) {
-  const request=JSON.parse(Buffer.from(bytes).toString('utf8'));
+  const envelope=JSON.parse(Buffer.from(bytes).toString('utf8'));
+  const request=envelope?.schema==='reviseit/openrouter-request@1'?unwrapOpenRouter(envelope,contract):envelope;
   if (!request || typeof request!=='object' || Array.isArray(request)
       || Object.keys(request).some(k=>!['model','max_tokens','stream','tools','messages','pins'].includes(k))
       || contract.mode!=='recorded' || request.model!==contract.model || request.stream!==false
