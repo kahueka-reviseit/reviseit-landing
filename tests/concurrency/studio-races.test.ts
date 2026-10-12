@@ -63,10 +63,11 @@ afterAll(async () => {
   await owner?.end(); await admin?.query(`drop database if exists ${name} with (force)`); await admin?.end();
 });
 
-async function blob(c: Client, content: string) {
-  const bytes = '%PDF-1.7 ' + content, digest = sha(bytes), size = Buffer.byteLength(bytes);
-  const s = await rpc(c, 'studio_create_upload', { p_module: MODULE, p_sha256: digest, p_size: size, p_media_type: 'application/pdf', p_filename: 'r.pdf', p_purpose: 'source', p_command: randomUUID() });
-  await verify(c, 'studio_prepare_commit', { p_session: s.sessionId, p_sha256: digest, p_size: size, p_detected_type: 'application/pdf' });
+async function blob(c: Client, content: string, revision = false) {
+  const bytes = revision ? content : '%PDF-1.7 ' + content, digest = sha(bytes), size = Buffer.byteLength(bytes);
+  const media = revision ? 'application/json' : 'application/pdf';
+  const s = await rpc(c, 'studio_create_upload', { p_module: MODULE, p_sha256: digest, p_size: size, p_media_type: media, p_filename: revision ? 'revision.json' : 'r.pdf', p_purpose: revision ? 'revision' : 'source', p_command: randomUUID() });
+  await verify(c, 'studio_prepare_commit', { p_session: s.sessionId, p_sha256: digest, p_size: size, p_detected_type: media });
   return (await verify(c, 'studio_commit_upload', { p_session: s.sessionId })).blobId;
 }
 async function startRun(c: Client) {
@@ -188,4 +189,31 @@ test('a late completion races lease-expiry reclaim: exactly one attempt can succ
     }
     evidence.lateCompletion = { pairs: 20, lateWins, newWins };
   } finally { await a.end(); await w1.end(); await w2.end(); }
+});
+
+
+test('review racing an editor replacement never leaves authority for superseded evidence', async () => {
+  const a = await editor(), b = await editor2(), w = await worker(); let approvedFirst = 0, editFirst = 0;
+  try {
+    for (let i = 0; i < 20; i++) {
+      await owner.query("update private.studio_stages set state='cancelled' where state in ('queued','running')");
+      const run = await startRun(a), c = await rpc(w,'studio_claim',{p_worker:'authority-race'});
+      const out = await rpc(w,'studio_put_output',{p_attempt:c.attemptId,p_lease:c.lease,p_logical_key:'inventory',p_kind:'inventory',p_sha256:sha('{}'),p_size:2,p_media_type:'application/json',p_schema:null,p_record:null,p_meta:{},p_provider_attempt:null});
+      await rpc(w,'studio_complete',{p_attempt:c.attemptId,p_lease:c.lease,p_outputs:[out.artifactId]});
+      const v = await rpc(a,'studio_gate_view',{p_run:run,p_gate:'G1_inventory'});
+      const newBlob = await blob(b,JSON.stringify({revision:i}),true);
+      const [review,edit] = await Promise.allSettled([
+        rpc(a,'studio_record_decision',{p_run:run,p_gate:'G1_inventory',p_expected_version:v.version,p_bound:[out.artifactId],p_outcome:'approved',p_rationale:'Reviewed original evidence',p_authorisation:AUTH,p_items:[],p_command:randomUUID()}),
+        rpc(b,'studio_revise_artifact',{p_artifact:out.artifactId,p_blob:newBlob,p_rationale:'Correct the source reading',p_command:randomUUID()})
+      ]);
+      expect(edit.status).toBe('fulfilled');
+      if(review.status==='fulfilled') approvedFirst++;
+      else { editFirst++; expect(String(review.reason)).toMatch(/Gate changed|Review binding changed/); }
+      const after=await rpc(a,'studio_gate_view',{p_run:run,p_gate:'G1_inventory'});
+      expect(after.live).toBeNull();
+      expect(after.binding.artifacts.map((x:any)=>x.id)).toEqual([(edit as PromiseFulfilledResult<any>).value.artifactId]);
+      expect((await owner.query("select count(*)::int n from private.studio_stages where run_id=$1 and stage_key in ('S2_task_match','S3_spec_match') and state in ('queued','running')",[run])).rows[0].n).toBe(0);
+    }
+    evidence.approvalVsReplacement={pairs:20,approvedFirst,editFirst,staleApprovals:0};
+  } finally { await a.end();await b.end();await w.end(); }
 });

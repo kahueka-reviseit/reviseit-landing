@@ -5,8 +5,8 @@ import { PGlite } from '@electric-sql/pglite';
 import { readFileSync, readdirSync } from 'node:fs';
 import { test, expect } from 'vitest';
 
-const STUDIO = ['202610080039_studio_foundation.sql', '202610080040_studio_verification_and_apply.sql'];
 const migrations = readdirSync('supabase/migrations').filter(f => f.endsWith('.sql')).sort();
+const STUDIO = migrations.filter(f => /^202610\d{6}_studio_/.test(f));
 async function database(files: string[]) {
   const db = new PGlite();
   await db.exec(`create role anon nologin;create role authenticated nologin;create role service_role nologin;create schema auth;

@@ -13,7 +13,7 @@ export const MAX_CHUNK = 1_500_000;
 const WORKER = /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$/;
 const LOGICAL = /^[a-z][a-z0-9_]*(:[A-Za-z0-9_.-]+){0,4}$/;
 const KINDS = ['inventory', 'task_matches', 'spec_matches', 'gap_list', 'draft_record', 'changeset_manifest', 'validation_result', 'package_file', 'page_text', 'evidence'];
-const SAFE_MESSAGES = /Studio lease lost|explicit retry required|Provider request changed|not dispatchable|already settled|never dispatched|Integrity blocked|Input not available|exactly the outputs|unsettled|current settled attempt|Invalid record proposal|logical key mismatch|different path|Only (drafting|assembly)|must list exactly|Validation result|Unsafe or out-of-scope|does not resolve|already exists|Retiring|Storage cleanup in progress|Deterministic stages|must persist its change set|superseded before completion/;
+const SAFE_MESSAGES = /Output ownership|Output replay changed|Studio lease lost|explicit retry required|Provider request changed|not dispatchable|already settled|never dispatched|Integrity blocked|Input not available|exactly the outputs|unsettled|current settled attempt|Invalid record proposal|logical key mismatch|different path|Only (drafting|assembly)|must list exactly|Validation result|Unsafe or out-of-scope|does not resolve|already exists|Retiring|Storage cleanup in progress|Deterministic stages|must persist its change set|superseded before completion/;
 
 export type GatewayDeps = { token: string | undefined; otherTokens?: (string | undefined)[]; rpc: Rpc | null; storage: StudioStorage | null };
 const json = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status, headers: { 'content-type': 'application/json', 'cache-control': 'private, no-store', 'x-content-type-options': 'nosniff' } });
