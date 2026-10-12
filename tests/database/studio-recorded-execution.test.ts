@@ -188,11 +188,11 @@ for(const newRecords of [false,true])test.skipIf(!enabled)(`complete recorded S1
  const c5=await ok(svc(),'studio_claim',{p_worker:'author'}),s5=state();
  const draft=await execute('S5_draft',false,false,c5,s5);expect(draft.report.drafts).toHaveLength(newRecords?4:0);expect(draft.report.deferred.length).toBeGreaterThan(0);
  const afterDraft=(await db.sql('select count(*)::int n from private.studio_provider_attempts'))[0].n;
- const dr=await execute('S5_draft',true,true,c5,s5);expect(dr.report).toEqual(draft.report);expect((await db.sql('select count(*)::int n from private.studio_provider_attempts'))[0].n).toBe(afterDraft);
+ const dr=await execute('S5_draft',true,true,c5,state());expect(dr.report).toEqual(draft.report);expect((await db.sql('select count(*)::int n from private.studio_provider_attempts'))[0].n).toBe(afterDraft);
  const c6=await ok(svc(),'studio_claim',{p_worker:'validator'}),s6=state();
  const checked=await execute('S6_assemble_validate',false,false,c6,s6);expect(checked.report.bankStructuralOk,JSON.stringify(checked.report.recordContractErrors)).toBe(true);expect(checked.report.legacyInventoryCompatible).toBe(false);
  const changeset=await db.sql("select id from private.studio_changesets where run_id=$1 and state='draft'",[runId]);expect(changeset).toHaveLength(1);
- const cr=await execute('S6_assemble_validate',true,true,c6,s6);expect(cr.report).toEqual(checked.report);
+ const cr=await execute('S6_assemble_validate',true,true,c6,state());expect(cr.report).toEqual(checked.report);
  expect(await db.sql("select id from private.studio_changesets where run_id=$1 and state='draft'",[runId])).toEqual(changeset);
  expect(await ok(svc(),'studio_claim',{p_worker:'before-G3'})).toBeNull();await gate(editor,runId,'G3_records');
  expect(await ok(svc(),'studio_claim',{p_worker:'before-G4'})).toBeNull();
@@ -203,7 +203,42 @@ for(const newRecords of [false,true])test.skipIf(!enabled)(`complete recorded S1
  const packaged=await execute('S7_package',false,false,c7,s7);expect(packaged.report.requiredFiles).toHaveLength(13);
  expect(packaged.report.files.length).toBe(newRecords?22:13);expect(packaged.report.integrationOccurred).toBe(false);
  expect(packaged.report.sourceAttachments).toHaveLength(1);
- const again=await execute('S7_package',true,true,c7,s7);expect(again.report).toEqual(packaged.report);
+ const again=await execute('S7_package',true,true,c7,state());expect(again.report).toEqual(packaged.report);
  const g5=await ok(editor,'studio_gate_view',{p_run:runId,p_gate:'G5_integration'});expect(g5.live).toBeNull();expect(g5.changeset.state).toBe('draft');
  expect((await db.sql('select accepted_snapshot_id from private.studio_modules where module_id=$1',[MODULE]))[0].accepted_snapshot_id).toBe(pinned);
 },120000);
+
+for(const invalid of [false,true])test.skipIf(!enabled)(`fresh worker restores remote ${invalid?'failure':'success'} after response upload and before settlement`,async()=>{
+ await run();const c=await ok(svc(),'studio_claim',{p_worker:'remote-crash'}),lease={attemptId:c.attemptId,lease:c.lease},old=state();
+ const died=await child({mode:'exchange',state:old,lease,invalid,crash:'after_remote'});expect(died.code,died.err).toBe(71);
+ const a=(await db.sql('select id,dispatch_state from private.studio_provider_attempts'))[0];expect(a.dispatch_state).toBe('dispatched');
+ const copies=await db.sql('select kind,state from private.studio_provider_evidence');expect(copies).toHaveLength(2);expect(copies.every((r:any)=>r.state==='verified')).toBe(true);
+ rmSync(old,{recursive:true});const fresh=state();
+ const restored=await child({mode:'settle',state:fresh,providerAttemptId:a.id});expect(restored.code,restored.err).toBe(0);
+ expect((await db.sql('select dispatch_state,usage from private.studio_provider_attempts'))[0]).toMatchObject({dispatch_state:invalid?'failed':'succeeded',usage:{evidenceLocation:'remote_verified'}});
+ const replay=await child({mode:'exchange',state:fresh,lease,invalid,replay:true});
+ if(invalid)expect(replay.code).not.toBe(0);else{expect(replay.code,replay.err).toBe(0);expect(JSON.parse(replay.out).calls).toBe(0);}
+ expect(await db.sql('select id from private.studio_provider_attempts')).toHaveLength(1);
+});
+test.skipIf(!enabled)('lost local reply before remote copy stays visible and cannot settle or dispatch again',async()=>{
+ await run();const c=await ok(svc(),'studio_claim',{p_worker:'missing-evidence'}),lease={attemptId:c.attemptId,lease:c.lease},old=state();
+ expect((await child({mode:'exchange',state:old,lease,crash:'before_remote'})).code).toBe(71);
+ const a=(await db.sql('select id from private.studio_provider_attempts'))[0];rmSync(old,{recursive:true});const fresh=state();
+ expect((await child({mode:'settle',state:fresh,providerAttemptId:a.id})).code).not.toBe(0);
+ expect((await child({mode:'exchange',state:fresh,lease,replay:true})).code).not.toBe(0);
+ expect(await ok(svc(),'studio_evidence_pending',{})).toMatchObject([{providerAttemptId:a.id,dispatchState:'dispatched',exchangeState:'missing'}]);
+ expect(await refused(svc(),'studio_provider_result',{p_provider_attempt:a.id,p_outcome:'succeeded',p_result_digest:sha('unretained'),p_provider_request_id:null,p_usage:{},p_attempt:c.attemptId,p_lease:c.lease})).toMatch(/not durable/);
+});
+test.skipIf(!enabled)('large remote envelope is chunked, immutable, protected from cleanup and inaccessible to editors',async()=>{
+ await run();const c=await ok(svc(),'studio_claim',{p_worker:'large-evidence'}),lease={attemptId:c.attemptId,lease:c.lease},old=state();
+ const first=await child({mode:'exchange',state:old,lease,large:true});expect(first.code,first.err).toBe(0);
+ const aid=JSON.parse(first.out).attempt,info=await ok(svc(),'studio_evidence_info',{p_provider_attempt:aid,p_kind:'exchange'});expect(info.parts.length).toBeGreaterThan(1);
+ expect(await refused(ed(),'studio_evidence_info',{p_provider_attempt:aid,p_kind:'exchange'})).toMatch(/permission denied/);
+ expect(await ok(svc(),'studio_gc_claim',{p_key:info.parts[0].key})).toBe(false);
+ expect(await refused(svc(),'studio_evidence_begin',{p_provider_attempt:aid,p_kind:'exchange',p_sha256:sha('tampered'),p_size:info.size,p_parts:info.parts.map((p:any)=>({ordinal:p.ordinal,sha256:p.sha256,size:p.size})),p_attempt:null,p_lease:null})).toMatch(/replay changed/);
+ rmSync(old,{recursive:true});const replay=await child({mode:'exchange',state:state(),lease,large:true,replay:true});expect(replay.code,replay.err).toBe(0);expect(JSON.parse(replay.out).calls).toBe(0);
+ await store.put(info.parts[0].key,Buffer.from('corrupt'),'application/octet-stream');
+ const corrupt=await child({mode:'settle',state:state(),providerAttemptId:aid});expect(corrupt.code).not.toBe(0);
+ expect(await ok(svc(),'studio_evidence_pending',{})).toMatchObject([{providerAttemptId:aid,integrityBlocked:true}]);
+ expect((await db.sql('select count(*)::int n from private.studio_provider_attempts'))[0].n).toBe(1);
+});

@@ -245,3 +245,27 @@ test('20 simultaneous budget admissions cannot oversubscribe a shared trial', as
   evidence.budgetAdmissions={pairs:20,admitted,refused,oversubscribed:0};
  }finally{await a.end();await wa.end();await wb.end();await op.end();}
 });
+
+test('20 evidence intents racing orphan cleanup never allow both to acquire the same bytes',async()=>{
+ const a=await editor(),wa=await worker(),wb=await worker();let evidenceWins=0,gcWins=0;
+ try{for(let i=0;i<20;i++){
+  await owner.query("update private.studio_stages set state='cancelled' where state in ('queued','running')");await startRun(a);
+  const c=await rpc(wa,'studio_claim',{p_worker:'evidence-race'}),p=await rpc(wa,'studio_provider_prepare',{p_attempt:c.attemptId,p_lease:c.lease,p_operation:'evidence',p_request_digest:sha('request')});
+  const digest=sha(randomUUID()),key=`studio/blobs/${MODULE}/${digest}`;
+  const r=await Promise.allSettled([rpc(wa,'studio_evidence_begin',{p_provider_attempt:p.providerAttemptId,p_kind:'request',p_sha256:digest,p_size:1,p_parts:[{ordinal:0,sha256:digest,size:1}],p_attempt:c.attemptId,p_lease:c.lease}),rpc(wb,'studio_gc_claim',{p_key:key})]);
+  const stored=r[0].status==='fulfilled',clean=r[1].status==='fulfilled'&&r[1].value===true;expect(stored&&clean).toBe(false);expect(stored||clean).toBe(true);
+  if(stored){evidenceWins++;expect(await rpc(wb,'studio_gc_claim',{p_key:key})).toBe(false);}else{gcWins++;expect(String((r[0] as PromiseRejectedResult).reason)).toMatch(/cleanup/);await rpc(wb,'studio_gc_finish',{p_key:key});}
+ }evidence.evidenceVsCleanup={pairs:20,evidenceWins,gcWins,conflictingWins:0};}
+ finally{await a.end();await wa.end();await wb.end();}
+});
+test('concurrent conflicting evidence declarations preserve exactly one immutable manifest',async()=>{
+ const a=await editor(),wa=await worker(),wb=await worker();
+ try{
+ await owner.query("update private.studio_stages set state='cancelled' where state in ('queued','running')");await startRun(a);const c=await rpc(wa,'studio_claim',{p_worker:'manifest-race'});
+ const p=await rpc(wa,'studio_provider_prepare',{p_attempt:c.attemptId,p_lease:c.lease,p_operation:'evidence',p_request_digest:sha('request')});
+ const begin=(w:Client,digest:string)=>rpc(w,'studio_evidence_begin',{p_provider_attempt:p.providerAttemptId,p_kind:'request',p_sha256:digest,p_size:1,p_parts:[{ordinal:0,sha256:digest,size:1}],p_attempt:c.attemptId,p_lease:c.lease});
+ const r=await Promise.allSettled([begin(wa,sha('one')),begin(wb,sha('two'))]);expect(r.filter(x=>x.status==='fulfilled')).toHaveLength(1);expect(r.filter(x=>x.status==='rejected')).toHaveLength(1);
+ expect((await owner.query('select count(*)::int n from private.studio_provider_evidence where provider_attempt_id=$1',[p.providerAttemptId])).rows[0].n).toBe(1);
+ evidence.conflictingEvidence={accepted:1,rejected:1};
+ }finally{await a.end();await wa.end();await wb.end();}
+});

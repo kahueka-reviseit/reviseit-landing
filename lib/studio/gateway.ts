@@ -3,6 +3,7 @@ import { blobKey, call, isSha256, isUuid, OUTPUT_TYPES, sha256, StudioError, typ
 import type { StudioStorage } from './storage/types';
 import { placeImmutable, readForWorker } from './uploads';
 import { budgetManifest } from './budget';
+import { evidenceInfo, evidencePart, finishEvidence, EVIDENCE_PART } from './provider-evidence';
 
 /**
  * Studio worker gateway. Separate bearer token (STUDIO_WORKER_TOKEN) and a closed allowlist of
@@ -14,7 +15,7 @@ export const MAX_CHUNK = 1_500_000;
 const WORKER = /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$/;
 const LOGICAL = /^[a-z][a-z0-9_]*(:[A-Za-z0-9_.-]+){0,4}$/;
 const KINDS = ['inventory', 'task_matches', 'spec_matches', 'gap_list', 'draft_record', 'changeset_manifest', 'validation_result', 'package_file', 'page_text', 'evidence'];
-const SAFE_MESSAGES = /Budget|Studio budget|Live Studio provider|Output ownership|Output replay changed|Studio lease lost|explicit retry required|Provider request changed|not dispatchable|already settled|never dispatched|Integrity blocked|Input not available|exactly the outputs|unsettled|current settled attempt|Invalid record proposal|logical key mismatch|different path|Only (drafting|assembly)|must list exactly|Validation result|Unsafe or out-of-scope|does not resolve|already exists|Retiring|Storage cleanup in progress|Deterministic stages|must persist its change set|superseded before completion/;
+const SAFE_MESSAGES = /Evidence|Budget|Studio budget|Live Studio provider|Output ownership|Output replay changed|Studio lease lost|explicit retry required|Provider request changed|not dispatchable|already settled|never dispatched|Integrity blocked|Input not available|exactly the outputs|unsettled|current settled attempt|Invalid record proposal|logical key mismatch|different path|Only (drafting|assembly)|must list exactly|Validation result|Unsafe or out-of-scope|does not resolve|already exists|Retiring|Storage cleanup in progress|Deterministic stages|must persist its change set|superseded before completion/;
 
 export type GatewayDeps = { token: string | undefined; otherTokens?: (string | undefined)[]; rpc: Rpc | null; storage: StudioStorage | null };
 const json = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status, headers: { 'content-type': 'application/json', 'cache-control': 'private, no-store', 'x-content-type-options': 'nosniff' } });
@@ -112,6 +113,30 @@ export async function handleStudioGateway(request: Request, deps: GatewayDeps): 
       case 'budget_settle':
         if (!isUuid(v.providerAttemptId) || !isSha256(v.evidenceSha256) || (v.actualMicro!==null && (!Number.isSafeInteger(v.actualMicro) || v.actualMicro<0))) break;
         return json({result:await call(rpc,'studio_budget_settle',{p_provider_attempt:v.providerAttemptId,p_actual_micro:v.actualMicro,p_evidence_sha256:v.evidenceSha256})});
+      case 'retained_output': {
+        if (!lease(v)||typeof v.logicalKey!=='string'||!LOGICAL.test(v.logicalKey)) break;
+        const info=await call<any>(rpc,'studio_retained_output',{...fenced(v),p_logical_key:v.logicalKey});
+        if(!info)return json({result:null});
+        const bytes=await readForWorker(rpc,storage,info);
+        if(bytes.length>MAX_CHUNK)throw new StudioError('Retained output exceeds bound','invalid');
+        return json({result:{sha256:info.sha256,content:Buffer.from(bytes).toString('base64')}});
+      }
+      case 'evidence_begin':
+        if (!isUuid(v.providerAttemptId) || !['request','exchange'].includes(v.kind) || !isSha256(v.sha256) || !Number.isSafeInteger(v.size) || v.size<1 || v.size>8388608 || !Array.isArray(v.parts) || v.parts.length<1 || v.parts.length>8 || ((v.attemptId!==undefined||v.lease!==undefined)&&!lease(v))) break;
+        return json({result:await call(rpc,'studio_evidence_begin',{p_provider_attempt:v.providerAttemptId,p_kind:v.kind,p_sha256:v.sha256,p_size:v.size,p_parts:v.parts,p_attempt:v.attemptId??null,p_lease:v.lease??null})});
+      case 'evidence_info':
+        if (!isUuid(v.providerAttemptId)||!['request','exchange'].includes(v.kind)) break;
+        return json({result:await evidenceInfo(rpc,v.providerAttemptId,v.kind)});
+      case 'evidence_part': {
+        if (!isUuid(v.providerAttemptId)||!['request','exchange'].includes(v.kind)||!Number.isInteger(v.ordinal)||v.ordinal<0||v.ordinal>7) break;
+        if (v.content!==undefined&&(typeof v.content!=='string'||v.content.length>Math.ceil(EVIDENCE_PART*4/3)+4||!/^[A-Za-z0-9+/]+=*$/.test(v.content))) break;
+        return json({result:await evidencePart(rpc,storage,v.providerAttemptId,v.kind,v.ordinal,v.content===undefined?undefined:Buffer.from(v.content,'base64'))});
+      }
+      case 'evidence_finish':
+        if (!isUuid(v.providerAttemptId)||!['request','exchange'].includes(v.kind)) break;
+        return json({result:await finishEvidence(rpc,storage,v.providerAttemptId,v.kind)});
+      case 'evidence_pending':
+        return json({result:await call(rpc,'studio_evidence_pending',{})});
       case 'provider_prepare':
         if (!lease(v) || typeof v.operation !== 'string' || !/^[a-z0-9_:.-]{1,120}$/.test(v.operation) || !isSha256(v.requestDigest)) break;
         return json({ result: await call(rpc, 'studio_provider_prepare', { ...fenced(v), p_operation: v.operation, p_request_digest: v.requestDigest }) });
