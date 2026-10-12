@@ -58,6 +58,9 @@ export async function handleStudioGateway(request: Request, deps: GatewayDeps): 
       case 'claim_mock':
         if (typeof v.worker !== 'string' || !WORKER.test(v.worker)) break;
         return json({ result: await call(rpc, 'studio_claim_mock', { p_worker: v.worker }) });
+      case 'claim_live':
+        if (typeof v.worker !== 'string' || !WORKER.test(v.worker) || !isUuid(v.runId) || !isSha256(v.bundleSha256) || !isSha256(v.planSha256) || !isSha256(v.keyEvidenceSha256)) break;
+        return json({result:await call(rpc,'studio_claim_live',{p_worker:v.worker,p_run:v.runId,p_bundle:v.bundleSha256,p_plan:v.planSha256,p_key_evidence:v.keyEvidenceSha256})});
       case 'claim_recorded':
         if (typeof v.worker !== 'string' || !WORKER.test(v.worker) || !isUuid(v.runId) || !isSha256(v.bundleSha256)) break;
         return json({ result: await call(rpc, 'studio_claim_recorded', { p_worker: v.worker, p_run: v.runId, p_bundle: v.bundleSha256 }) });

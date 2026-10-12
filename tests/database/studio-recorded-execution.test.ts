@@ -32,10 +32,10 @@ beforeAll(async()=>{
 beforeEach(async()=>{if(enabled){await db.begin();return ()=>db.rollback();}});
 afterAll(async()=>{if(enabled){await new Promise<void>(r=>server.close(()=>r()));await db.close();rmSync(dir,{recursive:true,force:true});}});
 function state(){const p=mkdtempSync(join(dir,'state-'));chmodSync(p,0o700);return p;}
-async function run(funded=true){
+async function run(funded=true,profile=PROFILE,purpose="canonical"){
  const b=await blob(ed(),MODULE,'recorded source');
  const source=await ok(ed(),'studio_create_source',{p_module:MODULE,p_title:'Synthetic recorded execution',p_files:[{blobId:b,role:'combined',filename:'p.pdf'}],p_identity:{},p_command:key()});
- const id=(await ok(ed(),'studio_start_run',{p_source:source.sourceId,p_expected_source_revision:1,p_purpose:'canonical',p_snapshot:snapshot,p_skill_contract:SKILL,p_profile:PROFILE,p_command:key()})).runId as string;
+ const id=(await ok(ed(),'studio_start_run',{p_source:source.sourceId,p_expected_source_revision:1,p_purpose:purpose,p_snapshot:snapshot,p_skill_contract:SKILL,p_profile:profile,p_command:key()})).runId as string;
  if(funded)await grantBudget(db,id);return id;
 }
 function child(cfg:Record<string,unknown>){
@@ -299,15 +299,21 @@ test.skipIf(!enabled)('recorded worker claims only its named funded run; mock wo
  const recorded=await ok(svc(),'studio_claim_recorded',{p_worker:'scoped',p_run:second,p_bundle:bundle});expect(recorded.runId).toBe(second);
 });
 
-for(const scenario of ['success','charged_error','unknown_cost','before_raw','after_remote'])test.skipIf(!enabled)(`OpenRouter loopback ${scenario}: real admission and remote recovery without resend`,async()=>{
+for(const scenario of ['success','charged_error','unknown_cost','before_raw','after_remote','live_success','live_wrong_route'])test.skipIf(!enabled)(`OpenRouter loopback ${scenario}: real admission and remote recovery without resend`,async()=>{
  const fixture=await child({mode:'openrouter_fixture'});expect(fixture.code,fixture.err).toBe(0);
- const {profile,reply}=JSON.parse(fixture.out);
+ const {profile,reply}=JSON.parse(fixture.out);const live=scenario.startsWith('live_');
+ if(live)await db.sql("insert into private.studio_provider_profiles values ('synthetic-live','live','synthetic','synthetic',true)");
  const c={...contract(sha(readFileSync(join(WORKER!,'studio/execution/manifest.json')))),id:'openrouter-synthetic-v1',
-  endpoint:profile.endpoint,model:profile.model,capability_sha256:profile.capability_sha256,pricing_sha256:profile.pricing_sha256,
+  ...(live?{mode:'openrouter',profile_id:'synthetic-live'}:{}),endpoint:profile.endpoint,model:profile.model,capability_sha256:profile.capability_sha256,pricing_sha256:profile.pricing_sha256,
   input_micro_per_million:profile.input_micro_per_million,output_micro_per_million:profile.output_micro_per_million};
  const fields=Object.keys(c);
  await db.sql(`insert into private.studio_budget_contracts(${fields.join(',')},evidence) values(${fields.map((_,i)=>'$'+(i+1)).join(',')},$${fields.length+1})`,[...Object.values(c),JSON.stringify({synthetic:true,operatorNote:"not-for-worker",openrouter:{...profile,unrelatedNote:"not-for-worker"}})]);
- const runId=await run(false);await ok(db.rpc({kind:'operator'}),'studio_budget_grant',{...grantArgs(runId),p_contract:c.id});
+ const runId=await run(false,live?'synthetic-live':PROFILE,live?'rehearsal':'canonical');
+ await ok(db.rpc({kind:'operator'}),'studio_budget_grant',{...grantArgs(runId),p_contract:c.id,...(live?{p_trial_limit:2000000,p_run_limit:1600000,p_stage_limit:1600000,p_operation_limit:600000}:{})});
+ if(live){
+  const i=(await db.sql('select * from private.studio_run_inputs where run_id=$1',[runId]))[0];
+  await ok(db.rpc({kind:'operator'}),'studio_live_authorise',{p_run:runId,p_plan_sha256:sha('synthetic-plan'),p_key_evidence_sha256:sha('synthetic-key-preflight'),p_expires:new Date(Date.now()+3600000).toISOString(),p_reference:'Explicit synthetic loopback authorisation',p_scope:{sourceDigest:i.source_digest,bankManifestSha256:i.bank_manifest_sha256,policySha256:i.policy_sha256,skillSha256:i.skill_sha256}});
+ }
  const claim=await ok(svc(),'studio_claim',{p_worker:'loopback'}),lease={attemptId:claim.attemptId,lease:claim.lease};
  const context=await ok(svc(),'studio_budget_context',{p_attempt:claim.attemptId,p_lease:claim.lease});
  expect(context.contract.evidence).toEqual({openrouter:profile});
@@ -320,23 +326,25 @@ for(const scenario of ['success','charged_error','unknown_cost','before_raw','af
   const rows=await db.sql('select dispatch_state from private.studio_provider_attempts');expect(rows[0].dispatch_state).toBe('dispatched');
   const response=scenario==='charged_error'?{error:{code:429},usage:{cost:'0.000003'}}:reply;
   if(scenario==='unknown_cost')delete response.usage;
+  if(live){expect(req.headers['x-openrouter-metadata']).toBe('enabled');response.provider=scenario==='live_wrong_route'?'Other':'Synthetic';response.model=profile.model;response.openrouter_metadata={requested:profile.model,strategy:'direct',attempt:1,is_byok:false,pipeline:[]};}
   res.writeHead(scenario==='charged_error'?429:200,{'Content-Type':'application/json','Retry-After':'0'});res.end(JSON.stringify(response));
  });
  await new Promise<void>(r=>http.listen(0,'127.0.0.1',r));const address=http.address();const port=typeof address==='object'&&address?address.port:0;
- const root=state(),cfg={mode:'exchange',state:root,lease,openrouter:{profile,port}};
+ const root=state(),cfg={mode:'exchange',state:root,lease,openrouter:{profile,port,live}};
  try{
   const first=await child({...cfg,crash:['before_raw','after_remote'].includes(scenario)?scenario:undefined});
   expect(calls,first.err).toBe(1);expect(!!sent).toBe(true);
-  if(scenario==='success')expect(first.code,first.err).toBe(0);else expect(first.code).not.toBe(0);
+  if(['success','live_success'].includes(scenario))expect(first.code,first.err).toBe(0);else expect(first.code).not.toBe(0);
   const attempts=await db.sql('select * from private.studio_provider_attempts');expect(attempts).toHaveLength(1);
   const settled=await child({mode:'settle',state:state(),providerAttemptId:attempts[0].id});
   if(scenario==='before_raw')expect(settled.code).not.toBe(0);else expect(settled.code,settled.err).toBe(0);
   const repeated=await child(cfg);
-  if(['success','after_remote'].includes(scenario)){expect(repeated.code,repeated.err).toBe(0);expect(JSON.parse(repeated.out).reused).toBe(true);}
+  if(['success','after_remote','live_success'].includes(scenario)){expect(repeated.code,repeated.err).toBe(0);expect(JSON.parse(repeated.out).reused).toBe(true);}
   else expect(repeated.code).not.toBe(0);
   expect(calls).toBe(1);
   const row=(await db.sql('select dispatch_state,usage from private.studio_provider_attempts'))[0];
   const budget=(await db.sql('select actual_micro,reserved_micro from private.studio_budget_reservations'))[0];
+  if(scenario==='live_wrong_route'){expect(row.dispatch_state).toBe('failed');expect(row.usage.studioOutcome).toBe('invalid_response');}
   if(scenario==='charged_error'){expect(row.dispatch_state).toBe('failed');expect(Number(budget.actual_micro)).toBe(3);expect(row.usage.studioOutcome).toBe('provider_error');}
   if(['before_raw','unknown_cost'].includes(scenario)){expect(budget.actual_micro).toBeNull();expect(Number(budget.reserved_micro)).toBeGreaterThan(0);}
   expect(await db.sql('select * from private.studio_decisions')).toHaveLength(0);

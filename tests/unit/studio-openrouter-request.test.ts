@@ -17,6 +17,17 @@ test('OpenRouter admission verifies the registered route and counts the whole re
  const e=fixture(),bytes=Buffer.from(JSON.stringify(e)),m=budgetManifest(bytes,c);
  expect(m).toMatchObject({requestDigest:sha(bytes),requestBytes:bytes.length,inputTokenBound:bytes.length+1000,imageCount:1,model:p.model,endpoint:p.endpoint});
 });
+test('live admission refuses caching hints, hosted tools and uncompiled requests',()=>{
+ const live={...c,mode:'openrouter'};
+ expect(budgetManifest(Buffer.from(JSON.stringify(fixture())),live).mode).toBe('openrouter');
+ for(const mutate of [(w:any)=>w.messages[0].content[0].cache_control={type:'ephemeral'},
+  (w:any)=>w.messages[0].content[0].image_url.detail='high',
+  (w:any)=>w.tools=[{type:'web_search'}],(w:any)=>w.tools=[{type:'function',function:{name:'f',parameters:{},cache_control:{type:'ephemeral'}}}]]){
+  const e=fixture(),w=JSON.parse(Buffer.from(e.wireBody,'base64').toString());mutate(w);const raw=Buffer.from(stable(w));e.wireBody=raw.toString('base64');e.wireSha256=sha(raw);
+  expect(()=>budgetManifest(Buffer.from(JSON.stringify(e)),live)).toThrow(/Budget/);
+ }
+ expect(()=>budgetManifest(Buffer.from(JSON.stringify({model:p.model,max_tokens:10,stream:false,tools:[],messages:[],pins:{bundle:c.bundle_sha256}})),live)).toThrow(/Budget/);
+});
 test('rehashed wire tampering cannot bypass pinned provider, privacy, capability, price or output ceilings',()=>{
  for(const mutate of [(w:any)=>w.provider.allow_fallbacks=true,(w:any)=>w.provider.only=['other'],(w:any)=>w.provider.zdr=false,
   (w:any)=>w.provider.max_price.prompt='999',(w:any)=>w.provider.require_parameters=false,(w:any)=>w.stream=true,

@@ -12,7 +12,7 @@ do $$ declare f record; begin
 end $$;
 -- Full local decommission includes remote provider evidence and later budget evidence; never use this as a financial reset.
 drop table if exists private.studio_revision_requests, private.studio_provider_evidence_parts, private.studio_provider_evidence cascade;
-drop table if exists private.studio_budget_receipts, private.studio_budget_reservations,
+drop table if exists private.studio_live_authorisations, private.studio_budget_receipts, private.studio_budget_reservations,
  private.studio_run_budgets, private.studio_budget_trials, private.studio_budget_contracts cascade;
 drop table if exists private.studio_content_judgments, private.studio_decisions, private.studio_changeset_entries, private.studio_gates,
  private.studio_snapshot_acceptances, private.studio_record_links, private.studio_record_index, private.studio_snapshot_files,

@@ -6,6 +6,7 @@ import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { beforeAll, afterAll, test, expect } from 'vitest';
 import { baseBank, snapshotPayload, sha, ids, MODULE, SKILL, PROFILE, AUTH } from '../database/studio-fixture';
+import {contract,grantArgs,manifest} from '../database/studio-budget-fixture';
 
 const url = process.env.REVISEIT_CONCURRENCY_DATABASE_URL || '';
 if (!/^postgres(ql)?:\/\/[^@]*@(127\.0\.0\.1|localhost):\d+\//.test(url)) throw new Error('Set REVISEIT_CONCURRENCY_DATABASE_URL to a disposable loopback PostgreSQL server');
@@ -70,11 +71,40 @@ async function blob(c: Client, content: string, revision = false) {
   await verify(c, 'studio_prepare_commit', { p_session: s.sessionId, p_sha256: digest, p_size: size, p_detected_type: media });
   return (await verify(c, 'studio_commit_upload', { p_session: s.sessionId })).blobId;
 }
-async function startRun(c: Client) {
+async function startRun(c: Client, profile=PROFILE, purpose='canonical') {
   const b = await blob(c, randomUUID());
   const src = await rpc(c, 'studio_create_source', { p_module: MODULE, p_title: 'Race paper', p_files: [{ blobId: b, role: 'combined', filename: 'r.pdf' }], p_identity: {}, p_command: randomUUID() });
-  return (await rpc(c, 'studio_start_run', { p_source: src.sourceId, p_expected_source_revision: 1, p_purpose: 'canonical', p_snapshot: snapshot, p_skill_contract: SKILL, p_profile: PROFILE, p_command: randomUUID() })).runId;
+  return (await rpc(c, 'studio_start_run', { p_source: src.sourceId, p_expected_source_revision: 1, p_purpose: purpose, p_snapshot: snapshot, p_skill_contract: SKILL, p_profile: profile, p_command: randomUUID() })).runId;
 }
+
+test('20 competing live dispatch pairs cannot consume the same last call allowance',async()=>{
+ const ed=await editor(),wa=await worker(),wb=await worker(),op=await session({role:'reviseit_studio_operator'});
+ const c={...contract(),id:'live-race',profile_id:'live-race',mode:'openrouter',model:'synthetic/model',endpoint:'https://openrouter.ai/api/v1/chat/completions'};
+ try{
+  await owner.query("insert into private.studio_provider_profiles values ('live-race','live','synthetic','synthetic',true)");
+  const keys=Object.keys(c);await owner.query(`insert into private.studio_budget_contracts(${keys.join(',')},evidence) values(${keys.map((_,i)=>'$'+(i+1)).join(',')},'{"synthetic":true}')`,Object.values(c));
+  for(let n=0;n<20;n++){
+   await owner.query("update private.studio_stages set state='cancelled' where state in ('queued','running')");
+   const run=await startRun(ed,c.profile_id,'rehearsal');
+   await rpc(op,'studio_budget_grant',{...grantArgs(run),p_contract:c.id,p_trial_limit:2000000,p_run_limit:1600000,p_stage_limit:1600000,p_operation_limit:600000});
+   const i=(await owner.query('select * from private.studio_run_inputs where run_id=$1',[run])).rows[0];
+   await rpc(op,'studio_live_authorise',{p_run:run,p_plan_sha256:sha('plan'),p_key_evidence_sha256:sha('proof'),p_expires:new Date(Date.now()+3600000).toISOString(),p_reference:'Synthetic concurrent dispatch authorisation',p_scope:{sourceDigest:i.source_digest,bankManifestSha256:i.bank_manifest_sha256,policySha256:i.policy_sha256,skillSha256:i.skill_sha256}});
+   const cl=await rpc(wa,'studio_claim_live',{p_worker:'live-race',p_run:run,p_bundle:c.bundle_sha256,p_plan:sha('plan'),p_key_evidence:sha('proof')});
+   const prepared=[];
+   for(let j=0;j<3;j++){
+    const p=await rpc(wa,'studio_provider_prepare',{p_attempt:cl.attemptId,p_lease:cl.lease,p_operation:'turn:'+j,p_request_digest:sha('turn'+j)});
+    const args={p_attempt:cl.attemptId,p_lease:cl.lease,p_provider_attempt:p.providerAttemptId};
+    await rpc(wa,'studio_budget_reserve',{...args,p_request_manifest:manifest(sha('turn'+j),{contractId:c.id,mode:'openrouter',model:c.model,endpoint:c.endpoint})});prepared.push(args);
+   }
+   await rpc(wa,'studio_provider_dispatched',prepared[0]);
+   const results=await Promise.allSettled([rpc(wa,'studio_provider_dispatched',prepared[1]),rpc(wb,'studio_provider_dispatched',prepared[2])]);
+   expect(results.filter(r=>r.status==='fulfilled')).toHaveLength(1);
+   expect(String((results.find(r=>r.status==='rejected') as PromiseRejectedResult).reason)).toMatch(/ceiling reached/);
+   expect((await owner.query('select count(*)::int n from private.studio_provider_attempts a join private.studio_provider_operations o on o.id=a.operation_id join private.studio_stages s on s.id=o.stage_id where s.run_id=$1 and a.possible_charge',[run])).rows[0].n).toBe(2);
+  }
+  evidence.liveDispatchCeiling={pairs:20,accepted:20,refused:20,oversubscribed:0};
+ }finally{await ed.end();await wa.end();await wb.end();await op.end();}
+});
 
 test('40 simultaneous reviewer pairs on one gate version produce exactly one decision each time', async () => {
   const a = await editor(), b = await editor2(), w = await worker(); let winsA = 0, winsB = 0;
