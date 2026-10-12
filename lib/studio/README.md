@@ -1,6 +1,6 @@
 # Curriculum Studio foundation (assignment 02)
 
-Corrected local candidate. Studio migrations 039–043 are local-only; this build does not deploy them.
+Corrected local candidate. Studio migrations 039–044 are local-only; this build does not deploy them.
 
 ## What exists
 
@@ -58,7 +58,7 @@ evidence of real R2 behaviour. Provider calls are mocked throughout.
 For full Studio decommission only, back up and export all Studio and financial evidence before
 running `rollback/202610080039_studio_foundation.down.sql`. Remove the corresponding Studio migration
 history records with the process that applied them. Forward recovery applies all Studio migrations
-in order (currently 039–043); `tests/database/studio-migration.test.ts` proves they leave every existing
+in order (currently 039–044); `tests/database/studio-migration.test.ts` proves they leave every existing
 object byte-identical. Storage objects under `studio/` are removed separately and only after export.
 This destructive rollback is not a financial reset or the routine downgrade path for migration 043.
 
@@ -96,3 +96,17 @@ No contract provisioning interface, spending UI or OpenRouter network adapter is
 Migration 043 also qualifies provider operations by stage identity: separate runs pinning identical
 bytes no longer share an attempt. Historical operation rows are reused by their own stage/key tuple;
 their keys and settlement history are not rewritten.
+
+## Registered matching inputs (migration 044)
+
+`studio_matching_inputs` is a service-only read for fenced S2/S3 stages. It accepts no snapshot or
+module selector: the run's pinned input determines the file/blob mapping, projection, source revision
+and module. The closed gateway exposes it as `matching_inputs`. Byte access still goes through the
+existing verified, stage-scoped reads. Editors and other stages cannot invoke this function.
+
+The paired worker loads G1-approved inventory/page artifacts and the registered snapshot instead of
+accepting an arbitrary working-directory bank. It emits one model-derived artifact per whole-question
+batch plus a deterministic whole-paper evidence report. G2 binds all of these; S3 still uses G1 inputs
+independently of S2. The new integration fixture proves 62 leaves in 12 task batches and 11 structured
+specification batches, repeatable without new dispatches, with G2 left unapproved. Its source, intake
+receipts and replies are synthetic; it does not prove automatic extraction or model quality.

@@ -85,3 +85,36 @@ test.skipIf(!enabled)('matching tool loop replays two recorded turns then submit
  expect(await db.sql('select id from private.studio_provider_attempts')).toHaveLength(2);
  expect((await ok(ed(),'studio_gate_view',{p_run:id,p_gate:'G2_matches'})).live).toBeNull();
 });
+
+test.skipIf(!enabled)('registered whole-paper matching loads approved sources and bank; 62 leaves in 12 replayable batches, then 11 independent spec batches',async()=>{
+ const syntheticSkill='# Synthetic skill fixture: review proposals; never publish.';
+ await db.sql("insert into private.studio_skill_contracts(id,contract_sha256,skill_sha256,validator_sha256,files) select 'synthetic-matching@1',contract_sha256,$1,validator_sha256,files from private.studio_skill_contracts where id=$2",[sha(syntheticSkill),SKILL]);
+ for(const f of baseBank)await store.put(`studio/blobs/${MODULE}/${sha(f.content)}`,Buffer.from(f.content),'text/markdown');
+ const manifest=JSON.stringify({files:Object.fromEntries([...baseBank].sort((a,b)=>a.path<b.path?-1:1).map(f=>[f.path,sha(f.content)])),module:MODULE,schema:'reviseit/studio-bank-manifest@1'});
+ await store.put(`studio/blobs/${MODULE}/${sha(manifest)}`,Buffer.from(manifest),'application/json');
+ const sourceBytes='%PDF-1.7 synthetic registered source',b=await blob(ed(),MODULE,'registered source');
+ await store.put(`studio/blobs/${MODULE}/${sha(sourceBytes)}`,Buffer.from(sourceBytes),'application/pdf');
+ const src=await ok(ed(),'studio_create_source',{p_module:MODULE,p_title:'Synthetic full paper',p_files:[{blobId:b,role:'question_paper',filename:'fixture.pdf'}],p_identity:{},p_command:key()});
+ const runId=(await ok(ed(),'studio_start_run',{p_source:src.sourceId,p_expected_source_revision:1,p_purpose:'canonical',p_snapshot:snapshot,p_skill_contract:'synthetic-matching@1',p_profile:PROFILE,p_command:key()})).runId;
+ const c1=await ok(svc(),'studio_claim',{p_worker:'intake'}),lease={attemptId:c1.attemptId,lease:c1.lease};
+ expect(await refused(svc(),'studio_matching_inputs',{p_attempt:c1.attemptId,p_lease:c1.lease})).toMatch(/unavailable/);
+ const revision=(await db.sql('select source_revision_id from private.studio_run_inputs where run_id=$1',[runId]))[0].source_revision_id;
+ const intake=await child({mode:'prepare_intake',state:state(),lease,moduleId:MODULE,sourceSha256:sha(sourceBytes),sourceRevision:revision});expect(intake.code,intake.err).toBe(0);
+ expect(await ok(svc(),'studio_claim',{p_worker:'before-approval'})).toBeNull();
+ await gate(ed(),runId,'G1_inventory');await grantBudget(db,runId);
+ const c=await ok(svc(),'studio_claim',{p_worker:'registered'});expect(c.stageKey).toBe('S2_task_match');
+ const inputArgs={p_attempt:c.attemptId,p_lease:c.lease};
+ expect(await refused(ed(),'studio_matching_inputs',inputArgs)).toMatch(/permission denied/);
+ expect(await refused(svc(),'studio_matching_inputs',{...inputArgs,p_lease:key()})).toMatch(/lease lost/);
+ const meta=await ok(svc(),'studio_matching_inputs',inputArgs);expect(meta.snapshotId).toBe(snapshot);expect(meta.records.length).toBeGreaterThan(3);
+ const root=state();const first=await child({mode:'registered_batches',state:root,claim:c});expect(first.code,first.err).toBe(0);
+ const f=JSON.parse(first.out);expect(f.calls).toBe(12);expect(f.report.result.leaves).toHaveLength(62);expect(f.report.humanApproval).toBe(false);
+ const restored=state();cpSync(root,restored,{recursive:true});
+ const replay=await child({mode:'registered_batches',state:restored,claim:c,replay:true,finish:true});expect(replay.code,replay.err).toBe(0);
+ const r=JSON.parse(replay.out);expect(r.calls).toBe(0);expect(r.report).toEqual(f.report);expect(r.completed.state).toBe('succeeded');
+ const c3=await ok(svc(),'studio_claim',{p_worker:'specification'});expect(c3.stageKey).toBe('S3_spec_match');
+ const spec=await child({mode:'registered_batches',state:state(),claim:c3,finish:true});expect(spec.code,spec.err).toBe(0);
+ expect(JSON.parse(spec.out).report.result.questions).toHaveLength(11);
+ expect(await db.sql('select id from private.studio_provider_attempts')).toHaveLength(23);
+ const g2=await ok(ed(),'studio_gate_view',{p_run:runId,p_gate:'G2_matches'});expect(g2.live).toBeNull();expect(g2.binding.artifacts).toHaveLength(25);
+},60000);
