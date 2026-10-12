@@ -1,6 +1,6 @@
 # Curriculum Studio foundation (assignment 02)
 
-Corrected local candidate (02A). Not deployed; migrations 039 and 040 are unapplied to hosted databases.
+Corrected local candidate. Studio migrations 039–043 are local-only; this build does not deploy them.
 
 ## What exists
 
@@ -55,13 +55,44 @@ evidence of real R2 behaviour. Provider calls are mocked throughout.
 
 ## Rollback
 
-Back up and export any Studio evidence, then run `rollback/202610080039_studio_foundation.down.sql`
-and remove BOTH Studio migration history records with the process that applied them. Forward recovery
-re-applies 039 then 040; `tests/database/studio-migration.test.ts` proves both leave every existing
+For full Studio decommission only, back up and export all Studio and financial evidence before
+running `rollback/202610080039_studio_foundation.down.sql`. Remove the corresponding Studio migration
+history records with the process that applied them. Forward recovery applies all Studio migrations
+in order (currently 039–043); `tests/database/studio-migration.test.ts` proves they leave every existing
 object byte-identical. Storage objects under `studio/` are removed separately and only after export.
+This destructive rollback is not a financial reset or the routine downgrade path for migration 043.
 
 Migration 040 replaces only Studio functions. Deploy it with its matching server callers; old callers
 lack the trusted actor argument and fail closed. Existing pre-040 change sets do not have the newly
 bound change-set ID and must be recreated and reviewed before local apply. Do not backfill approved
 hashes or roll back to the vulnerable attestation grants. This candidate has no production Studio data.
 The existing funded-order/teacher queue surface is checked for unchanged definitions and behaviour.
+
+## Recorded execution budget (migration 043)
+
+Five private tables hold immutable recorded-mode capability/pricing contracts, shared trial caps,
+immutable run bindings, per-attempt reservations and append-only reconciliation receipts. Values are
+integer micro-US dollars. A trial row serializes admission across runs; the normal run/stage lease
+fence is acquired first. Stage caps span replacement stage IDs within the same run and stage key.
+
+The operator grants a run allowance before its first dispatch. The worker can reserve and settle,
+but cannot grant, change caps, release uncertain charges or operate on the tables directly. The
+gateway derives request limits from reconstructed bytes, including images, tools and retained history,
+and checks bundle/model/capability/pricing pins against the immutable contract. No live pricing or
+endpoint capability is inferred from synthetic fixtures. The current gateway's body limit is lower
+than the execution helper's four-MiB ceiling; large papers require batches.
+
+A reservation is held until known actual cost is recorded or an operator reconciles evidence.
+Unknown cost blocks output acceptance and further admission. Over-bound actual cost is recorded and
+halts work. Cancellation does not refund a sent request. Explicit retries use separately numbered
+attempts; earlier reservations/charges remain, and an unreconciled ended/uncertain attempt prevents
+the next dispatch. Operators can release only provably unsent reservations as unsent. A replay uses
+the existing receipt without reserving or billing twice.
+
+The new exchange always requires a budget. Original mock-v0 protocol fixtures without a budget remain
+available. Every live profile is disabled at dispatch, and contracts accept only recorded mode.
+No contract provisioning interface, spending UI or OpenRouter network adapter is included.
+
+Migration 043 also qualifies provider operations by stage identity: separate runs pinning identical
+bytes no longer share an attempt. Historical operation rows are reused by their own stage/key tuple;
+their keys and settlement history are not rewritten.

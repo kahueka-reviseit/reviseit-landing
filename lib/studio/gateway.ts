@@ -2,6 +2,7 @@ import { timingSafeEqual } from 'node:crypto';
 import { blobKey, call, isSha256, isUuid, OUTPUT_TYPES, sha256, StudioError, type Rpc } from './contracts';
 import type { StudioStorage } from './storage/types';
 import { placeImmutable, readForWorker } from './uploads';
+import { budgetManifest } from './budget';
 
 /**
  * Studio worker gateway. Separate bearer token (STUDIO_WORKER_TOKEN) and a closed allowlist of
@@ -13,7 +14,7 @@ export const MAX_CHUNK = 1_500_000;
 const WORKER = /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$/;
 const LOGICAL = /^[a-z][a-z0-9_]*(:[A-Za-z0-9_.-]+){0,4}$/;
 const KINDS = ['inventory', 'task_matches', 'spec_matches', 'gap_list', 'draft_record', 'changeset_manifest', 'validation_result', 'package_file', 'page_text', 'evidence'];
-const SAFE_MESSAGES = /Output ownership|Output replay changed|Studio lease lost|explicit retry required|Provider request changed|not dispatchable|already settled|never dispatched|Integrity blocked|Input not available|exactly the outputs|unsettled|current settled attempt|Invalid record proposal|logical key mismatch|different path|Only (drafting|assembly)|must list exactly|Validation result|Unsafe or out-of-scope|does not resolve|already exists|Retiring|Storage cleanup in progress|Deterministic stages|must persist its change set|superseded before completion/;
+const SAFE_MESSAGES = /Budget|Studio budget|Live Studio provider|Output ownership|Output replay changed|Studio lease lost|explicit retry required|Provider request changed|not dispatchable|already settled|never dispatched|Integrity blocked|Input not available|exactly the outputs|unsettled|current settled attempt|Invalid record proposal|logical key mismatch|different path|Only (drafting|assembly)|must list exactly|Validation result|Unsafe or out-of-scope|does not resolve|already exists|Retiring|Storage cleanup in progress|Deterministic stages|must persist its change set|superseded before completion/;
 
 export type GatewayDeps = { token: string | undefined; otherTokens?: (string | undefined)[]; rpc: Rpc | null; storage: StudioStorage | null };
 const json = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status, headers: { 'content-type': 'application/json', 'cache-control': 'private, no-store', 'x-content-type-options': 'nosniff' } });
@@ -91,6 +92,17 @@ export async function handleStudioGateway(request: Request, deps: GatewayDeps): 
       case 'uncertain':
         if (!lease(v) || typeof v.reason !== 'string') break;
         return json({ result: await call(rpc, 'studio_mark_uncertain', { ...fenced(v), p_reason: v.reason.slice(0, 1000) }) });
+      case 'budget_reserve': {
+        if (!lease(v) || !isUuid(v.providerAttemptId) || typeof v.request !== 'string' || !/^[A-Za-z0-9+/]+=*$/.test(v.request)) break;
+        const bytes=Buffer.from(v.request,'base64');
+        const context=await call<any>(rpc,'studio_budget_context',fenced(v));
+        const manifest=budgetManifest(bytes,context.contract);
+        const reservation=await call<any>(rpc,'studio_budget_reserve',{...fenced(v),p_provider_attempt:v.providerAttemptId,p_request_manifest:manifest});
+        return json({result:{...reservation,manifest}});
+      }
+      case 'budget_settle':
+        if (!isUuid(v.providerAttemptId) || !isSha256(v.evidenceSha256) || (v.actualMicro!==null && (!Number.isSafeInteger(v.actualMicro) || v.actualMicro<0))) break;
+        return json({result:await call(rpc,'studio_budget_settle',{p_provider_attempt:v.providerAttemptId,p_actual_micro:v.actualMicro,p_evidence_sha256:v.evidenceSha256})});
       case 'provider_prepare':
         if (!lease(v) || typeof v.operation !== 'string' || !/^[a-z0-9_:.-]{1,120}$/.test(v.operation) || !isSha256(v.requestDigest)) break;
         return json({ result: await call(rpc, 'studio_provider_prepare', { ...fenced(v), p_operation: v.operation, p_request_digest: v.requestDigest }) });

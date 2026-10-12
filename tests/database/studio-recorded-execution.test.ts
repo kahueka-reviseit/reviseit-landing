@@ -4,19 +4,20 @@
 import { beforeAll, beforeEach, afterAll, test, expect } from 'vitest';
 import { createServer, type Server } from 'node:http';
 import { spawn } from 'node:child_process';
-import { mkdtempSync, chmodSync, rmSync, cpSync } from 'node:fs';
+import { mkdtempSync, chmodSync, rmSync, cpSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { handleStudioGateway } from '../../lib/studio/gateway';
 import { LocalStudioStorage } from '../../lib/studio/storage/local';
 import { StudioDb, ids, MODULE, SKILL, PROFILE, sha, ok, refused, key, blob, baseBank, importSnapshot, accept, gate, work, complete } from './studio-fixture';
+import { installBudgetContract, grantBudget } from './studio-budget-fixture';
 const WORKER=process.env.STUDIO_E2E_WORKER, PYTHON=process.env.STUDIO_EXECUTION_PYTHON;
 const enabled=!!WORKER && !!PYTHON, TOKEN='r'.repeat(48);
 const db=new StudioDb();let server:Server,origin='',dir:string,snapshot:string,store:LocalStudioStorage;
 const ed=()=>db.rpc({kind:'user',id:ids.editor}),svc=()=>db.rpc({kind:'service'});
 beforeAll(async()=>{
  if(!enabled)return;
- await db.init();const op=db.rpc({kind:'operator'});
+ await db.init();await installBudgetContract(db,sha(readFileSync(join(WORKER!,'studio/execution/manifest.json'))));const op=db.rpc({kind:'operator'});
  await ok(op,'studio_enrol_module',{p_module:MODULE,p_subject_adapter:'caps-physical-sciences@1'});
  snapshot=(await importSnapshot(op,MODULE,baseBank)).snapshotId;await accept(op,MODULE,snapshot,null);
  dir=mkdtempSync(join(tmpdir(),'studio-recorded-'));store=new LocalStudioStorage(join(dir,'store'));
@@ -31,10 +32,11 @@ beforeAll(async()=>{
 beforeEach(async()=>{if(enabled){await db.begin();return ()=>db.rollback();}});
 afterAll(async()=>{if(enabled){await new Promise<void>(r=>server.close(()=>r()));await db.close();rmSync(dir,{recursive:true,force:true});}});
 function state(){const p=mkdtempSync(join(dir,'state-'));chmodSync(p,0o700);return p;}
-async function run(){
+async function run(funded=true){
  const b=await blob(ed(),MODULE,'recorded source');
  const source=await ok(ed(),'studio_create_source',{p_module:MODULE,p_title:'Synthetic recorded execution',p_files:[{blobId:b,role:'combined',filename:'p.pdf'}],p_identity:{},p_command:key()});
- return (await ok(ed(),'studio_start_run',{p_source:source.sourceId,p_expected_source_revision:1,p_purpose:'canonical',p_snapshot:snapshot,p_skill_contract:SKILL,p_profile:PROFILE,p_command:key()})).runId as string;
+ const id=(await ok(ed(),'studio_start_run',{p_source:source.sourceId,p_expected_source_revision:1,p_purpose:'canonical',p_snapshot:snapshot,p_skill_contract:SKILL,p_profile:PROFILE,p_command:key()})).runId as string;
+ if(funded)await grantBudget(db,id);return id;
 }
 function child(cfg:Record<string,unknown>){
  return new Promise<{code:number|null,out:string,err:string}>(resolve=>{
@@ -73,7 +75,7 @@ for(const invalid of [false,true])for(const crash of ['before_raw','after_raw','
  });
 }
 test.skipIf(!enabled)('matching tool loop replays two recorded turns then submits evidence without approving G2',async()=>{
- const id=await run();const w=await work(svc(),[{key:'inventory',kind:'inventory',content:'{}'}],'S1_extract');await complete(svc(),w.claim,w.made);await gate(ed(),id,'G1_inventory');
+ const id=await run(false);const w=await work(svc(),[{key:'inventory',kind:'inventory',content:'{}'}],'S1_extract');await complete(svc(),w.claim,w.made);await gate(ed(),id,'G1_inventory');await grantBudget(db,id);
  const c=await ok(svc(),'studio_claim',{p_worker:'recorded-matcher'});expect(c.stageKey).toBe('S2_task_match');
  const lease={attemptId:c.attemptId,lease:c.lease},root=state();
  const first=await child({mode:'loop',state:root,lease});expect(first.code,first.err).toBe(0);expect(JSON.parse(first.out).calls).toBe(2);

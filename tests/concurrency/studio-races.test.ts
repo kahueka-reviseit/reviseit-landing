@@ -217,3 +217,31 @@ test('review racing an editor replacement never leaves authority for superseded 
     evidence.approvalVsReplacement={pairs:20,approvedFirst,editFirst,staleApprovals:0};
   } finally { await a.end();await b.end();await w.end(); }
 });
+
+// Two requests each fit alone; together they exceed the same trial. Real independent sessions.
+test('20 simultaneous budget admissions cannot oversubscribe a shared trial', async()=>{
+ const a=await editor(),wa=await worker(),wb=await worker(),op=await session({role:'reviseit_studio_operator'});
+ try{
+  await owner.query(`insert into private.studio_budget_contracts(id,profile_id,bundle_sha256,capability_sha256,pricing_sha256,model,endpoint,mode,input_micro_per_million,output_micro_per_million,max_input_tokens,max_output_tokens,max_request_bytes,image_token_ceiling,max_images,evidence)
+   values('race-budget','mock-v0',$1,$1,$1,'recorded-only','recorded/local','recorded',1000000,1000000,10000000,32768,1500000,1000,100,'{"synthetic":true}')`,[sha('budget-race')]);
+  let admitted=0,refused=0;
+  for(let i=0;i<20;i++){
+   await owner.query("update private.studio_stages set state='cancelled' where state in ('queued','running')");
+   await owner.query('update private.studio_settings set max_running=2');
+   const trial=randomUUID(),ra=await startRun(a),rb=await startRun(a);
+   for(const run of [ra,rb])await rpc(op,'studio_budget_grant',{p_run:run,p_trial:trial,p_trial_limit:300,p_run_limit:300,p_stage_limit:300,p_operation_limit:300,p_contract:'race-budget',p_authorisation:{reference:'Synthetic race allowance'}});
+   const ca=await rpc(wa,'studio_claim',{p_worker:'budget-a'}),cb=await rpc(wb,'studio_claim',{p_worker:'budget-b'});
+   const prepare=(w:Client,c:any)=>rpc(w,'studio_provider_prepare',{p_attempt:c.attemptId,p_lease:c.lease,p_operation:'turn',p_request_digest:sha('request')});
+   const pa=await prepare(wa,ca),pb=await prepare(wb,cb);
+   const m={requestDigest:sha('request'),contractId:'race-budget',bundleDigest:sha('budget-race'),capabilityDigest:sha('budget-race'),pricingDigest:sha('budget-race'),model:'recorded-only',endpoint:'recorded/local',requestBytes:100,imageCount:0,inputTokenBound:100,outputTokens:100};
+   const reserve=(w:Client,c:any,p:any)=>rpc(w,'studio_budget_reserve',{p_attempt:c.attemptId,p_lease:c.lease,p_provider_attempt:p.providerAttemptId,p_request_manifest:m});
+   const r=await Promise.allSettled([reserve(wa,ca,pa),reserve(wb,cb,pb)]);
+   expect(r.filter(x=>x.status==='fulfilled')).toHaveLength(1);
+   expect(r.filter(x=>x.status==='rejected')).toHaveLength(1);
+   for(const x of r)if(x.status==='rejected')expect(String(x.reason)).toMatch(/budget exhausted/);
+   const sum=(await owner.query('select sum(reserved_micro)::int n,count(*)::int c from private.studio_budget_reservations where trial_id=$1',[trial])).rows[0];
+   expect(sum).toEqual({n:200,c:1});admitted++;refused++;
+  }
+  evidence.budgetAdmissions={pairs:20,admitted,refused,oversubscribed:0};
+ }finally{await a.end();await wa.end();await wb.end();await op.end();}
+});
