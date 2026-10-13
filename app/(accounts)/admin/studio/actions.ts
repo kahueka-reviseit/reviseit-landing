@@ -82,3 +82,31 @@ export async function requestRevision(_previous: ActionResult | null, form: Form
     return { ok: true, value: result };
   } catch (e) { return fail(e); }
 }
+
+/** A mark correction records no checkpoint approval and never changes source observations. */
+export async function correctInventoryMarkAction(form: FormData): Promise<ActionResult> {
+  try {
+    const { rpc, verifiedRpc, user } = await requireStudioEditor();
+    const storage = studioStorage();
+    if (!storage) return { ok: false, error: 'Studio storage is not configured.' };
+    const { saveInventoryMark } = await import('../../../../lib/studio/inventory-review');
+    const raw = String(form.get('marks') ?? '').trim(), run = String(form.get('runId'));
+    const value = await saveInventoryMark(rpc, verifiedRpc, storage, user.id, {
+      runId: run, artifactId: String(form.get('artifactId')), expectedSha256: String(form.get('expectedSha256')),
+      partId: String(form.get('partId')), marks: raw === '' ? null : Number(raw), reason: String(form.get('reason') || ''),
+      command: String(form.get('command')), asOf: String(form.get('asOf')),
+    });
+    revalidatePath(`/admin/studio/runs/${run}`); revalidatePath(`/admin/studio/runs/${run}/inventory`);
+    return { ok: true, value };
+  } catch (e) { return fail(e); }
+}
+
+export async function reviewInventoryAction(form: FormData): Promise<ActionResult> {
+  try {
+    if (form.get('gate') !== 'G1_inventory' || form.get('reviewed') !== 'yes')
+      return { ok: false, error: 'Confirm that you reviewed the inventory and its open issues.' };
+    await recordDecision(form);
+    revalidatePath(`/admin/studio/runs/${String(form.get('runId'))}/inventory`);
+    return { ok: true };
+  } catch (e) { return fail(e); }
+}

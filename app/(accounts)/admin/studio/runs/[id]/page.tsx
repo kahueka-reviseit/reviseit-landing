@@ -47,7 +47,8 @@ export default async function StudioRun({ params }: { params: Promise<{ id: stri
           {GATES.map((g: Gate, i) => { const gv = views[i]; const bound = gv?.binding?.artifacts || [];
             return <tr key={g}><td>{gateLabels[g]}</td><td>{gv?.live ? `approved${gv.live.self_reviewed ? ' (self-reviewed)' : ''}` : gv?.binding ? (gv.previousApproved ? 'ready for review' : 'waiting for earlier checkpoint') : 'waiting'}</td>
               <td>{bound.map((a: any) => <div key={a.id}><Link className={ui['link']} href={`/admin/studio/files/${a.id}`}>{a.logicalKey}</Link> <span className={s.mono}>{a.sha256.slice(0, 10)}</span></div>)}</td>
-              <td>{v.run.state === 'active' && gv?.binding && !gv.live && gv.previousApproved && <form action={recordDecision} className={s.form}>
+              <td>{g === 'G1_inventory' && gv?.binding && <Link className={ui['link']} href={`/admin/studio/runs/${id}/inventory`}>Review inventory and source pages</Link>}
+                {g !== 'G1_inventory' && v.run.state === 'active' && gv?.binding && !gv.live && gv.previousApproved && <form action={recordDecision} className={s.form}>
                 <input type="hidden" name="runId" value={id}/><input type="hidden" name="gate" value={g}/><input type="hidden" name="version" value={gv.version}/><input type="hidden" name="bound" value={bound.map((a: any) => a.id).join(',')}/><input type="hidden" name="command" value={randomUUID()}/>
                 <label>Outcome<select name="outcome"><option value="approved">Approve</option><option value="rejected">Reject</option></select></label>
                 <label>Rationale<input name="rationale" required minLength={3}/></label>

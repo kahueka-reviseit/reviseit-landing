@@ -12,3 +12,12 @@
 .form label { display:flex; flex-direction:column; gap:4px; font-size:13px; }
 .form input, .form select, .form textarea { font:inherit; padding:6px 8px; border:1px solid var(--color-border, #c9ced6); border-radius:8px; min-width:180px; }
 .note { margin:0; font-size:13px; line-height:18px; color:var(--color-text-muted); }
+.reviewGrid { display:grid; grid-template-columns:minmax(0, 1.25fr) minmax(280px, 1fr); gap:28px; }
+.reviewGrid details { margin:12px 0; }
+.reviewGrid summary { cursor:pointer; font-size:14px; font-weight:600; }
+.reviewPart { padding:16px 0; border-bottom:1px solid var(--color-border, #d9dde3); }
+.sourceText { white-space:pre-wrap; line-height:1.6; }
+.sourceFigure { margin:0 0 24px; }
+.sourceFigure img { display:block; width:100%; height:auto; border:1px solid var(--color-border, #d9dde3); }
+.sourceFigure figcaption { font-size:12px; margin-top:6px; }
+@media(max-width:800px) { .reviewGrid { grid-template-columns:1fr; } }
