@@ -20,6 +20,10 @@ export default async function StudioRun({ params }: { params: Promise<{ id: stri
   try { v = await call(rpc, 'studio_run_view', { p_run: id }); } catch { notFound(); }
   const views = await Promise.all(GATES.map(g => call<any>(rpc, 'studio_gate_view', { p_run: id, p_gate: g }).catch(() => null)));
   const execution = await call<any>(rpc, 'studio_execution_view', { p_run: id });
+  const budget = execution.budget;
+  const live = budget?.mode === 'openrouter';
+  const recorded = budget?.mode === 'recorded';
+  const dollars = (micro: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 6 }).format(micro / 1_000_000);
   const pins = v.inputs.at(-1);
   return <><StaffHeader current="studio" studioEnabled creditsEnabled={creditsEnabled()} signedIn name={(account.full_name || '').split(/\s+/)[0] || undefined} record={{ back: '/admin/studio', label: 'Curriculum Studio' }}/>
     <main className={ui['site-shell__main']}><div className={ui['page--staff']}><div className={s.studio}>
@@ -29,8 +33,10 @@ export default async function StudioRun({ params }: { params: Promise<{ id: stri
         <table className={s.table}><tbody>{[['Source digest', pins.source_digest], ['Bank manifest', pins.bank_manifest_sha256], ['Policy', pins.policy_sha256], ['Skill contract', `${pins.skill_contract_id} · ${pins.skill_sha256}`], ['Validator', pins.validator_sha256], ['Subject adapter', pins.subject_adapter], ['Provider profile', `${pins.provider_profile_id} · ${pins.adapter_version} · ${pins.prompt_version}`]]
           .map(([k, val]) => <tr key={k}><th>{k}</th><td className={s.mono}>{val}</td></tr>)}</tbody></table></section>
       <section className={s.card}><h2 className={s.card__title}>Execution</h2>
-        <p className={s.note}>{execution.budget ? `Recorded replies only. Allowance: ${execution.budget.trialState}. This is workflow testing, not live model analysis.` : 'Waiting for the operator to bind a recorded runtime allowance. Starting a run does not grant spending authority.'}</p>
-        {execution.budget && <p className={s.mono}>Contract {execution.budget.contractId} · bundle {execution.budget.bundleSha256.slice(0, 16)} · held {execution.budget.heldMicro} / settled {execution.budget.settledMicro} micro-USD of {execution.budget.runLimitMicro} allowed (recorded simulation)</p>}
+        <p className={s.note}>{budget ? `${live ? 'Live model analysis through OpenRouter.' : recorded ? 'Recorded replies only. This is workflow testing, not live model analysis.' : 'Execution mode unavailable.'} Allowance: ${budget.trialState}.` : 'Waiting for the operator to bind a runtime allowance. Starting a run does not grant spending authority.'}</p>
+        {live && <p className={s.note}>Model calls require a valid operator authorisation and remain subject to the human checkpoints below. Spending limits do not approve content.</p>}
+        {budget && <p>Reserved: {dollars(budget.heldMicro)} · Settled: {dollars(budget.settledMicro)} · Run limit: {dollars(budget.runLimitMicro)} USD{recorded ? ' (recorded simulation)' : ''}</p>}
+        {budget && <p className={s.mono}>Contract {budget.contractId} · bundle {budget.bundleSha256.slice(0, 16)}</p>}
       </section>
       <section className={s.card}><h2 className={s.card__title}>Stages</h2>
         <table className={s.table}><thead><tr><th>Stage</th><th>State</th><th>Attempts</th><th>Error</th><th>Action</th></tr></thead><tbody>
@@ -68,7 +74,7 @@ export default async function StudioRun({ params }: { params: Promise<{ id: stri
           {v.artifacts.map((a: any) => <tr key={a.id}><td><Link className={ui['link']} href={`/admin/studio/files/${a.id}`}>{a.logicalKey}</Link></td><td>{a.revision}</td><td>{a.state}</td><td>{a.author}</td>
             <td><span className={a.integrity === 'verified' ? s.state : s['state--problem']}>{a.integrity}</span></td><td className={s.mono}>{a.sha256.slice(0, 16)}</td></tr>)}</tbody></table></section>
       <section className={s.card}><h2 className={s.card__title}>Provider attempts</h2>
-        {v.providerOperations.length === 0 ? <p className={s.note}>No recorded exchanges yet. Live model calls are disabled.</p> :
+        {v.providerOperations.length === 0 ? <p className={s.note}>No provider attempts have been recorded for this run.</p> :
         <table className={s.table}><thead><tr><th>Operation</th><th>Attempts</th></tr></thead><tbody>{v.providerOperations.map((o: any) => <tr key={o.id}><td>{o.operation}</td>
           <td>{o.attempts.map((p: any) => `${p.attempt_number}: ${p.dispatch_state}${p.possible_charge ? ' (possible charge)' : ''}${p.late ? ' (late)' : ''}`).join(', ')}</td></tr>)}</tbody></table>}</section>
       <section className={s.card}><h2 className={s.card__title}>Audit history</h2>
