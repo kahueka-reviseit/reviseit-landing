@@ -133,3 +133,15 @@ packaging is fenced out. Repeated commands replay; stale review screens fail rat
 This is a feedback-driven redrafting loop, not an inline Markdown editor. The low-level revision RPC
 still cannot make an arbitrary text edit satisfy the execution metadata contract. No direct-edit
 bypass was added. These controls remain local candidate work; migration 048 is not deployed.
+
+## Complete live rehearsals (migration 054)
+
+The full-analysis candidate adds a distinct operator authorisation for seven stages,
+while preserving the scope of existing synthetic and paper-intake grants. The worker
+still runs one claimed stage at a time; the five editor checkpoints control progress.
+A full run pins its source, bank manifest, policy, skill and runtime, with fixed
+$100 trial / $90 run / $30 stage / $9 operation limits and 256 dispatches.
+The gateway binds each request to its stage and local function tools. Renewing key
+preflight evidence does not renew expiry or enlarge scope. These files do not grant
+spending permission, create a profile or enable a live run. Deployment and actual
+trial outcomes are recorded separately in the product return.

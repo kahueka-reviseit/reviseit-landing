@@ -2,7 +2,7 @@
 // Live mode additionally requires a compiled wire envelope and an operator-pinned contract.
 import { createHash } from 'node:crypto';
 import { unwrapOpenRouter } from './openrouter-request';
-import { paperIntakeManifest } from './paper-intake';
+import { workflowManifest } from './workflow-request';
 export function budgetManifest(bytes: Uint8Array, contract: any) {
   const envelope=JSON.parse(Buffer.from(bytes).toString('utf8'));
   const request=envelope?.schema==='reviseit/openrouter-request@1'?unwrapOpenRouter(envelope,contract):envelope;
@@ -28,7 +28,7 @@ export function budgetManifest(bytes: Uint8Array, contract: any) {
   }
   const input=bytes.byteLength+images*contract.image_token_ceiling;
   if(bytes.byteLength<1||bytes.byteLength>contract.max_request_bytes||images>contract.max_images||input>contract.max_input_tokens)throw new Error('Budget request exceeds pinned capability');
-  return {...paperIntakeManifest(request,bytes.byteLength,images,contract),...(contract.mode==='openrouter'?{mode:'openrouter'}:{}),requestDigest:createHash('sha256').update(bytes).digest('hex'),contractId:contract.id,bundleDigest:contract.bundle_sha256,
+  return {...workflowManifest(request,bytes.byteLength,images,contract),...(contract.mode==='openrouter'?{mode:'openrouter'}:{}),requestDigest:createHash('sha256').update(bytes).digest('hex'),contractId:contract.id,bundleDigest:contract.bundle_sha256,
     capabilityDigest:contract.capability_sha256,pricingDigest:contract.pricing_sha256,model:contract.model,endpoint:contract.endpoint,
     requestBytes:bytes.byteLength,imageCount:images,inputTokenBound:input,outputTokens:request.max_tokens};
 }
