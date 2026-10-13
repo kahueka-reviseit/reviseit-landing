@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { StudioDb, ids, MODULE, SKILL, PROFILE, ok, refused, key, blob, importSnapshot, baseBank, accept, work, complete, gate, sha, verified } from './studio-fixture';
-import { saveInventoryMark, correctInventoryMark, sourcePagePng, inventorySummary, type MarkCorrection } from '../../lib/studio/inventory-review';
+import { saveInventoryMark, correctInventoryMark, saveInventoryCognition, correctInventoryCognition, sourcePagePng, inventorySummary, type MarkCorrection } from '../../lib/studio/inventory-review';
 import { LocalStudioStorage } from '../../lib/studio/storage/local';
 const db = new StudioDb(), ed = () => db.rpc({kind:'user',id:ids.editor}), svc = () => db.rpc({kind:'service'});
 let snapshot: string, dir: string, store: LocalStudioStorage;
@@ -63,4 +63,49 @@ test('inline source rendering refuses arbitrary files and mismatched image diges
  expect(sourcePagePng({kind:'page_text'},bytes)).toEqual(png);
  expect(()=>sourcePagePng({kind:'inventory'},bytes)).toThrow();
  expect(()=>sourcePagePng({kind:'page_text'},Buffer.from(JSON.stringify({render:png.toString('base64'),render_sha256:'f'.repeat(64)})))).toThrow(/integrity/);
+});
+
+test('cognitive corrections save the named category, level, reason and reviewer provenance without changing marks or source evidence', async()=>{
+ const {editor,run,input}=await prepared();
+ const change={...input,level:3,category:'Apply',reason:'The learner must apply a familiar method to the given numerical situation.'};
+ const result=await saveInventoryCognition(editor,verified(editor),store,ids.editor,change);
+ expect(await saveInventoryCognition(editor,verified(editor),store,ids.editor,change)).toEqual(result);
+ const rows=await db.sql('select * from private.studio_artifacts order by revision');expect(rows).toHaveLength(2);
+ const fixed=JSON.parse(Buffer.from((await store.get(`studio/blobs/${MODULE}/${rows[1].sha256}`))!).toString());
+ const part=fixed.questions[0].sub_questions[0];expect(part).toMatchObject({marks:null,curriculum_level:3,taxonomy_description:'Apply',classification_provenance:'reviewer_judgement',classification_reason:change.reason});
+ expect(part.source_observations).toEqual(inventory.questions[0].sub_questions[0].source_observations);expect(fixed.questions[0].source_content).toEqual(inventory.questions[0].source_content);
+ expect(fixed.human_cognitive_corrections[0]).toMatchObject({previous:{curriculum_level:null,taxonomy_description:null},corrected:{curriculum_level:3,taxonomy_description:'Apply'},recorded_by:ids.editor,parent_artifact_id:input.artifactId});
+ expect(inventorySummary(fixed).unresolvedClassifications).toBe(0);
+ expect((await ok(editor,'studio_gate_view',{p_run:run,p_gate:'G1_inventory'})).live).toBeNull();expect(await ok(svc(),'studio_claim',{p_worker:'must-wait'})).toBeNull();
+});
+test('cognitive edits invalidate prior approval and fence matching; a stale mark edit cannot overwrite the classification',async()=>{
+ const {editor,run,input}=await prepared();await gate(editor,run,'G1_inventory');
+ const claim=await ok(svc(),'studio_claim',{p_worker:'matcher'});
+ await saveInventoryCognition(editor,verified(editor),store,ids.editor,{...input,level:3,category:'Analyse'});
+ expect((await ok(editor,'studio_gate_view',{p_run:run,p_gate:'G1_inventory'})).live).toBeNull();
+ await expect(saveInventoryMark(editor,verified(editor),store,ids.editor,{...input,command:key()})).rejects.toThrow(/revision changed/);
+ expect(await refused(svc(),'studio_put_output',{p_attempt:claim.attemptId,p_lease:claim.lease,p_logical_key:'matches',p_kind:'task_matches',p_sha256:sha('{}'),p_size:2,p_media_type:'application/json',p_schema:null,p_record:null,p_meta:{},p_provider_attempt:null})).toMatch(/lease lost/);
+});
+test('a reviewer can return a classification to unresolved while retaining both judgments',()=>{
+ const input={runId:key(),artifactId:key(),expectedSha256:'a'.repeat(64),partId:'1.3',command:key(),asOf:'2026-10-13',reason:'Applying the learned method is needed.',level:3,category:'Apply'};
+ const first=correctInventoryCognition(inventory,input,ids.editor);
+ const second=correctInventoryCognition(first,{...input,command:key(),level:null,category:null,reason:'More source context is needed before making this judgement.'},ids.editor);
+ expect(second.questions[0].sub_questions[0]).toMatchObject({curriculum_level:null,taxonomy_description:null,classification_provenance:'unresolved'});
+ expect(second.human_cognitive_corrections).toHaveLength(2);expect(second.human_cognitive_corrections[1].previous.taxonomy_description).toBe('Apply');expect(inventorySummary(second).unresolvedClassifications).toBe(1);
+});
+test('CAPS category pairs are validated without applying the Physical Sciences scale to other subjects',()=>{
+ const input={runId:key(),artifactId:key(),expectedSha256:'a'.repeat(64),partId:'1.3',command:key(),asOf:'2026-10-13',reason:'The reasoning involves applying a known method.',level:3,category:'Apply'};
+ const physical={...inventory,module_id:'caps-grade-11-physical-sciences'};
+ for(const category of ['Apply','Analyse'])expect(()=>correctInventoryCognition(physical,{...input,category},ids.editor)).not.toThrow();
+ for(const change of [{level:4},{category:'Invented'},{level:-1},{level:1.5},{level:Infinity},{level:5},{reason:'bad'},{partId:'missing'}])expect(()=>correctInventoryCognition(physical,{...input,...change},ids.editor)).toThrow();
+ expect(()=>correctInventoryCognition({...inventory,module_id:'other-subject'}, {...input,level:'Higher order'},ids.editor)).not.toThrow();
+ const same=correctInventoryCognition(physical,input,ids.editor);expect(()=>correctInventoryCognition(same,input,ids.editor)).toThrow(/unchanged/);
+ const partial=correctInventoryCognition(physical,{...input,category:null},ids.editor);expect(partial.questions[0].sub_questions[0].classification_provenance).toBe('unresolved');
+});
+test('unauthorised, foreign-run and corrupt-source cognitive writes fail before creating a revision',async()=>{
+ const {editor,input}=await prepared(),change={...input,level:3,category:'Apply'};
+ const outsider=db.rpc({kind:'user',id:ids.outsider});await expect(saveInventoryCognition(outsider,verified(outsider),store,ids.outsider,change)).rejects.toThrow();
+ await expect(saveInventoryCognition(editor,verified(editor),store,ids.editor,{...change,runId:key()})).rejects.toThrow(/binding changed/);
+ await store.put(`studio/blobs/${MODULE}/${input.expectedSha256}`,Buffer.from('wrong'),'application/json');await expect(saveInventoryCognition(editor,verified(editor),store,ids.editor,change)).rejects.toThrow(/corrupt/);
+ expect(await db.sql('select * from private.studio_artifacts')).toHaveLength(1);
 });

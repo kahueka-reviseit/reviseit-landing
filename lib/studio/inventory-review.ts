@@ -1,5 +1,6 @@
 import { call, isUuid, isSha256, sha256, StudioError, type Rpc } from './contracts';
 import { finaliseUpload, readArtifact } from './uploads';
+import { COGNITIVE_CATEGORIES, PHYSICAL_SCIENCES_LEVELS, hasPhysicalSciencesLevels } from './cognitive-classification';
 import type { StudioStorage } from './storage/types';
 
 export type MarkCorrection = { runId: string; artifactId: string; expectedSha256: string; partId: string; marks: number | null; reason: string; command: string; asOf: string };
@@ -28,12 +29,53 @@ export function correctInventoryMark(inventory: any, input: MarkCorrection, acto
   return next;
 }
 
+export type CognitiveCorrection = Omit<MarkCorrection, 'marks'> & { level: number | string | null; category: string | null };
+
+export function correctInventoryCognition(inventory: any, input: CognitiveCorrection, actor: string) {
+  if (!isUuid(input.runId) || !isUuid(input.artifactId) || !isUuid(input.command) || !isUuid(actor) || !isSha256(input.expectedSha256)
+    || !/^\d{4}-\d{2}-\d{2}$/.test(input.asOf) || !Number.isFinite(Date.parse(input.asOf)) || input.asOf > new Date().toISOString().slice(0,10)
+    || typeof input.reason !== 'string' || input.reason.trim().length < 10 || input.reason.length > 2000)
+    throw new StudioError('Enter a classification and a reason of at least ten characters.');
+  if (input.level !== null && !(typeof input.level === 'number' ? Number.isInteger(input.level) && input.level > 0 && input.level <= 100 : typeof input.level === 'string' && input.level.trim().length > 0 && input.level.length <= 40))
+    throw new StudioError('Enter a valid curriculum cognitive level, or leave it unresolved.');
+  if (input.category !== null && !(COGNITIVE_CATEGORIES as readonly string[]).includes(input.category))
+    throw new StudioError('Choose a named cognitive category, or leave it unresolved.');
+  if (hasPhysicalSciencesLevels(inventory.module_id || '')) {
+    if (input.level !== null && ![1,2,3,4].includes(input.level as number)) throw new StudioError('Physical Sciences uses curriculum cognitive levels 1 to 4.');
+    if (input.level !== null && input.category !== null && PHYSICAL_SCIENCES_LEVELS[input.category] !== input.level)
+      throw new StudioError('The curriculum level and named category do not agree. Apply and Analyse belong to level 3; Evaluate and Create belong to level 4.');
+  }
+  if (!Array.isArray(inventory?.questions) || !inventory.meta || !inventory.source_sha256) throw new StudioError('This inventory format cannot be edited here.');
+  const next = structuredClone(inventory), parts = next.questions.flatMap((q: any) => q.sub_questions || []).filter((p: any) => p.id === input.partId);
+  if (parts.length !== 1) throw new StudioError('The assessed part is missing or ambiguous.');
+  const part = parts[0];
+  const previous = { curriculum_level: part.curriculum_level ?? null, taxonomy_description: part.taxonomy_description ?? null,
+    classification_reason: part.classification_reason ?? '', classification_provenance: part.classification_provenance ?? 'unresolved' };
+  const corrected = { curriculum_level: input.level, taxonomy_description: input.category,
+    classification_reason: input.reason.trim(), classification_provenance: input.level === null || input.category === null ? 'unresolved' : 'reviewer_judgement' };
+  if (JSON.stringify(previous) === JSON.stringify(corrected)) throw new StudioError('The classification and reason are unchanged.');
+  next.human_cognitive_corrections = [...(next.human_cognitive_corrections || []), {
+    command: input.command, part_id: part.id, source_id: part.source_id, source_page: part.source_page,
+    previous, corrected, reason: input.reason.trim(), recorded_by: actor, date: input.asOf,
+    parent_artifact_id: input.artifactId, parent_sha256: input.expectedSha256, provenance: 'editor_correction',
+  }];
+  next.meta.last_updated = input.asOf;
+  Object.assign(part, corrected);
+  return next;
+}
+
+export function saveInventoryMark(rpc: Rpc, verifiedRpc: Rpc, storage: StudioStorage, actor: string, input: MarkCorrection) {
+  return saveInventoryCorrection(rpc, verifiedRpc, storage, actor, input, correctInventoryMark, 'Marks');
+}
+export function saveInventoryCognition(rpc: Rpc, verifiedRpc: Rpc, storage: StudioStorage, actor: string, input: CognitiveCorrection) {
+  return saveInventoryCorrection(rpc, verifiedRpc, storage, actor, input, correctInventoryCognition, 'Cognitive classification');
+}
 /** Authenticated editor RPC performs revision CAS, invalidation and audit in one transaction. */
-export async function saveInventoryMark(rpc: Rpc, verifiedRpc: Rpc, storage: StudioStorage, actor: string, input: MarkCorrection) {
+async function saveInventoryCorrection<T extends Omit<MarkCorrection, 'marks'>>(rpc: Rpc, verifiedRpc: Rpc, storage: StudioStorage, actor: string, input: T, correct: (inventory: any, input: T, actor: string) => any, field: string) {
   const { info, bytes } = await readArtifact(rpc, storage, input.artifactId);
   if (info.runId !== input.runId || info.kind !== 'inventory' || info.logicalKey !== 'inventory' || info.sha256 !== input.expectedSha256)
     throw new StudioError('Inventory binding changed. Refresh and review the current revision.');
-  const next = correctInventoryMark(JSON.parse(new TextDecoder().decode(bytes)), input, actor);
+  const next = correct(JSON.parse(new TextDecoder().decode(bytes)), input, actor);
   const data = Buffer.from(JSON.stringify(next)), digest = sha256(data);
   const run = await call<any>(rpc, 'studio_run_view', { p_run: input.runId });
   const old = run.artifacts.find((a: any) => a.id === input.artifactId);
@@ -50,7 +92,7 @@ export async function saveInventoryMark(rpc: Rpc, verifiedRpc: Rpc, storage: Stu
   const result = await finaliseUpload(verifiedRpc, storage, upload.sessionId);
   if (result.state !== 'finalised') throw new StudioError('Correction bytes could not be verified. Refresh before trying again.');
   return call(rpc, 'studio_revise_artifact', { p_artifact: input.artifactId, p_blob: result.blobId,
-    p_rationale: `Part ${input.partId}: ${input.reason.trim()}`, p_command: input.command });
+    p_rationale: `${field === 'Marks' ? 'Part' : field + ' for part'} ${input.partId}: ${input.reason.trim()}`, p_command: input.command });
 }
 
 export function inventorySummary(inventory: any) {
