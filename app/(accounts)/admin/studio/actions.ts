@@ -118,11 +118,11 @@ export async function correctInventoryCognitionAction(form: FormData): Promise<A
     const storage = studioStorage();
     if (!storage) return { ok: false, error: 'Studio storage is not configured.' };
     const { saveInventoryCognition } = await import('../../../../lib/studio/inventory-review');
-    const raw = String(form.get('level') ?? '').trim(), run = String(form.get('runId'));
-    const level = raw === '' ? null : /^\d+$/.test(raw) ? Number(raw) : raw;
+    if (form.has('level')) return { ok: false, error: "Refresh the review screen to use the Bloom's-only correction form." };
+    const run = String(form.get('runId'));
     const value = await saveInventoryCognition(rpc, verifiedRpc, storage, user.id, {
       runId: run, artifactId: String(form.get('artifactId')), expectedSha256: String(form.get('expectedSha256')),
-      partId: String(form.get('partId')), level, category: String(form.get('category') || '') || null,
+      partId: String(form.get('partId')), category: String(form.get('category') || '') || null,
       reason: String(form.get('reason') || ''), command: String(form.get('command')), asOf: String(form.get('asOf')),
     });
     revalidatePath(`/admin/studio/runs/${run}`); revalidatePath(`/admin/studio/runs/${run}/inventory`);

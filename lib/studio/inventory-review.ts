@@ -1,6 +1,6 @@
 import { call, isUuid, isSha256, sha256, StudioError, type Rpc } from './contracts';
 import { finaliseUpload, readArtifact } from './uploads';
-import { COGNITIVE_CATEGORIES, PHYSICAL_SCIENCES_LEVELS, hasPhysicalSciencesLevels } from './cognitive-classification';
+import { COGNITIVE_CATEGORIES } from './cognitive-classification';
 import type { StudioStorage } from './storage/types';
 
 export type MarkCorrection = { runId: string; artifactId: string; expectedSha256: string; partId: string; marks: number | null; reason: string; command: string; asOf: string };
@@ -29,30 +29,24 @@ export function correctInventoryMark(inventory: any, input: MarkCorrection, acto
   return next;
 }
 
-export type CognitiveCorrection = Omit<MarkCorrection, 'marks'> & { level: number | string | null; category: string | null };
+export type CognitiveCorrection = Omit<MarkCorrection, 'marks'> & { category: string | null };
 
 export function correctInventoryCognition(inventory: any, input: CognitiveCorrection, actor: string) {
   if (!isUuid(input.runId) || !isUuid(input.artifactId) || !isUuid(input.command) || !isUuid(actor) || !isSha256(input.expectedSha256)
     || !/^\d{4}-\d{2}-\d{2}$/.test(input.asOf) || !Number.isFinite(Date.parse(input.asOf)) || input.asOf > new Date().toISOString().slice(0,10)
     || typeof input.reason !== 'string' || input.reason.trim().length < 10 || input.reason.length > 2000)
     throw new StudioError('Enter a classification and a reason of at least ten characters.');
-  if (input.level !== null && !(typeof input.level === 'number' ? Number.isInteger(input.level) && input.level > 0 && input.level <= 100 : typeof input.level === 'string' && input.level.trim().length > 0 && input.level.length <= 40))
-    throw new StudioError('Enter a valid curriculum cognitive level, or leave it unresolved.');
+  if ('level' in input) throw new StudioError("Use the Bloom's-only form. Refresh the review screen.");
   if (input.category !== null && !(COGNITIVE_CATEGORIES as readonly string[]).includes(input.category))
-    throw new StudioError('Choose a named cognitive category, or leave it unresolved.');
-  if (hasPhysicalSciencesLevels(inventory.module_id || '')) {
-    if (input.level !== null && ![1,2,3,4].includes(input.level as number)) throw new StudioError('Physical Sciences uses curriculum cognitive levels 1 to 4.');
-    if (input.level !== null && input.category !== null && PHYSICAL_SCIENCES_LEVELS[input.category] !== input.level)
-      throw new StudioError('The curriculum level and named category do not agree. Apply and Analyse belong to level 3; Evaluate and Create belong to level 4.');
-  }
+    throw new StudioError("Choose a Bloom's level, or leave it unresolved.");
   if (!Array.isArray(inventory?.questions) || !inventory.meta || !inventory.source_sha256) throw new StudioError('This inventory format cannot be edited here.');
   const next = structuredClone(inventory), parts = next.questions.flatMap((q: any) => q.sub_questions || []).filter((p: any) => p.id === input.partId);
   if (parts.length !== 1) throw new StudioError('The assessed part is missing or ambiguous.');
   const part = parts[0];
-  const previous = { curriculum_level: part.curriculum_level ?? null, taxonomy_description: part.taxonomy_description ?? null,
+  const previous = { taxonomy_description: part.taxonomy_description ?? null,
     classification_reason: part.classification_reason ?? '', classification_provenance: part.classification_provenance ?? 'unresolved' };
-  const corrected = { curriculum_level: input.level, taxonomy_description: input.category,
-    classification_reason: input.reason.trim(), classification_provenance: input.level === null || input.category === null ? 'unresolved' : 'reviewer_judgement' };
+  const corrected = { taxonomy_description: input.category,
+    classification_reason: input.reason.trim(), classification_provenance: input.category === null ? 'unresolved' : 'reviewer_judgement' };
   if (JSON.stringify(previous) === JSON.stringify(corrected)) throw new StudioError('The classification and reason are unchanged.');
   next.human_cognitive_corrections = [...(next.human_cognitive_corrections || []), {
     command: input.command, part_id: part.id, source_id: part.source_id, source_page: part.source_page,
@@ -60,6 +54,7 @@ export function correctInventoryCognition(inventory: any, input: CognitiveCorrec
     parent_artifact_id: input.artifactId, parent_sha256: input.expectedSha256, provenance: 'editor_correction',
   }];
   next.meta.last_updated = input.asOf;
+  // Any historical curriculum_level is source data: never infer or edit it from Bloom's.
   Object.assign(part, corrected);
   return next;
 }
@@ -99,7 +94,7 @@ export function inventorySummary(inventory: any) {
   const leaves = inventory.questions.flatMap((q: any) => q.sub_questions);
   return { questions: inventory.questions.length, parts: leaves.length, marks: leaves.reduce((n: number, p: any) => n + (p.marks ?? 0), 0),
     unknownMarks: leaves.filter((p: any) => p.marks === null).length,
-    unresolvedClassifications: leaves.filter((p: any) => p.curriculum_level == null || p.taxonomy_description == null).length,
+    unresolvedClassifications: leaves.filter((p: any) => !(COGNITIVE_CATEGORIES as readonly string[]).includes(p.taxonomy_description)).length,
     printedTotal: inventory.paper_metadata.total_marks };
 }
 

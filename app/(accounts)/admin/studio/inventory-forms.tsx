@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { correctInventoryMarkAction, correctInventoryCognitionAction, reviewInventoryAction, type ActionResult } from './actions';
 import { button } from '../../system/button';
 import s from './studio.module.css';
-import { COGNITIVE_CATEGORIES, hasPhysicalSciencesLevels } from '../../../../lib/studio/cognitive-classification';
+import { COGNITIVE_CATEGORIES } from '../../../../lib/studio/cognitive-classification';
 
 function SubmitForm({ children, action, label, success }: { children: React.ReactNode; action: (form: FormData) => Promise<ActionResult>; label: string; success: string }) {
   const [result, setResult] = useState<ActionResult | null>(null), [pending, setPending] = useState(false);
@@ -34,19 +34,14 @@ export function InventoryDecisionForm({ runId, version, bound, command }: { runI
   </SubmitForm>;
 }
 
-export function CognitiveCorrectionForm({ runId, artifactId, expectedSha256, partId, level, category, reason, moduleId, command, asOf }: {
-  runId: string; artifactId: string; expectedSha256: string; partId: string; level: number | string | null;
-  category: string | null; reason: string; moduleId: string; command: string; asOf: string;
+export function CognitiveCorrectionForm({ runId, artifactId, expectedSha256, partId, category, reason, command, asOf }: {
+  runId: string; artifactId: string; expectedSha256: string; partId: string;
+  category: string | null; reason: string; command: string; asOf: string;
 }) {
-  const physicalSciences = hasPhysicalSciencesLevels(moduleId);
-  return <SubmitForm action={correctInventoryCognitionAction} label="Save cognitive correction" success="Cognitive correction saved as a new revision. Inventory approval is still required.">
+  return <SubmitForm action={correctInventoryCognitionAction} label="Save Bloom’s correction" success="Bloom’s correction saved as a new revision. Inventory approval is still required.">
     {Object.entries({ runId, artifactId, expectedSha256, partId, command, asOf }).map(([name,value]) => <input key={name} type="hidden" name={name} value={value}/>)}
-    <label>Curriculum cognitive level for {partId}{physicalSciences
-      ? <select name="level" defaultValue={level ?? ''}><option value="">Unresolved</option>{[1,2,3,4].map(n => <option key={n} value={n}>Level {n}</option>)}</select>
-      : <input name="level" maxLength={40} defaultValue={level ?? ''} placeholder="Leave blank if unresolved"/>}</label>
-    <label>Named cognitive category for {partId}<select name="category" defaultValue={category ?? ''}><option value="">Unresolved</option>{category && !(COGNITIVE_CATEGORIES as readonly string[]).includes(category) && <option value={category} disabled>{category} (existing label)</option>}{COGNITIVE_CATEGORIES.map(name => <option key={name} value={name}>{name}</option>)}</select></label>
-    <label>Reason for cognitive classification of {partId}<textarea name="reason" required minLength={10} maxLength={2000} rows={3} defaultValue={reason}/></label>
-    {physicalSciences && <p className={s.note}>1: Remember · 2: Understand · 3: Apply or Analyse · 4: Evaluate or Create. Classify the reasoning required, not the verb alone.</p>}
-    <p className={s.note}>Recorded as a reviewer judgement, or unresolved if either field is unknown. Earlier classifications remain in revision history.</p>
+    <label>Bloom’s level for {partId}<select name="category" defaultValue={category ?? ''}><option value="">Unresolved</option>{category && !(COGNITIVE_CATEGORIES as readonly string[]).includes(category) && <option value={category} disabled>{category} (existing label)</option>}{COGNITIVE_CATEGORIES.map(name => <option key={name} value={name}>{name}</option>)}</select></label>
+    <label>Reason for Bloom’s classification of {partId}<textarea name="reason" required minLength={10} maxLength={2000} rows={3} defaultValue={reason}/></label>
+    <p className={s.note}>Recorded as a reviewer judgement, or unresolved if the Bloom’s level is unknown. Earlier classifications remain in revision history.</p>
   </SubmitForm>;
 }
