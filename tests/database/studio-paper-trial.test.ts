@@ -7,7 +7,7 @@ let snapshot:string;
 beforeAll(async()=>{await db.init();await ok(op(),'studio_enrol_module',{p_module:MODULE,p_subject_adapter:'caps-physical-sciences@1'});
  snapshot=(await importSnapshot(op(),MODULE,baseBank)).snapshotId;await accept(op(),MODULE,snapshot,null);},60000);
 beforeEach(async()=>{await db.begin();return()=>db.rollback();});afterAll(()=>db.close());
-async function start(pages=17,purpose='rehearsal',change:(p:any)=>void=()=>{}){
+async function start(pages=17,purpose='rehearsal',change:(p:any)=>void=()=>{},scanned=false){
  const id='paper-'+key();await db.sql('insert into private.studio_provider_profiles values ($1,$2,$3,$4,true)',[id,'live','synthetic','synthetic']);
  const b=await blob(ed(),MODULE,'synthetic paper');const src=await ok(ed(),'studio_create_source',{p_module:MODULE,p_title:'Synthetic paper trial',p_files:[{blobId:b,role:'question_paper',filename:'synthetic.pdf'}],p_identity:{},p_command:key()});
  const r=await ok(ed(),'studio_start_run',{p_source:src.sourceId,p_expected_source_revision:1,p_purpose:purpose,p_snapshot:snapshot,p_skill_contract:SKILL,p_profile:id,p_command:key()});
@@ -16,12 +16,13 @@ async function start(pages=17,purpose='rehearsal',change:(p:any)=>void=()=>{}){
  const plan={schema:'reviseit/studio-paper-intake-plan@1',moduleId:MODULE,inputManifest:{sourceSha256:source.sha256,sourceBytes:Number(source.size_bytes),policySha256:i.policy_sha256,skillSha256:i.skill_sha256,pageCount:pages,pages:Array.from({length:pages},(_,n)=>({filePage:n+1,renderSha256:sha('render'+n),textSha256:sha('text'+n)}))},
   phaseLimits:{page:{requestBytes:786432,outputTokens:8192,images:1},reconcile:{requestBytes:262144,outputTokens:32768,images:0}},
   limits:{trialMicro:12000000,runMicro:10000000,stageMicro:10000000,operationMicro:2000000,maxDispatches:pages+1,requiredBalanceMicro:10000000}};
+ if(scanned){plan.schema='reviseit/studio-paper-intake-plan@2';Object.assign(plan.limits,{trialMicro:22000000,runMicro:20000000,stageMicro:20000000,requiredBalanceMicro:20000000});}
  change(plan);
  const c={...contract(),id,profile_id:id,mode:'openrouter',model:'synthetic/model',endpoint:'https://openrouter.ai/api/v1/chat/completions',
   input_micro_per_million:2000000,output_micro_per_million:10000000,max_input_tokens:790528,max_request_bytes:786432,max_output_tokens:32768,max_images:1,image_token_ceiling:4096,
   evidence:{paperIntake:plan,planDigest:sha('synthetic-plan')}};
  const fields=Object.keys(c);await db.sql(`insert into private.studio_budget_contracts(${fields.join(',')}) values(${fields.map((_,n)=>'$'+(n+1)).join(',')})`,Object.values(c).map(v=>typeof v==='object'?JSON.stringify(v):v));
- const trial=key();await ok(op(),'studio_budget_grant',{...grantArgs(r.runId),p_trial:trial,p_contract:id,p_trial_limit:12000000,p_run_limit:10000000,p_stage_limit:10000000,p_operation_limit:2000000});
+ const trial=key();await ok(op(),'studio_budget_grant',{...grantArgs(r.runId),p_trial:trial,p_contract:id,p_trial_limit:scanned?22000000:12000000,p_run_limit:scanned?20000000:10000000,p_stage_limit:scanned?20000000:10000000,p_operation_limit:2000000});
  const args={p_run:r.runId,p_plan_sha256:sha('synthetic-plan'),p_key_evidence_sha256:sha('synthetic-proof'),p_expires:new Date(Date.now()+3600000).toISOString(),p_reference:'Synthetic paper trial explicit authorisation',p_scope:{sourceDigest:i.source_digest,bankManifestSha256:i.bank_manifest_sha256,policySha256:i.policy_sha256,skillSha256:i.skill_sha256}};
  return {run:r.runId,args,c,trial};
 }
@@ -84,4 +85,17 @@ test('revocation between reserve and dispatch still prevents charge; stage chang
  await ok(op(),'studio_live_revoke',{p_run:r.run,p_reason:'Stop this synthetic paper trial'});
  expect(await refused(svc(),'studio_provider_dispatched',p.args)).toMatch(/disabled/);
  expect(await refused(op(),'studio_live_authorise_paper',r.args)).toMatch(/immutable/);
+});
+
+test('scanned paper has separately bound ceilings without enlarging v1 grants',async()=>{
+ const r=await start(14,'rehearsal',()=>{},true);expect(await claim(r.run,r.c)).toBeNull();
+ const a=await ok(op(),'studio_live_authorise_paper',r.args);expect(a.max_dispatches).toBe(15);
+ const cl=await claim(r.run,r.c);expect(cl.stageKey).toBe('S1_extract');
+ const old=await start(14);expect(old.c.evidence.paperIntake.limits.runMicro).toBe(10000000);
+ await ok(op(),'studio_live_authorise_paper',old.args);
+ for(const mutate of [(p:any)=>p.schema='reviseit/studio-paper-intake-plan@99',(p:any)=>p.limits.runMicro=21000000,(p:any)=>p.limits.operationMicro=3000000,(p:any)=>p.limits.maxDispatches=16]){
+  const bad=await start(14,'rehearsal',mutate,true);expect(await refused(op(),'studio_live_authorise_paper',bad.args)).toMatch(/refused/);
+ }
+ const mismatched=await start(14,'rehearsal',(p:any)=>{p.schema='reviseit/studio-paper-intake-plan@1'},true);
+ expect(await refused(op(),'studio_live_authorise_paper',mismatched.args)).toMatch(/refused/);
 });
