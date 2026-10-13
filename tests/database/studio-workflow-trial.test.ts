@@ -77,3 +77,33 @@ test('fresh key evidence is operator-only and cannot change plan, revive revocat
  await ok(op(),'studio_live_revoke',{p_run:r.run,p_reason:'Synthetic complete workflow stop'});
  expect(await refused(op(),'studio_live_refresh_key_evidence',{...args,p_previous:args.p_new})).toMatch(/Exact active/);
 });
+
+test('explicit page retry reuses completed pages, requires reconciled cost and preserves all spending',async()=>{
+ const r=await start(2);await ok(op(),'studio_live_authorise_workflow',r.args);
+ const cl=await claim(r.run,r.c);
+ const first=await prepared(cl,r.c,1);await ok(svc(),'studio_budget_reserve',{...first.args,p_request_manifest:first.m});await settle(first);
+ const failed=await prepared(cl,r.c,2);await ok(svc(),'studio_budget_reserve',{...failed.args,p_request_manifest:failed.m});
+ await ok(svc(),'studio_provider_dispatched',failed.args);
+ await ok(svc(),'studio_provider_result',{...failed.args,p_outcome:'failed',p_provider_request_id:null,p_result_digest:sha('incomplete'),p_usage:{}});
+ await ok(svc(),'studio_budget_settle',{p_provider_attempt:failed.p.providerAttemptId,p_actual_micro:null,p_evidence_sha256:sha('incomplete')});
+ await ok(svc(),'studio_fail',{p_attempt:cl.attemptId,p_lease:cl.lease,p_error:'Incomplete provider reply',p_retryable:false});
+ expect(await claim(r.run,r.c)).toBeNull();
+ await ok(ed(),'studio_retry_stage',{p_stage:cl.stageId,p_expected_attempts:1,p_reason:'Explicitly retry failed page; keep prior cost and completed pages',p_command:key()});
+ const resumed=await claim(r.run,r.c);expect(resumed.stageId).toBe(cl.stageId);
+ const reused=await prepared(resumed,r.c,1);expect(reused.p.action).toBe('reuse');expect(reused.p.providerAttemptId).toBe(first.p.providerAttemptId);
+ const retry=await prepared(resumed,r.c,2);expect(retry.p.providerAttemptId).not.toBe(failed.p.providerAttemptId);
+ expect(await refused(svc(),'studio_budget_reserve',{...retry.args,p_request_manifest:retry.m})).toMatch(/reconciliation/i);
+ const prior=(await db.sql('select revision from private.studio_budget_reservations where provider_attempt_id=$1',[failed.p.providerAttemptId]))[0];
+ await ok(op(),'studio_budget_reconcile',{p_provider_attempt:failed.p.providerAttemptId,p_expected_revision:prior.revision,p_actual_micro:10,p_evidence_sha256:sha('provider billing evidence'),p_reason:'Confirmed cancelled generation cost',p_release_unsent:false});
+ expect(await refused(svc(),'studio_budget_reserve',{...retry.args,p_request_manifest:{...retry.m,inputTokenBound:retry.m.inputTokenBound+1}})).toMatch(/same-operation retry/);
+ await db.sql('update private.studio_provider_attempts set retried_by=null where id=$1',[retry.p.providerAttemptId]);
+ expect(await refused(svc(),'studio_budget_reserve',{...retry.args,p_request_manifest:retry.m})).toMatch(/explicit same-operation retry/);
+ await db.sql('update private.studio_provider_attempts set retried_by=$1 where id=$2',[ids.editor,retry.p.providerAttemptId]);
+ const different=await prepared(resumed,r.c,2,'different-operation-same-page');
+ expect(await refused(svc(),'studio_budget_reserve',{...different.args,p_request_manifest:different.m})).toMatch(/explicit same-operation retry/);
+ await ok(svc(),'studio_budget_reserve',{...retry.args,p_request_manifest:retry.m});await settle(retry);
+ const budget=(await ok(ed(),'studio_execution_view',{p_run:r.run})).budget;
+ expect(budget.settledMicro).toBe(12);expect(budget.runLimitMicro).toBe(90000000);
+ const final=await prepared(resumed,r.c,0);await ok(svc(),'studio_budget_reserve',{...final.args,p_request_manifest:final.m});
+ expect((await db.sql('select count(*)::int n from private.studio_provider_attempts where possible_charge'))[0].n).toBe(3);
+});
