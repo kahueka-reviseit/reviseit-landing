@@ -45,3 +45,21 @@ test.skipIf(!process.env.STUDIO_E2E_WORKER||!process.env.STUDIO_EXECUTION_PYTHON
  const m=budgetManifest(bytes,{...c,...v.profile,evidence:{openrouter:v.profile},bundle_sha256:env.pins.bundle});
  expect(m.requestDigest).toBe(sha(bytes));expect(m.imageCount).toBe(0);
 });
+
+
+test('complete assistant tool history preserves provider metadata, signatures and full byte accounting',()=>{
+ const e=fixture(),w=JSON.parse(Buffer.from(e.wireBody,'base64').toString());
+ const assistant={role:'assistant',content:null,refusal:null,reasoning:'Synthetic reasoning only',reasoning_details:[{type:'reasoning.text',text:'Synthetic reasoning only',format:'anthropic-claude-v1',index:0,signature:'synthetic-signature'}],tool_calls:[{id:'call-1',type:'function',function:{name:'submit_source_page',arguments:'{}'}}]};
+ w.messages.push(assistant,{role:'tool',tool_call_id:'call-1',content:'{"error":"Missing notes"}'});
+ const encode=(value:any)=>{const raw=Buffer.from(stable(value));return Buffer.from(JSON.stringify({...e,wireBody:raw.toString('base64'),wireSha256:sha(raw)}));};
+ const bytes=encode(w),before=structuredClone(w);const m=budgetManifest(bytes,{...c,mode:'openrouter'});
+ expect(w).toEqual(before);expect(m.requestBytes).toBe(bytes.length);expect(m.inputTokenBound).toBe(bytes.length+1000);
+ w.messages[1].reasoning=null;delete w.messages[1].reasoning_details;expect(budgetManifest(encode(w),{...c,mode:'openrouter'})).toBeTruthy();
+ for(const change of [(x:any)=>x.messages[1].refusal='refused',(x:any)=>x.messages[1].reasoning={},
+  (x:any)=>x.messages[0].reasoning='cannot add to user',(x:any)=>x.messages[1].reasoning_details=[{type:'web_search',text:'x'}],
+  (x:any)=>x.messages[1].reasoning_details=[{type:'reasoning.text',text:'x',cache_control:{type:'ephemeral'}}],
+  (x:any)=>x.messages[1].provider={allow_fallbacks:true}]){
+  const bad=structuredClone(w);change(bad);expect(()=>budgetManifest(encode(bad),{...c,mode:'openrouter'})).toThrow(/Budget/);
+ }
+ expect(()=>budgetManifest(bytes,c)).toThrow(/Budget/);
+});

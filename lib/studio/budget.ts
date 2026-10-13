@@ -16,8 +16,27 @@ export function budgetManifest(bytes: Uint8Array, contract: any) {
   let images=0;
   for(const message of request.messages){
     if(!message || !['system','user','assistant','tool'].includes(message.role))throw new Error('Budget request message is invalid');
-    if(Object.keys(message).some(k=>!['role','content','tool_calls','tool_call_id'].includes(k))
+    const assistantMetadata=contract.mode==='openrouter'&&message.role==='assistant';
+    const fields=['role','content','tool_calls','tool_call_id',...(assistantMetadata?['refusal','reasoning','reasoning_details']:[])];
+    if(Object.keys(message).some(k=>!fields.includes(k))
       || (message.content!==null && typeof message.content!=='string' && !Array.isArray(message.content)))throw new Error('Budget message shape is unsupported');
+    // Preserve provider reasoning blocks and signatures byte-for-byte across local tool turns.
+    // These are message data; they cannot introduce request options or hosted tools.
+    if(assistantMetadata){
+      if(('refusal' in message&&message.refusal!==null)
+        ||('reasoning' in message&&message.reasoning!==null&&typeof message.reasoning!=='string'))throw new Error('Budget assistant metadata is unsupported');
+      const details=message.reasoning_details;
+      if(details!==undefined&&details!==null){
+        if(!Array.isArray(details)||details.length>128)throw new Error('Budget reasoning details are unsupported');
+        for(const d of details){
+          const payload=({'reasoning.text':'text','reasoning.summary':'summary','reasoning.encrypted':'data'} as Record<string,string>)[d?.type];
+          if(!d||typeof d!=='object'||Array.isArray(d)||!payload||typeof d[payload]!=='string'
+            ||Object.keys(d).some(k=>!['type',payload,'id','format','index',...(d.type==='reasoning.text'?['signature']:[])].includes(k))
+            ||['id','format','signature'].some(k=>k in d&&d[k]!==null&&typeof d[k]!=='string')
+            ||('index' in d&&(!Number.isSafeInteger(d.index)||d.index<0)))throw new Error('Budget reasoning details are unsupported');
+        }
+      }
+    }
     if(Array.isArray(message.content))for(const part of message.content){
       if(contract.mode==='openrouter' && (Object.keys(part||{}).sort().join(',')!==(part?.type==='image_url'?'image_url,type':'text,type') || (part?.type==='image_url'&&Object.keys(part.image_url||{}).join(',')!=='url')))throw new Error('Budget live content extras are forbidden');
       if(part?.type==='image_url'){
