@@ -20,7 +20,7 @@ export default async function Studio() {
   try { data = await call<Overview>(rpc, 'studio_overview', {}); } catch { data = null; }
   const execution = await call<any>(rpc, 'studio_execution_options', {});
   const first = (account.full_name || '').split(/\s+/)[0];
-  return <><StaffHeader creditsEnabled={creditsEnabled()} signedIn name={first || undefined}/>
+  return <><StaffHeader current="studio" studioEnabled creditsEnabled={creditsEnabled()} signedIn name={first || undefined}/>
     <main className={ui['site-shell__main']}><div className={ui['page--staff']}>
       <header className={ui['page-header--staff']}><div className={ui['page-header__titles--staff']}><h1 className={ui['page-header__title--staff']}>Curriculum Studio</h1>
         <p className={ui['page-header__lede--staff']}>Past-paper analysis runs. The accepted bank stays on the operator&apos;s machine; Studio keeps verified copies and proposals.</p></div></header>

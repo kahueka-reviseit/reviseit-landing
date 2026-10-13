@@ -21,7 +21,7 @@ export default async function StudioRun({ params }: { params: Promise<{ id: stri
   const views = await Promise.all(GATES.map(g => call<any>(rpc, 'studio_gate_view', { p_run: id, p_gate: g }).catch(() => null)));
   const execution = await call<any>(rpc, 'studio_execution_view', { p_run: id });
   const pins = v.inputs.at(-1);
-  return <><StaffHeader creditsEnabled={creditsEnabled()} signedIn name={(account.full_name || '').split(/\s+/)[0] || undefined} record={{ back: '/admin/studio', label: 'Curriculum Studio' }}/>
+  return <><StaffHeader current="studio" studioEnabled creditsEnabled={creditsEnabled()} signedIn name={(account.full_name || '').split(/\s+/)[0] || undefined} record={{ back: '/admin/studio', label: 'Curriculum Studio' }}/>
     <main className={ui['site-shell__main']}><div className={ui['page--staff']}><div className={s.studio}>
       <header className={ui['page-header--staff']}><div className={ui['page-header__titles--staff']}><h1 className={ui['page-header__title--staff']}>Run {id.slice(0, 8)}</h1>
         <p className={ui['page-header__lede--staff']}>{v.run.purpose === 'rehearsal' ? 'Rehearsal: isolated, can never update the accepted bank or a live release.' : 'Canonical run pinned to the accepted bank snapshot.'} State: {v.run.state}. Input revision {v.run.current_input_revision}.</p></div></header>

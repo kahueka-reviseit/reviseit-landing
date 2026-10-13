@@ -11,10 +11,10 @@ export async function accountContext() {
   if (accountError || !account) return { kind: 'unavailable' as const };
   return { kind: 'authenticated' as const, supabase, user, account: account as TeacherAccount };
 }
-export async function requireAccount() {
+export async function requireAccount(loginPath = '/login') {
   const context = await accountContext();
-  if (context.kind === 'unavailable') redirect('/login?message=unavailable');
-  if (context.kind === 'anonymous') redirect('/login');
+  if (context.kind === 'unavailable') redirect(`${loginPath}?message=unavailable`);
+  if (context.kind === 'anonymous') redirect(loginPath);
   return context;
 }
 export async function requireTeacher() {
@@ -23,7 +23,7 @@ export async function requireTeacher() {
   return context;
 }
 export async function requireReviewer() {
-  const context = await requireAccount();
+  const context = await requireAccount('/admin/login');
   const { data, error } = await context.supabase.rpc('is_account_reviewer');
   if (error || data !== true) redirect('/account');
   return context;

@@ -6,13 +6,13 @@ import { logout } from './actions';
 import { MenuButton, useMenu } from './system/navigation';
 import nav from './system/navigation.module.css';
 
-export type StaffPlace='overview'|'accounts'|'papers'|'departments';
+export type StaffPlace='overview'|'accounts'|'papers'|'departments'|'studio';
 /** Navy staff header (S2 to S8p). Counts come from the page's own server reads. */
-export function StaffHeader({current,counts,name,signedIn=false,record,creditsEnabled=false}:{current?:StaffPlace;counts?:{accounts:number|null;papers:number|null};name?:string;signedIn?:boolean;creditsEnabled?:boolean;record?:{back:string;label:string;position?:string}}){
+export function StaffHeader({current,counts,name,signedIn=false,record,creditsEnabled=false,studioEnabled=false}:{current?:StaffPlace;counts?:{accounts:number|null;papers:number|null};name?:string;signedIn?:boolean;creditsEnabled?:boolean;studioEnabled?:boolean;record?:{back:string;label:string;position?:string}}){
  const menu=useMenu(),id=useId();
  const links:{place:StaffPlace;href:string;label:string;count?:number|null;problem?:boolean}[]=[
   {place:'overview',href:'/admin',label:'Overview'},{place:'accounts',href:'/admin/accounts',label:'School accounts',count:counts?.accounts},
-  {place:'papers',href:'/admin/papers',label:'Papers',count:counts?.papers,problem:true},...(creditsEnabled?[{place:'departments' as const,href:'/admin/departments',label:'Departments'}]:[])];
+  {place:'papers',href:'/admin/papers',label:'Papers',count:counts?.papers,problem:true},...(creditsEnabled?[{place:'departments' as const,href:'/admin/departments',label:'Departments'}]:[]),...(studioEnabled?[{place:'studio' as const,href:'/admin/studio',label:'Curriculum Studio'}]:[])];
  return <header className={`${ui['staff-header']} ${record?ui['staff-header--record']:''}`}>
   <div className={ui['staff-header__start']}>
    <Link className={ui['staff-header__brand']} href={signedIn?'/admin':'/admin/login'}><span className={ui['staff-header__wordmark']}>Revise It</span><span className={ui['staff-header__mark']}>ADMIN</span></Link>

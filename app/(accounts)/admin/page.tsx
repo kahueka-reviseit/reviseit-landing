@@ -11,18 +11,19 @@ export const dynamic='force-dynamic';
 function greeting(){const h=Number(new Intl.DateTimeFormat('en-ZA',{hour:'numeric',hourCycle:'h23',timeZone:'Africa/Johannesburg'}).format(new Date()));return h<12?'Good morning':h<17?'Good afternoon':'Good evening';}
 export default async function Administration() {
   const { supabase, user, account } = await requireReviewer();
-  const [counts, pending, { paid, queue }, emails] = await Promise.all([
+  const [counts, pending, { paid, queue }, emails, studioAccess] = await Promise.all([
     accountCounts(supabase, user.id),
     supabase.from('teacher_accounts').select('user_id,full_name,requested_school,email_confirmed_at').neq('user_id', user.id).eq('status', 'pending').order('created_at', { ascending: false }).limit(5),
     papersNeedingAttention(supabase),
     emailNotifications(supabase),
+    supabase.rpc('studio_is_editor'),
   ]);
   const emailProblems = (emails || []).filter(emailNeedsLook);
   const papers = [...(paid || []).map(p => ({ id: p.orderId, title: queue?.find(q => q.id === p.orderId)?.title || `Paper ${p.orderId.slice(0, 8)}`, reason: p.reason })),
     ...(queue || []).filter(q => !(paid || []).some(p => p.orderId === q.id)).map(q => ({ id: q.id, title: q.title, reason: q.state === 'held' ? 'Generation held' : 'Being checked' }))];
   const first = (account.full_name || '').split(/\s+/)[0];
   const accountsWaiting = counts?.pending ?? null, papersWaiting = paid || queue ? papers.length : null;
-  return <><StaffHeader creditsEnabled={creditsEnabled()} current="overview" signedIn name={first || undefined} counts={{ accounts: accountsWaiting, papers: papersWaiting }}/>
+  return <><StaffHeader creditsEnabled={creditsEnabled()} current="overview" studioEnabled={!studioAccess.error && studioAccess.data === true} signedIn name={first || undefined} counts={{ accounts: accountsWaiting, papers: papersWaiting }}/>
     <main className={ui['site-shell__main']}><div className={ui['page--staff']}>
     <header className={ui['page-header--staff']}><div className={ui['page-header__titles--staff']}><h1 className={ui['page-header__title--staff']}>{greeting()}{first ? `, ${first}` : ''}</h1>
       <p className={ui['page-header__lede--staff']}>{accountsWaiting === 0 && papersWaiting === 0 ? 'Nothing needs you right now.' : 'Two queues wait for a person. Start with whichever has work.'}</p></div></header>
@@ -40,6 +41,11 @@ export default async function Administration() {
         {papers.length > 5 && <p className={ui['queue-card__more']}>and {papers.length - 5} more</p>}
         <div><Link className={button('inverse')} href="/admin/papers">Open papers →</Link></div></section>
     </div>
+    {!studioAccess.error && studioAccess.data === true && <section className={ui['queue-card']} aria-labelledby="studio-entry">
+      <h2 id="studio-entry" className={ui['queue-card__label']}>Curriculum Studio</h2>
+      <p className={ui['queue-card__more']}>Manage past papers, review analysis and prepare question-bank updates.</p>
+      <div><Link className={button('inverse')} href="/admin/studio">Open Curriculum Studio →</Link></div>
+    </section>}
     {emails && emails.length > 0 && <section className={ui['queue-card']} aria-labelledby="email-queue"><h2 id="email-queue" className={ui['queue-card__label']}>Email to teachers</h2>
       <p className={ui['queue-card__more']}>{emailProblems.length === 0 ? `No delivery problems in the last ${emails.length} messages. Delivered means the school's mail server accepted it, not that it was read.` : `${emailProblems.length} ${emailProblems.length === 1 ? 'message needs' : 'messages need'} a look. A failed email never holds a paper; the teacher can still open it from My papers.`}</p>
       {emailProblems.length > 0 && <ul className={ui['queue-card__list']}>{emailProblems.slice(0, 5).map(e => <li key={e.id} className={ui['queue-card__item']}>
