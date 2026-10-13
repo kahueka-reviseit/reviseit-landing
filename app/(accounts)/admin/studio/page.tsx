@@ -10,6 +10,7 @@ import ui from '../../experience.module.css';
 import s from './studio.module.css';
 import { startRun } from './actions';
 import { UploadSource } from './upload-source';
+import { importedStatus } from '../../../../lib/studio/imported-analysis';
 export const dynamic = 'force-dynamic';
 
 type Overview = { modules: any[]; snapshots: any[]; sources: any[]; runs: any[] };
@@ -19,16 +20,28 @@ export default async function Studio() {
   let data: Overview | null = null;
   try { data = await call<Overview>(rpc, 'studio_overview', {}); } catch { data = null; }
   const execution = await call<any>(rpc, 'studio_execution_options', {});
+  const imported = await call<any[]>(rpc, 'studio_imported_analyses', {});
   const first = (account.full_name || '').split(/\s+/)[0];
   return <><StaffHeader current="studio" studioEnabled creditsEnabled={creditsEnabled()} signedIn name={first || undefined}/>
     <main className={ui['site-shell__main']}><div className={ui['page--staff']}>
       <header className={ui['page-header--staff']}><div className={ui['page-header__titles--staff']}><h1 className={ui['page-header__title--staff']}>Curriculum Studio</h1>
-        <p className={ui['page-header__lede--staff']}>Past-paper analysis runs. The accepted bank stays on the operator&apos;s machine; Studio keeps verified copies and proposals.</p></div></header>
+        <p className={ui['page-header__lede--staff']}>Past-paper collections and analysis runs. The accepted bank stays on the operator&apos;s machine; Studio keeps verified copies and proposals.</p></div></header>
       {!data ? <Notice tone="problem">Studio could not be loaded. Nothing was changed.</Notice> : <div className={s.studio}>
         <section className={s.card} aria-labelledby="modules"><h2 id="modules" className={s.card__title}>Modules and accepted snapshots</h2>
           {data.modules.length === 0 ? <p className={s.note}>No module is enrolled. The operator enrols a module and imports a verified snapshot first.</p> :
           <table className={s.table}><thead><tr><th>Module</th><th>Subject adapter</th><th>Accepted snapshot</th></tr></thead><tbody>
             {data.modules.map(m => <tr key={m.moduleId}><td>{m.moduleId}</td><td>{m.subjectAdapter}</td><td className={s.mono}>{m.acceptedManifestSha256 ? m.acceptedManifestSha256.slice(0, 16) + '…' : 'none accepted'}</td></tr>)}</tbody></table>}
+        </section>
+        <section className={s.card} aria-labelledby="imported"><h2 id="imported" className={s.card__title}>Previously analysed papers</h2>
+          <p className={s.note}>Existing collections, imported with their retained sources and reports. No rescanning is performed.</p>
+          {imported.length === 0 ? <p>No previous analysis has been imported.</p> : data.modules.map(m => {
+            const items=imported.filter(x=>x.moduleId===m.moduleId); if(!items.length)return null;
+            const label=m.moduleId.includes('grade-10')?'Grade 10':m.moduleId.includes('grade-11')?'Grade 11':m.moduleId;
+            return <details key={m.moduleId} open><summary><strong>{label} Physical Sciences</strong> · {items.length} records</summary>
+              <table className={s.table}><thead><tr><th>Paper or document</th><th>Retained evidence</th><th>Files</th></tr></thead><tbody>
+                {items.map(x=><tr key={x.id}><td><Link className={ui['link']} href={`/admin/studio/imports/${x.id}`}>{x.title}</Link></td><td>{importedStatus[x.status as keyof typeof importedStatus]}</td><td>{x.fileCount}</td></tr>)}
+              </tbody></table></details>;
+          })}
         </section>
         <section className={s.card} aria-labelledby="sources"><h2 id="sources" className={s.card__title}>Sources</h2>
           {data.modules.length > 0 && <UploadSource modules={data.modules.map(m => m.moduleId)}/>}
