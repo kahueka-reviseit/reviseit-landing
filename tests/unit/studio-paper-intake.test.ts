@@ -31,3 +31,21 @@ test('reconciliation requires one observation per page and the pinned policy',()
  expect(()=>paperIntakeManifest(r,1000,0,c)).toThrow();
 });
 test('old contracts retain their prior admission path',()=>expect(paperIntakeManifest({},1,0,{evidence:{}})).toEqual({}));
+
+
+test('v2 full workflow admits only two bounded correction turns and preserves pinned source checks',()=>{
+ const f=fixture();const c=f.contract as any;c.evidence.paperIntake.schema='reviseit/studio-analysis-trial-plan@2';
+ const r=f.request as any;
+ const pair=(id:string)=>[{role:'assistant',tool_calls:[{id,type:'function',function:{name:'submit_source_page',arguments:'{}'}}]},
+  {role:'tool',tool_call_id:id,content:JSON.stringify({error:'Missing required field: notes'})}];
+ expect(paperIntakeManifest(r,1000,1,c)).toMatchObject({intakeTurn:1});
+ r.messages.push(...pair('a'));expect(paperIntakeManifest(r,1000,1,c)).toMatchObject({intakeTurn:2});
+ r.messages.push(...pair('b'));expect(paperIntakeManifest(r,1000,1,c)).toMatchObject({intakeTurn:3});
+ r.messages.push(...pair('c'));expect(()=>paperIntakeManifest(r,1000,1,c)).toThrow();r.messages.splice(6);
+ for(const change of [(x:any)=>x.messages[3].tool_call_id='wrong',(x:any)=>x.messages[3].content='{}',
+  (x:any)=>x.messages[2].role='system',(x:any)=>x.messages[2].tool_calls[0].function.name='other',
+  (x:any)=>x.messages[1].content[1].image_url.url='data:image/png;base64,QQ==']){
+  const copy=structuredClone(r);change(copy);expect(()=>paperIntakeManifest(copy,1000,1,c)).toThrow();
+ }
+ c.evidence.paperIntake.schema='reviseit/studio-analysis-trial-plan@1';expect(()=>paperIntakeManifest(r,1000,1,c)).toThrow();
+});

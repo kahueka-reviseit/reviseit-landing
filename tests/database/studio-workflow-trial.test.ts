@@ -107,3 +107,19 @@ test('explicit page retry reuses completed pages, requires reconciled cost and p
  const final=await prepared(resumed,r.c,0);await ok(svc(),'studio_budget_reserve',{...final.args,p_request_manifest:final.m});
  expect((await db.sql('select count(*)::int n from private.studio_provider_attempts where possible_charge'))[0].n).toBe(3);
 });
+
+
+test('v2 intake correction needs previous settled turn, same operation family and stays bounded',async()=>{
+ const r=await start(1,'rehearsal',(p:any)=>{p.schema='reviseit/studio-analysis-trial-plan@2';p.runtime={requestBytes:1500000,turns:3,rejections:2,callSeconds:300,batchSeconds:960,stageSeconds:7200};});
+ await ok(op(),'studio_live_authorise_workflow',r.args);const cl=await claim(r.run,r.c);
+ const first=await prepared(cl,r.c,1,'s1_extract:page:synthetic:turn:1');const m1={...first.m,intakeTurn:1};
+ await ok(svc(),'studio_budget_reserve',{...first.args,p_request_manifest:m1});
+ const second=await prepared(cl,r.c,1,'s1_extract:page:synthetic:turn:2');const m2={...second.m,intakeTurn:2};
+ expect(await refused(svc(),'studio_budget_reserve',{...second.args,p_request_manifest:m2})).toMatch(/preceding settled reply/);
+ await settle(first);await ok(svc(),'studio_budget_reserve',{...second.args,p_request_manifest:m2});await settle(second);
+ const unrelated=await prepared(cl,r.c,1,'s1_extract:page:other:turn:3');
+ expect(await refused(svc(),'studio_budget_reserve',{...unrelated.args,p_request_manifest:{...unrelated.m,intakeTurn:3}})).toMatch(/preceding settled reply/);
+ const third=await prepared(cl,r.c,1,'s1_extract:page:synthetic:turn:3');await ok(svc(),'studio_budget_reserve',{...third.args,p_request_manifest:{...third.m,intakeTurn:3}});await settle(third);
+ const fourth=await prepared(cl,r.c,1,'s1_extract:page:synthetic:turn:4');expect(await refused(svc(),'studio_budget_reserve',{...fourth.args,p_request_manifest:{...fourth.m,intakeTurn:4}})).toMatch(/correction turn/);
+ expect((await ok(ed(),'studio_execution_view',{p_run:r.run})).budget.settledMicro).toBe(3);
+});
