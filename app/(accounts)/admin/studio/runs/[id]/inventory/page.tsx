@@ -39,6 +39,16 @@ export default async function InventoryReview({ params }: { params: Promise<{ id
         <p>{totals.questions} questions · {totals.parts} assessed parts · {totals.marks} recorded marks / {totals.printedTotal ?? 'unknown'} printed total · {totals.unknownMarks} unknown marks</p>
         <p>{totals.unknownMarks === 0 && totals.marks === totals.printedTotal ? 'The assessed marks reconcile to the printed paper total.' : 'The marks need review against the source.'}</p>
         <p>{totals.unresolvedClassifications} Bloom’s classifications unresolved. Memorandum comparison: {inventory.memorandum?.comparison_status === 'not_performed' ? 'not performed' : inventory.memorandum?.comparison_status || 'not available'}.</p>
+        {inventory.paper_total_evidence?.requires_review && <div role="note">
+          <h3>Conflicting paper-total observations</h3>
+          <p>{inventory.paper_total_evidence.selection_basis === 'unique_cover_observation'
+            ? 'The proposed paper total uses the cover. Another page reported a different total; check whether it is a question subtotal or a source error.'
+            : 'No single cover total resolves the conflicting observations. The paper total remains unknown.'}</p>
+          <ul>{inventory.paper_total_evidence.observations.map((o: any) => <li key={`${o.source_id}:${o.file_page}`}>
+            Page {o.file_page} ({o.disposition}): {o.printed_total_marks} marks. {o.notes}
+          </li>)}</ul>
+          <p>Every original observation is retained. This selection does not resolve or approve the discrepancy.</p>
+        </div>}
         <p className={s.note}>These checks describe this inventory revision. Original page observations and earlier extraction reports remain unchanged. Approving the inventory allows matching; it does not approve scientific content or changes to the question bank.</p>
       </section>
       <section className={s.card}><h2 className={s.card__title}>Recorded mark corrections</h2>
