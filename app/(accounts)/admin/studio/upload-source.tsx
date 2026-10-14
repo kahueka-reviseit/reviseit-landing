@@ -1,5 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { moduleLabel } from '../../../../lib/studio/presentation';
 import { button } from '../../system/button';
 import s from './studio.module.css';
 import { createSource, finishUpload, startUpload } from './actions';
@@ -9,8 +11,13 @@ import { createSource, finishUpload, startUpload } from './actions';
  * server to verify and finalise. The browser's digest is only a claim; the server recomputes it.
  */
 export function UploadSource({ modules }: { modules: string[] }) {
+  const router = useRouter(), busy = useRef(false);
+  const [pending,setPending] = useState(false);
   const [status, setStatus] = useState<string>('');
   async function submit(form: FormData) {
+    if (busy.current) return;
+    busy.current=true; setPending(true);
+    try {
     const file = form.get('file');
     if (!(file instanceof File) || file.size === 0) { setStatus('Choose a PDF or image first.'); return; }
     setStatus('Checking the file…');
@@ -31,14 +38,17 @@ export function UploadSource({ modules }: { modules: string[] }) {
     const fd = new FormData(); fd.set('moduleId', String(form.get('moduleId'))); fd.set('title', String(form.get('title'))); fd.set('blobId', v.blobId!);
     fd.set('role', String(form.get('role'))); fd.set('filename', file.name); fd.set('command', crypto.randomUUID());
     const source = await createSource(fd);
-    setStatus(source.ok ? 'Source saved. Refresh to see it in the list.' : source.error);
+    setStatus(source.ok ? 'Source saved. The file is verified and ready to open.' : source.error);
+    if(source.ok) router.refresh();
+    } catch { setStatus('Upload interrupted. Refresh to check whether the source was saved before trying again.'); }
+    finally { busy.current=false;setPending(false); }
   }
   return <form action={submit} className={s.form}>
-    <label>Module<select name="moduleId">{modules.map(m => <option key={m}>{m}</option>)}</select></label>
+    <label>Module<select name="moduleId">{modules.map(m => <option key={m} value={m}>{moduleLabel(m)}</option>)}</select></label>
     <label>Title<input name="title" required minLength={3} maxLength={200}/></label>
     <label>Role<select name="role" defaultValue="combined"><option value="combined">Paper and memorandum</option><option value="question_paper">Question paper</option><option value="memorandum">Memorandum</option></select></label>
     <label>File<input type="file" name="file" accept="application/pdf,image/png,image/jpeg"/></label>
-    <button className={button('secondary', { size: 'small' })}>Upload source</button>
+    <button disabled={pending} className={button('secondary', { size: 'small' })}>{pending ? 'Uploading…' : 'Upload source'}</button>
     {status && <p className={s.note} role="status">{status}</p>}
   </form>;
 }

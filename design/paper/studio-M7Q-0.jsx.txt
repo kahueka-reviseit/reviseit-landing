@@ -1,0 +1,249 @@
+(
+    <div style={{ backgroundColor: 'var(--color-background)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', fontSize: '12px', fontSynthesis: 'none', height: 'fit-content', lineHeight: '16px', MozOsxFontSmoothing: 'grayscale', overflow: 'clip', overflowWrap: 'anywhere', WebkitFontSmoothing: 'antialiased', width: '1440px' }}>
+      <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '56px', justifyContent: 'space-between', paddingInline: '32px' }}>
+        <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '32px' }}>
+          <div style={{ alignItems: 'baseline', boxSizing: 'border-box', display: 'flex', gap: '8px' }}>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'inline-block', fontFamily: '"Playfair Display", system-ui, sans-serif', fontSize: '20px', fontWeight: 700, lineHeight: '24px' }}>
+              Revise It
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-gold)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.15em', lineHeight: '14px' }}>
+              ADMIN
+            </div>
+          </div>
+          <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '4px' }}>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                Overview
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                School accounts
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                Papers
+              </div>
+            </div>
+            <div style={{ backgroundColor: '#FFFFFF1F', borderRadius: '999px', boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '14px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', fontWeight: 600, lineHeight: '18px' }}>
+                Curriculum
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+          Signed in as Kahueka · reviewer
+        </div>
+      </div>
+      <div style={{ boxSizing: 'border-box', display: 'flex', minHeight: '844px', width: '1440px' }}>
+        <div style={{ alignSelf: 'stretch', backgroundColor: 'var(--color-surface-paper)', borderRightColor: 'var(--color-border)', borderRightStyle: 'solid', borderRightWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', flexShrink: '0', gap: '28px', padding: '24px', width: '288px' }}>
+          <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '12px', padding: '14px' }}>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '11px', fontWeight: 600, lineHeight: '15px' }}>
+              CURRICULUM MODULE
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 600, lineHeight: '21px' }}>
+              Grade 10 Physical Sciences
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px' }}>
+              Switch module ⌄
+            </div>
+          </div>
+          <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', fontFamily: 'var(--font-body)', fontSize: '16px', fontWeight: 600, lineHeight: '22px' }}>
+                Sources
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Library
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px' }} />
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Work queue
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Releases
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+          </div>
+        </div>
+        <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', flexShrink: '0', gap: '24px', paddingBlock: '32px', paddingInline: '40px', width: '1152px' }}>
+          <div style={{ alignItems: 'start', boxSizing: 'border-box', display: 'flex', gap: '16px' }}>
+            <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '8px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px' }}>
+                Sources / Grade 10 Physical Sciences
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-display)', fontSize: '32px', fontWeight: 600, lineHeight: '40px' }}>
+                Source library
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '15px', lineHeight: '21px' }}>
+                Past papers, memoranda and policy documents
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '16px' }}>
+              <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', borderColor: 'var(--color-inverse)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                  Upload documents
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '16px' }}>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', borderColor: 'var(--color-inverse)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                All documents
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                Question papers
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                Memoranda
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                Curriculum policy
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                Archived
+              </div>
+            </div>
+          </div>
+          <div style={{ alignItems: 'start', boxSizing: 'border-box', display: 'flex', gap: '24px' }}>
+            <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', flexShrink: '0', width: '632px' }}>
+              <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '18px', fontWeight: 600, lineHeight: '25px' }}>
+                  Limpopo · 17 March 2025 · Control Test 1
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-caution-text)', fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '20px' }}>
+                  Question paper and memorandum retained · verified
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '20px' }}>
+                  Inventory ready for review · 50 parts · 99 / 100 marks
+                </div>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '16px' }}>
+                  <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                      Open source
+                    </div>
+                  </div>
+                  <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                      View memorandum
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style={{ borderTopColor: 'var(--color-border)', borderTopStyle: 'solid', borderTopWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '18px', fontWeight: 600, lineHeight: '25px' }}>
+                  Original combined download
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '20px' }}>
+                  21 pages · original retained alongside the two extracts
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '20px' }}>
+                  14 question-paper pages · 7 memorandum pages
+                </div>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '16px' }}>
+                  <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                      Open original
+                    </div>
+                  </div>
+                  <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                      View revisions
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style={{ borderTopColor: 'var(--color-border)', borderTopStyle: 'solid', borderTopWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '18px', fontWeight: 600, lineHeight: '25px' }}>
+                  A better scan is a new revision
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '15px', lineHeight: '21px' }}>
+                  Keep the original. Earlier analyses keep their original pages and fingerprint; reanalysis can use the improved scan.
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '20px' }}>
+                  Archive hides a source from default lists. Referenced evidence remains available.
+                </div>
+              </div>
+            </div>
+            <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', flexShrink: '0', gap: '16px', padding: '24px', width: '416px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '22px', fontWeight: 600, lineHeight: '31px' }}>
+                Add documents
+              </div>
+              <div style={{ backgroundColor: 'var(--color-surface)', borderRadius: '8px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', fontFamily: 'var(--font-body)', fontSize: '16px', fontWeight: 600, lineHeight: '22px' }}>
+                  Drop PDFs here or choose files
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px' }}>
+                  Example: a question paper and its memorandum
+                </div>
+              </div>
+              <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                  Document role
+                </div>
+                <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                    Memorandum ⌄
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                  Attach to source
+                </div>
+                <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                    Limpopo · March 2025 · Test 1 ⌄
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '20px' }}>
+                  Confirm grade, year and paper from the PDF before analysing.
+                </div>
+              </div>
+              <div style={{ backgroundColor: 'var(--color-surface-paper)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 600, lineHeight: '21px' }}>
+                  Same document already exists
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '20px' }}>
+                  Identical bytes reuse a verified file. A better scan creates a revision of the same paper; matching paper identity alone does not reject it.
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '16px' }}>
+                <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                    Cancel
+                  </div>
+                </div>
+                <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', borderColor: 'var(--color-inverse)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                    Save & verify
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" style={{ width: '256px', height: '256px', flexShrink: '0' }}>
+          <path fillRule="evenodd" d="" fill="none" stroke="#000000" />
+        </svg>
+      </div>
+    </div>
+  )

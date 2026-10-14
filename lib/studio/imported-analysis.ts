@@ -1,7 +1,6 @@
 import {call,sha256,StudioError,type Rpc} from './contracts';
 import type {StudioStorage} from './storage/types';
-export const importedStatus = {reports_retained:'Imported analysis · reports retained',source_only:'Imported source · reports unavailable',reference_document:'Reference document'} as const;
-export const importedRole = {question_paper:'Question paper',memorandum:'Memorandum',combined:'Paper and memorandum',source:'Source document',reference:'Reference',analysis_report:'Analysis report'} as const;
+export { importedStatus, importedRole } from './presentation';
 export async function readImportedFile(rpc:Rpc,storage:StudioStorage,id:string){
  const info=await call<any>(rpc,'studio_read_imported_file',{p_id:id});
  let bytes:Uint8Array|null;

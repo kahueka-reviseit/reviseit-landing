@@ -1,0 +1,455 @@
+{
+  "file": {
+    "id": "01M36MRM9HCJ4T87N081XDT4MX",
+    "name": "Revise It Website"
+  },
+  "contentHash": {
+    "tokens": "a19978d2"
+  }
+}
+(
+    <div style={{ backgroundColor: 'var(--color-background)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', fontSize: '12px', fontSynthesis: 'none', height: 'fit-content', lineHeight: '16px', MozOsxFontSmoothing: 'grayscale', overflow: 'clip', overflowWrap: 'anywhere', WebkitFontSmoothing: 'antialiased', width: '1440px' }}>
+      <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '56px', justifyContent: 'space-between', paddingInline: '32px' }}>
+        <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '32px' }}>
+          <div style={{ alignItems: 'baseline', boxSizing: 'border-box', display: 'flex', gap: '8px' }}>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'inline-block', fontFamily: '"Playfair Display", system-ui, sans-serif', fontSize: '20px', fontWeight: 700, lineHeight: '24px' }}>
+              Revise It
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-gold)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.15em', lineHeight: '14px' }}>
+              ADMIN
+            </div>
+          </div>
+          <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '4px' }}>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                Overview
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                School accounts
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                Papers
+              </div>
+            </div>
+            <div style={{ backgroundColor: '#FFFFFF1F', borderRadius: '999px', boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '14px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', fontWeight: 600, lineHeight: '18px' }}>
+                Curriculum
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+          Signed in as Kahueka · reviewer
+        </div>
+      </div>
+      <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexGrow: '1', minHeight: '0px' }}>
+        <div style={{ alignSelf: 'stretch', backgroundColor: 'var(--color-surface-paper)', borderRightColor: 'var(--color-border)', borderRightStyle: 'solid', borderRightWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', flexShrink: '0', gap: '28px', padding: '24px', width: '288px' }}>
+          <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '12px', padding: '14px' }}>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '11px', fontWeight: 600, lineHeight: '15px' }}>
+              CURRICULUM MODULE
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 600, lineHeight: '21px' }}>
+              Grade 11 Physical Sciences
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px' }}>
+              Switch module ⌄
+            </div>
+          </div>
+          <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Sources
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', fontFamily: 'var(--font-body)', fontSize: '16px', fontWeight: 600, lineHeight: '22px' }}>
+                Library
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px' }}>
+                89
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Work queue
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Releases
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+          </div>
+        </div>
+        <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '20px', minWidth: '0px', paddingBottom: '32px', paddingInline: '40px', paddingTop: '28px' }}>
+          <div style={{ alignItems: 'end', boxSizing: 'border-box', display: 'flex', gap: '24px', justifyContent: 'space-between' }}>
+            <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                data / task-types / physics
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Playfair Display", system-ui, sans-serif', fontSize: '36px', fontWeight: 700, lineHeight: '44px' }}>
+                Physics task types
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '15px', lineHeight: '18px' }}>
+                15 markdown files. Each file is one reusable assessment family that agents read when matching and generating questions.
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px' }}>
+              <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '8px', height: '40px', paddingInline: '12px', width: '260px' }}>
+                <svg width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', flexShrink: '0' }}>
+                  <circle cx="6" cy="6" r="4.5" fill="none" stroke="#4A4A4A" strokeWidth="1.4" />
+                  <path d="M9.5 9.5L13 13" fill="#000000" stroke="#4A4A4A" strokeWidth="1.4" strokeLinecap="round" />
+                </svg>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Find a file or identifier
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', borderRadius: '8px', boxSizing: 'border-box', display: 'flex', height: '40px', paddingInline: '18px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', fontWeight: 600, lineHeight: '18px' }}>
+                  New task type from template
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style={{ alignItems: 'center', backgroundColor: 'var(--color-structured-tint-subtle)', borderColor: 'var(--color-structured-track)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', gap: '12px', paddingBlock: '12px', paddingInline: '16px' }}>
+            <div style={{ backgroundColor: 'var(--color-structured)', borderRadius: '999px', boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', height: '8px', width: '8px' }} />
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+              2 files added here on 5 October by the change “Optics recovery”. The task index moved from version 6.4.0 to 6.5.0. The change is integrated into the bank.
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', fontWeight: 600, lineHeight: '18px' }}>
+              Open the change →
+            </div>
+          </div>
+          <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '10px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', overflow: 'clip' }}>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderBottomColor: 'var(--color-border)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '40px', paddingInline: '20px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.12em', lineHeight: '14px', width: '450px' }}>
+                FILE
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.12em', lineHeight: '14px' }}>
+                TITLE INSIDE THE FILE
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.12em', lineHeight: '14px', width: '100px' }}>
+                CHANGED
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.12em', lineHeight: '14px', textAlign: 'right', width: '64px' }}>
+                SIZE
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '38px', paddingInline: '20px' }}>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', width: '450px' }}>
+                  <div style={{ boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', width: '8px' }} />
+                  <svg width="14" height="16" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                    <path d="M2 1.5h6.5L12 5v9.5H2zM8.5 1.5V5H12" fill="none" stroke="#898780" strokeWidth="1.2" strokeLinejoin="round" />
+                  </svg>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                    PHYS_01_Equations_of_Motion_for_Consta.md
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Equations of Motion for Constant Acceleration
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', width: '100px' }}>
+                  22 Sep 2026
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', textAlign: 'right', width: '64px' }}>
+                  1.4 KB
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '38px', paddingInline: '20px' }}>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', width: '450px' }}>
+                  <div style={{ boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', width: '8px' }} />
+                  <svg width="14" height="16" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                    <path d="M2 1.5h6.5L12 5v9.5H2zM8.5 1.5V5H12" fill="none" stroke="#898780" strokeWidth="1.2" strokeLinejoin="round" />
+                  </svg>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                    PHYS_02_Newtons_Second_Law_Applicatio.md
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Newton's Second Law Applications (F_net = ma)
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', width: '100px' }}>
+                  22 Sep 2026
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', textAlign: 'right', width: '64px' }}>
+                  5.8 KB
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '38px', paddingInline: '20px' }}>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', width: '450px' }}>
+                  <div style={{ boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', width: '8px' }} />
+                  <svg width="14" height="16" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                    <path d="M2 1.5h6.5L12 5v9.5H2zM8.5 1.5V5H12" fill="none" stroke="#898780" strokeWidth="1.2" strokeLinejoin="round" />
+                  </svg>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                    PHYS_03_Work_Energy_Theorem_Applicatio.md
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Work-Energy Theorem Applications
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', width: '100px' }}>
+                  22 Sep 2026
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', textAlign: 'right', width: '64px' }}>
+                  1.4 KB
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '38px', paddingInline: '20px' }}>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', width: '450px' }}>
+                  <div style={{ boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', width: '8px' }} />
+                  <svg width="14" height="16" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                    <path d="M2 1.5h6.5L12 5v9.5H2zM8.5 1.5V5H12" fill="none" stroke="#898780" strokeWidth="1.2" strokeLinejoin="round" />
+                  </svg>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                    PHYS_04_Ohms_Law_and_Series_Parallel_.md
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Ohm's Law and Series-Parallel Circuit Analysis
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', width: '100px' }}>
+                  22 Sep 2026
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', textAlign: 'right', width: '64px' }}>
+                  1.4 KB
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '38px', paddingInline: '20px' }}>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', width: '450px' }}>
+                  <div style={{ boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', width: '8px' }} />
+                  <svg width="14" height="16" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                    <path d="M2 1.5h6.5L12 5v9.5H2zM8.5 1.5V5H12" fill="none" stroke="#898780" strokeWidth="1.2" strokeLinejoin="round" />
+                  </svg>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                    PHYS_05_Electrical_Power_and_Energy_Ca.md
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Electrical Power and Energy Calculations
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', width: '100px' }}>
+                  22 Sep 2026
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', textAlign: 'right', width: '64px' }}>
+                  1.2 KB
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '38px', paddingInline: '20px' }}>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', width: '450px' }}>
+                  <div style={{ boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', width: '8px' }} />
+                  <svg width="14" height="16" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                    <path d="M2 1.5h6.5L12 5v9.5H2zM8.5 1.5V5H12" fill="none" stroke="#898780" strokeWidth="1.2" strokeLinejoin="round" />
+                  </svg>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                    PHYS_06_Electric_Field_and_Force_Calcu.md
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Electric Field and Force Calculations
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', width: '100px' }}>
+                  22 Sep 2026
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', textAlign: 'right', width: '64px' }}>
+                  1.3 KB
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '38px', paddingInline: '20px' }}>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', width: '450px' }}>
+                  <div style={{ boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', width: '8px' }} />
+                  <svg width="14" height="16" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                    <path d="M2 1.5h6.5L12 5v9.5H2zM8.5 1.5V5H12" fill="none" stroke="#898780" strokeWidth="1.2" strokeLinejoin="round" />
+                  </svg>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                    PHYS_07_Electromagnetic_Induction_Far.md
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Electromagnetic Induction (Faraday's Law)
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', width: '100px' }}>
+                  22 Sep 2026
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', textAlign: 'right', width: '64px' }}>
+                  1.5 KB
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '38px', paddingInline: '20px' }}>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', width: '450px' }}>
+                  <div style={{ boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', width: '8px' }} />
+                  <svg width="14" height="16" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                    <path d="M2 1.5h6.5L12 5v9.5H2zM8.5 1.5V5H12" fill="none" stroke="#898780" strokeWidth="1.2" strokeLinejoin="round" />
+                  </svg>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                    PHYS_08_Coulombs_Law_Calculations.md
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Coulomb's Law Calculations
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', width: '100px' }}>
+                  22 Sep 2026
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', textAlign: 'right', width: '64px' }}>
+                  2.1 KB
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '38px', paddingInline: '20px' }}>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', width: '450px' }}>
+                  <div style={{ boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', width: '8px' }} />
+                  <svg width="14" height="16" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                    <path d="M2 1.5h6.5L12 5v9.5H2zM8.5 1.5V5H12" fill="none" stroke="#898780" strokeWidth="1.2" strokeLinejoin="round" />
+                  </svg>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                    PHYS_09_Wave_Properties_v_equals_flambda.md
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Wave Properties (v = fλ)
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', width: '100px' }}>
+                  22 Sep 2026
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', textAlign: 'right', width: '64px' }}>
+                  1.2 KB
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '38px', paddingInline: '20px' }}>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', width: '450px' }}>
+                  <div style={{ boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', width: '8px' }} />
+                  <svg width="14" height="16" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                    <path d="M2 1.5h6.5L12 5v9.5H2zM8.5 1.5V5H12" fill="none" stroke="#898780" strokeWidth="1.2" strokeLinejoin="round" />
+                  </svg>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                    PHYS_10_Sound_Waves_and_Intensity.md
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Sound Waves and Intensity
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', width: '100px' }}>
+                  22 Sep 2026
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', textAlign: 'right', width: '64px' }}>
+                  1.4 KB
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '38px', paddingInline: '20px' }}>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', width: '450px' }}>
+                  <div style={{ boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', width: '8px' }} />
+                  <svg width="14" height="16" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                    <path d="M2 1.5h6.5L12 5v9.5H2zM8.5 1.5V5H12" fill="none" stroke="#898780" strokeWidth="1.2" strokeLinejoin="round" />
+                  </svg>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                    PHYS_11_Universal_Gravitation.md
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Universal Gravitation (g = GM/r^2)
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', width: '100px' }}>
+                  22 Sep 2026
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', textAlign: 'right', width: '64px' }}>
+                  3.5 KB
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '38px', paddingInline: '20px' }}>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', width: '450px' }}>
+                  <div style={{ boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', width: '8px' }} />
+                  <svg width="14" height="16" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                    <path d="M2 1.5h6.5L12 5v9.5H2zM8.5 1.5V5H12" fill="none" stroke="#898780" strokeWidth="1.2" strokeLinejoin="round" />
+                  </svg>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                    PHYS_12_Multi_Force_Resultant_Component_Method.md
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Multi-Force Resultant by Component Method
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', width: '100px' }}>
+                  7 Apr 2026
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', textAlign: 'right', width: '64px' }}>
+                  10.2 KB
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', backgroundColor: 'var(--color-action-tint-subtle)', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '38px', paddingInline: '20px' }}>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', width: '450px' }}>
+                  <div style={{ backgroundColor: 'var(--color-structured)', borderRadius: '999px', boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', height: '8px', width: '8px' }} />
+                  <svg width="14" height="16" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                    <path d="M2 1.5h6.5L12 5v9.5H2zM8.5 1.5V5H12" fill="none" stroke="#898780" strokeWidth="1.2" strokeLinejoin="round" />
+                  </svg>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-action-strong)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', fontWeight: 600, lineHeight: '16px' }}>
+                    PHYS_13_Refraction_and_Snells_Law.md
+                  </div>
+                </div>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexGrow: '1', gap: '8px' }}>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                    Geometrical optics: Refraction and Snell's Law
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', fontWeight: 600, lineHeight: '16px', width: '100px' }}>
+                  Added 5 Oct
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', textAlign: 'right', width: '64px' }}>
+                  7.8 KB
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '38px', paddingInline: '20px' }}>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', width: '450px' }}>
+                  <div style={{ boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', width: '8px' }} />
+                  <svg width="14" height="16" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                    <path d="M2 1.5h6.5L12 5v9.5H2zM8.5 1.5V5H12" fill="none" stroke="#898780" strokeWidth="1.2" strokeLinejoin="round" />
+                  </svg>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                    PHYS_14_Diffraction_and_Wave_Behaviour.md
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Diffraction and Wave Behaviour
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', width: '100px' }}>
+                  7 Apr 2026
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', textAlign: 'right', width: '64px' }}>
+                  11.1 KB
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '38px', paddingInline: '20px' }}>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', width: '450px' }}>
+                  <div style={{ backgroundColor: 'var(--color-structured)', borderRadius: '999px', boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', height: '8px', width: '8px' }} />
+                  <svg width="14" height="16" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                    <path d="M2 1.5h6.5L12 5v9.5H2zM8.5 1.5V5H12" fill="none" stroke="#898780" strokeWidth="1.2" strokeLinejoin="round" />
+                  </svg>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                    PHYS_15_Critical_Angle_and_Total_Internal_Reflection.md
+                  </div>
+                </div>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexGrow: '1', gap: '8px' }}>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                    Geometrical optics: Critical angle and total internal reflection
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', fontWeight: 600, lineHeight: '16px', width: '100px' }}>
+                  Added 5 Oct
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px', textAlign: 'right', width: '64px' }}>
+                  8.0 KB
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )

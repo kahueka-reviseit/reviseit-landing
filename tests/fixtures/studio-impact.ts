@@ -1,0 +1,3 @@
+import type {FileImpact} from '../../lib/studio/dependencies';
+import {fileDetail,libraryItem} from './studio-library';
+export const impact:FileImpact={file:fileDetail,computedAt:'2099-03-17T10:30:00Z',projectionSha256:'b'.repeat(64),binding:{draftId:null,revision:0,sha256:fileDetail.sha256},dependentRecords:[{kind:'specification',id:'P1-SYNTH-01',parentId:'',path:'data/specs/SPEC_P1_SYNTH_01.md',sha256:'c'.repeat(64),status:'active'}],unresolvedLinkCount:2,catalogueUses:[{...libraryItem,current:true,manifestSha256:'d'.repeat(64),sources:libraryItem.sources}],formItems:[],orders:{pinningSourceBytes:3,containingFormItem:0,unrecognisedSnapshots:1},coverage:{currentCatalogueItems:2,currentItemsWithoutBindings:1}};

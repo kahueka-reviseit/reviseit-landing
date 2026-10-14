@@ -1,0 +1,249 @@
+(
+    <div style={{ backgroundColor: 'var(--color-background)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', fontFamily: 'var(--font-body)', fontSize: '12px', fontSynthesis: 'none', height: 'fit-content', lineHeight: '16px', MozOsxFontSmoothing: 'grayscale', overflow: 'clip', overflowWrap: 'anywhere', WebkitFontSmoothing: 'antialiased', width: '1440px' }}>
+      <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '56px', justifyContent: 'space-between', paddingInline: '32px' }}>
+        <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '32px' }}>
+          <div style={{ alignItems: 'baseline', boxSizing: 'border-box', display: 'flex', gap: '8px' }}>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'inline-block', fontFamily: '"Playfair Display", system-ui, sans-serif', fontSize: '20px', fontWeight: 700, lineHeight: '24px' }}>
+              Revise It
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-gold)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.15em', lineHeight: '14px' }}>
+              ADMIN
+            </div>
+          </div>
+          <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '4px' }}>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                Overview
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                School accounts
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                Papers
+              </div>
+            </div>
+            <div style={{ backgroundColor: '#FFFFFF1F', borderRadius: '999px', boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '14px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', fontWeight: 600, lineHeight: '18px' }}>
+                Curriculum
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+          Signed in as Kahueka · reviewer
+        </div>
+      </div>
+      <div style={{ boxSizing: 'border-box', display: 'flex', width: '1440px' }}>
+        <div style={{ alignSelf: 'stretch', backgroundColor: 'var(--color-surface-paper)', borderRightColor: 'var(--color-border)', borderRightStyle: 'solid', borderRightWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', flexShrink: '0', gap: '28px', padding: '24px', width: '288px' }}>
+          <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '12px', padding: '14px' }}>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '11px', fontWeight: 600, lineHeight: '15px' }}>
+              CURRICULUM MODULE
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 600, lineHeight: '21px' }}>
+              Grade 10 Physical Sciences
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px' }}>
+              Switch module ⌄
+            </div>
+          </div>
+          <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ alignItems: 'center', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', fontWeight: 600, lineHeight: '22px' }}>
+                Sources
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Library
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px' }} />
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Work queue
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Releases
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+          </div>
+        </div>
+        <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', flexShrink: '0', gap: '24px', paddingBottom: '40px', paddingInline: '40px', paddingTop: '32px', width: '1152px' }}>
+          <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+              Work queue / Limpopo · March 2025 / Execution history
+            </div>
+            <div style={{ boxSizing: 'border-box', color: '#000000', fontFamily: '"Playfair Display", system-ui, sans-serif', fontSize: '34px', lineHeight: '42px' }}>
+              Inventory captured. Your review is next.
+            </div>
+            <div style={{ boxSizing: 'border-box', color: '#000000', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px' }}>
+              S1 · Inventory revision 1 · awaiting G1 · no model call is running
+            </div>
+          </div>
+          <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex' }}>
+            <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '8px', padding: '20px' }}>
+              <div style={{ boxSizing: 'border-box', color: '#000000', fontFamily: 'system-ui, sans-serif', fontSize: '23px', fontWeight: 600, lineHeight: '28px' }}>
+                16 model calls
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                This successful run
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '8px', padding: '20px' }}>
+              <div style={{ boxSizing: 'border-box', color: '#000000', fontFamily: 'system-ui, sans-serif', fontSize: '23px', fontWeight: 600, lineHeight: '28px' }}>
+                $0.73
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                This run · $4.63 across all five runs
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '8px', padding: '20px' }}>
+              <div style={{ boxSizing: 'border-box', color: '#000000', fontFamily: 'system-ui, sans-serif', fontSize: '23px', fontWeight: 600, lineHeight: '28px' }}>
+                31 retained artifacts
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                Verified against stored bytes
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '8px', padding: '20px' }}>
+              <div style={{ boxSizing: 'border-box', color: '#000000', fontFamily: 'system-ui, sans-serif', fontSize: '23px', fontWeight: 600, lineHeight: '28px' }}>
+                $100 authorised cap
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                No outstanding cost reservation
+              </div>
+            </div>
+          </div>
+          <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ boxSizing: 'border-box', padding: '24px' }}>
+              <div style={{ boxSizing: 'border-box', color: '#000000', fontFamily: '"Playfair Display", system-ui, sans-serif', fontSize: '26px', lineHeight: '32px' }}>
+                This run’s record
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', borderTopColor: 'var(--color-border)', borderTopStyle: 'solid', borderTopWidth: '1px', boxSizing: 'border-box', display: 'flex', gap: '16px', paddingBlock: '18px', paddingInline: '24px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', flexShrink: '0', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px', width: '36px' }}>
+                01
+              </div>
+              <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '5px' }}>
+                <div style={{ boxSizing: 'border-box', color: '#000000', fontFamily: 'system-ui, sans-serif', fontSize: '16px', fontWeight: 600, lineHeight: '20px' }}>
+                  Inputs fixed
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px' }}>
+                  Original PDF, rendered pages, bank snapshot, skill and provider profile retained.
+                </div>
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', flexShrink: '0', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px', width: '150px' }}>
+                View inputs →
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', borderTopColor: 'var(--color-border)', borderTopStyle: 'solid', borderTopWidth: '1px', boxSizing: 'border-box', display: 'flex', gap: '16px', paddingBlock: '18px', paddingInline: '24px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', flexShrink: '0', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px', width: '36px' }}>
+                02
+              </div>
+              <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '5px' }}>
+                <div style={{ boxSizing: 'border-box', color: '#000000', fontFamily: 'system-ui, sans-serif', fontSize: '16px', fontWeight: 600, lineHeight: '20px' }}>
+                  14 pages analysed
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px' }}>
+                  Page results and exact model replies saved before completion was recorded.
+                </div>
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', flexShrink: '0', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px', width: '150px' }}>
+                View pages →
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', borderTopColor: 'var(--color-border)', borderTopStyle: 'solid', borderTopWidth: '1px', boxSizing: 'border-box', display: 'flex', gap: '16px', paddingBlock: '18px', paddingInline: '24px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', flexShrink: '0', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px', width: '36px' }}>
+                03
+              </div>
+              <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '5px' }}>
+                <div style={{ boxSizing: 'border-box', color: '#000000', fontFamily: 'system-ui, sans-serif', fontSize: '16px', fontWeight: 600, lineHeight: '20px' }}>
+                  One bounded correction
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px' }}>
+                  An invalid submission was kept with its validation error. A further admitted call corrected it.
+                </div>
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', flexShrink: '0', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px', width: '150px' }}>
+                Compare replies →
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', borderTopColor: 'var(--color-border)', borderTopStyle: 'solid', borderTopWidth: '1px', boxSizing: 'border-box', display: 'flex', gap: '16px', paddingBlock: '18px', paddingInline: '24px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', flexShrink: '0', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px', width: '36px' }}>
+                04
+              </div>
+              <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '5px' }}>
+                <div style={{ boxSizing: 'border-box', color: '#000000', fontFamily: 'system-ui, sans-serif', fontSize: '16px', fontWeight: 600, lineHeight: '20px' }}>
+                  Inventory assembled
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px' }}>
+                  50 assessed parts; 99 proposed marks against 100 printed. Review remains outstanding.
+                </div>
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', flexShrink: '0', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px', width: '150px' }}>
+                Open inventory →
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', borderTopColor: 'var(--color-border)', borderTopStyle: 'solid', borderTopWidth: '1px', boxSizing: 'border-box', display: 'flex', gap: '16px', paddingBlock: '18px', paddingInline: '24px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', flexShrink: '0', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px', width: '36px' }}>
+                G1
+              </div>
+              <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '5px' }}>
+                <div style={{ boxSizing: 'border-box', color: '#000000', fontFamily: 'system-ui, sans-serif', fontSize: '16px', fontWeight: 600, lineHeight: '20px' }}>
+                  Waiting for you
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px' }}>
+                  No matching, draft generation or bank integration has started.
+                </div>
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', flexShrink: '0', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px', width: '150px' }}>
+                Review checkpoint →
+              </div>
+            </div>
+          </div>
+          <div style={{ boxSizing: 'border-box', display: 'flex', gap: '24px' }}>
+            <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '14px', padding: '24px' }}>
+              <div style={{ boxSizing: 'border-box', color: '#000000', fontFamily: '"Playfair Display", system-ui, sans-serif', fontSize: '24px', lineHeight: '30px' }}>
+                Earlier attempts stay visible
+              </div>
+              <div style={{ boxSizing: 'border-box', color: '#000000', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px' }}>
+                Four earlier failed runs remain in the record. Their evidence and costs are retained alongside this successful run.
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px' }}>
+                View all five runs →
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                Costs shown are a 14 October 2026 snapshot.
+              </div>
+            </div>
+            <div style={{ backgroundColor: 'var(--color-caution-tint)', borderColor: 'var(--color-caution-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '14px', padding: '24px' }}>
+              <div style={{ boxSizing: 'border-box', color: '#000000', fontFamily: '"Playfair Display", system-ui, sans-serif', fontSize: '24px', lineHeight: '30px' }}>
+                If a call’s outcome is uncertain
+              </div>
+              <div style={{ boxSizing: 'border-box', color: '#000000', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px' }}>
+                Stop and ask an operator to reconcile the provider outcome and cost. An uncertain request is never silently sent again.
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-caution-text)', fontFamily: 'system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                Recovery state example · this run has no uncertain call.
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'system-ui, sans-serif', fontSize: '16px', lineHeight: '20px' }}>
+                Operator reconciliation · not needed for this run
+              </div>
+            </div>
+          </div>
+          <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+            Correction limits: at most three submissions with two retained rejections. Every new model turn is a separately admitted, recorded call. Exhausted limits stop the stage for review.
+          </div>
+        </div>
+      </div>
+    </div>
+  )

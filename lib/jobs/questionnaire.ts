@@ -26,6 +26,7 @@ function fields(value:unknown,max:number):value is QuestionField[]{
   });
  });
 }
+export {fields as isQuestionFields};
 export function isQuestionnaire(v:unknown):v is Questionnaire{
  if(!record(v)||!exact(v,['schemaVersion','revision','items','paperFields'])||v.schemaVersion!==2||!text(v.revision,64)||!/^[a-f0-9]{64}$/.test(v.revision)||!Array.isArray(v.items)||v.items.length<1||v.items.length>30||!fields(v.paperFields,20))return false;
  let count=v.paperFields.length;const seen=new Set<string>();

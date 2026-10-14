@@ -145,3 +145,103 @@ The gateway binds each request to its stage and local function tools. Renewing k
 preflight evidence does not renew expiry or enlarge scope. These files do not grant
 spending permission, create a profile or enable a live run. Deployment and actual
 trial outcomes are recorded separately in the product return.
+
+### Maintenance integration (migration 062)
+
+A passing maintenance check and the latest explicit content review can prepare a bank-file
+change set. The integration screen reads verified before/after bytes, the retained check report
+and dependency impact. Authorisation is a separate editor command bound to the exact manifest,
+report, review version and selected saved revisions. The older unbound maintenance-authorisation
+function is no longer executable by editors. Rehearsal checks cannot prepare canonical integration.
+
+`studio_maintenance_integrations` binds these existing objects; it is not a competing bank.
+Before application, edits, discarded drafts, later content reviews or accepted-bank movement make
+that authority stale. An operator begins a numbered handover, which freezes the selected drafts,
+content review and accepted pointer. It has no automatic expiry: uncertain filesystem work needs
+explicit recovery. Worker and editor roles cannot apply or accept the bank.
+
+The Mac operator uses `python -m studio.operator.handover` from the private worker repository.
+It fetches current database authority, uses the existing per-file atomic apply/recovery journal,
+verifies and uploads the complete resulting bank, registers its lineage, and finishes through
+`studio_complete_maintenance_handover`. Completion checks the full candidate fingerprint and
+exact replacement receipt, then records application and acceptance in one database transaction.
+It never activates a teacher release. A restored complete base permits explicit abort; rollback
+after acceptance requires a newly reviewed change set. External Mac editors do not honour the
+operator lock, so stop concurrent authoring during handover. Old snapshots and recovery bytes stay.
+
+Initial accepted baselines are separately verified operator imports of the unchanged authoritative
+Mac tree. Imported analysis history and rehearsal snapshots do not become canonical by relabelling.
+
+### Accepted-bank release preparation (migration 063)
+
+The Releases page requests an offline producer build from the current accepted canonical bank.
+The operator runs `scripts/studio_release_prepare.py` in the private curriculum-content producer
+checkout, with content-service on `PYTHONPATH`. It verifies the entire Mac bank against the
+accepted snapshot, freezes supplementary generation skills, pins producer/consumer/renderer and
+migration bytes, and uses the existing exporters and worker bundle consumers. Reviewed
+registrations are carried unchanged only when their exact bindings match. Missing or changed
+classifications are gaps, never inferred rules.
+
+The teacher rehearsal script runs all migrations in a fresh in-memory PGlite database. It checks
+registration replay, rejects tampered definitions and compiles every eligible entry into synthetic
+orders. It cannot access the hosted database. Reports, input manifests, supplemental instructions,
+exports, verified registrations and rehearsal evidence are retained in private R2 under digest keys.
+Authenticated editors can download them through a preparation-scoped, integrity-checked route.
+
+Requests are idempotent; each build has one durable operation and toolchain. Explicit recovery
+reuses a sealed report and immutable files. Cancellation or a moved accepted-bank/current-release
+pointer fences completion. Technical build failure closes the preparation; uncertain upload or
+completion retains the operation for explicit recovery. These states grant no human approval or
+publisher authority. New version reservation, live platform/worker registration, publication approval,
+activation and rollback are not implemented by this preparation slice. The operator process still
+owns them. The hosted Studio worker and teacher generation services do not change.
+
+
+## Release review and publication (migration 064)
+
+Preparation remains separate from approval. The Releases screen reads the exact retained
+publication and registration files through verified private storage. `studio_stage_release`
+compares their raw UTF-8 digests with the preparation file records, checks complete coverage
+and reserves `(module_id, release)`. Candidate bytes are immutable; a changed package needs
+a new release identity and review. Grade 10 packages with missing forms stay blocked.
+
+`studio_review_release` appends a named editor's approval or revocation against the report
+fingerprint. It never publishes. Reapproval creates a new identifier and invalidates earlier
+worker receipts. Module and catalogue changes fence unpublished candidates. An approval is
+not invented from a successful build or recorded by a worker.
+
+The separate `/api/internal/studio-releases` route uses the existing teacher worker bearer
+credential, not the analysis worker credential. Its closed operations list approved bundle
+files, return verified bounded file chunks, and confirm readiness. It cannot approve,
+activate, call arbitrary database functions or make model requests. `generation.release_control`
+is opt-in on the actual teacher bridge (`STUDIO_RELEASE_CONTROL=1`); the optional
+`STUDIO_RELEASE_PLATFORM_URL` points at the Studio deployment while normal teacher jobs
+continue using `TEACHER_PLATFORM_URL`. The existing deployment protection credential is reused.
+The bridge copies existing immutable form bundles from its read-only runtime into its private
+state volume, preserves historical workflow mappings, validates every installed file using
+both existing generation consumers, and confirms the same in-memory registry used for claims.
+It refreshes confirmations while idle; a busy or unavailable worker does not assert readiness.
+This rollout assumes the existing single teacher bridge. A multi-worker fleet must gate
+activation on readiness of every worker eligible to claim that module before scaling out.
+
+`studio_activate_release` is an editor-only command, separately acknowledged in the screen.
+It locks the module, checks the exact approval, report integrity, accepted bank, predecessor
+and previous activation identifier, and requires a worker receipt newer than two minutes.
+It calls the existing catalogue publisher, form registration, execution registration and
+Bloom classification registration in one transaction, enables supported entries and records
+an immutable activation event. Any failed binding or unavailable entry rolls everything back.
+Command replay returns the prior receipt and never reactivates an older version.
+
+Rollback selects a previously activated, retained candidate with current approval and fresh
+worker confirmation. It verifies existing platform definitions without rebinding them and
+switches the current catalogue pointer atomically. Published definitions, historical bundles
+and purchased order snapshots remain intact. Existing releases can be recorded as a verified
+baseline only if their stored catalogue and all registered definitions equal the prepared
+package. Historical publications without that verification do not become rollback targets.
+Revoking approval blocks future activation; it is not an emergency catalogue withdrawal.
+
+Tables: `studio_release_candidates` owns frozen release identity;
+`studio_release_reviews` owns append-only human decisions;
+`studio_release_worker_receipts` owns expiring runtime confirmation;
+`studio_release_activations` owns ordered activation and rollback history. No direct table
+access is granted to editors, the analysis operator or service clients.

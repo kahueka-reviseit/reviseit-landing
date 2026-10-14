@@ -1,0 +1,245 @@
+{
+  "file": {
+    "id": "01M36MRM9HCJ4T87N081XDT4MX",
+    "name": "Revise It Website"
+  },
+  "contentHash": {
+    "tokens": "a19978d2"
+  }
+}
+(
+    <div style={{ backgroundColor: 'var(--color-background)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', fontSize: '12px', fontSynthesis: 'none', height: 'fit-content', lineHeight: '16px', MozOsxFontSmoothing: 'grayscale', overflow: 'clip', overflowWrap: 'anywhere', WebkitFontSmoothing: 'antialiased', width: '1440px' }}>
+      <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '56px', justifyContent: 'space-between', paddingInline: '32px' }}>
+        <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '32px' }}>
+          <div style={{ alignItems: 'baseline', boxSizing: 'border-box', display: 'flex', gap: '8px' }}>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'inline-block', fontFamily: '"Playfair Display", system-ui, sans-serif', fontSize: '20px', fontWeight: 700, lineHeight: '24px' }}>
+              Revise It
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-gold)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.15em', lineHeight: '14px' }}>
+              ADMIN
+            </div>
+          </div>
+          <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '4px' }}>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                Overview
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                School accounts
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                Papers
+              </div>
+            </div>
+            <div style={{ backgroundColor: '#FFFFFF1F', borderRadius: '999px', boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '14px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', fontWeight: 600, lineHeight: '18px' }}>
+                Curriculum
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+          Signed in as Kahueka · reviewer
+        </div>
+      </div>
+      <div style={{ boxSizing: 'border-box', display: 'flex', minHeight: '844px', width: '1440px' }}>
+        <div style={{ alignSelf: 'stretch', backgroundColor: 'var(--color-surface-paper)', borderRightColor: 'var(--color-border)', borderRightStyle: 'solid', borderRightWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', flexShrink: '0', gap: '28px', padding: '24px', width: '288px' }}>
+          <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '12px', padding: '14px' }}>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '11px', fontWeight: 600, lineHeight: '15px' }}>
+              CURRICULUM MODULE
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 600, lineHeight: '21px' }}>
+              Grade 11 Physical Sciences
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px' }}>
+              Switch module ⌄
+            </div>
+          </div>
+          <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Sources
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Library
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px' }}>
+                89
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Work queue
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', fontFamily: 'var(--font-body)', fontSize: '16px', fontWeight: 600, lineHeight: '22px' }}>
+                Releases
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+          </div>
+        </div>
+        <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', flexShrink: '0', gap: '24px', paddingBlock: '32px', paddingInline: '40px', width: '1152px' }}>
+          <div style={{ alignItems: 'start', boxSizing: 'border-box', display: 'flex', gap: '16px' }}>
+            <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '8px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px' }}>
+                Releases / Grade 11 Physical Sciences
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-display)', fontSize: '32px', fontWeight: 600, lineHeight: '40px' }}>
+                Activation history
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '15px', lineHeight: '21px' }}>
+                Illustrative future state · 5.7.2 is active · this is not a live status report
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '16px' }}>
+              <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                  Back to candidates
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', borderColor: 'var(--color-inverse)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                  Review rollback
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px' }}>
+            <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '16px' }}>
+              <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '8px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '20px', fontWeight: 600, lineHeight: '28px' }}>
+                  Rollback target: catalogue release 5.7.1
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '20px' }}>
+                  Previously registered files and receipts are retained. This changes future catalogue selection; existing orders keep their purchased definitions.
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                  Compare releases
+                </div>
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '15px', lineHeight: '21px' }}>
+              Names remain reserved after retirement. A rollback never rebuilds different files under an old version.
+            </div>
+          </div>
+          <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '16px', paddingBlock: '18px', paddingInline: '20px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', flexShrink: '0', fontFamily: 'var(--font-body)', fontSize: '12px', fontWeight: 600, lineHeight: '17px', width: '450px' }}>
+                SUCCESSFUL TRANSITION
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', flexShrink: '0', fontFamily: 'var(--font-body)', fontSize: '12px', fontWeight: 600, lineHeight: '17px', width: '210px' }}>
+                ACTOR / TIME
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '12px', fontWeight: 600, lineHeight: '17px' }}>
+                RESULT
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', borderTopColor: 'var(--color-border)', borderTopStyle: 'solid', borderTopWidth: '1px', boxSizing: 'border-box', display: 'flex', gap: '16px', paddingBlock: '16px', paddingInline: '20px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', flexShrink: '0', fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 600, lineHeight: '21px', width: '450px' }}>
+                Activate · 5.7.1 → 5.7.2
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', flexShrink: '0', fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '20px', width: '210px' }}>
+                Kahueka · 11:20
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', flexShrink: '0', fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '20px', width: '210px' }}>
+                Current
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                Receipt →
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', borderTopColor: 'var(--color-border)', borderTopStyle: 'solid', borderTopWidth: '1px', boxSizing: 'border-box', display: 'flex', gap: '16px', paddingBlock: '16px', paddingInline: '20px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', flexShrink: '0', fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 600, lineHeight: '21px', width: '450px' }}>
+                Rollback · 5.7.2 → 5.7.1
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', flexShrink: '0', fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '20px', width: '210px' }}>
+                Kahueka · 11:10
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', flexShrink: '0', fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '20px', width: '210px' }}>
+                Recorded
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                Receipt →
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', borderTopColor: 'var(--color-border)', borderTopStyle: 'solid', borderTopWidth: '1px', boxSizing: 'border-box', display: 'flex', gap: '16px', paddingBlock: '16px', paddingInline: '20px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', flexShrink: '0', fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 600, lineHeight: '21px', width: '450px' }}>
+                Activate · 5.7.1 → 5.7.2
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', flexShrink: '0', fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '20px', width: '210px' }}>
+                Kahueka · 11:00
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', flexShrink: '0', fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '20px', width: '210px' }}>
+                Recorded
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                Receipt →
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', borderTopColor: 'var(--color-border)', borderTopStyle: 'solid', borderTopWidth: '1px', boxSizing: 'border-box', display: 'flex', gap: '16px', paddingBlock: '16px', paddingInline: '20px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', flexShrink: '0', fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 600, lineHeight: '21px', width: '450px' }}>
+                Activate · 5.7.0 → 5.7.1
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', flexShrink: '0', fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '20px', width: '210px' }}>
+                Kahueka · 10:30
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', flexShrink: '0', fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '20px', width: '210px' }}>
+                Recorded
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                Receipt →
+              </div>
+            </div>
+          </div>
+          <div style={{ boxSizing: 'border-box', display: 'flex', gap: '16px' }}>
+            <div style={{ backgroundColor: 'var(--color-caution-tint)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '12px', padding: '20px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '18px', fontWeight: 600, lineHeight: '25px' }}>
+                Authorise rollback to 5.7.1
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '15px', lineHeight: '21px' }}>
+                Review the release comparison and current checks. Your reason and this exact transition will be retained.
+              </div>
+              <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', fontFamily: 'var(--font-body)', gap: '8px', width: '100%' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 600, lineHeight: '21px' }}>
+                  Reason for rollback · required
+                </div>
+                <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', padding: '14px' }}>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '24px' }}>
+                    Explain why teachers should return to 5.7.1…
+                  </div>
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', borderRadius: '6px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', fontFamily: 'var(--font-body)', justifyContent: 'center', paddingBlock: '10px', paddingInline: '16px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'flex', fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600, lineHeight: '20px' }}>
+                  Authorise rollback · add reason
+                </div>
+              </div>
+            </div>
+            <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '12px', padding: '20px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '18px', fontWeight: 600, lineHeight: '25px' }}>
+                Before the switch
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '15px', lineHeight: '21px', whiteSpace: 'pre-wrap' }}>
+                Current release: 5.7.2<br />Return to: 5.7.1<br />Existing orders: unchanged
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '20px' }}>
+                If another administrator changes the active release, this action stops and asks you to review the new state. It never silently switches from a different version.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )

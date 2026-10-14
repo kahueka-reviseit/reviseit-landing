@@ -43,3 +43,5 @@ supabase/.branches/
 
 # Paper synchronisation previews and recovery journals (local; evidence is kept privately)
 .paper-link/
+
+/studio-test-results/

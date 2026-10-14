@@ -1,0 +1,3 @@
+export type IntegrationEntry={path:string;beforeSha256:string;afterSha256:string;beforeBlobId:string;afterBlobId:string};
+export type Integration={id:string;moduleId:string;snapshotId:string;manifestSha256:string;candidateManifestSha256:string;checkId:string;reviewId:string;state:'prepared'|'authorised'|'applying'|'accepted'|'cancelled';current:boolean;rationale:string;authorisationReason:string|null;authorisedAt:string|null;selfReviewed:boolean|null;operationId:string|null;acceptedSnapshotId:string|null;receipt:unknown;entries:IntegrationEntry[]};
+export const integrationUrl=(id:string)=>`/admin/studio/library/integrations/${id}`;

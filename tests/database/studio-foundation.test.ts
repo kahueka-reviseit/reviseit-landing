@@ -398,10 +398,10 @@ describe('record identity, CRUD and retirement (C05, C07, programme 11)', () => 
     const p01 = { action: 'retire', path: 'data/task-types/physics/PHYS_01_Synthetic_Motion.md', recordKind: 'task_type', recordId: 'PHYS_01', blobId: retired };
     expect(await refused(ed(), 'studio_create_maintenance_changeset', { p_module: MODULE, p_base_snapshot: base.snapshotId, p_entries: [p01], p_rationale: 'Retire', p_command: key() })).toMatch(/required reference from P1-PHYS-01/);
     const both = await ok(ed(), 'studio_create_maintenance_changeset', { p_module: MODULE, p_base_snapshot: base.snapshotId, p_entries: [p01, { action: 'retire', path: 'data/specs/paper-1-physics/SPEC_P1_PHYS_01_Synthetic.md', recordKind: 'specification', recordId: 'P1-PHYS-01', blobId: specRetired }], p_rationale: 'Retire both', p_command: key() });
-    const a = await ok(ed2(), 'studio_authorise_changeset', { p_changeset: both.changesetId, p_expected_manifest_sha256: both.manifestSha256, p_rationale: 'Independent check', p_authorisation: AUTH, p_command: key() });
-    expect(a).toMatchObject({ state: 'authorised', selfReviewed: false });
-    const exported = await ok(op(), 'studio_export_changeset', { p_changeset: both.changesetId, p_purpose: 'canonical' });
-    expect(exported.entries.every((e: any) => e.before && e.after)).toBe(true); // replacement, never deletion
+    expect(await refused(ed2(), 'studio_authorise_changeset', { p_changeset: both.changesetId, p_expected_manifest_sha256: both.manifestSha256, p_rationale: 'Independent check', p_authorisation: AUTH, p_command: key() })).toMatch(/permission denied/);
+    // Migration 062 replaces unbound approval with checked content review. Retirement proposals remain inspectable.
+    const entries=await s.sql('select before_sha256,after_sha256 from private.studio_changeset_entries where changeset_id=$1',[both.changesetId]);
+    expect(entries.every((e:any)=>e.before_sha256&&e.after_sha256)).toBe(true);
     expect(await refused(ed(), 'studio_create_maintenance_changeset', { p_module: MODULE, p_base_snapshot: base.snapshotId, p_entries: [{ ...p01, path: 'data/archive/OLD_Synthetic.md' }], p_rationale: 'x', p_command: key() })).toMatch(/Unsafe or out-of-scope path/);
   });
   test('historical records stay readable after a later snapshot retires them', async () => {

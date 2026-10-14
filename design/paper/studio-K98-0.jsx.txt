@@ -1,0 +1,267 @@
+(
+    <div style={{ backgroundColor: 'var(--color-background)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', fontSize: '12px', fontSynthesis: 'none', height: 'fit-content', lineHeight: '16px', MozOsxFontSmoothing: 'grayscale', overflow: 'clip', overflowWrap: 'anywhere', WebkitFontSmoothing: 'antialiased', width: '1440px' }}>
+      <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '56px', justifyContent: 'space-between', paddingInline: '32px' }}>
+        <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '32px' }}>
+          <div style={{ alignItems: 'baseline', boxSizing: 'border-box', display: 'flex', gap: '8px' }}>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'inline-block', fontFamily: '"Playfair Display", system-ui, sans-serif', fontSize: '20px', fontWeight: 700, lineHeight: '24px' }}>
+              Revise It
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-gold)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.15em', lineHeight: '14px' }}>
+              ADMIN
+            </div>
+          </div>
+          <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '4px' }}>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                Overview
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                School accounts
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                Papers
+              </div>
+            </div>
+            <div style={{ backgroundColor: '#FFFFFF1F', borderRadius: '999px', boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '14px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', fontWeight: 600, lineHeight: '18px' }}>
+                Curriculum
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+          Signed in as Kahueka · reviewer
+        </div>
+      </div>
+      <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexGrow: '1', minHeight: '0px' }}>
+        <div style={{ alignSelf: 'stretch', backgroundColor: 'var(--color-surface-paper)', borderRightColor: 'var(--color-border)', borderRightStyle: 'solid', borderRightWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', flexShrink: '0', gap: '28px', padding: '24px', width: '288px' }}>
+          <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '12px', padding: '14px' }}>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '11px', fontWeight: 600, lineHeight: '15px' }}>
+              CURRICULUM MODULE
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 600, lineHeight: '21px' }}>
+              Grade 10 Physical Sciences
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px' }}>
+              Switch module ⌄
+            </div>
+          </div>
+          <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', fontFamily: 'var(--font-body)', fontSize: '16px', fontWeight: 600, lineHeight: '22px' }}>
+                Sources
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Library
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px' }} />
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Work queue
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Releases
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+          </div>
+        </div>
+        <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '20px', minWidth: '0px', paddingBottom: '32px', paddingInline: '40px', paddingTop: '28px' }}>
+          <div style={{ alignItems: 'end', boxSizing: 'border-box', display: 'flex', gap: '24px', justifyContent: 'space-between' }}>
+            <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                Sources / Limpopo · March 2025
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Playfair Display", system-ui, sans-serif', fontSize: '36px', fontWeight: 700, lineHeight: '44px' }}>
+                Control Test 1 · Physical Sciences
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '15px', lineHeight: '18px' }}>
+                Grade 10 · 17 March 2025 · 2 hours · 100 printed marks
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px' }}>
+              <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', height: '40px', paddingInline: '16px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', fontWeight: 600, lineHeight: '18px' }}>
+                  View memorandum
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', borderRadius: '8px', boxSizing: 'border-box', display: 'flex', height: '40px', paddingInline: '18px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', fontWeight: 600, lineHeight: '18px' }}>
+                  Review inventory
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style={{ alignItems: 'start', boxSizing: 'border-box', display: 'flex', gap: '24px' }}>
+            <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '20px', minWidth: '0px' }}>
+              <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '10px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', overflow: 'clip' }}>
+                <div style={{ backgroundColor: 'var(--color-surface-paper)', borderBottomColor: 'var(--color-border)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', paddingBlock: '14px', paddingInline: '20px' }}>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '15px', fontWeight: 700, lineHeight: '18px' }}>
+                    Original documents
+                  </div>
+                </div>
+                <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', gap: '14px', paddingBlock: '12px', paddingInline: '20px' }}>
+                  <svg width="14" height="16" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                    <path d="M2 1.5h6.5L12 5v9.5H2zM8.5 1.5V5H12" fill="none" stroke="#898780" strokeWidth="1.2" strokeLinejoin="round" />
+                  </svg>
+                  <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '2px' }}>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                      Question paper · 14 pages
+                    </div>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                      Extracted from the original combined download · verified
+                    </div>
+                  </div>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '11px', lineHeight: '14px' }}>
+                    Retained in private storage · original unchanged
+                  </div>
+                </div>
+                <div style={{ alignItems: 'center', backgroundColor: 'var(--color-caution-tint)', boxSizing: 'border-box', display: 'flex', gap: '14px', paddingBlock: '12px', paddingInline: '20px' }}>
+                  <svg width="14" height="16" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                    <path d="M2 1.5h6.5L12 5v9.5H2zM8.5 1.5V5H12" fill="none" stroke="#C49255" strokeWidth="1.2" strokeLinejoin="round" strokeDasharray="2 2" />
+                  </svg>
+                  <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '2px' }}>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-caution-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                      Memorandum · 7 pages
+                    </div>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-caution-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                      Stored and verified · not yet automatically compared
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '10px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', overflow: 'clip' }}>
+                <div style={{ backgroundColor: 'var(--color-surface-paper)', borderBottomColor: 'var(--color-border)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '4px', paddingBlock: '14px', paddingInline: '20px' }}>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '15px', fontWeight: 700, lineHeight: '18px' }}>
+                    Expected analysis package
+                  </div>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                    Only the inventory exists for this run; the remaining outputs are pending.
+                  </div>
+                </div>
+                <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', paddingBottom: '14px', paddingInline: '20px', paddingTop: '8px' }}>
+                  <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '30px' }}>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-subtle)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px', width: '300px' }}>
+                      01_Paper_Inventory.json
+                    </div>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                      Revision 1 · 50 parts · marks and Bloom’s need review
+                    </div>
+                  </div>
+                  <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '30px' }}>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-subtle)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px', width: '300px' }}>
+                      02_Task_Type_Coverage_Analysis.md
+                    </div>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                      Pending · task-type matches after G1
+                    </div>
+                  </div>
+                  <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '30px' }}>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-subtle)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px', width: '300px' }}>
+                      03_Spec_Coverage_Analysis.md
+                    </div>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                      Each whole question matched to a specification
+                    </div>
+                  </div>
+                  <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '30px' }}>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-subtle)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px', width: '300px' }}>
+                      04_Gap_Prioritization.md
+                    </div>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                      What is missing, in priority order
+                    </div>
+                  </div>
+                  <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '30px' }}>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-subtle)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px', width: '300px' }}>
+                      05_New_Task_Types/
+                    </div>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                      Draft task-type files, written from the template
+                    </div>
+                  </div>
+                  <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '30px' }}>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-subtle)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px', width: '300px' }}>
+                      06_Specification_Library_Updates.md
+                    </div>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                      New or extended specifications
+                    </div>
+                  </div>
+                  <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '30px' }}>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-subtle)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px', width: '300px' }}>
+                      07_Updated_Database_Files/
+                    </div>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                      The exact files that would be written into the bank
+                    </div>
+                  </div>
+                  <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '30px' }}>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-subtle)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px', width: '300px' }}>
+                      08_Validation_Report.md
+                    </div>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                      Script checks and reviewer judgments, kept apart
+                    </div>
+                  </div>
+                  <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '30px' }}>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-subtle)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px', width: '300px' }}>
+                      09_Summary_Reports/
+                    </div>
+                    <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                      Coverage before and after, what remains open
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '10px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', flexShrink: '0', gap: '10px', paddingBlock: '18px', paddingInline: '20px', width: '320px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.12em', lineHeight: '14px' }}>
+                THIS ANALYSIS
+              </div>
+              <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-action-strong)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  Source identity
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                  Limpopo Grade 10 · confirmed from the cover
+                </div>
+              </div>
+              <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-action-strong)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  Bank comparison
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                  Frozen Grade 10 bank · matching has not run
+                </div>
+              </div>
+              <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-action-strong)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  Integration
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                  No bank or teacher catalogue changes
+                </div>
+              </div>
+              <div style={{ borderTopColor: 'var(--color-surface-muted)', borderTopStyle: 'solid', borderTopWidth: '1px', boxSizing: 'border-box', display: 'inline-block', paddingTop: '8px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '19px' }}>
+                  The complete analysis package follows the remaining stages and human checkpoints. Only the inventory is ready for review.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )

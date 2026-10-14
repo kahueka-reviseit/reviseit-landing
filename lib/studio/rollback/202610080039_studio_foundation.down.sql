@@ -4,6 +4,7 @@
 -- script; the bucket prefix studio/ is removed separately (and only after the evidence export).
 -- After rollback, remove the migration's history record with the same process that applied it.
 begin;
+drop index if exists private.studio_catalogue_source_lookup, private.studio_order_source_lookup, private.studio_record_link_reverse_lookup;
 do $$ declare f record; begin
  for f in select p.oid::regprocedure sig from pg_proc p join pg_namespace n on n.oid=p.pronamespace
   where n.nspname in ('public','private') and p.proname like 'studio\_%' loop
@@ -11,6 +12,11 @@ do $$ declare f record; begin
  end loop;
 end $$;
 -- Full local decommission includes remote provider evidence and later budget evidence; never use this as a financial reset.
+drop table if exists private.studio_release_activations,private.studio_release_worker_receipts,private.studio_release_reviews,private.studio_release_candidates cascade;
+drop table if exists private.studio_release_preparation_files, private.studio_release_preparations cascade;
+drop table if exists private.studio_maintenance_integrations cascade;
+drop table if exists private.studio_maintenance_reviews, private.studio_maintenance_checks cascade;
+drop table if exists private.studio_maintenance_revisions, private.studio_maintenance_drafts cascade;
 drop table if exists private.studio_imported_analysis_files, private.studio_imported_analyses cascade;
 drop table if exists private.studio_revision_requests, private.studio_provider_evidence_parts, private.studio_provider_evidence cascade;
 drop table if exists private.studio_live_authorisations, private.studio_budget_receipts, private.studio_budget_reservations,

@@ -1,0 +1,4 @@
+export type CheckEntry={draftId:string;revision:number;sha256:string;path:string;blobId:string};
+export type CheckFinding={kind:string;path?:string;detail?:string;[key:string]:unknown};
+export type MaintenanceCheck={id:string;moduleId:string;snapshotId:string;purpose:string;baseManifestSha256:string;candidateManifestSha256:string;validatorSha256:string;entries:CheckEntry[];state:string;current:boolean;expired:boolean;error:string|null;createdAt:string;completedAt:string|null;reviewVersion:number;reportBlobId:string|null;reportSha256:string|null;report:null|{structuralOk:boolean;errors:CheckFinding[];warnings:CheckFinding[];fileCount:number;authoredFormCount:number;checks:string[];notChecked:string[]};reviews:Array<{id:string;version:number;outcome:string;rationale:string;selfReviewed:boolean;createdAt:string}>};
+export const checkUrl=(id:string)=>`/admin/studio/library/checks/${id}`;

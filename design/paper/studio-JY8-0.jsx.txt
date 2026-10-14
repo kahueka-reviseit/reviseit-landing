@@ -1,0 +1,302 @@
+{
+  "file": {
+    "id": "01M36MRM9HCJ4T87N081XDT4MX",
+    "name": "Revise It Website"
+  },
+  "contentHash": {
+    "tokens": "a19978d2"
+  }
+}
+(
+    <div style={{ backgroundColor: 'var(--color-background)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', fontSize: '12px', fontSynthesis: 'none', height: 'fit-content', lineHeight: '16px', MozOsxFontSmoothing: 'grayscale', overflow: 'clip', overflowWrap: 'anywhere', WebkitFontSmoothing: 'antialiased', width: '1440px' }}>
+      <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '56px', justifyContent: 'space-between', paddingInline: '32px' }}>
+        <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '32px' }}>
+          <div style={{ alignItems: 'baseline', boxSizing: 'border-box', display: 'flex', gap: '8px' }}>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'inline-block', fontFamily: '"Playfair Display", system-ui, sans-serif', fontSize: '20px', fontWeight: 700, lineHeight: '24px' }}>
+              Revise It
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-gold)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.15em', lineHeight: '14px' }}>
+              ADMIN
+            </div>
+          </div>
+          <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '4px' }}>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                Overview
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                School accounts
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                Papers
+              </div>
+            </div>
+            <div style={{ backgroundColor: '#FFFFFF1F', borderRadius: '999px', boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '14px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', fontWeight: 600, lineHeight: '18px' }}>
+                Curriculum
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+          Signed in as Kahueka · reviewer
+        </div>
+      </div>
+      <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexGrow: '1', minHeight: '0px' }}>
+        <div style={{ alignSelf: 'stretch', backgroundColor: 'var(--color-surface-paper)', borderRightColor: 'var(--color-border)', borderRightStyle: 'solid', borderRightWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', flexShrink: '0', gap: '28px', padding: '24px', width: '288px' }}>
+          <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '12px', padding: '14px' }}>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '11px', fontWeight: 600, lineHeight: '15px' }}>
+              CURRICULUM MODULE
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 600, lineHeight: '21px' }}>
+              Grade 11 Physical Sciences
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px' }}>
+              Switch module ⌄
+            </div>
+          </div>
+          <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Sources
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Library
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px' }}>
+                89
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', fontFamily: 'var(--font-body)', fontSize: '16px', fontWeight: 600, lineHeight: '22px' }}>
+                Work queue
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Releases
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+          </div>
+        </div>
+        <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '20px', minWidth: '0px', paddingBottom: '32px', paddingInline: '40px', paddingTop: '28px' }}>
+          <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+              maintenance / g11-optics-recovery-2026-10-05
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Playfair Display", system-ui, sans-serif', fontSize: '36px', fontWeight: 700, lineHeight: '44px' }}>
+              Optics recovery
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '15px', lineHeight: '22px' }}>
+              Recover two reserved Grade 11 optics task types and bind the existing P1-WAVE-02 questionnaire. No full-paper reanalysis.
+            </div>
+          </div>
+          <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '10px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', paddingBlock: '14px', paddingInline: '20px' }}>
+            <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '8px' }}>
+              <div style={{ backgroundColor: 'var(--color-action-strong)', borderRadius: '999px', boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', height: '18px', width: '18px' }} />
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                Drafted
+              </div>
+            </div>
+            <div style={{ backgroundColor: 'var(--color-action-strong)', boxSizing: 'border-box', flexBasis: '0%', flexGrow: '1', height: '2px' }} />
+            <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '8px', paddingInline: '4px' }}>
+              <div style={{ backgroundColor: 'var(--color-action-strong)', borderRadius: '999px', boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', height: '18px', width: '18px' }} />
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                Checked
+              </div>
+            </div>
+            <div style={{ backgroundColor: 'var(--color-action-strong)', boxSizing: 'border-box', flexBasis: '0%', flexGrow: '1', height: '2px' }} />
+            <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '8px', paddingInline: '4px' }}>
+              <div style={{ backgroundColor: 'var(--color-action-strong)', borderRadius: '999px', boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', height: '18px', width: '18px' }} />
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', fontWeight: 700, lineHeight: '18px' }}>
+                Written into the bank · 5 Oct
+              </div>
+            </div>
+            <div style={{ backgroundColor: 'var(--color-action-strong)', boxSizing: 'border-box', flexBasis: '0%', flexGrow: '1', height: '2px' }} />
+            <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '8px', paddingInline: '4px' }}>
+              <div style={{ backgroundColor: 'var(--color-action-strong)', borderRadius: '999px', boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', height: '18px', width: '18px' }} />
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                Published in release 5.7.0
+              </div>
+            </div>
+          </div>
+          <div style={{ borderBottomColor: 'var(--color-border)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', gap: '28px' }}>
+            <div style={{ borderBottomColor: 'var(--color-action-strong)', borderBottomStyle: 'solid', borderBottomWidth: '2px', boxSizing: 'border-box', display: 'flex', paddingBottom: '10px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-action-strong)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '15px', fontWeight: 600, lineHeight: '18px' }}>
+                Files
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'flex', paddingBottom: '10px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '15px', lineHeight: '18px' }}>
+                Differences
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'flex', paddingBottom: '10px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '15px', lineHeight: '18px' }}>
+                Releases →
+              </div>
+            </div>
+          </div>
+          <div style={{ alignItems: 'start', boxSizing: 'border-box', display: 'flex', gap: '24px' }}>
+            <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '10px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', minWidth: '0px', overflow: 'clip' }}>
+              <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderBottomColor: 'var(--color-border)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', paddingBlock: '14px', paddingInline: '20px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '15px', fontWeight: 700, lineHeight: '18px' }}>
+                  Bank files in this change
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                  Paths inside data/ · fingerprint after the change
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', backgroundColor: 'var(--color-action-tint-subtle)', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '40px', paddingInline: '20px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '12px', fontWeight: 600, lineHeight: '16px', width: '72px' }}>
+                  Added
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  task-types/physics/PHYS_13_Refraction_and_Snells_Law.md
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '11px', lineHeight: '14px', textAlign: 'right', width: '72px' }}>
+                  6c860c29
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '40px', paddingInline: '20px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '12px', fontWeight: 600, lineHeight: '16px', width: '72px' }}>
+                  Added
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  task-types/physics/PHYS_15_Critical_Angle_and_Total_Internal_Reflection.md
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '11px', lineHeight: '14px', textAlign: 'right', width: '72px' }}>
+                  8054f9cb
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '40px', paddingInline: '20px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '12px', fontWeight: 600, lineHeight: '16px', width: '72px' }}>
+                  Replaced
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  specs/paper-1-physics/SPEC_P1_WAVE_02_Refraction_Snells_Law.md
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '11px', lineHeight: '14px', textAlign: 'right', width: '72px' }}>
+                  64be8bb4
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '40px', paddingInline: '20px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '12px', fontWeight: 600, lineHeight: '16px', width: '72px' }}>
+                  Replaced
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  indexes/task-type-database-index.md
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '11px', lineHeight: '14px', textAlign: 'right', width: '72px' }}>
+                  68dabc4e
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '40px', paddingInline: '20px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '12px', fontWeight: 600, lineHeight: '16px', width: '72px' }}>
+                  Replaced
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  indexes/question-specification-library.md
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '11px', lineHeight: '14px', textAlign: 'right', width: '72px' }}>
+                  bcf53be3
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '40px', paddingInline: '20px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '12px', fontWeight: 600, lineHeight: '16px', width: '72px' }}>
+                  Replaced
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  reference/bank-inventory.md
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '11px', lineHeight: '14px', textAlign: 'right', width: '72px' }}>
+                  2d8f8fcc
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '40px', paddingInline: '20px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '12px', fontWeight: 600, lineHeight: '16px', width: '72px' }}>
+                  Replaced
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  catalogue/catalogue-copy.json
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '11px', lineHeight: '14px', textAlign: 'right', width: '72px' }}>
+                  654dd801
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '40px', paddingInline: '20px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '12px', fontWeight: 600, lineHeight: '16px', width: '72px' }}>
+                  Replaced
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  forms/authored/specification/P1-WAVE-02.json
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '11px', lineHeight: '14px', textAlign: 'right', width: '72px' }}>
+                  5c954aed
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '14px', height: '40px', paddingInline: '20px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '12px', fontWeight: 600, lineHeight: '16px', width: '72px' }}>
+                  Replaced
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  forms/authored/manifest.json
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', flexShrink: '0', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '11px', lineHeight: '14px', textAlign: 'right', width: '72px' }}>
+                  e3a53d6b
+                </div>
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', flexShrink: '0', gap: '18px', width: '280px' }}>
+              <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '10px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '10px', paddingBlock: '18px', paddingInline: '20px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.12em', lineHeight: '14px' }}>
+                  VALIDATION
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '19px' }}>
+                  Open the check report and review its findings. Structural checks and content judgement are separate.
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-action-strong)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  bank-validation.json →
+                </div>
+              </div>
+              <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '10px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '8px', paddingBlock: '18px', paddingInline: '20px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.12em', lineHeight: '14px' }}>
+                  ALSO IN THIS FOLDER
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  README.md
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  changes.diff
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  integration-manifest.json
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  source-evidence.json
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  paper-page-11.png
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px', whiteSpace: 'pre-wrap' }}>
+                  before/{'  '}·{'  '}07_Updated_Database_Files/
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  policy-page-81.png · policy-page-82.png
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )

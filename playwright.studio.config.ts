@@ -1,0 +1,2 @@
+import {defineConfig,devices} from '@playwright/test';
+export default defineConfig({testDir:'./tests/studio-browser',outputDir:'studio-test-results',workers:2,use:{baseURL:'http://127.0.0.1:3107',screenshot:'only-on-failure',trace:'retain-on-failure'},projects:[{name:'desktop',use:{...devices['Desktop Chrome'],viewport:{width:1440,height:1100}}},{name:'mobile',use:{...devices['Pixel 5']}}],webServer:{command:'npx vite tests/studio-preview --config tests/studio-preview/vite.config.mts',url:'http://127.0.0.1:3107',reuseExistingServer:true}});

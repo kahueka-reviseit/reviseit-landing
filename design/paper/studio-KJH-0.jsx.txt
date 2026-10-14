@@ -1,0 +1,300 @@
+{
+  "file": {
+    "id": "01M36MRM9HCJ4T87N081XDT4MX",
+    "name": "Revise It Website"
+  },
+  "contentHash": {
+    "tokens": "a19978d2"
+  }
+}
+(
+    <div style={{ backgroundColor: 'var(--color-background)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', fontSize: '12px', fontSynthesis: 'none', height: 'fit-content', lineHeight: '16px', MozOsxFontSmoothing: 'grayscale', overflow: 'clip', overflowWrap: 'anywhere', WebkitFontSmoothing: 'antialiased', width: '1440px' }}>
+      <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', boxSizing: 'border-box', display: 'flex', flexShrink: '0', height: '56px', justifyContent: 'space-between', paddingInline: '32px' }}>
+        <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '32px' }}>
+          <div style={{ alignItems: 'baseline', boxSizing: 'border-box', display: 'flex', gap: '8px' }}>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'inline-block', fontFamily: '"Playfair Display", system-ui, sans-serif', fontSize: '20px', fontWeight: 700, lineHeight: '24px' }}>
+              Revise It
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-gold)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.15em', lineHeight: '14px' }}>
+              ADMIN
+            </div>
+          </div>
+          <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '4px' }}>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                Overview
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                School accounts
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                Papers
+              </div>
+            </div>
+            <div style={{ backgroundColor: '#FFFFFF1F', borderRadius: '999px', boxSizing: 'border-box', display: 'inline-block', paddingBlock: '6px', paddingInline: '14px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', fontWeight: 600, lineHeight: '18px' }}>
+                Curriculum
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+          Signed in as Kahueka · reviewer
+        </div>
+      </div>
+      <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexGrow: '1', minHeight: '0px' }}>
+        <div style={{ alignSelf: 'stretch', backgroundColor: 'var(--color-surface-paper)', borderRightColor: 'var(--color-border)', borderRightStyle: 'solid', borderRightWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', flexShrink: '0', gap: '28px', padding: '24px', width: '288px' }}>
+          <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '12px', padding: '14px' }}>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: '11px', fontWeight: 600, lineHeight: '15px' }}>
+              CURRICULUM MODULE
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 600, lineHeight: '21px' }}>
+              Grade 11 Physical Sciences
+            </div>
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px' }}>
+              Switch module ⌄
+            </div>
+          </div>
+          <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Sources
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', fontFamily: 'var(--font-body)', fontSize: '16px', fontWeight: 600, lineHeight: '22px' }}>
+                Library
+              </div>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px' }}>
+                89
+              </div>
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Work queue
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+            <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface-paper)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', padding: '12px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '22px' }}>
+                Releases
+              </div>
+              <div style={{ boxSizing: 'border-box', fontFamily: 'var(--font-body)' }} />
+            </div>
+          </div>
+        </div>
+        <div style={{ boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '20px', minWidth: '0px', paddingBottom: '32px', paddingInline: '40px', paddingTop: '28px' }}>
+          <div style={{ alignItems: 'end', boxSizing: 'border-box', display: 'flex', gap: '24px', justifyContent: 'space-between' }}>
+            <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                maintenance / draft-2026-10-06 / 07_Updated_Database_Files / data / task-types / physics
+              </div>
+              <div style={{ alignItems: 'baseline', boxSizing: 'border-box', display: 'flex', gap: '14px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '20px', fontWeight: 600, lineHeight: '24px' }}>
+                  PHYS_16
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Playfair Display", system-ui, sans-serif', fontSize: '32px', fontWeight: 700, lineHeight: '40px' }}>
+                  New task type
+                </div>
+                <div style={{ backgroundColor: 'var(--color-structured-tint)', borderRadius: '999px', boxSizing: 'border-box', display: 'inline-block', paddingBlock: '3px', paddingInline: '10px' }}>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-structured)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '12px', fontWeight: 600, lineHeight: '16px' }}>
+                    Draft · not in the bank
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style={{ boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px' }}>
+              <div style={{ alignItems: 'center', backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', height: '40px', paddingInline: '16px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', fontWeight: 600, lineHeight: '18px' }}>
+                  Discard draft
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', backgroundColor: 'var(--color-inverse)', borderRadius: '8px', boxSizing: 'border-box', display: 'flex', height: '40px', opacity: '0.45', paddingInline: '18px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-on-inverse)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', fontWeight: 600, lineHeight: '18px' }}>
+                  Send for review
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style={{ alignItems: 'center', backgroundColor: 'var(--color-structured-tint-subtle)', borderColor: 'var(--color-structured-track)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', gap: '12px', paddingBlock: '12px', paddingInline: '16px' }}>
+            <div style={{ backgroundColor: 'var(--color-structured)', borderRadius: '999px', boxSizing: 'border-box', display: 'inline-block', flexShrink: '0', height: '8px', width: '8px' }} />
+            <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', flexBasis: '0%', flexGrow: '1', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+              This file was created from the task-type template inside a draft change. It reaches data/task-types/physics only when that change is checked and written into the bank. PHYS_16 was allocated because PHYS_01 to PHYS_15 are taken and no number is reserved.
+            </div>
+          </div>
+          <div style={{ alignItems: 'start', boxSizing: 'border-box', display: 'flex', gap: '24px' }}>
+            <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '10px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', flexShrink: '0', gap: '4px', paddingBlock: '18px', paddingInline: '20px', width: '300px' }}>
+              <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.12em', lineHeight: '14px' }}>
+                TEMPLATE SECTIONS
+              </div>
+              <div style={{ boxSizing: 'border-box', display: 'inline-block', paddingBottom: '10px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '11px', lineHeight: '14px' }}>
+                  from task-type-template.md
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', height: '32px' }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                  <circle cx="8" cy="8" r="7" fill="#436B56" />
+                  <path d="M5 8.2l2 2 4-4.2" fill="none" stroke="#FFFFFF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Identifier and filename
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', height: '32px' }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                  <circle cx="8" cy="8" r="7" fill="#436B56" />
+                  <path d="M5 8.2l2 2 4-4.2" fill="none" stroke="#FFFFFF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Source evidence
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', height: '32px' }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                  <circle cx="8" cy="8" r="7" fill="#436B56" />
+                  <path d="M5 8.2l2 2 4-4.2" fill="none" stroke="#FFFFFF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Version history
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', backgroundColor: 'var(--color-action-tint-subtle)', borderRadius: '6px', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', height: '32px', paddingInline: '8px' }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                  <circle cx="8" cy="8" r="6.3" fill="none" stroke="#436B56" strokeWidth="1.4" />
+                  <circle cx="8" cy="8" r="2.5" fill="#436B56" />
+                </svg>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-action-strong)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', fontWeight: 600, lineHeight: '18px' }}>
+                  Pedagogical purpose
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', height: '32px' }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                  <circle cx="8" cy="8" r="6.3" fill="none" stroke="#B9B4A8" strokeWidth="1.4" />
+                </svg>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Solution structure
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', height: '32px' }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                  <circle cx="8" cy="8" r="6.3" fill="none" stroke="#B9B4A8" strokeWidth="1.4" />
+                </svg>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Variants
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', height: '32px' }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                  <circle cx="8" cy="8" r="6.3" fill="none" stroke="#B9B4A8" strokeWidth="1.4" />
+                </svg>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Curriculum reference
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', height: '32px' }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                  <circle cx="8" cy="8" r="6.3" fill="#FFF8EC" stroke="#C49255" strokeWidth="1.4" />
+                  <path d="M8 4.8v3.6M8 10.8v.2" fill="#000000" stroke="#6E4E28" strokeWidth="1.6" strokeLinecap="round" />
+                </svg>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-caution-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Bloom’s classification · unresolved
+                </div>
+              </div>
+              <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', flexShrink: '0', gap: '10px', height: '32px' }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: '0', display: 'inline-block' }}>
+                  <circle cx="8" cy="8" r="6.3" fill="none" stroke="#B9B4A8" strokeWidth="1.4" />
+                </svg>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Variability format
+                </div>
+              </div>
+              <div style={{ borderTopColor: 'var(--color-surface-muted)', borderTopStyle: 'solid', borderTopWidth: '1px', boxSizing: 'border-box', display: 'inline-block', paddingTop: '12px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '19px' }}>
+                  3 of 9 written. “Send for review” unlocks when every section is written or marked unresolved with a reason.
+                </div>
+              </div>
+            </div>
+            <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: '10px', borderStyle: 'solid', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexBasis: '0%', flexDirection: 'column', flexGrow: '1', gap: '20px', minWidth: '0px', paddingBlock: '28px', paddingInline: '36px' }}>
+              <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  PHYS_16_Topic_assessment_focus.md · new file
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                  Document · Source
+                </div>
+              </div>
+              <div style={{ borderBottomColor: 'var(--color-surface-muted)', borderBottomStyle: 'solid', borderBottomWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '6px', paddingBottom: '16px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-subtle)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '22px', fontWeight: 700, lineHeight: '28px' }}>
+                  PHYS_16: Topic: assessment focus
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '14px', lineHeight: '18px' }}>
+                  Title follows the house form “Topic: assessment focus”. The official curriculum topic is stored separately.
+                </div>
+              </div>
+              <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '17px', fontWeight: 700, lineHeight: '22px' }}>
+                  Source evidence
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Georgia", system-ui, sans-serif', fontSize: '15px', lineHeight: '23px' }}>
+                  Observed in the paper being analysed, question and page filled in from the inventory, with the source fingerprint. Labelled “first observation”: one paper is not evidence of recurrence.
+                </div>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '12px', lineHeight: '16px' }}>
+                  Filled automatically from the sub-question that was marked as new
+                </div>
+              </div>
+              <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ boxSizing: 'border-box', color: 'var(--color-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '17px', fontWeight: 700, lineHeight: '22px' }}>
+                  Pedagogical purpose
+                </div>
+                <div style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-focus-ring)', borderRadius: '8px', borderStyle: 'solid', borderWidth: '2px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '8px', paddingBlock: '14px', paddingInline: '16px' }}>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text-subtle)', display: 'inline-block', fontFamily: '"Georgia", system-ui, sans-serif', fontSize: '15px', lineHeight: '23px' }}>
+                    Say what work is assessed, and why no existing family or variant already represents it…
+                  </div>
+                </div>
+                <div style={{ alignItems: 'center', boxSizing: 'border-box', display: 'flex', gap: '8px' }}>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                    Closest existing family found by the analysis:
+                  </div>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-action-strong)', display: 'inline-block', fontFamily: '"JetBrains Mono", system-ui, sans-serif', fontSize: '12px', fontWeight: 600, lineHeight: '16px' }}>
+                    compare side by side →
+                  </div>
+                </div>
+              </div>
+              <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ borderColor: 'var(--color-border-dashed)', borderRadius: '8px', borderStyle: 'dashed', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '4px', paddingBlock: '12px', paddingInline: '16px' }}>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '15px', fontWeight: 600, lineHeight: '18px' }}>
+                    Solution structure
+                  </div>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text-subtle)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                    The reasoning chain, relevant formulas and limitations
+                  </div>
+                </div>
+                <div style={{ borderColor: 'var(--color-border-dashed)', borderRadius: '8px', borderStyle: 'dashed', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '4px', paddingBlock: '12px', paddingInline: '16px' }}>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text-muted)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '15px', fontWeight: 600, lineHeight: '18px' }}>
+                    Variants
+                  </div>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-text-subtle)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                    Named with the parent, for example PHYS_16 (16A)
+                  </div>
+                </div>
+                <div style={{ backgroundColor: 'var(--color-caution-tint)', borderColor: 'var(--color-caution-border)', borderRadius: '8px', borderStyle: 'dashed', borderWidth: '1px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '4px', paddingBlock: '12px', paddingInline: '16px' }}>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-caution-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '15px', fontWeight: 600, lineHeight: '18px' }}>
+                    Bloom’s classification · unresolved
+                  </div>
+                  <div style={{ boxSizing: 'border-box', color: 'var(--color-caution-text)', display: 'inline-block', fontFamily: '"Source Sans 3", system-ui, sans-serif', fontSize: '13px', lineHeight: '16px' }}>
+                    Use a named Bloom’s level and rationale for each assessed task; leave unresolved when evidence is insufficient.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )

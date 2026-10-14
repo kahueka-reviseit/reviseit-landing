@@ -8,9 +8,9 @@ import { readArtifact } from '../../../../../../../lib/studio/uploads';
 import { inventorySummary } from '../../../../../../../lib/studio/inventory-review';
 import { creditsEnabled } from '../../../../../../../lib/credits/server';
 import { StaffHeader } from '../../../../../staff-header';
-import { MarkCorrectionForm, CognitiveCorrectionForm, InventoryDecisionForm } from '../../../inventory-forms';
+import { InventoryWorkspace } from '../../../inventory-workspace';
+import { StudioShell } from '../../../components';
 import ui from '../../../../../experience.module.css';
-import s from '../../../studio.module.css';
 export const dynamic = 'force-dynamic';
 export default async function InventoryReview({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params; if (!isUuid(id)) notFound();
@@ -28,53 +28,7 @@ export default async function InventoryReview({ params }: { params: Promise<{ id
     const artifact = bound.find((a: any) => a.logicalKey === ref.logicalKey);
     if (artifact) pageLinks.set(JSON.stringify([ref.sourceId, ref.filePage]), `/admin/studio/pages/${artifact.id}`);
   }
-  const corrections = inventory.human_mark_corrections || [], cognitiveCorrections = inventory.human_cognitive_corrections || [], asOf = new Date().toISOString().slice(0,10);
-  const editable = v.run.state === 'active';
-  return <><StaffHeader current="studio" studioEnabled creditsEnabled={creditsEnabled()} signedIn name={(account.full_name || '').split(/\s+/)[0] || undefined} record={{ back: `/admin/studio/runs/${id}`, label: 'Analysis run' }}/>
-    <main className={ui['site-shell__main']}><div className={ui['page--staff']}><div className={s.studio}>
-      <header><h1>Review question inventory</h1><p>{inventory.source_identity?.year} · {inventory.source_identity?.period} · Grade {inventory.source_identity?.grade} · {inventory.source_identity?.paper_designation}</p>
-        <p>Revision {info.revision} · {gate.live ? 'Approved for matching' : 'Awaiting inventory decision'} · {v.run.purpose === 'rehearsal' ? 'Rehearsal' : 'Canonical run'}</p>
-        <p className={s.note}>{inventory.meta?.status}</p></header>
-      <section className={s.card}><h2 className={s.card__title}>Inventory checks</h2>
-        <p>{totals.questions} questions · {totals.parts} assessed parts · {totals.marks} recorded marks / {totals.printedTotal ?? 'unknown'} printed total · {totals.unknownMarks} unknown marks</p>
-        <p>{totals.unknownMarks === 0 && totals.marks === totals.printedTotal ? 'The assessed marks reconcile to the printed paper total.' : 'The marks need review against the source.'}</p>
-        <p>{totals.unresolvedClassifications} Bloom’s classifications unresolved. Memorandum comparison: {inventory.memorandum?.comparison_status === 'not_performed' ? 'not performed' : inventory.memorandum?.comparison_status || 'not available'}.</p>
-        {inventory.paper_total_evidence?.requires_review && <div role="note">
-          <h3>Conflicting paper-total observations</h3>
-          <p>{inventory.paper_total_evidence.selection_basis === 'unique_cover_observation'
-            ? 'The proposed paper total uses the cover. Another page reported a different total; check whether it is a question subtotal or a source error.'
-            : 'No single cover total resolves the conflicting observations. The paper total remains unknown.'}</p>
-          <ul>{inventory.paper_total_evidence.observations.map((o: any) => <li key={`${o.source_id}:${o.file_page}`}>
-            Page {o.file_page} ({o.disposition}): {o.printed_total_marks} marks. {o.notes}
-          </li>)}</ul>
-          <p>Every original observation is retained. This selection does not resolve or approve the discrepancy.</p>
-        </div>}
-        <p className={s.note}>These checks describe this inventory revision. Original page observations and earlier extraction reports remain unchanged. Approving the inventory allows matching; it does not approve scientific content or changes to the question bank.</p>
-      </section>
-      <section className={s.card}><h2 className={s.card__title}>Recorded mark corrections</h2>
-        {!corrections.length ? <p>No mark corrections recorded.</p> : corrections.map((c: any) => <article key={c.command}><p><strong>Part {c.part_id}: {c.previous_marks ?? 'unknown'} → {c.corrected_marks ?? 'unknown'} marks</strong></p><p>{c.reason}</p><p className={s.note}>Recorded through editor account {c.recorded_by} · {c.date}. Original source observation retained. This correction grants no approval.</p></article>)}
-      </section>
-      <section className={s.card}><h2 className={s.card__title}>Recorded Bloom’s corrections</h2>
-        {!cognitiveCorrections.length ? <p>No Bloom’s corrections recorded.</p> : cognitiveCorrections.map((c: any) => <article key={c.command}><p><strong>Part {c.part_id}: {c.previous.taxonomy_description ?? 'unresolved'} → {c.corrected.taxonomy_description ?? 'unresolved'}</strong></p><p>{c.reason}</p><p className={s.note}>Recorded through editor account {c.recorded_by} · {c.date}. Earlier classification preserved. This correction grants no approval.</p></article>)}
-      </section>
-      {inventory.questions.map((q: any) => <section key={q.number} className={s.card} id={`question-${q.number}`}>
-        <h2>Question {q.number} <small>· {q.marks ?? 'unknown'} printed marks</small></h2>
-        <div className={s.reviewGrid}><div>
-          {(q.source_content?.fragments || []).map((f: any) => <details key={`${f.source_id}-${f.file_page}`}><summary>Shared wording, diagrams and page notes · page {f.file_page}</summary><p className={s.sourceText}>{f.question?.content?.shared_stem}</p>{(f.question?.content?.figures || []).map((figure: any) => <p key={figure.id}><strong>{figure.id}</strong>: {figure.description}<br/>{figure.notes}</p>)}<p className={s.note}>{f.page_notes}</p></details>)}
-          {q.sub_questions.map((part: any) => { const corrected = corrections.filter((c: any) => c.part_id === part.id).at(-1); return <article key={part.id} className={s.reviewPart}>
-            <h3>Part {part.id} · {part.marks ?? 'unknown'} marks{corrected ? ' · editor correction' : ''}</h3>
-            {(part.source_observations || []).map((o: any, n: number) => <div key={n}><p className={s.sourceText}>{o.content?.source_text || o.task}</p>{(o.content?.answer_choices || []).map((choice: any) => <p key={choice.label}>{choice.label}. {choice.text}</p>)}<p className={s.note}>Source page {o.file_page} · extracted mark: {o.marks ?? 'unknown'}</p></div>)}
-            {(part.source_observations || []).filter((o: any) => o.content?.notes).map((o: any, n: number) => <p key={`note:${n}`} className={s.note}>Source reading note · page {o.file_page}: {o.content.notes}</p>)}
-            <p className={s.note}>Bloom’s level: {part.taxonomy_description ?? 'unresolved'} · {part.classification_provenance}. {part.classification_reason}</p>
-            {editable && <details><summary>Correct marks for {part.id}</summary><p className={s.note}>Saves a new revision and invalidates any inventory approval and dependent reviews. Source transcriptions stay unchanged.</p><MarkCorrectionForm key={`${selected.id}:${part.id}`} runId={id} artifactId={selected.id} expectedSha256={info.sha256} partId={part.id} marks={part.marks} command={randomUUID()} asOf={asOf}/></details>}
-            {editable && <details><summary>Correct Bloom’s level for {part.id}</summary><p className={s.note}>Saves a new revision and requires a fresh inventory approval. Marks and source transcriptions stay unchanged.</p><CognitiveCorrectionForm key={`cognition:${selected.id}:${part.id}`} runId={id} artifactId={selected.id} expectedSha256={info.sha256} partId={part.id} category={part.taxonomy_description} reason={part.classification_provenance === 'reviewer_judgement' ? part.classification_reason : ''} command={randomUUID()} asOf={asOf}/></details>}
-          </article>; })}
-        </div><aside>{(q.source_content?.fragments || []).map((f: any) => { const url = pageLinks.get(JSON.stringify([f.source_id, f.file_page])); return <figure key={`${f.source_id}-${f.file_page}`} className={s.sourceFigure}>{url ? <a href={url} target="_blank" rel="noreferrer"><img src={url} alt={`Original source page ${f.file_page} for question ${q.number}`} loading="lazy"/></a> : <p>Source image not available.</p>}<figcaption>Original page {f.file_page} · select image to enlarge</figcaption></figure>; })}</aside></div>
-      </section>)}
-      <section className={s.card}><h2 className={s.card__title}>Inventory decision</h2>
-        <p>Review all {totals.parts} parts and the open issues above. Saving a correction does not approve the inventory. Any later correction requires a fresh decision.</p>
-        {gate.live ? <p>Approved for matching. Any remaining content questions still require later review.</p> : editable && <InventoryDecisionForm key={`${gate.version}:${selected.id}`} runId={id} version={gate.version} bound={bound.map((a: any) => a.id)} command={randomUUID()}/>}
-      </section>
-      <section className={s.card}><h2 className={s.card__title}>Inventory revision history</h2>{v.artifacts.filter((a: any) => a.kind === 'inventory').map((a: any) => <p key={a.id}><Link href={`/admin/studio/files/${a.id}`}>Download inventory revision {a.revision}</Link> · {a.state} · {a.author} · {a.createdAt}</p>)}<Link href={`/admin/studio/runs/${id}`}>All source evidence, decisions and audit history</Link></section>
-    </div></div></main></>;
+  const commands = Object.fromEntries(inventory.questions.flatMap((q: any) => q.sub_questions.map((p: any) => [p.id,{marks:randomUUID(),cognition:randomUUID()}])));
+  return <><StaffHeader current="studio" studioEnabled creditsEnabled={creditsEnabled()} signedIn name={(account.full_name || '').split(/\s+/)[0] || undefined}/>
+    <StudioShell moduleId={v.run.module_id}><InventoryWorkspace runId={id} inventory={inventory} totals={totals} artifact={{id:selected.id,sha256:info.sha256,revision:info.revision}} gate={gate} editable={v.run.state==='active'} rehearsal={v.run.purpose==='rehearsal'} pageLinks={Object.fromEntries(pageLinks)} commands={commands} decisionCommand={randomUUID()} asOf={new Date().toISOString().slice(0,10)} revisions={v.artifacts.filter((a:any)=>a.kind==='inventory')}/></StudioShell></>;
 }

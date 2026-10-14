@@ -1,0 +1,11 @@
+import Link from 'next/link';
+import {impactUrl} from '../../../../lib/studio/dependencies';
+import {StudioHeading} from './components';
+import {type FileDetail,recordLabel} from '../../../../lib/studio/library';
+import {canDraftFile,newDraftUrl} from '../../../../lib/studio/maintenance-drafts';
+import s from './studio.module.css';
+export function BankFileView({file,content,error}:{file:FileDetail;content:string|null;error?:string}) {
+ return <><StudioHeading title={file.path.split('/').pop()||'Bank file'} breadcrumb={<><Link href={`/admin/studio/library?module=${encodeURIComponent(file.moduleId)}&snapshot=${file.snapshotId}&tab=files`}>Library / Files</Link> / {file.path}</>}>{file.accepted?'Accepted bank':file.purpose==='rehearsal'?'Isolated rehearsal copy':'Historical bank copy'} · {Math.ceil(file.size/1024)} KB</StudioHeading>
+ <div className={s['studio-toolbar']}><Link className={s['studio-button']} href={impactUrl(file)}>Inspect dependency impact</Link>{content!==null&&canDraftFile(file)&&<Link className={s['studio-button--primary']} href={newDraftUrl(file)}>Edit private draft</Link>}<Link href={`/admin/studio/library/drafts?module=${encodeURIComponent(file.moduleId)}`}>Private drafts & history →</Link></div>
+ <div className={s['studio-columns']}><section className={s['studio-panel']}><h2>Source document</h2><p className={s.note}>Exact stored source. Legacy terminology is retained; it is not automatically converted to Bloom’s levels.</p>{content!==null?<pre className={s['studio-source-code']}>{content}</pre>:<p role="status">{error||'This file is not a text document.'}</p>}</section><aside className={s['studio-panel']}><h2>About this file</h2><dl className={s['studio-facts']}><dt>Integrity record</dt><dd>{file.integrity}</dd><dt>File fingerprint</dt><dd><code>{file.sha256}</code></dd><dt>Bank manifest</dt><dd><code>{file.manifestSha256}</code></dd></dl><h3>Records in this file</h3>{file.records.length?<ul>{file.records.map(r=><li key={`${r.kind}:${r.parentId}:${r.id}`}><strong>{recordLabel(r)}</strong> · {r.kind.replaceAll('_',' ')} · {r.status}</li>)}</ul>:<p>No projected record identifiers.</p>}<p className={s.note}>A variant belongs to its parent task type and shares this source file. Draft edits retain the original. Dependency impact still needs review before bank integration.</p></aside></div></>;
+}

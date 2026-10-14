@@ -24,3 +24,5 @@ vitest.config.*
 *.tsbuildinfo
 *.log
 concurrency.config.mts
+
+studio-test-results

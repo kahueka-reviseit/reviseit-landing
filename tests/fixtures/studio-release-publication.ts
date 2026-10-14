@@ -1,0 +1,2 @@
+import type {ReleasePublicationData} from '../../lib/studio/release-publication';
+export const releasePublication:ReleasePublicationData={candidates:[{id:'00000000-0000-4000-8000-000000000064',preparationId:'synthetic-preparation',moduleId:'caps-grade-11-physical-sciences',release:'5.8.0',reportSha256:'a'.repeat(64),intact:true,inputsCurrent:true,currentRelease:'5.7.0',approvalId:null,lastActivationId:null,previouslyActivated:false,worker:null,reviews:[]}],activations:[]};

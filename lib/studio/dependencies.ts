@@ -1,0 +1,4 @@
+import type {BankRecord,FileDetail} from './library';
+export type ImpactItem={moduleId:string;release:string;entryId:string;title:string;current:boolean};
+export type FileImpact={file:FileDetail;computedAt:string;projectionSha256:string;binding:{draftId:string|null;revision:number;sha256:string};dependentRecords:BankRecord[];unresolvedLinkCount:number;catalogueUses:Array<ImpactItem & {manifestSha256:string;sources:Array<{role:string;path:string;sha256:string}>}>;formItems:ImpactItem[];orders:{pinningSourceBytes:number;containingFormItem:number;unrecognisedSnapshots:number};coverage:{currentCatalogueItems:number;currentItemsWithoutBindings:number}};
+export function impactUrl(file:Pick<FileDetail,'snapshotId'|'path'|'sha256'>,draftId?:string,revision=0,sha256=file.sha256){return `/admin/studio/library/impact/${file.snapshotId}?${new URLSearchParams({path:file.path,sha256,...(draftId?{draft:draftId,revision:String(revision)}:{})})}`;}

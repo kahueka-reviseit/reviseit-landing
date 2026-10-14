@@ -1,0 +1,14 @@
+import Link from 'next/link';
+import {StudioHeading,Stats} from './components';
+import type {ReleasesData} from '../../../../lib/studio/library';
+import {moduleLabel} from '../../../../lib/studio/presentation';
+import s from './studio.module.css';
+export function ReleasesView({data,moduleId}:{data:ReleasesData;moduleId?:string}) {
+ const releases=data.releases.filter(r=>!moduleId||r.moduleId===moduleId), current=releases.filter(r=>r.current);
+ return <><StudioHeading title="Catalogue releases" breadcrumb={`Releases / ${moduleId?moduleLabel(moduleId):'All modules'}`}>Published catalogue records and their registered generation inputs. Bank acceptance and catalogue publication are separate.</StudioHeading>
+ {current.map(r=><section className={s['studio-panel']} key={r.moduleId}><div className={s['studio-toolbar']}><div><h2>{moduleLabel(r.moduleId)} · {r.release}</h2><p className={s.note}>Current teacher catalogue</p></div><Link href={`/admin/studio/library?module=${encodeURIComponent(r.moduleId)}`}>Inspect catalogue →</Link></div><Stats items={[{value:r.entries,label:'Catalogue items'},{value:r.ready,label:'Available to order'},{value:r.forms,label:'Registered teacher forms'},{value:r.executions,label:'Items with registered workflow bindings'}]}/><p className={s.note}>A registered workflow binding is a platform record; it is not proof of the generation worker’s current health.</p></section>)}
+ {!current.length&&<p role="status">No current catalogue entries are registered for this view.</p>}
+ <section className={s['studio-panel--caution']}><h2>Publication is a separate step</h2><p>Prepare and inspect release files below. Review and approve the exact package below. Publication waits for the teacher-generation worker, then registers the definitions and switches the catalogue together.</p><p className={s.note}>Existing orders retain their purchased definitions. Preparing files does not switch the catalogue or change availability.</p></section>
+ <section><h2>Publication records</h2><p className={s.note}>These are recorded publications and imports, not an activation or rollback history.</p><div className={s['studio-data-table']}><table><thead><tr><th>Module / release</th><th>Catalogue selection</th><th>Recorded date</th><th>Items / registered forms</th><th>Fingerprint</th></tr></thead><tbody>{releases.map(r=><tr key={`${r.moduleId}:${r.release}`}><td>{moduleLabel(r.moduleId)}<br/><strong>{r.release}</strong></td><td>{r.current?'Current':'Historical'}</td><td>{(r.publishedAt||r.importedAt)?.slice(0,10)||'No publication receipt'}{r.importedAt&&!r.publishedAt?' · imported':''}</td><td>{r.entries} / {r.forms}</td><td><details><summary>{r.contentDigest?`${r.contentDigest.slice(0,12)}…`:'Not recorded'}</summary><code className={s['studio-path']}>{r.contentDigest}</code>{r.previousRelease&&<p>Publication predecessor: {r.previousRelease}</p>}</details></td></tr>)}</tbody></table></div></section>
+ </>;
+}

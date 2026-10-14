@@ -46,6 +46,25 @@ export async function handleStudioGateway(request: Request, deps: GatewayDeps): 
   if (!v || typeof v !== 'object' || Array.isArray(v) || typeof v.action !== 'string') return json({ error: 'Invalid request' }, 400);
   try {
     switch (v.action) {
+      case 'maintenance_claim':
+        if(typeof v.worker!=='string'||!WORKER.test(v.worker)||!isSha256(v.validatorSha256))break;
+        return json({result:await call(rpc,'studio_claim_maintenance_check',{p_worker:v.worker,p_validator:v.validatorSha256})});
+      case 'maintenance_read': {
+        if(!isUuid(v.checkId)||!isUuid(v.lease)||!isUuid(v.blobId)||!Number.isSafeInteger(v.offset)||v.offset<0)break;
+        const info=await call<any>(rpc,'studio_maintenance_check_read',{p_check:v.checkId,p_lease:v.lease,p_blob:v.blobId});
+        const bytes=await readForWorker(rpc,storage,info);
+        return json({result:{sha256:info.sha256,size:info.size,content:Buffer.from(bytes.subarray(v.offset,v.offset+MAX_CHUNK)).toString('base64')}});
+      }
+      case 'maintenance_complete': {
+        if(!isUuid(v.checkId)||!isUuid(v.lease)||!v.report||typeof v.report!=='object'||Array.isArray(v.report))break;
+        const bytes=Buffer.from(JSON.stringify(v.report));if(bytes.length>1500000)break;
+        const ctx=await call<{moduleId:string}>(rpc,'studio_maintenance_check_context',{p_check:v.checkId,p_lease:v.lease});
+        const digest=sha256(bytes);await placeImmutable(storage,blobKey(ctx.moduleId,digest),bytes,digest,'application/json');
+        return json({result:await call(rpc,'studio_finish_maintenance_check',{p_check:v.checkId,p_lease:v.lease,p_report:v.report,p_sha256:digest,p_size:bytes.length})});
+      }
+      case 'maintenance_fail':
+        if(!isUuid(v.checkId)||!isUuid(v.lease))break;
+        return json({result:await call(rpc,'studio_fail_maintenance_check',{p_check:v.checkId,p_lease:v.lease})});
       case 'intake_inputs':
         if (!lease(v)) break;
         return json({ result: await call(rpc, 'studio_intake_inputs', fenced(v)) });

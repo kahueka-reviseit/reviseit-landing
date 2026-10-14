@@ -42,12 +42,13 @@ test('completion refuses output integrity loss after registration and unknown bl
  await ok(svc(),'studio_complete_recovery',{p_blob:a[0].blob_id,p_actor:ids.editor});
  expect(await complete(svc(),w.claim,w.made)).toMatchObject({state:'succeeded'});
 });
-test('a real database-authorised export applies through the Python operator with identical bank bytes',async()=>{
+test('a historical pre-062 authorised export still applies through the Python operator with identical bank bytes',async()=>{
  const base=await importSnapshot(op(),MODULE,baseBank);await accept(op(),MODULE,base.snapshotId,null);
  const changed='# PHYS_02 revised synthetic force', path=baseBank[2].path;
  const b=await blob(ed(),MODULE,changed,'text/markdown','revision');
  const c=await ok(ed(),'studio_create_maintenance_changeset',{p_module:MODULE,p_base_snapshot:base.snapshotId,p_entries:[{action:'replace',path,recordKind:'task_type',recordId:'PHYS_02',blobId:b}],p_rationale:'Synthetic correction',p_command:key()});
- await ok(ed(),'studio_authorise_changeset',{p_changeset:c.changesetId,p_expected_manifest_sha256:c.manifestSha256,p_rationale:'Reviewed exact synthetic bytes',p_authorisation:AUTH,p_command:key()});
+ // Seed a historical authorisation, as an owner fixture, to retain legacy export compatibility.
+ await s.sql("update private.studio_changesets set state='authorised' where id=$1",[c.changesetId]);
  const ex=await ok(op(),'studio_export_changeset',{p_changeset:c.changesetId,p_purpose:'canonical'});
  expect(JSON.parse(ex.manifestText)).toMatchObject({changesetId:c.changesetId,purpose:'canonical',baseManifestSha256:base.manifest});
  const d=mkdtempSync(join(tmpdir(),'studio-export-'));

@@ -473,3 +473,8 @@
   .queue-card { padding:20px; }
   .queue-card__number, .queue-card__number--problem { font-size:48px; line-height:48px; }
 }
+
+/* Paper 12 Studio admin bar. Other staff journeys retain their existing header. */
+.staff-header--studio { height:56px; border-top:0; padding:0 32px; box-sizing:border-box; }
+.staff-header--studio .staff-header__start { gap:32px; }
+@media(max-width:800px) { .staff-header--studio { padding-inline:16px; } }

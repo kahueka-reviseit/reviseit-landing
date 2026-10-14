@@ -6,6 +6,7 @@ import {importedStatus,importedRole} from '../../../../../../lib/studio/imported
 import {StaffHeader} from '../../../../staff-header';
 import ui from '../../../../experience.module.css';
 import s from '../../studio.module.css';
+import {StudioShell,StudioHeading} from '../../components';
 export const dynamic='force-dynamic';
 export default async function ImportedAnalysis({params}:{params:Promise<{id:string}>}){
  const {id}=await params;if(!isUuid(id))notFound();
@@ -13,8 +14,8 @@ export default async function ImportedAnalysis({params}:{params:Promise<{id:stri
  try{record=await call(rpc,'studio_imported_analysis',{p_id:id});}catch{notFound();}
  const p=record.provenance;
  return <><StaffHeader current="studio" studioEnabled signedIn name={(account.full_name||'').split(/\s+/)[0]} record={{back:'/admin/studio',label:'Curriculum Studio'}}/>
- <main className={ui['site-shell__main']}><div className={ui['page--staff']}><div className={s.studio}>
- <header><p><Link href="/admin/studio" className={ui.link}>Curriculum Studio</Link> / Imported history</p><h1>{record.title}</h1><p>{importedStatus[record.status as keyof typeof importedStatus]}</p></header>
+ <StudioShell moduleId={record.moduleId}>
+ <StudioHeading breadcrumb={<><Link href="/admin/studio">Sources</Link> / Imported history</>} title={record.title}>{importedStatus[record.status as keyof typeof importedStatus]}</StudioHeading>
  <section className={s.card}><h2 className={s.card__title}>Analysis history</h2>
  <p>These files were imported from the existing {record.moduleId.includes('grade-10')?'Grade 10':record.moduleId.includes('grade-11')?'Grade 11':record.moduleId} collection. Importing preserves the earlier work and does not run the analysis again.</p>
  <dl><dt>Original record</dt><dd>{p.originalId||'Not recorded'}</dd><dt>Original analysis date</dt><dd>{p.analysedOn||'Not recorded'}</dd><dt>Identity evidence</dt><dd>{p.identityNote||'Historical labels retained; not independently reverified during import.'}</dd><dt>Imported</dt><dd>{record.importedAt.slice(0,10)}</dd></dl>
@@ -23,5 +24,5 @@ export default async function ImportedAnalysis({params}:{params:Promise<{id:stri
  </section>
  <section className={s.card}><h2 className={s.card__title}>Retained files</h2><p className={s.note}>Original filenames and duplicate aliases are preserved. Identical bytes share one stored object. Downloads are checked against their recorded digest.</p>
  <table className={s.table}><thead><tr><th>File</th><th>Kind</th><th>Size</th><th>Integrity</th></tr></thead><tbody>{record.files.map((f:any)=><tr key={f.id}><td><Link className={ui.link} href={`/admin/studio/imports/files/${f.id}`}>{f.path}</Link></td><td>{importedRole[f.role as keyof typeof importedRole]}</td><td>{Math.ceil(f.size/1024)} KB</td><td>{f.integrity}</td></tr>)}</tbody></table></section>
- </div></div></main></>;
+ </StudioShell></>;
 }

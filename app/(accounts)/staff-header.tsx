@@ -13,7 +13,7 @@ export function StaffHeader({current,counts,name,signedIn=false,record,creditsEn
  const links:{place:StaffPlace;href:string;label:string;count?:number|null;problem?:boolean}[]=[
   {place:'overview',href:'/admin',label:'Overview'},{place:'accounts',href:'/admin/accounts',label:'School accounts',count:counts?.accounts},
   {place:'papers',href:'/admin/papers',label:'Papers',count:counts?.papers,problem:true},...(creditsEnabled?[{place:'departments' as const,href:'/admin/departments',label:'Departments'}]:[]),...(studioEnabled?[{place:'studio' as const,href:'/admin/studio',label:'Curriculum Studio'}]:[])];
- return <header className={`${ui['staff-header']} ${record?ui['staff-header--record']:''}`}>
+ return <header className={`${ui['staff-header']} ${record?ui['staff-header--record']:''} ${current==='studio'?ui['staff-header--studio']:''}`}>
   <div className={ui['staff-header__start']}>
    <Link className={ui['staff-header__brand']} href={signedIn?'/admin':'/admin/login'}><span className={ui['staff-header__wordmark']}>Revise It</span><span className={ui['staff-header__mark']}>ADMIN</span></Link>
    {signedIn&&<nav className={ui['staff-nav']} aria-label="Staff navigation">{links.map(l=><Link key={l.place} href={l.href} className={l.place===current?ui['staff-nav__link--current']:ui['staff-nav__link']} aria-current={l.place===current?'page':undefined}>
