@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { StudioDb, ids, MODULE, SKILL, PROFILE, ok, refused, key, blob, importSnapshot, baseBank, accept, work, complete, gate, sha, verified } from './studio-fixture';
-import { saveInventoryMark, correctInventoryMark, saveInventoryCognition, correctInventoryCognition, sourcePagePng, inventorySummary, type MarkCorrection } from '../../lib/studio/inventory-review';
+import { saveInventorySourceReview, addInventorySourceReview, saveInventoryMark, correctInventoryMark, saveInventoryCognition, correctInventoryCognition, sourcePagePng, inventorySummary, type MarkCorrection } from '../../lib/studio/inventory-review';
 import { LocalStudioStorage } from '../../lib/studio/storage/local';
 const db = new StudioDb(), ed = () => db.rpc({kind:'user',id:ids.editor}), svc = () => db.rpc({kind:'service'});
 let snapshot: string, dir: string, store: LocalStudioStorage;
@@ -115,4 +115,21 @@ test('unauthorised, foreign-run and corrupt-source cognitive writes fail before 
  await expect(saveInventoryCognition(editor,verified(editor),store,ids.editor,{...change,runId:key()})).rejects.toThrow(/binding changed/);
  await store.put(`studio/blobs/${MODULE}/${input.expectedSha256}`,Buffer.from('wrong'),'application/json');await expect(saveInventoryCognition(editor,verified(editor),store,ids.editor,change)).rejects.toThrow(/corrupt/);
  expect(await db.sql('select * from private.studio_artifacts')).toHaveLength(1);
+});
+
+test('source findings travel inside the revised inventory and invalidate approval without changing the source or marks',async()=>{
+ const {editor,run,input}=await prepared(); await gate(editor,run,'G1_inventory');
+ const reason='The source diagram and text disagree; retain both and resolve before drafting.';
+ const result=await saveInventorySourceReview(editor,verified(editor),store,ids.editor,{...input,reason});
+ expect(await saveInventorySourceReview(editor,verified(editor),store,ids.editor,{...input,reason})).toEqual(result);
+ const [row]=await db.sql('select * from private.studio_artifacts where id=$1',[result.artifactId]);
+ const saved=JSON.parse(Buffer.from((await store.get(`studio/blobs/${MODULE}/${row.sha256}`))!).toString());
+ const part=saved.questions[0].sub_questions[0];
+ expect(part.source_review_notes).toHaveLength(1);
+ expect(part.source_review_notes[0]).toMatchObject({reason,recorded_by:ids.editor,parent_artifact_id:input.artifactId,provenance:'editor_note'});
+ const withoutNotes=structuredClone(saved);delete withoutNotes.questions[0].sub_questions[0].source_review_notes;withoutNotes.meta.last_updated=inventory.meta.last_updated;
+ expect(withoutNotes).toEqual(inventory);
+ expect((await ok(editor,'studio_gate_view',{p_run:run,p_gate:'G1_inventory'})).live).toBeNull();
+ await expect(saveInventorySourceReview(editor,verified(editor),store,ids.editor,{...input,command:key(),reason:'Different finding against a stale revision.'})).rejects.toThrow(/revision changed/);
+ for(const bad of [{reason:'short'},{partId:'absent'},{asOf:'2099-01-01'}])expect(()=>addInventorySourceReview(inventory,{...input,reason,...bad},ids.editor)).toThrow();
 });

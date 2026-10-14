@@ -59,6 +59,30 @@ export function correctInventoryCognition(inventory: any, input: CognitiveCorrec
   return next;
 }
 
+export type SourceReviewNote = Omit<MarkCorrection, 'marks'>;
+/** Retain editorial findings in the inventory consumed by matching and drafting. */
+export function addInventorySourceReview(inventory: any, input: SourceReviewNote, actor: string) {
+  if (!isUuid(input.runId) || !isUuid(input.artifactId) || !isUuid(input.command) || !isUuid(actor) || !isSha256(input.expectedSha256)
+    || !/^\d{4}-\d{2}-\d{2}$/.test(input.asOf) || !Number.isFinite(Date.parse(input.asOf)) || input.asOf > new Date().toISOString().slice(0,10)
+    || typeof input.reason !== 'string' || input.reason.trim().length < 10 || input.reason.length > 2000)
+    throw new StudioError('Enter a source finding of ten to two thousand characters.');
+  if (!Array.isArray(inventory?.questions) || !inventory.meta || !inventory.source_sha256) throw new StudioError('This inventory format cannot be edited here.');
+  const next = structuredClone(inventory), parts = next.questions.flatMap((q: any) => q.sub_questions || []).filter((p: any) => p.id === input.partId);
+  if (parts.length !== 1) throw new StudioError('The assessed part is missing or ambiguous.');
+  const part = parts[0];
+  if ((part.source_review_notes || []).length >= 30) throw new StudioError('This part has reached its source-note limit.');
+  part.source_review_notes = [...(part.source_review_notes || []), {
+    command: input.command, part_id: part.id, source_id: part.source_id, source_page: part.source_page,
+    reason: input.reason.trim(), recorded_by: actor, date: input.asOf,
+    parent_artifact_id: input.artifactId, parent_sha256: input.expectedSha256, provenance: 'editor_note',
+  }];
+  next.meta.last_updated = input.asOf;
+  return next;
+}
+export function saveInventorySourceReview(rpc: Rpc, verifiedRpc: Rpc, storage: StudioStorage, actor: string, input: SourceReviewNote) {
+  return saveInventoryCorrection(rpc, verifiedRpc, storage, actor, input, addInventorySourceReview, 'Source review');
+}
+
 export function saveInventoryMark(rpc: Rpc, verifiedRpc: Rpc, storage: StudioStorage, actor: string, input: MarkCorrection) {
   return saveInventoryCorrection(rpc, verifiedRpc, storage, actor, input, correctInventoryMark, 'Marks');
 }

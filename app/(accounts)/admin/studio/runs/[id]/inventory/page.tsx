@@ -28,7 +28,7 @@ export default async function InventoryReview({ params }: { params: Promise<{ id
     const artifact = bound.find((a: any) => a.logicalKey === ref.logicalKey);
     if (artifact) pageLinks.set(JSON.stringify([ref.sourceId, ref.filePage]), `/admin/studio/pages/${artifact.id}`);
   }
-  const commands = Object.fromEntries(inventory.questions.flatMap((q: any) => q.sub_questions.map((p: any) => [p.id,{marks:randomUUID(),cognition:randomUUID()}])));
+  const commands = Object.fromEntries(inventory.questions.flatMap((q: any) => q.sub_questions.map((p: any) => [p.id,{marks:randomUUID(),cognition:randomUUID(),sourceReview:randomUUID()}])));
   return <><StaffHeader current="studio" studioEnabled creditsEnabled={creditsEnabled()} signedIn name={(account.full_name || '').split(/\s+/)[0] || undefined}/>
     <StudioShell moduleId={v.run.module_id}><InventoryWorkspace runId={id} inventory={inventory} totals={totals} artifact={{id:selected.id,sha256:info.sha256,revision:info.revision}} gate={gate} editable={v.run.state==='active'} rehearsal={v.run.purpose==='rehearsal'} pageLinks={Object.fromEntries(pageLinks)} commands={commands} decisionCommand={randomUUID()} asOf={new Date().toISOString().slice(0,10)} revisions={v.artifacts.filter((a:any)=>a.kind==='inventory')}/></StudioShell></>;
 }

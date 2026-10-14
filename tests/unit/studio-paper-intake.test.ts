@@ -49,3 +49,13 @@ test('v2 full workflow admits only two bounded correction turns and preserves pi
  }
  c.evidence.paperIntake.schema='reviseit/studio-analysis-trial-plan@1';expect(()=>paperIntakeManifest(r,1000,1,c)).toThrow();
 });
+
+test('combined plan accepts pinned memo pages only under explicit combined scope',()=>{
+ const f=fixture(),c=f.contract as any,r=f.request as any;
+ c.evidence.paperIntake.schema='reviseit/studio-analysis-trial-plan@3';c.evidence.paperIntake.inputManifest.sourceRole='combined';
+ const context=JSON.parse(r.messages[1].content[0].text);context.sourceRole='combined';r.messages[1].content[0].text=JSON.stringify(context);
+ expect(paperIntakeManifest(r,1000,1,c)).toEqual({intakePhase:'page',sourcePage:1,intakeTurn:1});
+ c.evidence.paperIntake.schema='reviseit/studio-analysis-trial-plan@2';expect(()=>paperIntakeManifest(r,1000,1,c)).toThrow();
+ c.evidence.paperIntake.schema='reviseit/studio-analysis-trial-plan@3';context.page.source_sha256=sha('other');r.messages[1].content[0].text=JSON.stringify(context);
+ expect(()=>paperIntakeManifest(r,1000,1,c)).toThrow();
+});

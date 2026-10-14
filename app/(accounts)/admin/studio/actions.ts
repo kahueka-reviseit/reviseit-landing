@@ -129,3 +129,21 @@ export async function correctInventoryCognitionAction(form: FormData): Promise<A
     return { ok: true, value };
   } catch (e) { return fail(e); }
 }
+
+/** Source notes are versioned evidence, not checkpoint approval. */
+export async function addInventorySourceReviewAction(form: FormData): Promise<ActionResult> {
+  try {
+    const { rpc, verifiedRpc, user } = await requireStudioEditor();
+    const storage = studioStorage();
+    if (!storage) return { ok: false, error: 'Studio storage is not configured.' };
+    const { saveInventorySourceReview } = await import('../../../../lib/studio/inventory-review');
+    const run = String(form.get('runId'));
+    const value = await saveInventorySourceReview(rpc, verifiedRpc, storage, user.id, {
+      runId: run, artifactId: String(form.get('artifactId')), expectedSha256: String(form.get('expectedSha256')),
+      partId: String(form.get('partId')), reason: String(form.get('reason') || ''),
+      command: String(form.get('command')), asOf: String(form.get('asOf')),
+    });
+    revalidatePath(`/admin/studio/runs/${run}`); revalidatePath(`/admin/studio/runs/${run}/inventory`);
+    return { ok: true, value };
+  } catch (e) { return fail(e); }
+}

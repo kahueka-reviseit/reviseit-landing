@@ -1,9 +1,9 @@
 import { beforeEach, expect, test, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { InventoryDecisionForm, MarkCorrectionForm, CognitiveCorrectionForm } from '../../app/(accounts)/admin/studio/inventory-forms';
-import { correctInventoryMarkAction, correctInventoryCognitionAction, reviewInventoryAction } from '../../app/(accounts)/admin/studio/actions';
+import { SourceReviewForm, InventoryDecisionForm, MarkCorrectionForm, CognitiveCorrectionForm } from '../../app/(accounts)/admin/studio/inventory-forms';
+import { addInventorySourceReviewAction, correctInventoryMarkAction, correctInventoryCognitionAction, reviewInventoryAction } from '../../app/(accounts)/admin/studio/actions';
 vi.mock('next/navigation',()=>({useRouter:()=>({refresh:vi.fn()})}));
-vi.mock('../../app/(accounts)/admin/studio/actions',()=>({correctInventoryMarkAction:vi.fn(),correctInventoryCognitionAction:vi.fn(),reviewInventoryAction:vi.fn()}));
+vi.mock('../../app/(accounts)/admin/studio/actions',()=>({addInventorySourceReviewAction:vi.fn(),correctInventoryMarkAction:vi.fn(),correctInventoryCognitionAction:vi.fn(),reviewInventoryAction:vi.fn()}));
 beforeEach(()=>{cleanup();vi.clearAllMocks();});
 test('mark correction sends the exact revision and displays stale-edit errors without retry or approval',async()=>{
  vi.mocked(correctInventoryMarkAction).mockResolvedValue({ok:false,error:'Inventory revision changed. Refresh before correcting it.'});
@@ -43,4 +43,14 @@ test('cognitive save shows validation errors without retrying or changing marks'
  render(<CognitiveCorrectionForm runId="run" artifactId="revision" expectedSha256="digest" partId="1.3" category="Apply" reason="Earlier reason preserved for editing." command="command" asOf="2026-10-13"/>);
  fireEvent.submit(screen.getByRole('button',{name:'Save Bloom’s correction'}).closest('form')!);
  await waitFor(()=>expect(screen.getByRole('alert')).toHaveTextContent(/valid Bloom’s level/));expect(correctInventoryCognitionAction).toHaveBeenCalledTimes(1);expect(correctInventoryMarkAction).not.toHaveBeenCalled();
+});
+
+test('source findings save the bound inventory without granting checkpoint approval',async()=>{
+ vi.mocked(addInventorySourceReviewAction).mockResolvedValue({ok:true});
+ render(<SourceReviewForm runId="run" artifactId="revision" expectedSha256="digest" partId="1.3" command="command" asOf="2026-10-14"/>);
+ fireEvent.change(screen.getByLabelText('Source finding for 1.3'),{target:{value:'Paper page 2 and memorandum page 1 disagree.'}});
+ fireEvent.submit(screen.getByRole('button',{name:'Save source finding'}).closest('form')!);
+ await waitFor(()=>expect(screen.getByRole('status')).toHaveTextContent('Approval is still required'));
+ const form=vi.mocked(addInventorySourceReviewAction).mock.calls[0][0];expect(form.get('artifactId')).toBe('revision');expect(form.get('expectedSha256')).toBe('digest');
+ expect(reviewInventoryAction).not.toHaveBeenCalled();expect(screen.getByRole('button',{name:'Save source finding'})).toBeDisabled();
 });

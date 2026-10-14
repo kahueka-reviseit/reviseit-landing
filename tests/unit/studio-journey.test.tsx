@@ -7,7 +7,7 @@ import {workspace,run,runId,runView,execution} from '../fixtures/studio-ui';
 import {checkpointStatus,queueStatus} from '../../lib/studio/presentation';
 import {reviewInventoryAction} from '../../app/(accounts)/admin/studio/actions';
 vi.mock('next/navigation',()=>({useRouter:()=>({refresh:vi.fn()})}));
-vi.mock('../../app/(accounts)/admin/studio/actions',()=>({correctInventoryMarkAction:vi.fn(),correctInventoryCognitionAction:vi.fn(),reviewInventoryAction:vi.fn()}));
+vi.mock('../../app/(accounts)/admin/studio/actions',()=>({addInventorySourceReviewAction:vi.fn(),correctInventoryMarkAction:vi.fn(),correctInventoryCognitionAction:vi.fn(),reviewInventoryAction:vi.fn()}));
 beforeEach(()=>{cleanup();vi.clearAllMocks();});
 test('question and attention navigation select the correct source part without changing or approving data',()=>{
  render(<InventoryWorkspace {...workspace}/>);
@@ -34,4 +34,13 @@ test('queue filters use checkpoint readiness, not extraction success alone',()=>
 test('uncertain provider result requires reconciliation without a silent retry action',()=>{
  render(<ExecutionSummary runId={runId} execution={{...execution,budget:{...execution.budget,heldMicro:500000}}} view={{...runView,providerOperations:[{attempts:[{dispatch_state:'uncertain'}]}]}}/>);
  expect(screen.getByRole('heading',{name:'Reconcile outstanding execution before retrying'})).toBeTruthy();expect(screen.queryByRole('button',{name:/retry/i})).toBeNull();expect(screen.getByText(/never silently sent again/)).toBeTruthy();
+});
+
+test('memorandum cover differences stay visible even when all marks reconcile',()=>{
+ const inventory={...workspace.inventory,identity_evidence:{requires_review:true,memorandum_differences:[{source_id:'memo',file_page:15,identity:{board:'Synthetic Board',paper_designation:'Bilingual marking guidelines',period:'March',year:2025}}]}};
+ render(<InventoryWorkspace {...workspace} inventory={inventory} totals={{...workspace.totals,marks:100,printedTotal:100,unknownMarks:0}}/>);
+ expect(screen.getByRole('heading',{name:'Memorandum identity needs review'})).toBeTruthy();
+ expect(screen.getByText(/Bilingual marking guidelines/)).toBeTruthy();
+ expect(screen.getByRole('button',{name:'Record inventory decision'})).toBeDisabled();
+ expect(reviewInventoryAction).not.toHaveBeenCalled();
 });

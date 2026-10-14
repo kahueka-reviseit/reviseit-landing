@@ -21,3 +21,10 @@ test('review controls retain uncertainty and never silently approve',async({page
  const decision=page.getByRole('button',{name:'Record inventory decision'});await expect(decision).toBeDisabled();await page.getByRole('combobox',{name:'Decision',exact:true}).selectOption('approved');await page.getByLabel('Review rationale').fill('Synthetic evidence reviewed.');await expect(decision).toBeDisabled();await page.getByRole('checkbox').check();await expect(decision).toBeEnabled();
  await page.getByRole('button',{name:'Next',exact:true}).click();await expect(page.getByRole('heading',{name:'Review part 2.1'})).toBeVisible();
 });
+
+test('source review findings remain separate from checkpoint approval',async({page})=>{
+ await page.goto('/?screen=inventory');await page.getByText('Record source finding',{exact:true}).click();
+ await page.getByLabel('Source finding for 1.1').fill('Paper and memorandum disagree; retain this finding.');
+ await page.getByRole('button',{name:'Save source finding'}).click();await expect(page.getByRole('alert')).toHaveText('Preview only: no correction was saved.');
+ await expect(page.getByRole('button',{name:'Record inventory decision'})).toBeDisabled();
+});

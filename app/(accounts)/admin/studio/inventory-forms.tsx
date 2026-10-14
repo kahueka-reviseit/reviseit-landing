@@ -1,7 +1,7 @@
 'use client';
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { correctInventoryMarkAction, correctInventoryCognitionAction, reviewInventoryAction, type ActionResult } from './actions';
+import { addInventorySourceReviewAction, correctInventoryMarkAction, correctInventoryCognitionAction, reviewInventoryAction, type ActionResult } from './actions';
 import { button } from '../../system/button';
 import s from './studio.module.css';
 import { COGNITIVE_CATEGORIES } from '../../../../lib/studio/cognitive-classification';
@@ -43,5 +43,15 @@ export function CognitiveCorrectionForm({ runId, artifactId, expectedSha256, par
     <label>Bloom’s level for {partId}<select name="category" defaultValue={category ?? ''}><option value="">Unresolved</option>{category && !(COGNITIVE_CATEGORIES as readonly string[]).includes(category) && <option value={category} disabled>{category} (existing label)</option>}{COGNITIVE_CATEGORIES.map(name => <option key={name} value={name}>{name}</option>)}</select></label>
     <label>Reason for Bloom’s classification of {partId}<textarea name="reason" required minLength={10} maxLength={2000} rows={3} defaultValue={reason}/></label>
     <p className={s.note}>Recorded as a reviewer judgement, or unresolved if the Bloom’s level is unknown. Earlier classifications remain in revision history.</p>
+  </SubmitForm>;
+}
+
+export function SourceReviewForm({ runId, artifactId, expectedSha256, partId, command, asOf }: {
+  runId: string; artifactId: string; expectedSha256: string; partId: string; command: string; asOf: string;
+}) {
+  return <SubmitForm action={addInventorySourceReviewAction} label="Save source finding" success="Finding saved in a new inventory revision. Approval is still required.">
+    {Object.entries({runId,artifactId,expectedSha256,partId,command,asOf}).map(([name,value])=><input key={name} type="hidden" name={name} value={value}/>)}
+    <label>Source finding for {partId}<textarea name="reason" required minLength={10} maxLength={2000} rows={4}/></label>
+    <p className={s.note}>Cite the source and page. This note reaches matching and drafting with the approved inventory. It does not change the original transcription, marks or Bloom’s level.</p>
   </SubmitForm>;
 }

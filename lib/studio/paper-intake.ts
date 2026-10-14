@@ -7,7 +7,10 @@ export function paperIntakeManifest(request:any,bytes:number,images:number,contr
  const plan=contract.evidence?.paperIntake;
  if(!plan)return {};
  const phase=request.pins?.phase,limit=plan.phaseLimits?.[phase];
- const corrections=plan.schema==='reviseit/studio-analysis-trial-plan@2';
+ const combined=plan.schema==='reviseit/studio-analysis-trial-plan@3';
+ const sourceRole=combined?'combined':'question_paper';
+ if(combined&&plan.inputManifest?.sourceRole!=='combined')fail();
+ const corrections=combined||plan.schema==='reviseit/studio-analysis-trial-plan@2';
  const history=request.messages?.slice(2)??[];
  if(history.length%2||history.length>(corrections?4:0))fail();
  for(let i=0;i<history.length;i+=2){
@@ -30,7 +33,7 @@ export function paperIntakeManifest(request:any,bytes:number,images:number,contr
  let context:any;try{context=JSON.parse(content[0].text);}catch{fail();}
  if(phase==='page'){
   const page=context.page,n=page?.file_page,expected=plan.inputManifest.pages?.[n-1];
-  if(!Number.isInteger(n)||!expected||expected.filePage!==n||context.sourceRole!=='question_paper'
+  if(!Number.isInteger(n)||!expected||expected.filePage!==n||context.sourceRole!==sourceRole
     ||page.source_sha256!==plan.inputManifest.sourceSha256||page.render_sha256!==expected.renderSha256
     ||page.text_sha256!==expected.textSha256||typeof page.text!=='string'||hash(page.text)!==expected.textSha256)fail();
   const url=content[1]?.image_url?.url;
@@ -39,7 +42,7 @@ export function paperIntakeManifest(request:any,bytes:number,images:number,contr
  }
  if(context.module_id!==plan.moduleId||context.source_sha256!==plan.inputManifest.sourceSha256
    ||!Array.isArray(context.source_files)||context.source_files.length!==1
-   ||context.source_files[0].sha256!==plan.inputManifest.sourceSha256||context.source_files[0].role!=='question_paper'
+   ||context.source_files[0].sha256!==plan.inputManifest.sourceSha256||context.source_files[0].role!==sourceRole
    ||context.source_files[0].id!==context.primary_source_id
    ||context.source_files[0].pages!==plan.inputManifest.pageCount
    ||context.curriculum_policy?.sha256!==plan.inputManifest.policySha256

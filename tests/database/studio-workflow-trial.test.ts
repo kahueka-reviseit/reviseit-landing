@@ -7,9 +7,9 @@ let snapshot:string;
 beforeAll(async()=>{await db.init();await ok(op(),'studio_enrol_module',{p_module:MODULE,p_subject_adapter:'caps-physical-sciences@1'});
  snapshot=(await importSnapshot(op(),MODULE,baseBank)).snapshotId;await accept(op(),MODULE,snapshot,null);},60000);
 beforeEach(async()=>{await db.begin();return()=>db.rollback();});afterAll(()=>db.close());
-async function start(pages=17,purpose='rehearsal',change:(p:any)=>void=()=>{},scanned=true){
+async function start(pages=17,purpose='rehearsal',change:(p:any)=>void=()=>{},scanned=true,role='question_paper'){
  const id='paper-'+key();await db.sql('insert into private.studio_provider_profiles values ($1,$2,$3,$4,true)',[id,'live','synthetic','synthetic']);
- const b=await blob(ed(),MODULE,'synthetic paper');const src=await ok(ed(),'studio_create_source',{p_module:MODULE,p_title:'Synthetic paper trial',p_files:[{blobId:b,role:'question_paper',filename:'synthetic.pdf'}],p_identity:{},p_command:key()});
+ const b=await blob(ed(),MODULE,'synthetic paper');const src=await ok(ed(),'studio_create_source',{p_module:MODULE,p_title:'Synthetic paper trial',p_files:[{blobId:b,role,filename:'synthetic.pdf'}],p_identity:{},p_command:key()});
  const r=await ok(ed(),'studio_start_run',{p_source:src.sourceId,p_expected_source_revision:1,p_purpose:purpose,p_snapshot:snapshot,p_skill_contract:SKILL,p_profile:id,p_command:key()});
  const i=(await db.sql('select * from private.studio_run_inputs where run_id=$1',[r.runId]))[0];
  const source=(await db.sql('select * from private.studio_blobs where id=$1',[b]))[0];
@@ -122,4 +122,32 @@ test('v2 intake correction needs previous settled turn, same operation family an
  const third=await prepared(cl,r.c,1,'s1_extract:page:synthetic:turn:3');await ok(svc(),'studio_budget_reserve',{...third.args,p_request_manifest:{...third.m,intakeTurn:3}});await settle(third);
  const fourth=await prepared(cl,r.c,1,'s1_extract:page:synthetic:turn:4');expect(await refused(svc(),'studio_budget_reserve',{...fourth.args,p_request_manifest:{...fourth.m,intakeTurn:4}})).toMatch(/correction turn/);
  expect((await ok(ed(),'studio_execution_view',{p_run:r.run})).budget.settledMicro).toBe(3);
+});
+
+test('combined paper-and-memo plans require explicit v3 scope and preserve the forty-page boundary',async()=>{
+ const combined=(p:any)=>{p.schema='reviseit/studio-analysis-trial-plan@3';p.inputManifest.sourceRole='combined';p.runtime={requestBytes:1500000,turns:3,rejections:2,callSeconds:300,batchSeconds:960,stageSeconds:7200};};
+ const r=await start(21,'rehearsal',combined,true,'combined');await ok(op(),'studio_live_authorise_workflow',r.args);
+ const cl=await claim(r.run,r.c);expect(cl.stageKey).toBe('S1_extract');
+ const p=await prepared(cl,r.c,21,'s1:page:21:turn:1');await ok(svc(),'studio_budget_reserve',{...p.args,p_request_manifest:{...p.m,intakeTurn:1}});
+ for(const [pages,role,change] of [[41,'combined',combined],[21,'question_paper',combined],[21,'combined',(p:any)=>{}]] as const){
+  const bad=await start(pages,'rehearsal',change,true,role);expect(await refused(op(),'studio_live_authorise_workflow',bad.args)).toMatch(/refused/);
+ }
+});
+
+
+test('larger combined reconciliation needs its exact grant and never widens older grants',async()=>{
+ const combined=(large:boolean)=>(p:any)=>{p.schema='reviseit/studio-analysis-trial-plan@3';p.inputManifest.sourceRole='combined';p.runtime={requestBytes:1500000,turns:3,rejections:2,callSeconds:300,batchSeconds:960,stageSeconds:7200};if(large)p.phaseLimits.reconcile.requestBytes=1048576;};
+ for(const large of [false,true]){
+  const r=await start(1,'rehearsal',combined(large),true,'combined');await ok(op(),'studio_live_authorise_workflow',r.args);const cl=await claim(r.run,r.c);
+  const page=await prepared(cl,r.c,1,'s1:page:1:turn:1');await ok(svc(),'studio_budget_reserve',{...page.args,p_request_manifest:{...page.m,intakeTurn:1}});await settle(page);
+  const final=await prepared(cl,r.c,0,'s1:reconcile:turn:1');
+  const args={...final.args,p_request_manifest:{...final.m,intakeTurn:1,requestBytes:300000,inputTokenBound:300000}};
+  if(large){
+   expect(await refused(svc(),'studio_budget_reserve',{...args,p_request_manifest:{...args.p_request_manifest,requestBytes:1048577,inputTokenBound:1048577}})).toMatch(/reconciliation phase limit/);
+   await ok(svc(),'studio_budget_reserve',args);
+  }else expect(await refused(svc(),'studio_budget_reserve',args)).toMatch(/reconciliation phase limit/);
+ }
+ for(const bytes of [null,1048577]){const bad=await start(1,'rehearsal',(p:any)=>{combined(true)(p);if(bytes===null)delete p.phaseLimits;else p.phaseLimits.reconcile.requestBytes=bytes;},true,'combined');expect(await refused(op(),'studio_live_authorise_workflow',bad.args)).toMatch(/contract refused/);}
+ const old=await start(1,'rehearsal',(p:any)=>{p.phaseLimits.reconcile.requestBytes=1048576;});
+ expect(await refused(op(),'studio_live_authorise_workflow',old.args)).toMatch(/contract refused/);
 });

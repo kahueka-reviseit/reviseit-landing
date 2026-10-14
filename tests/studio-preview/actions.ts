@@ -19,3 +19,5 @@ export async function cancelReleasePreparation(){return {ok:true as const};}
 export async function stageRelease(){return {ok:true as const};}
 export async function reviewRelease(){return {ok:true as const};}
 export async function activateRelease(){return {ok:true as const};}
+
+export const addInventorySourceReviewAction=correctInventoryMarkAction;
