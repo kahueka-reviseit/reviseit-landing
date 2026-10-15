@@ -26,6 +26,7 @@ export default async function RunDetail({ params, history = false }: { params: P
   const recorded = budget?.mode === 'recorded';
   const dollars = (micro: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 6 }).format(micro / 1_000_000);
   const pins = v.inputs.at(-1);
+  const reusedIntake = v.artifacts.find((a: any) => a.kind === 'inventory' && a.state === 'current')?.meta?.reusedIntake;
   const source = v.run.source_id ? await call<any>(rpc,'studio_source_view',{p_source:v.run.source_id}).catch(()=>null) : null;
   return <><StaffHeader current="studio" studioEnabled creditsEnabled={creditsEnabled()} signedIn name={(account.full_name || '').split(/\s+/)[0] || undefined}/>
     <StudioShell current="queue" moduleId={v.run.module_id}>
@@ -33,6 +34,7 @@ export default async function RunDetail({ params, history = false }: { params: P
         {v.run.purpose === 'rehearsal' ? 'Isolated rehearsal. This run cannot update the accepted bank or a live release.' : 'Canonical run pinned to the accepted bank snapshot.'} State: {v.run.state}. Input revision {v.run.current_input_revision}. {source?.title}
       </StudioHeading>
       {v.run.source_id && <Link href={`/admin/studio/sources/${v.run.source_id}`}>Open past paper and original files →</Link>}
+      {reusedIntake && isUuid(reusedIntake.runId) && <section className={s['studio-panel']}><h2>Reviewed inventory reused</h2><p>The inventory and source-page evidence were copied unchanged from <Link href={`/admin/studio/runs/${reusedIntake.runId}`}>the earlier analysis</Link>. This run did not scan the paper again. Its inventory checkpoint must be recorded before matching can start.</p></section>}
       {!history && <Checkpoints runId={id} views={views} decisions={v.decisions}/>}
       {history && <ExecutionSummary runId={id} view={v} execution={execution}/>}
       {history && <>

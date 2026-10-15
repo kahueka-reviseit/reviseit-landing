@@ -11,6 +11,9 @@ import { evidenceInfo, evidencePart, finishEvidence, EVIDENCE_PART } from './pro
  * The worker proposes outputs; it never transitions reviews. Lease fencing happens in the database.
  */
 export const MAX_GATEWAY_BODY = 2_100_000;
+// Provider envelopes already encode their wire body. Budget admission avoids a
+// second base64 expansion while ordinary uploads retain their smaller bound.
+export const MAX_BUDGET_BODY = 4_250_000;
 export const MAX_CHUNK = 1_500_000;
 const WORKER = /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$/;
 const LOGICAL = /^[a-z][a-z0-9_]*(:[A-Za-z0-9_.-]+){0,4}$/;
@@ -27,11 +30,13 @@ export function authorised(header: string | null, token: string | undefined) {
 }
 
 async function readBody(request: Request) {
-  if (Number(request.headers.get('content-length') || 0) > MAX_GATEWAY_BODY) throw new Error('Too large');
+  if (Number(request.headers.get('content-length') || 0) > MAX_BUDGET_BODY) throw new Error('Too large');
   const reader = request.body?.getReader(); if (!reader) throw new Error('Missing body');
   let size = 0; const chunks: Uint8Array[] = [];
-  while (true) { const r = await reader.read(); if (r.done) break; size += r.value.length; if (size > MAX_GATEWAY_BODY) { await reader.cancel(); throw new Error('Too large'); } chunks.push(r.value); }
-  return JSON.parse(Buffer.concat(chunks).toString('utf8'));
+  while (true) { const r = await reader.read(); if (r.done) break; size += r.value.length; if (size > MAX_BUDGET_BODY) { await reader.cancel(); throw new Error('Too large'); } chunks.push(r.value); }
+  const value = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+  if (size > MAX_GATEWAY_BODY && (value?.action !== 'budget_reserve' || typeof value.requestUtf8 !== 'string')) throw new Error('Too large');
+  return value;
 }
 const lease = (v: any) => isUuid(v.attemptId) && isUuid(v.lease);
 const fenced = (v: any) => ({ p_attempt: v.attemptId, p_lease: v.lease });
@@ -131,8 +136,13 @@ export async function handleStudioGateway(request: Request, deps: GatewayDeps): 
         if (!lease(v) || typeof v.reason !== 'string') break;
         return json({ result: await call(rpc, 'studio_mark_uncertain', { ...fenced(v), p_reason: v.reason.slice(0, 1000) }) });
       case 'budget_reserve': {
-        if (!lease(v) || !isUuid(v.providerAttemptId) || typeof v.request !== 'string' || !/^[A-Za-z0-9+/]+=*$/.test(v.request)) break;
-        const bytes=Buffer.from(v.request,'base64');
+        if (!lease(v) || !isUuid(v.providerAttemptId)) break;
+        const utf8 = typeof v.requestUtf8 === 'string' && v.request === undefined;
+        const legacy = v.requestUtf8 === undefined && typeof v.request === 'string' && /^[A-Za-z0-9+/]+=*$/.test(v.request);
+        if (!utf8 && !legacy) break;
+        const bytes = Buffer.from(utf8 ? v.requestUtf8 : v.request, utf8 ? 'utf8' : 'base64');
+        if (utf8 && bytes.toString('utf8') !== v.requestUtf8) break;
+        if (bytes.length < 1 || bytes.length > 4 * 1024 * 1024) break;
         const context=await call<any>(rpc,'studio_budget_context',fenced(v));
         const manifest=budgetManifest(bytes,context.contract);
         const reservation=await call<any>(rpc,'studio_budget_reserve',{...fenced(v),p_provider_attempt:v.providerAttemptId,p_request_manifest:manifest});
